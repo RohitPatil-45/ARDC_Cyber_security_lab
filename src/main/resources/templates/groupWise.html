@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Group wise VM Report</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">VM Activity</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h1 class="card-title" style="padding-top: 10px; font-weight: bold;">[[${pageTitle}]]</h1>
+										</div>
+									</div>
+								</div>
+								<form th:action="${'/report/groupWiseReport'}" th:method="POST"
+								enctype="multipart/form-data" th:object="${objEnt}">
+									<div class="card-body" id="reportForm">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label>Group</label>
+													<select tabindex="1" id="groupName" th:field="*{groupName}"
+														required name="groupName"
+														class="form-control" multiple="multiple"
+														style="width: 100%;">
+														<option th:each="ob:${groupList}"
+															th:value="${ob[1]}" th:text="${ob[1]}" /></option>
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" id="vmActivityBtn" class="btn btn-primary">Generate</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.container-fluid -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+	<!-- <script th:src="@{/custom_js/vmReport.js}"></script> -->
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/multiselect/bootstrap-multiselect.min.js}"></script>
+</body>
+<script type="text/javascript">
+	$('document').ready(function() {
+		
+		$('#groupName').multiselect({
+			enableFiltering: true,
+			includeSelectAllOption: true,
+			buttonWidth: '100%',
+			maxHeight: 350,
+
+		});
+		
+		$('#groupName').keyup(function(){
+	        var group = $(this).val();
+	        if(group != ''){
+	        	this.setCustomValidity('');
+	            $('#vmActivityBtn').prop('disabled', false);
+	        } else {
+	        	this.setCustomValidity('Please select Group');
+	        }
+	    });
+		
+		
+	});
+	
+</script>
+</html>

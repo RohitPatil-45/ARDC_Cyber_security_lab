@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Resource Utilization Per VM</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Resource Utilization</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<!-- <div class="col-md-2">
+											<a th:href="@{'/users/view/'}"
+												class="btn btn-block bg-gradient-primary">Report</a>
+										</div> -->
+									</div>
+								</div>
+								<form th:action="@{'/'+${action_name}+'/resizeTab'}"
+									method="post" enctype="multipart/form-data"
+									th:object="${objEnt}">
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label>Report Date range: </label>
+
+													<div class="input-group">
+														<button type="button" class="btn btn-default float-right"
+															id="daterange-btn" name="daterange-btn">
+															<i class="far fa-calendar-alt"></i> Date range picker <i
+																class="fas fa-caret-down"></i>
+														</button>
+														<input type="text" id='from_date' name='from_date'
+															class="form-control" readonly /> <input type="text"
+															id='to_date' name='to_date' class="form-control" readonly />
+													</div>
+												</div>
+
+												<div class="form-group">
+													<label>Instance name</label>
+													<select tabindex="1" id="instance_name"
+														th:field="*{instance_name}" required name="instance_name"
+														class="form-control select2"
+														style="width: 100%;">
+														<option value='-1'>SELECT</option>
+														<option th:each="ob:${instanceNameList}"
+															th:value="${ob[0]}" th:text="${ob[1]}" /></option>
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" id="adduserForm" class="btn btn-primary">Generate</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.container-fluid -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+</body>
+
+</html>

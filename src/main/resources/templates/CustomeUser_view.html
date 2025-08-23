@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>View Users</title>
+<head th:include="templateListing :: headFragment"></head>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header_bk :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>View&nbsp;[[${titleofpage}]]</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">View&nbsp;[[${titleofpage}]]</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${titleofpage}]]&nbsp;Details</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/users/new/'}"
+												class="btn btn-block bg-gradient-primary">Add</a>
+										</div>
+									</div>
+									<div th:if="${message != null}"
+										class="alert alert-success alert-dismissible fade show text-center message"
+										role="alert">
+										[[${message}]]
+										<button type="button" class="close btn-sm"
+											data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+								<div class="card-body" th:if="${listObj != null }">
+									<table id="example1" class="table table-bordered table-striped">
+										<thead class="thead-light">
+											<tr>
+												<th scope="col">Sr</th>
+												<th scope="col">Name</th>
+												<th scope="col">Username</th>
+												<!-- <th scope="col">User Type</th> -->
+												<th scope="col">Email Id</th>
+												<th scope="col">Mobile No</th>
+
+												<th scope="col">Group Name</th>
+												<!-- <th scope="col">Generation Type</th>
+												<th scope="col">Switch</th> -->
+
+												<th scope="col">Actions</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="user, userStat : ${listObj}">
+												<th scope="row" th:text="${userStat.count}">1</th>
+												<td>[[${user.name}]]</td>
+												<td>[[${user.userName}]]</td>
+
+												<td>[[${user.email}]]</td>
+												<td>[[${user.mobileNo}]]</td>
+												<td
+													th:text="${user.groupName == null ? 'No Group' : user.groupName == '' ? 'No Group' : user.groupName}"></td>
+												<!-- <td>[[${user.generationType}]]</td>
+												<td>[[${user.switch_id.getSwitch_name}]]</td> -->
+
+												<td><a th:href="@{'/users/edit/' + ${user.userId}}"
+													title="Edit this tutorial" class="fa fa-edit"></a> &nbsp; <a
+													th:href="@{'/users/delete/' + ${user.userId}}"
+													th:tutorialTitle="${user.name}" id="btnDelete"
+													title="Delete this tutorial" class="fa fa-trash btn-delete"></a>
+
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div class="modal fade text-center" id="confirmModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Delete Confirmation</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<span id="confirmText"></span>
+					</div>
+					<div class="modal-footer">
+						<a type="button" id="yesBtn" class="btn btn-danger">Yes</a>
+						<button type="button" class="btn btn-secondary"
+							data-dismiss="modal">No</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="templateListing :: jsscript"></div>
+	<script type="text/javascript">
+		$(document).ready(
+				function() {
+					$(".btn-delete").on(
+							"click",
+							function(e) {
+								e.preventDefault();
+								link = $(this);
+
+								tutorialTitle = link.attr("tutorialTitle");
+								$("#yesBtn").attr("href", link.attr("href"));
+								$("#confirmText").html(
+										"Do you want to delete the User \<strong\>"
+												+ tutorialTitle
+												+ "\<\/strong\>?");
+								$("#confirmModal").modal();
+							});
+
+					$("#btnClear").on("click", function(e) {
+						e.preventDefault();
+						$("#keyword").text("");
+						window.location = "[[@{/tutorials}]]";
+					});
+
+				});
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<title>Openstack Request</title>
+
+<style type="text/css">
+th {
+	text-align: center;
+}
+
+td {
+	text-align: center;
+}
+</style>
+<head th:include="templateListing :: headFragment">
+</head>
+
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>View request</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">View request</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">Openstack
+												raised request details</h3>
+										</div>
+
+									</div>
+									<div th:if="${message != null}"
+										class="alert alert-success alert-dismissible fade show text-center message"
+										role="alert">
+										[[${message}]]
+										<button type="button" class="close btn-sm"
+											data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div th:if="${error != null}"
+										class="alert alert-danger alert-dismissible fade show text-center message"
+										role="alert">
+										[[${error}]]
+										<button type="button" class="close btn-sm"
+											data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+								<div class="card-body" th:if="${listObj != null }">
+									<table id="example1" class="table table-bordered table-striped">
+										<thead class="thead-light" style="text-align: center;">
+											<tr>
+												<th scope="col">Sr No.</th>
+												<th scope="col">Instance</th>
+												<th scope="col">Image</th>
+												<th scope="col">Flavor</th>
+												<th scope="col">Request Type</th>
+												<th scope="col">Description</th>
+												<th scope="col">Request By</th>
+												<th scope="col">Request on</th>
+												<th scope="col">Admin approval status</th>
+												<th scope="col">Final approval status</th>
+												<th scope="col">Approver</th>
+												<th scope="col">Approved on</th>
+												<th scope="col"
+													sec:authorize="hasAnyRole('ROLE_SUPERADMIN','ROLE_ADMIN')">Action</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="obj, stat : ${listObj}">
+												<th scope="row" style="text-align: center;"
+													th:text="${stat.count}">1</th>
+												<th>[[${obj.instanceName}]]</th>
+												<th>[[${obj.image}]]</th>
+												<td>[[${obj.flavor}]]</td>
+												<td>[[${obj.requestType}]]</td>
+												<td>[[${obj.description}]]</td>
+												<td>[[${obj.requestBy}]]</td>
+												<td>[[${obj.requestOn}]]</td>
+												<td>[[${obj.adminApprovalStatus}]]</td>
+												<td>[[${obj.finalApprovalStatus}]]</td>
+												<td>[[${obj.approverName}]]</td>
+												<td>[[${obj.approvedOn}]]</td>
+												<td
+													sec:authorize="hasAnyRole('ROLE_SUPERADMIN','ROLE_ADMIN')">
+
+													<a sec:authorize="hasRole('ROLE_SUPERADMIN')"
+													th:if="${obj.finalApprovalStatus == 'Pending' && obj.requestType == 'instance create'}"
+													class="fa fa-thumbs-up approve-btn" data-toggle="modal"
+													style="color: green;" th:data-request-id="${obj.id}"
+													data-target="#approvalModal"></a> <a
+													sec:authorize="hasRole('ROLE_ADMIN')"
+													th:if="${obj.adminApprovalStatus == 'Pending'}"
+													class="fa fa-thumbs-up adminApprove-btn"
+													data-toggle="modal" style="color: green;"
+													th:data-request-id="${obj.id}" data-target="#adminApproval"></a>
+
+													<!-- 	<a class="fa fa-eye showDetails" data-toggle="modal"
+													onclick="modaltriggeronclick()"
+													data-target="#currentVMModal" th:data-id="${obj.id}"
+													th:data-instance-name="${obj.image}"
+													th:data-vcpu="${obj.flavor}"
+													th:data-ram="${obj.requestType}"
+													th:data-ssd-disk="${obj.requestBy}"
+													th:data-created-on="${obj.requestOn}"
+													th:data-os="${obj.adminApprovalStatus}"
+													th:data-switch="${obj.finalApprovalStatus}"
+													th:data-location="${obj.approverName}"
+													th:data-requestType="${obj.approvedOn}"> </a></td> -->
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div class="modal fade text-center" id="approvalModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Approval</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="action" class="float-left">Action</label> <select
+								tabindex="1" id="approvalAction" class="form-control select2"
+								style="width: 100%;">
+								<option value='-1'>SELECT</option>
+								<option value='Approved'>Approve</option>
+								<option value='Reject'>Reject</option>
+							</select> <br> <label id="remark1" class="float-left"
+								style="display: none">Remark</label>
+							<textarea type="text" id="remark" class="form-control"
+								style="display: none" required></textarea>
+
+							<label id="ProjectLabel" class="float-left" style="display: none">
+								Projects</label> <select tabindex="1" id="ProjectZone" required
+								name="ProjectZone" class="form-control"
+								data-placeholder="Select Project"
+								style="width: 100%; display: none;">
+								<option value='' selected disabled
+									title="Please select a valid option">SELECT</option>
+								<option th:each="ob:${ProjectsList}" th:value="${ob[0]}"
+									th:text="${ob[1]}" /></option>
+
+							</select> <label id="zoneLabel" class="float-left" style="display: none">
+								Availability Zone</label> <select tabindex="1" id="availabilityZone"
+								required name="availabilityZone" class="form-control"
+								data-placeholder="Select Availability Zone"
+								style="width: 100%; display: none;">
+								<option value='' selected disabled
+									title="Please select a valid option">SELECT</option>
+								<option th:each="ob:${availabilityZoneList}" th:value="${ob[0]}"
+									th:text="${ob[0]}" /></option>
+
+							</select> <br> <label id="networkLabel" class="float-left"
+								style="display: none">Network</label> <select tabindex="1"
+								id="network" required name="network" class="form-control"
+								data-placeholder="Select Network"
+								style="width: 100%; display: none;"
+								title="Please select a valid option">
+								<option value='' selected disabled>SELECT</option>
+								<option th:each="ob:${networkList}" th:value="${ob[0]}"
+									th:text="${ob[1]}" /></option>
+							</select> <br> <label id="keyPairLabel" class="float-left"
+								style="display: none">Key Pair</label> <select tabindex="1"
+								id="keyPair" required name="keyPair" class="form-control"
+								data-placeholder="Select Key Pair"
+								style="width: 100%; display: none;"
+								title="Please select a valid option">
+								<option value='' selected disabled>SELECT</option>
+								<option th:each="ob:${keyPairList}" th:value="${ob[0]}"
+									th:text="${ob[0]}" /></option>
+							</select> <br> <label id="securityGroupNameLabel" class="float-left"
+								style="display: none">Security Group</label> <select
+								tabindex="1" id="securityGroupName" required
+								name="securityGroupName" class="form-control"
+								data-placeholder="Select Security Group"
+								style="width: 100%; display: none;"
+								title="Please select a valid option">
+								<option value='' selected disabled>SELECT</option>
+								<option th:each="ob:${securityGroupList}" th:value="${ob[1]}"
+									th:text="${ob[1]}" /></option>
+							</select>
+
+
+						</div>
+						<input type="hidden" id="requestIdField">
+						<div class="form-group">
+							<button class="btn btn-success"
+								th:onclick="callVMrejectbysuper()" id="callVMrejectbysuperid"
+								style="display: none;">
+								Submit <i
+									style="margin-left: 10px; color: yellow; display: none"
+									id="actionSpinnerhere23" class='fa fa-spinner fa-spin'></i>
+							</button>
+							<button class="btn btn-success"
+								th:onclick="callVMApprovalbysuper()"
+								id="callVMApprovalbysuperid" style="display: none;">
+								Submit <i
+									style="margin-left: 10px; color: yellow; display: none"
+									id="actionSpinnerhere2" class='fa fa-spinner fa-spin'></i>
+							</button>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- Admin Approval -->
+		<div class="modal fade text-center" id="adminApproval">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Approval</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="action" class="float-left">Action</label> <select
+								tabindex="1" id="adminApprovalAction"
+								class="form-control select2" style="width: 100%;">
+								<option value='-1'>SELECT</option>
+								<option value='Approved'>Approve</option>
+								<option value='Reject'>Reject</option>
+							</select> <br> <label id="adminRemark" class="float-left"
+								style="display: none">Remark</label>
+							<textarea type="text" id="adminTextArea" class="form-control"
+								style="display: none" required></textarea>
+						</div>
+						<input type="hidden" id="adminRequestIdField">
+						<div class="form-group">
+							<button class="btn btn-success" th:onclick="callAdminApproval()">
+								Submit <i
+									style="margin-left: 10px; color: yellow; display: none"
+									id="adminSpinner" class='fa fa-spinner fa-spin'></i>
+							</button>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Admin Approval -->
+
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="templateListing :: jsscript"></div>
+	<script th:src="@{/custom_js/openstackCloudInstance.js}"></script>
+
+	<script type="text/javascript">
+		$(document).ready(
+				function() {
+					$(".btn-delete").on(
+							"click",
+							function(e) {
+								e.preventDefault();
+								link = $(this);
+								tutorialTitle = link.attr("tutorialTitle");
+								$("#yesBtn").attr("href", link.attr("href"));
+								$("#confirmText").html(
+										"Do you want to delete the VM \<strong\>"
+												+ tutorialTitle
+												+ "\<\/strong\>?");
+								$("#approvalModal").modal();
+							});
+
+					$("#btnClear").on("click", function(e) {
+						e.preventDefault();
+						$("#keyword").text("");
+						window.location = "[[@{/'+${action_name}+'/view}]]";
+					});
+				});
+	</script>
+
+	<script th:inline="javascript">
+		var datatablemy = $("#currentVMTable").DataTable({
+
+			"responsive" : true,
+			"lengthChange" : true,
+			"autoWidth" : true,
+			"sScrollX" : "100%",
+			"sScrollXInner" : "150%",
+			"bScrollCollapse" : true,
+			//pageLength : 5,
+			searching : false
+		});
+		function modaltriggeronclick() {
+			// 			alert("i m innn  ");
+
+			setTimeout(function() {
+				datatablemy.columns.adjust().draw()
+			}, 500);
+			// 			datatablemy.columns.adjust().draw();
+
+			// 			$('#currentVMTable').DataTable().draw();
+
+		}
+
+		// 		$('#currentVMTable').DataTable().draw();
+	</script>
+
+</body>
+
+</html>

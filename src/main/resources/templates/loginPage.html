@@ -1,0 +1,291 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Login</title>
+
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
+
+
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/AdminPro/css/bootstrap.min.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/AdminPro/css/style.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/AdminPro/css/responsive.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/js/sweetAlert/sweetalert2.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/js/sweetAlert/sweetalert2.min.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/js/sweetAlert/sweetalert2.min.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css}">
+<script type="text/javascript"
+	th:src="@{/webtemplate/js/sweetAlert/sweetalert2.min.js}"></script>
+<script type="text/javascript"
+	th:src="@{/webtemplate/js/sweetAlert/sweetalert2.js}"></script>
+<link rel="shortcut icon" type="image/x-icon"
+	th:href="@{/webtemplate/dist/img/AdminLogo.png}">
+
+
+
+<style>
+body {
+	line-height: 0.42857143;
+}
+
+.login-block {
+	background: #DE6262; /* fallback for old browsers */
+	background: -webkit-linear-gradient(to bottom, #118c9b, #010419);
+	/* Chrome 10-25, Safari 5.1-6 */
+	background: linear-gradient(to bottom, #118c9b, #010419);
+	/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+	float: left;
+	width: 100%;
+	padding: 25px 0;
+	background-size: cover;
+	height: 100vh;
+}
+
+.banner-sec {no-repeat left bottom;
+	background-size: cover;
+	min-height: 105px;
+	border-radius: 0 0 10px 0;
+	padding: 0;
+}
+
+.container {
+	background: #fff;
+	border-radius: 10px;
+	box-shadow: 15px 20px 0px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-inner {
+	border-radius: 0 10px 10px 0;
+}
+
+.carousel-caption {
+	text-align: left;
+	left: 5%;
+}
+
+.login-sec {
+	padding: 50px 30px;
+	position: relative;
+}
+
+.login-sec .copy-text {
+	position: absolute;
+	width: 80%;
+	bottom: 20px;
+	font-size: 13px;
+	text-align: center;
+}
+
+.login-sec .copy-text i {
+	color: #FEB58A;
+}
+
+.login-sec .copy-text a {
+	color: #E36262;
+}
+
+.login-sec h2 {
+	margin-bottom: 30px;
+	font-weight: 800;
+	font-size: 30px;
+	color: #DE6262;
+}
+
+.login-sec h2:after {
+	content: " ";
+	width: 100px;
+	height: 5px;
+	background: #FEB58A;
+	display: block;
+	margin-top: 20px;
+	border-radius: 3px;
+	margin-left: auto;
+	margin-right: auto
+}
+
+.btn-login {
+	background: #DE6262;
+	color: #fff;
+	font-weight: 600;
+}
+
+.banner-text {
+	width: 70%;
+	position: absolute;
+	bottom: 40px;
+	padding-left: 20px;
+}
+
+.banner-text h2 {
+	color: #fff;
+	font-weight: 600;
+}
+
+.banner-text h2:after {
+	content: " ";
+	width: 100px;
+	height: 5px;
+	background: #FFF;
+	display: block;
+	margin-top: 20px;
+	border-radius: 3px;
+}
+
+.banner-text p {
+	color: #fff;
+}
+</style>
+</head>
+
+<body>
+
+
+
+
+
+
+
+	<!------ Include the above in your HEAD tag ---------->
+
+	<section class="login-block">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-4 login-sec">
+
+				<form name='f' th:action="@{/j_spring_security_check}" method='POST'>
+					<h3 class="text-center mt-0 m-b-15">
+						<a href="javascript:void(0);" id="logo" class="logo logo-admin">
+							<img src="/webtemplate/dist/img/canaris.jpeg" style="height: 75px"
+							width="235px" ; alt="logo">
+						</a>
+					</h3>
+					<br>
+					<h4 class="text-center">Sign In</h4>
+
+					<br> <br> <br>
+					<div class="form-group">
+						<label for="exampleInputEmail1" class="text-uppercase">Username</label>
+						<br> <br> <br> <input type='text' name='username'
+							value='' class="form-control" placeholder="Please Enter Username">
+
+					</div>
+
+					<br> <br>
+					<div class="form-group" id="show_hide_password">
+						<label for="exampleInputPassword1" class="text-uppercase">Password</label>
+						<br> <br> <br> <input type='password'
+							name='password' class="form-control" id="password"
+							placeholder="Please Enter Password">
+						<div class="input-group-append"
+							style="float: right; margin-top: -23px; margin-right: 10px">
+							<span class="input-group-text" style="cursor: pointer;"><i
+								class="fa fa-eye-slash" aria-hidden="true"></i></span>
+						</div>
+					</div>
+					<br> <br>
+					<div class="form-group">
+						<label for="exampleiii" class="text-uppercase"></label> <br>
+						<input type="checkbox" name="remember-me" /> Remember Me?
+					</div>
+					<br> <br>
+					<div class="col-12">
+						<button id="submit-button" type="submit" tabindex="4"
+							class="btn btn-primary btn-block">Sign In</button>
+							<br>
+							<br>
+						<button onclick="#" tabindex="4"
+							
+							class="btn btn-primary btn-block">Sign In with AD</button>
+					</div>
+					<!-- 	<div class="form-check">
+
+						<br> <br> <br>
+						<center>
+
+							<input name="submit" type="submit" value="submit"
+								class="btn btn-login float-right" /> &nbsp;&nbsp;
+							<button type="reset" class="btn btn-login" name="resetbtn"
+								id="resetbtn">Sign In with AD</button>
+						</center>
+					</div> -->
+					<!-- /login?error=true -->
+					<div th:if="${#request.getParameter('error') == 'true'}"
+						style="color: red; margin: 10px 0px;">
+						Login Failed!!!<br /> <br />
+						<br /> <br /> Reason : <span
+							th:if="${#session!= null and #session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION') != null}"
+							th:utext="${#session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION').message}">
+							Static summary </span>
+
+					</div>
+				</form>
+
+				<br> <br> <br> <br> <br> <br> <br>
+				<br> <br> <br> <br> <br> <br> <br>
+				<br> <br> <br> <br> <br> <br>
+
+
+				<div class="copy-text">
+					Copyright © 2024- <a href="https://canaris.in/">Tarang Pvt Ltd</a>
+				</div>
+			</div>
+			<div class="col-md-8 banner-sec"
+				style="padding-right: 0px; padding-bottom: 0px;">
+				<div id="carouselExampleIndicators" class="carousel slide"
+					data-ride="carousel">
+					<ol class="carousel-indicators">
+					</ol>
+					<div class="carousel-inner" role="listbox">
+						<div class="carousel-item active">
+							<img class="d-block img-fluid"
+								src="/webtemplate/dist/img/cloud-computing.jpg"
+								style="height: 655px" alt="First slide">
+							<div class="carousel-caption d-none d-md-block"></div>
+						</div>
+
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+	</section>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/AdminPro/js/vendor/jquery-1.11.3.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/AdminPro/js/bootstrap.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/sweetalert2/sweetalert2.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/sweetalert2/sweetalert2.min.js}"></script>
+	<script type="text/javascript">
+		var input = $("#show_hide_password input");
+		var icon = $("#show_hide_password i");
+		icon.on('click', function (event) {
+		    event.preventDefault();
+	
+		    if (input.attr("type") === "text") {
+		        input.attr('type', 'password');
+		        icon.addClass("fa-eye-slash");
+		        icon.removeClass("fa-eye");
+	
+		    } else if (input.attr("type") === "password") {
+		        input.attr('type', 'text');
+		        icon.removeClass("fa-eye-slash");
+		        icon.addClass("fa-eye");
+		    }
+		});
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Add Public IP</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Add Public IP</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/'+${action_name}+'/view/'}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+								<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+									enctype="multipart/form-data" th:object="${objEnt}">
+									<input type="hidden" th:field="*{id}" />
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="location_id">DC location</label> <select
+														tabindex="1" id="location_id" th:field="*{location_id}"
+														required name="location_id" class="form-control"
+														style="width: 100%;">
+														<option value='-1'>SELECT</option>
+														<option th:each="ob:${dcLocationList}" th:value="${ob[0]}"
+															th:text="${ob[1]}" /></option>
+													</select>
+												</div>
+												<!-- <div class="form-group">
+													<label for="ip_range">IP Range</label> <input tabindex="3"
+														type="text" th:field="*{ip_range}" required id="ip_range"
+														name="ip_range" class="form-control"
+														placeholder="Enter IP Ranges" />
+												</div> -->
+												<div class="form-group">
+													<label for="public_ip">Public IP</label> <input tabindex="5"
+														type="text" th:field="*{public_ip}" required id="public_ip"
+														name="public_ip" class="form-control"
+														placeholder="Enter Public IP" />
+												</div>
+											</div>
+										
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" class="btn btn-primary">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="template :: jsscript"></div>
+</body>
+</html>

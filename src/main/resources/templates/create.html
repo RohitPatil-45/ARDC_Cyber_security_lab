@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:include="template :: headFragment(${pageTitle})">
+<title>Create RDP Connection | Cyber Ranges</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<!-- Header -->
+		<div th:replace="fragments/header :: header"></div>
+
+		<!-- Sidebar -->
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<!-- Main Content -->
+		<div class="content-wrapper">
+
+			<!-- Page Header -->
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>
+								<i class="text-primary"></i> Create  Connection
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a th:href="@{/}"><i
+										class="fas fa-home"></i> Home</a></li>
+
+								<li class="breadcrumb-item active">Create</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Content Section -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row justify-content-center">
+						<div class="col-md-12">
+
+							<div class="card">
+								<div class="card-header bg-white">
+									<h3 class="card-title text-primary">
+										<i class="fas fa-desktop"></i> Connection Details
+									</h3>
+								</div>
+
+								<form th:action="@{/guac/create}" method="post" class="p-4">
+
+									<!-- Name -->
+									<div class="form-group">
+										<label for="name" class="required-field">Connection
+											Name</label> <input type="text" id="name" name="name"
+											class="form-control" required
+											placeholder="Enter connection name">
+									</div>
+
+									<!-- Protocol -->
+									<div class="form-group">
+										<label for="protocol" class="required-field">Protocol</label>
+										<select id="protocol" name="protocol" class="form-control"
+											required>
+											<option value="rdp" selected>RDP</option>
+											<option value="ssh">SSH</option>
+											<option value="vnc">VNC</option>
+											<option value="telnet">Telnet</option>
+											<option value="kubernetes">Kubernetes</option>
+										</select>
+									</div>
+
+									<!-- Host / Port -->
+									<div class="form-row">
+										<div class="form-group col-md-8">
+											<label for="host" class="required-field">Host</label> <input
+												type="text" id="host" name="host" class="form-control"
+												required placeholder="e.g. 192.168.1.100">
+										</div>
+										<div class="form-group col-md-4">
+											<label for="port" class="required-field">Port</label> <input
+												type="number" id="port" name="port" class="form-control"
+												value="3389" required>
+										</div>
+									</div>
+
+									<!-- Credentials -->
+									<div class="form-row">
+										<div class="form-group col-md-6">
+											<label for="user">Username</label> <input type="text"
+												id="user" name="user" class="form-control"
+												placeholder="Enter username">
+										</div>
+										<div class="form-group col-md-6">
+											<label for="pass">Password</label> <input type="password"
+												id="pass" name="pass" class="form-control"
+												placeholder="Enter password">
+										</div>
+									</div>
+
+									<!-- RDP Specific -->
+									<div class="border rounded p-3 mb-3 bg-light">
+										<h5 class="text-secondary">
+											<i class="fas fa-desktop"></i> RDP Options
+										</h5>
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<label for="domain">Domain</label> <input type="text"
+													id="domain" name="domain" class="form-control">
+											</div>
+											<div class="form-group col-md-6">
+												<label for="ignoreCert">Ignore Certificate</label><br>
+												<input type="checkbox" id="ignoreCert" name="ignoreCert"
+													value="true"> Yes
+											</div>
+										</div>
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<label for="width">Width</label> <input type="number"
+													id="width" name="width" value="1366" class="form-control">
+											</div>
+											<div class="form-group col-md-6">
+												<label for="height">Height</label> <input type="number"
+													id="height" name="height" value="768" class="form-control">
+											</div>
+										</div>
+									</div>
+
+									<!-- SSH -->
+									<div class="border rounded p-3 mb-3 bg-light">
+										<h5 class="text-secondary">
+											<i class="fas fa-terminal"></i> SSH Options
+										</h5>
+										<div class="form-group">
+											<label for="privateKey">Private Key</label>
+											<textarea id="privateKey" name="privateKey"
+												class="form-control" rows="3"></textarea>
+										</div>
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<label for="passphrase">Passphrase</label> <input
+													type="password" id="passphrase" name="passphrase"
+													class="form-control">
+											</div>
+											<div class="form-group col-md-6">
+												<label for="command">Command</label> <input type="text"
+													id="command" name="command" class="form-control">
+											</div>
+										</div>
+									</div>
+
+									<!-- Kubernetes -->
+									<div class="border rounded p-3 mb-3 bg-light">
+										<h5 class="text-secondary">
+											<i class="fas fa-cube"></i> Kubernetes Options
+										</h5>
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<label for="namespace">Namespace</label> <input type="text"
+													id="namespace" name="namespace" class="form-control"
+													value="default">
+											</div>
+											<div class="form-group col-md-6">
+												<label for="container">Container</label> <input type="text"
+													id="container" name="container" class="form-control">
+											</div>
+										</div>
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<label for="kubeCommand">Command</label> <input type="text"
+													id="kubeCommand" name="kubeCommand" class="form-control"
+													value="/bin/bash">
+											</div>
+											<div class="form-group col-md-6">
+												<label for="kubeToken">Token</label> <input type="text"
+													id="kubeToken" name="kubeToken" class="form-control">
+											</div>
+										</div>
+									</div>
+
+									<!-- Submit -->
+									<div class="text-right">
+										<a th:href="@{/guac/list}" class="btn btn-secondary"> <i
+											class="fas fa-arrow-left"></i> Cancel
+										</a>
+										<button type="submit" class="btn btn-primary">
+											<i class="fas fa-save"></i> Create Connection
+										</button>
+									</div>
+
+								</form>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- Footer -->
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+
+</body>
+</html>

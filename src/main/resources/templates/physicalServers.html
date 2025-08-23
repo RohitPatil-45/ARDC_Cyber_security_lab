@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Physical Servers</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Servers</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+							
+								<div class="card-body">
+									<table id="example1" class="table table-bordered table-striped">
+										<thead class="thead-light" style="text-align: center;">
+											<tr>
+												<!-- 												<th scope="col">Request Type</th> -->
+												<!-- 												<th scope="col">Event Time</th> -->
+												<th scope="col">Sr</th>
+												<th scope="col">Server IP</th>
+
+												<th scope="col">Hostname</th>
+												<th scope="col">Last sync Time</th>
+												
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="obj, stat : ${servers}">
+												<th scope="row" style="text-align: center;"
+													th:text="${stat.count}">1</th>
+												<td style="text-align: center;">[[${obj.serverIP}]]</td>
+
+												<td style="text-align: center;">[[${obj.hostname}]]</td>
+												<td style="text-align: center;">[[${obj.lastSyncTime}]]</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.container-fluid -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script>
+		$(function() {
+			$("#example1")
+					.DataTable(
+							{
+
+								"responsive" : false,
+								"paging" : true,
+								"pageLength" : 25,
+								//"sScrollX" : "100%",
+								//"sScrollXInner" : "200%",
+								//"bScrollCollapse" : true,
+								"lengthChange" : false,
+								"autoWidth" : false,
+								"buttons" : [
+										{
+											extend : 'csv',
+											title : 'Data Export'
+										},
+										{
+											extend : 'excel',
+											title : 'Data Export'
+										},
+										{
+											extend : 'pdf',
+											title : 'Data Export',
+											orientation : 'landscape',
+											pageSize : 'A4',
+											customize : function(doc) {
+												var numColumns = doc.content[1].table.body[0].length;
+												//alert(numColumns+1);
+												// Set column widths (example values, adjust as needed)
+												doc.content[1].table.widths = Array(
+														numColumns + 1).fill(
+														'*');
+
+												// Adjust margins and font sizes
+												// 												doc.pageMargins = [ 10, 10, 10,
+												// 														10 ];
+												doc.defaultStyle.fontSize = 8;
+
+												// Reduce header font size
+												doc.styles.tableHeader.fontSize = 8;
+												doc.styles.tableHeader.alignment = 'center';
+
+												// Center-align table body cells
+												doc.styles.tableBodyEven.alignment = 'center';
+												doc.styles.tableBodyOdd.alignment = 'center';
+
+												// Handle text overflow and wrapping
+												doc.content
+														.forEach(function(item) {
+															if (item.table
+																	&& item.table.body) {
+																item.table.body
+																		.forEach(function(
+																				row) {
+																			row
+																					.forEach(function(
+																							cell) {
+																						cell.margin = [
+																								5,
+																								2,
+																								5,
+																								2 ]; // Add margins for better readability
+																						//	 										cell.fillColor = '#f2f2f2'; // Optional: set background color
+																						cell.alignment = 'left'; // Optional: left-align text
+
+																						if (typeof cell.text === 'string') {
+																							// Insert line breaks every 30 characters (adjust as needed)
+																							cell.text = cell.text
+																									.replace(
+																											/(.{1,30})/g,
+																											'$1\n')
+																									.trim();
+																						}
+																					});
+																		});
+															}
+														});
+
+												var tableWrapper = {
+													table : doc.content[1].table,
+													layout : 'noBorders',
+													alignment : 'center',
+													margin : [ 0, 0, 0, 0 ]
+												// top, right, bottom, left
+												};
+												doc.content[1] = tableWrapper;
+											}
+										},
+										{
+											extend : 'print',
+											customize : function(win) {
+												$(win.document.body).find(
+														'table').addClass(
+														'compact').css(
+														'font-size', '8px')
+														.css('width', '100%');
+											}
+										}, "colvis" ]
+							}).buttons().container().appendTo(
+							'#example1_wrapper .col-md-6:eq(0)');
+
+		})
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:include="template :: headFragment(${pageTitle})">
+<title>Create Playlist | Cyber Ranges</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link
+	href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto+Mono:wght@400;700&display=swap"
+	rel="stylesheet">
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+</head>
+<style>
+/* Base Dark Theme */
+body {
+	background-color: #0d0d0d;
+	color: #e0e0e0;
+	font-family: 'Poppins', sans-serif;
+	margin: 0;
+}
+
+.wrapper, .content-wrapper {
+	background-color: #0d0d0d;
+}
+
+h1, h3 {
+	color: #00f2ff;
+	text-shadow: 0 0 8px #00f2ff, 0 0 15px #3b82f6;
+	font-family: 'Roboto Mono', monospace;
+}
+
+/* Cyber Loader */
+#loader-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 6px;
+	background: #1a1a1a;
+	overflow: hidden;
+	z-index: 9999;
+}
+
+#loader-bar {
+	height: 100%;
+	width: 0%;
+	background: linear-gradient(90deg, #00f2ff, #3b82f6, #00f2ff);
+	box-shadow: 0 0 12px #00f2ff, 0 0 24px #3b82f6;
+	transition: width 0.1s linear;
+}
+
+/* Card Styling */
+.card {
+	background-color: #141414;
+	border: 1px solid #222;
+	border-radius: 10px;
+	box-shadow: 0 0 12px rgba(0, 242, 255, 0.2);
+}
+
+.card-header {
+	background-color: #1a1a1a;
+	border-bottom: 1px solid #222;
+	color: #00f2ff;
+	font-weight: 600;
+}
+
+/* Table Styling */
+#table-container {
+	display: none;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+	margin-top: 15px;
+	font-family: 'Roboto Mono', monospace;
+}
+
+table th, table td {
+	border: 1px solid #2a2a2a;
+	padding: 10px;
+	text-align: left;
+}
+
+table th {
+	background-color: #1e1e1e;
+	color: #00f2ff;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+table tr {
+	background-color: #121212;
+}
+
+table tr:nth-child(even) {
+	background-color: #1a1a1a;
+}
+
+table tr:hover {
+	background-color: #222;
+	color: #00f2ff;
+	transition: 0.3s;
+}
+
+/* Breadcrumb Styling */
+.breadcrumb {
+	background: transparent;
+}
+
+.breadcrumb-item a {
+	color: #b0b0b0;
+	text-decoration: none;
+}
+
+.breadcrumb-item.active {
+	color: #00f2ff;
+}
+
+/* Footer */
+.main-footer {
+	background-color: #111;
+	border-top: 1px solid #222;
+	color: #777;
+	text-align: center;
+	padding: 10px;
+}
+</style>
+<body class="hold-transition sidebar-mini layout-fixed">
+
+	<div class="wrapper">
+
+		<!-- Cyber Loader -->
+		<div id="loader-container">
+			<div id="loader-bar"></div>
+		</div>
+
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>
+								<i class="fas fa-list-ol playlist-icon"></i> View VM Connetion
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#"><i
+										class="fas fa-home"></i> Home</a></li>
+								<li class="breadcrumb-item active"><a href="#">VM
+										Connetion</a></li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card">
+								<div class="card-header">
+									<h3 class="card-title">
+										<i class="text-primary"></i> Overview
+									</h3>
+								</div>
+								<div class="card-body" id="table-container">
+									<div class="row">
+										<div class="col-md-8">
+											<!-- 											<table id="example3" -->
+											<!-- 												class="table table-bordered table-striped"> -->
+											<!-- 												<thead> -->
+											<!-- 													<tr> -->
+											<!-- 														<th>Sr No.</th> -->
+											<!-- 														<th>Scenario Name</th> -->
+											<!-- 														<th>Device</th> -->
+											<!-- 														<th>Vm Name</th> -->
+											<!-- 														<th>Action</th> -->
+											<!-- 													</tr> -->
+											<!-- 												</thead> -->
+											<!-- 												<tbody> -->
+											<!-- 													<tr> -->
+											<!-- 														<td>1</td> -->
+											<!-- 														<td>Scenario A</td> -->
+											<!-- 														<td>Router</td> -->
+											<!-- 														<td>VM1</td> -->
+											<!-- 														<td><button class="btn btn-sm btn-primary">Run</button></td> -->
+											<!-- 													</tr> -->
+											<!-- 													<tr> -->
+											<!-- 														<td>2</td> -->
+											<!-- 														<td>Scenario B</td> -->
+											<!-- 														<td>Switch</td> -->
+											<!-- 														<td>VM2</td> -->
+											<!-- 														<td><button class="btn btn-sm btn-primary">Run</button></td> -->
+											<!-- 													</tr> -->
+											<!-- 												</tbody> -->
+											<!-- 											</table> -->
+
+											<table class="table table-bordered table-striped">
+												<thead style="background-color: darkgrey; color: white;">
+													<tr>
+														<th style="width: 60px;">ID</th>
+														<th>Name</th>
+														<th>Protocol</th>
+														<th>Max Connection Per User</th>
+														<th>Max Connection</th>
+														<th>Active Connection</th>
+														<th>Last Active</th>
+														<th style="width: 150px;">Actions</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr th:each="conn : ${connections}">
+														<td th:text="${conn.id}"></td>
+														<td th:text="${conn.name}"></td>
+														<td><span class="badge badge-info"
+															th:text="${conn.protocol}"></span></td>
+														<td th:text="${conn.maxconnectionperuser}"></td>
+														<td th:text="${conn.maxconnection}"></td>
+														<td th:text="${conn.activeconnection}"></td>
+														<td th:text="${conn.lastactive}"></td>
+														<td><a th:href="@{|/guac/view/${conn.id}|}"
+															class="btn btn-sm btn-success mr-1"> <i
+																class="fas fa-play"></i> Start
+														</a></td>
+													</tr>
+													<tr th:if="${#lists.isEmpty(connections)}">
+														<td colspan="4" class="text-muted">No connections
+															found.</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+								<!-- card-body -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+
+	<script>
+    // Cyber loader logic
+    document.addEventListener("DOMContentLoaded", function () {
+      let loader = document.getElementById("loader-bar");
+      let container = document.getElementById("loader-container");
+      let width = 0;
+
+      let interval = setInterval(() => {
+        width += 1;
+        loader.style.width = width + "%";
+
+        if (width >= 100) {
+          clearInterval(interval);
+
+          // Show Swal after load complete
+          Swal.fire({
+            title: 'Simulation Ready',
+            text: "Do you want to start ?",
+            icon: 'info',
+            background: '#1a1a1a',
+            color: '#e0e0e0',
+            showCancelButton: true,
+            confirmButtonText: '🚀 Start',
+            cancelButtonText: '❌ Cancel',
+            confirmButtonColor: '#00f2ff',
+            cancelButtonColor: '#444'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              document.getElementById("table-container").style.display = "block";
+            }
+            // Hide loader after swal
+            container.style.display = "none";
+          });
+        }
+      }, 100); // 10 seconds
+    });
+  </script>
+</body>
+</html>

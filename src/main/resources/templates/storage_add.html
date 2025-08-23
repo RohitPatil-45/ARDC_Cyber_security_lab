@@ -1,0 +1,433 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud Portal</title>
+
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
+<!-- Ionicons -->
+<link rel="stylesheet" th:href="@{/css/ionicIcons.css}">
+<!-- Tempusdominus Bootstrap 4 -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css}">
+<!-- iCheck -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
+<!-- JQVMap -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/jqvmap/jqvmap.min.css}">
+<!-- Theme style -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/dist/css/adminlte.min.css}">
+<!-- overlayScrollbars -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/overlayScrollbars/css/OverlayScrollbars.min.css}">
+<!-- Daterange picker -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/daterangepicker/daterangepicker.css}">
+<!-- summernote -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/summernote/summernote-bs4.min.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css}">
+
+<!--End Common CSS  -->
+
+<!-- <link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">  -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/css/cloudfont-awesome.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/css/font-awesome.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-responsive/css/responsive.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-buttons/css/buttons.bootstrap4.min.css}">
+
+<style>
+td {
+	text-align: center;
+}
+
+th {
+	text-align: center;
+}
+</style>
+
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<!-- Header -->
+		<div th:replace="fragments/header_bk :: header"></div>
+		<!--Close Header -->
+
+		<!-- Sidebar -->
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<!-- Close Sidebar -->
+		<div class="content-wrapper">
+
+			<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+				enctype="multipart/form-data" th:object="${objEnt}">
+				<input type="hidden" th:field="*{id}" />
+
+				<!-- DC Location -->
+				<section class="content" style="padding-top: 10px">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">DC
+												Location</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Select
+												DC Location</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<!-- <select class="form-control select2" id="location"
+											name="location" multiple="multiple"
+											data-placeholder="Select Location" style="width: 100%;">
+										</select> -->
+											<select tabindex="1" id="location_id"
+												th:field="*{location_id}" required name="location_id"
+												autofocus="autofocus"
+												class="form-control select2" multiple="multiple"
+												data-placeholder="Select Location" style="width: 100%;">
+												<option value='-1'>SELECT</option>
+												<option th:each="ob:${dcLocationList}" th:value="${ob[0]}"
+													th:text="${ob[1]}" /></option>
+											</select>
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End DC Location -->
+
+
+				<!-- Select Plan -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Select
+												Plan Type</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Object
+												Storage Plan</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<section class="content">
+											<div class="container-fluid">
+												<div class="row">
+													<div class="col-12">
+														<div class="card">
+															<div class="card-body">
+																<table id="sharedPlanTable"
+																	class="table table-bordered table-striped">
+																	<thead>
+																		<tr>
+																			<th><input type="checkbox"></th>
+																			<th>Size</th>
+																			<th>Type</th>
+																			<th>Price</th>
+																			<th>Action</th>
+																		</tr>
+																	</thead>
+																	<tbody>
+																		<tr>
+																			<td><input type="checkbox" name="select"></td>
+																			<td>25 GB</td>
+																			<td><span class="badge badge-success">Monthly</span></td>
+																			<td><span class="badge badge-info">Rs.125.00</span></td>
+																			<td><button type="button"
+																					class="btn btn-primary"
+																					style="width: 35%; padding: 0px;">Choose
+																					Plan</button></td>
+																		</tr>
+																		<tr>
+																			<td><input type="checkbox" name="select"></td>
+																			<td>50 GB</td>
+																			<td><span class="badge badge-success">Monthly</span></td>
+																			<td><span class="badge badge-info">Rs.225.00</span></td>
+																			<td><button type="button"
+																					class="btn btn-primary"
+																					style="width: 35%; padding: 0px;">Choose
+																					Plan</button></td>
+																		</tr>
+																		<tr>
+																			<td><input type="checkbox" name="select"></td>
+																			<td>100 GB</td>
+																			<td><span class="badge badge-success">Monthly</span></td>
+																			<td><span class="badge badge-info">Rs.350.00</span></td>
+																			<td><button type="button"
+																					class="btn btn-primary"
+																					style="width: 35%; padding: 0px;">Choose
+																					Plan</button></td>
+																		</tr>
+																		<tr>
+																			<td><input type="checkbox" name="select"></td>
+																			<td>250 GB</td>
+																			<td><span class="badge badge-success">Monthly</span></td>
+																			<td><span class="badge badge-info">Rs.875.00</span></td>
+																			<td><button type="button"
+																					class="btn btn-primary"
+																					style="width: 35%; padding: 0px;">Choose
+																					Plan</button></td>
+																		</tr>
+																		<tr>
+																			<td><input type="checkbox" name="select"></td>
+																			<td>500 GB</td>
+																			<td><span class="badge badge-success">Monthly</span></td>
+																			<td><span class="badge badge-info">Rs.1350.00</span></td>
+																			<td><button type="button"
+																					class="btn btn-primary"
+																					style="width: 35%; padding: 0px;">Choose
+																					Plan</button></td>
+																		</tr>
+																		<tr>
+																			<td><input type="checkbox" name="select"></td>
+																			<td>1000 GB</td>
+																			<td><span class="badge badge-success">Monthly</span></td>
+																			<td><span class="badge badge-info">Rs.2800.00</span></td>
+																			<td><button type="button"
+																					class="btn btn-primary"
+																					style="width: 35%; padding: 0px;">Choose
+																					Plan</button></td>
+																		</tr>
+																		<tr>
+																			<td><input type="checkbox" name="select"></td>
+																			<td>2000 GB</td>
+																			<td><span class="badge badge-success">Monthly</span></td>
+																			<td><span class="badge badge-info">Rs.5100.00</span></td>
+																			<td><button type="button"
+																					class="btn btn-primary"
+																					style="width: 35%; padding: 0px;">Choose
+																					Plan</button></td>
+																		</tr>
+																		<tr>
+																			<td><input type="checkbox" name="select"></td>
+																			<td>5000 GB</td>
+																			<td><span class="badge badge-success">Monthly</span></td>
+																			<td><span class="badge badge-info">Rs.12500.00</span></td>
+																			<td><button type="button"
+																					class="btn btn-primary"
+																					style="width: 35%; padding: 0px;">Choose
+																					Plan</button></td>
+																		</tr>
+																		<tr>
+																			<td><input type="checkbox" name="select"></td>
+																			<td>10000 GB</td>
+																			<td><span class="badge badge-success">Monthly</span></td>
+																			<td><span class="badge badge-info">Rs.19500.00</span></td>
+																			<td><button type="button"
+																					class="btn btn-primary"
+																					style="width: 35%; padding: 0px;">Choose
+																					Plan</button></td>
+																		</tr>
+
+																	</tbody>
+
+																</table>
+
+
+															</div>
+															<!-- /.card-body -->
+														</div>
+
+													</div>
+												</div>
+											</div>
+											<!-- /.container-fluid -->
+										</section>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Select Plan -->
+
+
+				<!-- Storage Bucket -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Bucket
+												Name</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Input
+												the Bucket name</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<input type="password" class="form-control"
+												style="width: 30%;" autocomplete="false" id="bukcet"
+												name="bukcet" placeholder="storage_1">
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- Storage Bucket -->
+
+				<!-- Cost -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-body">
+										<div class="form-group">
+											<h3 class="card-title"
+												style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+												<span class="card-title">Total Cost</span> <span
+													class="card-title" style="font-weight: bold;">Rs.5100
+													/ mon</span>
+											</h3>
+											<button type="button" style="width: 12%"
+												class="btn bg-gradient-primary float-right">Create
+												Storage</button>
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- Cost -->
+
+
+			</form>
+		</div>
+
+	</div>
+
+	<!-- Footer -->
+	<div th:replace="fragments/footer :: footer"></div>
+	<!--Close Footer -->
+
+	<!-- ./wrapper -->
+
+	<!-- Common JS  -->
+
+	<!-- jQuery -->
+	<script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
+	<!-- jQuery UI 1.11.4 -->
+	<script th:src="@{/webtemplate/plugins/jquery-ui/jquery-ui.min.js}"></script>
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+		$.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<!-- ChartJS -->
+	<!-- <script th:src="@{/webtemplate/plugins/chart.js/Chart.min.js}"></script> -->
+	<!-- Sparkline -->
+	<script th:src="@{/webtemplate/plugins/sparklines/sparkline.js}"></script>
+	<!-- JQVMap -->
+	<!-- <script th:src="@{/webtemplate/plugins/jqvmap/jquery.vmap.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jqvmap/maps/jquery.vmap.usa.js}"></script> -->
+	<!-- jQuery Knob Chart -->
+	<script th:src="@{/webtemplate/plugins/jquery-knob/jquery.knob.min.js}"></script>
+	<!-- daterangepicker -->
+	<script th:src="@{/webtemplate/plugins/moment/moment.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/daterangepicker/daterangepicker.js}"></script>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js}"></script>
+	<!-- Summernote -->
+	<script
+		th:src="@{/webtemplate/plugins/summernote/summernote-bs4.min.js}"></script>
+	<!-- overlayScrollbars -->
+	<script
+		th:src="@{/webtemplate/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js}"></script>
+	<!-- AdminLTE App -->
+	<script th:src="@{/webtemplate/dist/js/adminlte.js}"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script th:src="@{/webtemplate/dist/js/demo.js}"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+	<!-- <script th:src="@{/webtemplate/dist/js/pages/dashboard.js}"></script> -->
+	<!--End Common JS  -->
+
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+
+	<script
+		th:src="@{/webtemplate/plugins/datatables/jquery.dataTables.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/dataTables.responsive.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/responsive.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/dataTables.buttons.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.bootstrap4.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jszip/jszip.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/pdfmake.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/vfs_fonts.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.html5.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.print.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.colVis.min.js}"></script>
+
+	<script th:src="@{/custom_js/cloudInstance.js}"></script>
+
+	<script type="text/javascript">
+		$(function() {
+			//Initialize Select2 Elements
+			$('.select2').select2()
+
+			//Initialize Select2 Elements
+			$('.select2bs4').select2({
+				theme : 'bootstrap4'
+			})
+
+		});
+	</script>
+</body>
+</html>

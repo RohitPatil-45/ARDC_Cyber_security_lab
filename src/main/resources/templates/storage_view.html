@@ -1,0 +1,363 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud Portal</title>
+
+<!-- Common CSS -->
+
+<!-- Google Font: Source Sans Pro -->
+ <link rel="stylesheet"
+	th:href="@{/css/fontAwesome.css}">
+<!-- Font Awesome -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
+<!-- Ionicons -->
+ <link rel="stylesheet"
+	th:href="@{/css/ionicIcons.css}"> 
+<!-- Tempusdominus Bootstrap 4 -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css}">
+<!-- iCheck -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
+<!-- JQVMap -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/jqvmap/jqvmap.min.css}">
+<!-- Theme style -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/dist/css/adminlte.min.css}">
+<!-- overlayScrollbars -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/overlayScrollbars/css/OverlayScrollbars.min.css}">
+<!-- Daterange picker -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/daterangepicker/daterangepicker.css}">
+<!-- summernote -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/summernote/summernote-bs4.min.css}">
+	
+<!--End Common CSS  -->
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- <link rel="stylesheet"
+	th:href="@{/css/cloudFlare.css}"> -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-responsive/css/responsive.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-buttons/css/buttons.bootstrap4.min.css}">
+
+
+<style type="text/css">
+.text-center {
+	text-align: center !important;
+}
+
+/* Style for the span */
+.glow-span {
+	display: inline-block;
+	padding: 10px;
+	background-color: #fff;
+	/* border: 1px solid #ccc; */
+	transition: box-shadow 0.3s;
+	border-radius: 10px;
+	width: -webkit-fill-available;
+	text-align: center;
+}
+
+.glow-span:hover {
+	box-shadow: 0 0 10px 5px rgba(0, 0, 255, 0.5);
+	background-color: blue; /* Blue glow effect */
+}
+
+.glow-span2 {
+	display: inline-block;
+	padding: 10px;
+	background-color: #ffc700;
+	/* border: 1px solid #ccc; */
+	transition: box-shadow 0.3s;
+	border-radius: 10px;
+	width: -webkit-fill-available;
+	text-align: center;
+}
+
+.glow-span2:hover {
+	box-shadow: 0 0 10px 5px rgba(0, 0, 255, 0.5);
+	background-color: #ffc700;
+}
+
+/* right click context menu */
+* {
+  margin:0px;
+  padding:0px;
+  box-sizing:border-box;
+}
+ul li {
+  list-style:none;
+}
+#contextMenu {
+  position:absolute;
+  transform-origin:top left;
+  transform:scale(0);
+  width:220px;
+  border:1px solid rgba(100,100,100,0.55);
+  padding:5px;
+  background:rgba(250,250,250,0.98);
+  box-shadow:2px 2px 12px 4px rgba(100,100,100,0.4);
+  transition:transform 400ms ease-in-out 50ms;
+}
+#contextMenu.visible {
+  transform:scale(1);
+}
+#contextMenu ul li {
+  padding:5px 3px;
+  display:flex;
+  align-items:center;
+  cursor:pointer;
+  color:rgba(50,50,50,0.9);
+  font-size:15px;
+}
+#contextMenu ul li:hover {
+  background:rgba(100,100,100,0.12);
+}
+#contextMenu ul li.disabled {
+  color:rgba(100,100,100,0.5);
+  cursor:pointer;
+}
+#contextMenu ul li.share {
+/*   height:40px; */
+  width:100%;
+  flex-direction:column;
+  align-items:left;
+  flex-wrap:wrap;
+}
+#contextMenu ul li.share > .name {
+  margin-top:-2px;
+  margin-bottom:10px;
+  display:block;
+}
+
+#contextMenu ul li.share .icons {
+  width:100%;
+  display:flex;
+  justify-content:space-around;
+}
+#contextMenu ul li.share .icons > i:hover{
+  background:#e7e7e7;
+}
+
+#contextMenu ul li i {
+  width:20px;
+}
+#contextMenu ul li div.name {
+  padding-left:8px;
+}
+#contextMenu div.break {
+  margin:4px 0px;
+  border-top:1px solid rgba(100,100,100,0.5);
+}
+
+#pulse {
+  position:fixed;
+  width:35px;
+  height:35px;
+  background:rgba(0,0,0,1);
+  opacity:0;
+  border-radius:50%;
+  z-index:100;
+}
+#pulse.active {
+  animation:pulse 400ms ease;
+}
+
+@keyframes pulse {
+  0% {
+    opacity:1;
+    transform:scale(0);
+  }
+  100% {
+    opacity:0;
+    transform:scale(1.1);
+  }
+}
+
+td {
+	text-align: center;
+}
+</style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<!-- Header -->
+		<div th:replace="fragments/header_bk :: header"></div>
+		<!--Close Header -->
+
+		<!-- Sidebar -->
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<!-- Close Sidebar -->
+		
+		<div class="content-wrapper">
+
+			<section class="content" style="padding-top: 15px">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+
+
+							<div class="card">
+								<div class="card-header">
+									<h3 class="card-title">Object Storage</h3>
+									<a class="btn btn-sm btn-primary float-right">+ Create Bucket</a>
+								</div>
+							</div>
+							<div>
+								<table id="example1" class="table table-bordered table-striped">
+									<thead style="background-color: #e2e2e2">
+										<tr>
+											<th class="text-center">Sr No.</th>
+											<th class="text-center">Storage</th>
+											<th class="text-center">Location</th>
+											<th class="text-center">Objects</th>
+											<th class="text-center">Status</th>
+											<th class="text-center">Created at</th>
+											<th class="text-center">Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="odd" style="background-color: #fff;">
+											<td>1</td>
+											<td>mybucketxs4m0ntzvcntp2hp</td>
+											<td>India</td>
+											<td>0</td>
+											<td>Active</td>
+											<td>2024-03-27 17:21:23</td>
+											<td><button class="btn btn-primary" style="width: 70%">Manage</button></td>
+										</tr>
+									</tbody>
+								</table>
+
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- End Cloud Instances -->
+
+			<!-- Right Click Context Menu -->
+			<div id="pulse"></div>
+			<div id="contextMenu" style="height: 80px;">
+				<ul>
+					<li><i class="fa fa-folder-open-o" aria-hidden="true"></i>
+						<div class="name" onclick="viewCloudServerDetails()">Manage Cloud</div></li>
+					<li><i class="fa fa-refresh" aria-hidden="true"></i>
+						<div class="name">Console</div></li>
+				</ul>
+			</div>
+			<!--End Right Click Context Menu -->
+
+		</div>
+
+	</div>
+
+	<!-- Footer -->
+	<div th:replace="fragments/footer :: footer"></div>
+	<!--Close Footer -->
+	<script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
+	<!-- jQuery UI 1.11.4 -->
+	<script th:src="@{/webtemplate/plugins/jquery-ui/jquery-ui.min.js}"></script>
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+		$.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<!-- ChartJS -->
+	<script th:src="@{/webtemplate/plugins/chart.js/Chart.min.js}"></script>
+	<!-- Sparkline -->
+<!-- 	<script th:src="@{/webtemplate/plugins/sparklines/sparkline.js}"></script> -->
+	<!-- JQVMap -->
+	<!-- <script th:src="@{/webtemplate/plugins/jqvmap/jquery.vmap.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jqvmap/maps/jquery.vmap.usa.js}"></script> -->
+	<!-- jQuery Knob Chart -->
+	<script th:src="@{/webtemplate/plugins/jquery-knob/jquery.knob.min.js}"></script>
+	<!-- daterangepicker -->
+	<script th:src="@{/webtemplate/plugins/moment/moment.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/daterangepicker/daterangepicker.js}"></script>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js}"></script>
+	<!-- Summernote -->
+	<script
+		th:src="@{/webtemplate/plugins/summernote/summernote-bs4.min.js}"></script>
+	<!-- overlayScrollbars -->
+	<script
+		th:src="@{/webtemplate/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js}"></script>
+	<!-- AdminLTE App -->
+	<script th:src="@{/webtemplate/dist/js/adminlte.js}"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script th:src="@{/webtemplate/dist/js/demo.js}"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+	<!-- <script th:src="@{/webtemplate/dist/js/pages/dashboard.js}"></script> -->
+	<!--End Common JS  -->
+
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+
+	<script
+		th:src="@{/webtemplate/plugins/datatables/jquery.dataTables.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/dataTables.responsive.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/responsive.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/dataTables.buttons.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.bootstrap4.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jszip/jszip.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/pdfmake.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/vfs_fonts.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.html5.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.print.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.colVis.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+
+	<script type="text/javascript"
+		th:src="@{/custom_js/datatable.checkbox.min.js}"></script>
+
+	<script th:src="@{/custom_js/cloudServer.js}"></script> 
+
+	<script type="text/javascript">
+		$(function() {
+			//Initialize Select2 Elements
+			$('.select2').select2()
+
+			//Initialize Select2 Elements
+			$('.select2bs4').select2({
+				theme : 'bootstrap4'
+			})
+
+		});
+	</script>
+</body>
+</html>

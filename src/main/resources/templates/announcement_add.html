@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Add Announcement</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Add Announcement</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/'+${action_name}+'/view/'}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+								<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+									enctype="multipart/form-data" th:object="${objEnt}">
+									<input type="hidden" th:field="*{id}" />
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="customer_name">Customer Name</label> <select
+														tabindex="1" id="customer_name"
+														th:field="*{customer_name}" required name="customer_name"
+														class="form-control select2" style="width: 100%;">
+														<option value="" label="Please Select" />
+														<option value="Hourly" label="SBI" />
+														<option value="Daily" label="Daily" />
+														<option value="Monthly" label="Monthly" />
+														<option value="Yearly" label="Yearly" />
+														<option value="5 Years" label="5 Years" />
+													</select>
+												</div>
+
+												<div class="form-group">
+													<label for="announcement">Announcement </label> <input tabindex="2" type="text"
+														th:field="*{announcement}" required
+														id="announcement" name="announcement"
+														class="form-control"
+														placeholder="Enter Announcement " />
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" class="btn btn-primary">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="template :: jsscript"></div>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Add VPC</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Add VPC</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/'+${action_name}+'/view/'}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+								<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+									enctype="multipart/form-data" th:object="${objEnt}">
+									<input type="hidden" th:field="*{id}" />
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="location_id">DC location</label> <select
+														tabindex="1" id="location_id" th:field="*{location_id}"
+														required name="location_id" class="form-control"
+														style="width: 100%;">
+														<!-- <option value="" label="Please Select" />
+														<option value="Mumbai" label="Mumbai" />
+														<option value="Pune" label="Pune" />
+														<option value="Thane" label="Thane" />
+ -->
+														<option value='-1'>SELECT</option>
+														<option th:each="ob:${dcLocationList}" th:value="${ob[0]}"
+															th:text="${ob[1]}" /></option>
+													</select>
+												</div>
+												<div class="form-group">
+													<label for="network">Network</label> <input tabindex="3"
+														type="text" th:field="*{network}" required id="network"
+														name="network" class="form-control"
+														placeholder="Enter Network" />
+												</div>
+												<div class="form-group">
+													<label for="subnet">Subnet</label> <input tabindex="5"
+														type="text" th:field="*{subnet}" required id="subnet"
+														name="subnet" class="form-control"
+														placeholder="Enter Subnet" />
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="vpc_name">VPC Name</label> <input tabindex="2"
+														type="text" th:field="*{vpc_name}" required id="vpc_name"
+														name="vpc_name" class="form-control"
+														placeholder="Enter VPC name" />
+												</div>
+												<div class="form-group">
+													<label for="network_size">Network Size</label> <input
+														tabindex="4" type="text" th:field="*{network_size}"
+														required id="network_size" name="network_size"
+														class="form-control" placeholder="Enter Network Size" />
+												</div>
+												<div class="form-group">
+													<label for="status">Status</label> <select tabindex="6"
+														id="status" th:field="*{status}" required name="status"
+														class="form-control" style="width: 100%;">
+														<option value="" label="Please Select" />
+														<option value="Enable" label="Enable" />
+														<option value="Disable" label="Disable" />
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" class="btn btn-primary">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="template :: jsscript"></div>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Add Flavor</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Add Flavor</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/'+${action_name}+'/view/'}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+								<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+									enctype="multipart/form-data" th:object="${objEnt}">
+									<input type="hidden" th:field="*{id}" />
+									<div class="card-body">
+										<div class="row">
+
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="exampleInputEmail1">Flavor Name</label> <input
+														tabindex="1" type="text" th:field="*{name}"
+														onchange="checkDuplicateFlavor(this.value)"
+														placeholder="Flavor Name" required class="form-control"
+														id="flavorname" />
+												</div>
+												<!-- 												<div class="form-group"> -->
+												<!-- 													<label for="exampleInputEmail1">ID</label> <input -->
+												<!-- 														tabindex="1" type="text" th:field="*{id}" -->
+												<!-- 														placeholder="Flavor ID" required class="form-control" -->
+												<!-- 														id="flavorID" /> -->
+												<!-- 												</div> -->
+												<div class="form-group">
+													<label for="exampleInputPassword1">Root Disk (GB)</label> <input
+														tabindex="1" type="number" class="form-control"
+														th:field="*{rootDisk}" placeholder="Root Disk" />
+												</div>
+											</div>
+
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="exampleInputPassword1">VCPUs</label> <input
+														tabindex="1" type="number" class="form-control"
+														th:field="*{vcpus}" placeholder="VCPU" />
+												</div>
+												<div class="form-group">
+													<label for="exampleInputPassword1">RAM (MB)</label> <input
+														tabindex="1" type="number" class="form-control"
+														th:field="*{ram}" placeholder="RAM" />
+												</div>
+											</div>
+
+											<div class="col-md-6">
+
+												<div class="form-group">
+													<label for="exampleInputPassword1">Public</label> <select
+														tabindex="1" id="Public" th:field="*{isPublic}" required
+														name="Public" class="form-control" style="width: 100%;">
+														<option value=5 disabled selected>Please Select</option>
+														<option value=1>Yes</option>
+														<option value=0>No</option>
+													</select>
+												</div>
+
+
+
+												<!-- 												<div class="form-group"> -->
+												<!-- 													<label for="exampleInputPassword1">Ephemeral Disk (GB)</label> -->
+												<!-- 													 <input tabindex="1" type="number" class="form-control" -->
+												<!-- 														th:field="*{ephemeralDisk}" placeholder="Ephemeral Disk" /> -->
+												<!-- 												</div> -->
+
+											</div>
+											<!-- 											<div class="col-md-6"> -->
+											<!-- 											<div class="form-group"> -->
+											<!-- 													<label for="exampleInputPassword1">Swap Disk (GB)</label> -->
+											<!-- 													 <input tabindex="1" type="number" class="form-control" -->
+											<!-- 														th:field="*{swap}" placeholder="Swap Disk" /> -->
+											<!-- 												</div> -->
+
+											<!-- 												<div class="form-group"> -->
+											<!-- 													<label for="exampleInputPassword1">RX/TX Factor</label> -->
+											<!-- 													 <input tabindex="1" type="number" class="form-control" -->
+											<!-- 														th:field="*{rxTxFactorAlt}" placeholder="SRX/TX Factor" /> -->
+											<!-- 												</div> -->
+
+
+											<!-- 											</div> -->
+
+
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" id="createFlavor"
+											class="btn btn-primary">
+											Create Flavor<i
+												style="margin-left: 10px; color: yellow; display: none"
+												id="createFlavorspinner" class='fa fa-spinner fa-spin'></i>
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<script th:src="@{/custom_js/image.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/bs-custom-file-input/bs-custom-file-input.min.js}"></script>
+	<script>
+		$(function() {
+			bsCustomFileInput.init();
+		});
+	</script>
+	<div th:replace="templateListing :: jsscript"></div>
+	<script th:inline="javascript">
+	if([[${message}]] == 'success'){
+		Swal.fire({
+			position: "top",
+			icon: "success",
+			title: 'Flavor has been created successfully',
+			showConfirmButton: true,
+			timer: 5000,
+		})
+	}
+	else if([[${message}]] == 'fail'){
+		Swal.fire({
+			position: "top",
+			icon: "warning",
+			title: 'Failed to create Flavor',
+			showConfirmButton: true,
+			timer: 5000,
+		})
+	}
+	
+	 
+//           $('#createFlavor').on('click', function() {
+//               $('#createFlavorspinner').show();
+//           });
+      
+	
+</script>
+</body>
+</html>

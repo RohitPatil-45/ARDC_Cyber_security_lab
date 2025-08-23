@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})">
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Add Firewall</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Add Firewall</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<!-- <div class="col-md-2">
+											<a th:href="@{'/'+${action_name}+'/view/'}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div> -->
+									</div>
+								</div>
+								<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+									enctype="multipart/form-data" th:object="${objEnt}">
+									<input type="hidden" th:field="*{id}" />
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="security_group_name">Security Group</label> <input
+														tabindex="2" type="text" th:field="*{security_group_name}"
+														required id="security_group_name"
+														name="security_group_name" class="form-control"
+														placeholder="Enter security group name" />
+												</div>
+
+												<div class="form-group">
+													<label for="description">Description</label>
+													<textarea tabindex="2" type="text"
+														th:field="*{description}" required id="description"
+														name="description" class="form-control"
+														placeholder="Enter description"></textarea>
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="vpc_id">VPC</label> <select tabindex="1"
+														id="vpc_id" th:field="*{vpc_id}" required name="vpc_id"
+														class="form-control" style="width: 100%;">
+														<option value='-1'>SELECT</option>
+														<option th:each="ob:${vpcList}" th:value="${ob[0]}"
+															th:text="${ob[1]}" /></option>
+													</select>
+												</div>
+												<!-- <div class="form-group">
+													<label for="password">Password</label> <input tabindex="2" type="password"
+														th:field="*{password}" required
+														id="password" name="password"
+														class="form-control"
+														placeholder="Enter Password" />
+												</div> -->
+											</div>
+											<div class="col-md-12">
+												<div class="card border-transparent">
+													<div class="card-header">
+														<h3 class="card-title"
+															style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+															<span class="card-title" style="font-weight: bold;">Inbound
+																Rules</span>
+														</h3>
+													</div>
+													<div class="card-body">
+														<div class="form-group">
+															<table>
+																<tr>
+																	<th style="padding: 5px">Type</th>
+																	<th style="padding: 5px">Protocol</th>
+																	<th style="padding: 5px">Port Range</th>
+																	<th style="padding: 5px">Source</th>
+																	<th style="padding: 5px">Description - optional</th>
+																</tr>
+																<tr>
+																	<td style="padding: 5px"><select tabindex="1"
+																		id="type" required name="type"
+																		class="form-control" style="width: 100%;">
+																			<option value='-1'>All Traffic</option>
+																			<option value='-1'>TCP</option>
+																			<option value='-1'>UDP</option>
+																			<option value='-1'>ICMP-IPv4</option>
+																			<option value='-1'>ICMP-IPv6</option>
+																			<option value='-1'>IMAP</option>
+																			<option value='-1'>SSH</option>
+																			<option value='-1'>HTTPS</option>
+																			<option value='-1'>LDAP</option>
+																			<option value='-1'>SMB</option>
+																			<option value='-1'>SMTPS</option>
+																			<option value='-1'>IMAPS</option>
+																			<option value='-1'>POP3S</option>
+																			<option value='-1'>MSSQL</option>
+																			<option value='-1'>MYSQL</option>
+																			<option value='-1'>PostgreSQL</option>
+																			<option value='-1'>Oracle</option>
+																			<option value='-1'>Red Shift</option>
+																			<option value='-1'>NFS</option>
+																			<option value='-1'>RDP</option>
+																			<option value='-1'>Custom UDP</option>
+																			<option value='-1'>Custom TCP</option>
+																			<option value='-1'>Custom ICMP-IPv4</option>
+																			<option value='-1'>Custom Protocol</option>
+																			<option value='-1'>All Traffic</option>
+																			<option value='-1'>All TCP</option>
+																			<option value='-1'>All UDP</option>
+																			<option value='-1'>All ICMP-IPv4</option>
+																			<option value='-1'>All ICMP-IPv6</option>
+																			<option value='-1'>SMTP</option>
+
+																	</select></td>
+																	<td style="padding: 5px"><input tabindex="2"
+																		type="text" id="protocol" name="protocol"
+																		class="form-control" /></td>
+																	<td style="padding: 5px"><input tabindex="2"
+																		type="text" id="portRange" name="portRange"
+																		class="form-control" /></td>
+
+																	<td style="padding: 5px">
+																		<div class="row">
+																			<div class="col-md-6">
+																				<select tabindex="1" id="source" onchange="getIP()" required
+																					name="source" class="form-control"
+																					style="width: 100%;">
+																					<option value='-1'>Custom</option>
+																					<option value='-1'>Custom TCP</option>
+																					<option value='Anywhere-IPv4'>Anywhere-IPv4</option>
+																					<option value='-1'>Anywhere-IPv6</option>
+																					<option value='-1'>My IP</option>
+																				</select>
+																			</div>
+																			<div class="col-md-6">
+																				<input tabindex="2" type="text" id="ip" name="ip"
+																					class="form-control" />
+																			</div>
+																		</div>
+																	</td>
+																	<td style="padding: 5px"><input tabindex="2"
+																		type="text" id="description" name="description"
+																		class="form-control" /></td>
+																	<td style="padding: 5px"><button type="button"
+																			class="btn btn-danger" style="width: 100px">Delete</button></td>
+																</tr>
+
+															</table>
+														</div>
+
+														<div class="form-group">
+															<button type="button" class="btn btn-warning"
+																style="margin-left: 10px; width: 100px">Add
+																Rule</button>
+														</div>
+													</div>
+													<!-- /.card-body -->
+												</div>
+											</div>
+
+
+											<div class="col-md-12">
+												<div class="card border-transparent">
+													<div class="card-header">
+														<h3 class="card-title"
+															style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+															<span class="card-title" style="font-weight: bold;">Outbound
+																Rules</span>
+														</h3>
+													</div>
+													<div class="card-body">
+														<div class="form-group">
+															<table>
+																<tr>
+																	<th style="padding: 5px">Type</th>
+																	<th style="padding: 5px">Protocol</th>
+																	<th style="padding: 5px">Port Range</th>
+																	<th style="padding: 5px">Source</th>
+																	<th style="padding: 5px">Description - optional</th>
+																</tr>
+																<tr>
+																	<td style="padding: 5px"><select tabindex="1"
+																		id="type" required name="type"
+																		class="form-control" style="width: 100%;">
+																			<option value='-1'>All Traffic</option>
+																			<option value='-1'>TCP</option>
+																			<option value='-1'>UDP</option>
+																			<option value='-1'>ICMP-IPv4</option>
+																			<option value='-1'>ICMP-IPv6</option>
+																			<option value='-1'>IMAP</option>
+																			<option value='-1'>SSH</option>
+																			<option value='-1'>HTTPS</option>
+																			<option value='-1'>LDAP</option>
+																			<option value='-1'>SMB</option>
+																			<option value='-1'>SMTPS</option>
+																			<option value='-1'>IMAPS</option>
+																			<option value='-1'>POP3S</option>
+																			<option value='-1'>MSSQL</option>
+																			<option value='-1'>MYSQL</option>
+																			<option value='-1'>PostgreSQL</option>
+																			<option value='-1'>Oracle</option>
+																			<option value='-1'>Red Shift</option>
+																			<option value='-1'>NFS</option>
+																			<option value='-1'>RDP</option>
+																			<option value='-1'>Custom UDP</option>
+																			<option value='-1'>Custom TCP</option>
+																			<option value='-1'>Custom ICMP-IPv4</option>
+																			<option value='-1'>Custom Protocol</option>
+																			<option value='-1'>All Traffic</option>
+																			<option value='-1'>All TCP</option>
+																			<option value='-1'>All UDP</option>
+																			<option value='-1'>All ICMP-IPv4</option>
+																			<option value='-1'>All ICMP-IPv6</option>
+																			<option value='-1'>SMTP</option>
+
+																	</select></td>
+																	<td style="padding: 5px"><input tabindex="2"
+																		type="text" id="protocol" name="protocol"
+																		class="form-control" /></td>
+																	<td style="padding: 5px"><input tabindex="2"
+																		type="text" id="portRange" name="portRange"
+																		class="form-control" /></td>
+
+																	<td style="padding: 5px">
+																		<div class="row">
+																			<div class="col-md-6">
+																				<select tabindex="1" id="source" required
+																					name="source" class="form-control"
+																					style="width: 100%;">
+																					<option value='-1'>Custom</option>
+																					<option value='-1'>Custom TCP</option>
+																					<option value='-1'>Anywhere-IPv4</option>
+																					<option value='-1'>Anywhere-IPv6</option>
+																					<option value='-1'>My IP</option>
+																				</select>
+																			</div>
+
+																			<div class="col-md-6">
+																				<input tabindex="2" type="text" id="portRange"
+																					name="portRange" class="form-control" />
+																			</div>
+
+																		</div>
+																	</td>
+																	<td style="padding: 5px"><input tabindex="2"
+																		type="text" id="description" name="description"
+																		class="form-control" /></td>
+																	<td style="padding: 5px"><button type="button"
+																			class="btn btn-danger" style="width: 100px;">Delete</button></td>
+																</tr>
+
+															</table>
+														</div>
+
+														<div class="form-group">
+															<button type="button" class="btn btn-warning"
+																style="margin-left: 10px; width: 100px">Add
+																Rule</button>
+														</div>
+													</div>
+													<!-- /.card-body -->
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" class="btn btn-primary">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="template :: jsscript"></div>
+
+	<script type="text/javascript">
+	  var x = document.getElementById("source").value;
+	  alert
+	  if(x == 'Anywhere-IPv4'){
+		  alert(x)
+		  document.getElementById("ip").innerHTML = '0.0.0.0/0';
+	  }
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/'+${action_name}+'/view/'}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+								<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+									enctype="multipart/form-data" th:object="${objEnt}">
+									<input type="hidden" th:field="*{id}" />
+
+
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="network">Instance Name</label> <input
+														tabindex="3" type="text" th:field="*{instance_name}"
+														required id="instance_name" name="instance_name"
+														class="form-control" placeholder="Enter Instance Name" />
+												</div>
+
+												<div class="form-group">
+													<label for="location_id">DC location</label> <select
+														tabindex="1" id="location_id" th:field="*{location_id}"
+														required name="location_id" class="form-control select2"
+														style="width: 100%;">
+														<option value='-1'>SELECT</option>
+														<option th:each="ob:${dcLocationList}" th:value="${ob[0]}"
+															th:text="${ob[1]}" /></option>
+													</select>
+												</div>
+
+												<div class="form-group">
+													<label for="vpc_id">VPC Name</label> <select tabindex="1"
+														id="vpc_id" th:field="*{vpc_id}" required name="vpc_id"
+														class="form-control select2" style="width: 100%;">
+														<option value='-1'>SELECT</option>
+														<option th:each="ob:${vpcList}" th:value="${ob[0]}"
+															th:text="${ob[1]}" /></option>
+													</select>
+												</div>
+
+												<div class="form-group">
+													<label for="subnet">Password</label> <input tabindex="5"
+														type="text" th:field="*{instance_password}" required
+														id="instance_password" name="instance_password"
+														class="form-control" placeholder="Enter instance password" />
+												</div>
+
+
+											</div>
+
+										</div>
+									</div>
+
+
+
+
+
+								</form>
+
+
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+
+
+			<section class="content">
+				<div class="container-fluid">
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card border-transparent">
+								<div class="card-header">
+									<h3 class="card-title" style="font-weight: bold;">Application
+										and OS Name</h3>
+								</div>
+								<div class="card-body">
+									<!-- Nav tabs -->
+									<div class="default-tab">
+										<ul class="nav nav-tabs" role="tablist">
+											<li class="nav-item"><a class="nav-link active"
+												onclick="hideDBForm()" data-toggle="tab" href="#os">Operating
+													System </a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#database">Database</a></li>
+											<li class="nav-item"><a class="nav-link"
+												onclick="hideDBForm()" data-toggle="tab" href="#application">Application</a></li>
+										</ul>
+										<div class="tab-content">
+											<div class="tab-pane fade show active" id="os"
+												role="tabpanel">
+												<div class="pt-4">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row">
+																<div class="col-12 col-sm-6 col-md-4">
+																	<div class="info-box">
+																		<i class="fa fa-windows"
+																			style="font-size: 60px; color: dodgerblue"></i>
+																		<div class="info-box-content">
+																			<span class="info-box-text" style="cursor: pointer;"
+																				onclick="getSubProduct('Windows')">Windows</span> <span
+																				class="info-box-number"
+																				style="color: #b5b5c3 !important;"> Select
+																				Version </span>
+																		</div>
+
+																	</div>
+
+																</div>
+
+																<div class="col-12 col-sm-6 col-md-4">
+																	<div class="info-box mb-3">
+																		<i class="fa fa-linux" style="font-size: 60px;"></i>
+																		<div class="info-box-content">
+																			<span class="info-box-text" style="cursor: pointer;"
+																				onclick="getSubProduct('Ubuntu')">Ubuntu</span> <span
+																				class="info-box-number"
+																				style="color: #b5b5c3 !important">Select
+																				Version</span>
+																		</div>
+
+																	</div>
+
+																</div>
+																<div class="col-12 col-sm-6 col-md-4">
+																	<div class="info-box mb-3">
+																		<div class="info-box-content">
+																			<span class="info-box-text" style="cursor: pointer;"
+																				onclick="getSubProduct('CentOs')">Centos</span> <span
+																				class="info-box-number"
+																				style="color: #b5b5c3 !important">Select
+																				Version</span>
+																		</div>
+
+																	</div>
+
+																</div>
+
+															</div>
+															<div class="row">
+																<div class="col-12 col-sm-6 col-md-4">
+																	<div class="info-box mb-3">
+																		<span class="info-box-icon bg-warning elevation-1"><i
+																			class="fas fa-users"></i></span>
+																		<div class="info-box-content">
+																			<span class="info-box-text" style="cursor: pointer;"
+																				onclick="getSubProduct('Debian')">Debian</span> <span
+																				class="info-box-number"
+																				style="color: #b5b5c3 !important">Select
+																				Version</span>
+																		</div>
+
+																	</div>
+
+																</div>
+																<div class="col-12 col-sm-6 col-md-4">
+																	<div class="info-box mb-3">
+																		<span class="info-box-icon bg-warning elevation-1"><i
+																			class="fas fa-users"></i></span>
+																		<div class="info-box-content">
+																			<span class="info-box-text" style="cursor: pointer;"
+																				onclick="getSubProduct('Red Hat')">Red Hat</span> <span
+																				class="info-box-number"
+																				style="color: #b5b5c3 !important">Select
+																				Version</span>
+																		</div>
+
+																	</div>
+
+																</div>
+																<div class="col-12 col-sm-6 col-md-4">
+																	<div class="info-box mb-3">
+																		<span class="info-box-icon bg-warning elevation-1"><i
+																			class="fas fa-users"></i></span>
+																		<div class="info-box-content">
+																			<span class="info-box-text" style="cursor: pointer;"
+																				onclick="getSubProduct('macOS')">Mac OS</span> <span
+																				class="info-box-number"
+																				style="color: #b5b5c3 !important">Select
+																				Version</span>
+																		</div>
+
+																	</div>
+
+																</div>
+															</div>
+														</div>
+														<!-- /.container-fluid -->
+													</section>
+
+												</div>
+											</div>
+
+											<!-- Database -->
+											<div class="tab-pane fade" id="database">
+												<div class="pt-4">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row">
+																<div class="col-12 col-sm-6 col-md-4">
+																	<div class="info-box">
+																		<span class="info-box-icon bg-info elevation-1"><i
+																			class="fas fa-cog"></i></span>
+																		<div class="info-box-content">
+																			<span class="info-box-text" onclick="showDBForm()">Oracle</span>
+																			<span class="info-box-number"
+																				style="color: #b5b5c3 !important"> Select
+																				Version </span>
+																		</div>
+
+																	</div>
+
+																</div>
+
+																<div class="col-12 col-sm-6 col-md-4">
+																	<div class="info-box mb-3">
+																		<span class="info-box-icon bg-danger elevation-1"><i
+																			class="fas fa-thumbs-up"></i></span>
+																		<div class="info-box-content">
+																			<span class="info-box-text" onclick="showDBForm()">PostgreSQL</span>
+																			<span class="info-box-number"
+																				style="color: #b5b5c3 !important">Select
+																				Version</span>
+																		</div>
+
+																	</div>
+
+																</div>
+																<div class="col-12 col-sm-6 col-md-4">
+																	<div class="info-box mb-3">
+																		<span class="info-box-icon bg-success elevation-1"><i
+																			class="fas fa-shopping-cart"></i></span>
+																		<div class="info-box-content">
+																			<span class="info-box-text" onclick="showDBForm()">MySQL</span>
+																			<span class="info-box-number"
+																				style="color: #b5b5c3 !important">Select
+																				Version</span>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+														<!-- /.container-fluid -->
+													</section>
+
+												</div>
+											</div>
+											<!--End Database -->
+										</div>
+									</div>
+									<div class="row" id="dbForm" style="display: none">
+										<div class="col-md-6">
+											<label for="exampleSubProduct">Root Password</label>
+											<div class="form-group">
+												<input type="text" id="name" autocomplete="off"
+													class="form-control" placeholder="e.g MyP@ssw0rd@123" />
+											</div>
+											<div class="form-group">
+												<label for="exampleSubProduct">Database Name</label> <input
+													type="text" id="name" autocomplete="off"
+													class="form-control" placeholder="e.g myDB" />
+											</div>
+											<div class="form-group">
+												<label for="exampleSubProduct">Database User</label> <input
+													type="text" id="name" autocomplete="off"
+													class="form-control" placeholder="e.g myUser" />
+											</div>
+											<div class="form-group">
+												<label for="exampleSubProduct">Database User
+													Password</label> <input type="text" id="name" autocomplete="off"
+													class="form-control" placeholder="e.g Pass@123" />
+											</div>
+											<div class="form-group">
+												<label for="exampleSubProduct">Remote IP(if
+													enabled)(IP or all)</label> <input type="text" id="name"
+													autocomplete="off" class="form-control"
+													placeholder="e.g 192.168.1.1" />
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+
+			<!-- Sub Product -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<!-- PIE CHART -->
+							<div class="card border-transparent">
+								<div class="card-header">
+									<h3 class="card-title"
+										style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+										<span class="card-title" style="font-weight: bold;">Sub
+											Product</span> <span class="card-title"
+											style="font-size: 1rem !important; color: #b5b5c3 !important">Select
+											Sub Product</span>
+									</h3>
+								</div>
+								<div class="card-body">
+									<div class="form-group">
+										<select class="form-control select2" id="subProduct"
+											name="subProduct" multiple="multiple"
+											data-placeholder="Select Sub Product" style="width: 100%;">
+										</select>
+									</div>
+								</div>
+								<!-- /.card-body -->
+							</div>
+							<!-- /.card -->
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- End Sub Product -->
+			
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card border-transparent">
+								<div class="card-header">
+									<h3 class="card-title"
+										style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+										<span class="card-title" style="font-weight: bold;">Select
+											Biling Cycle</span> <span class="card-title"
+											style="font-size: 1rem !important; color: #b5b5c3 !important">Anuualy,
+											Monthly, Hourly</span>
+									</h3>
+								</div>
+								<div class="card-body">
+									<ul class="nav nav-pills ml-auto p-2"
+										style="display: inline-flex;">
+										<li class="nav-item"><a class="nav-link active"
+											href="#tab_1" data-toggle="tab">Hourly</a></li>
+										<li class="nav-item"><a class="nav-link" href="#tab_2"
+											data-toggle="tab">Daily</a></li>
+										<li class="nav-item"><a class="nav-link" href="#tab_3"
+											data-toggle="tab">Monthly</a></li>
+										<li class="nav-item"><a class="nav-link" href="#tab_4"
+											data-toggle="tab">Anuualy</a></li>
+										<li class="nav-item"><a class="nav-link" href="#tab_5"
+											data-toggle="tab">5 Years</a></li>
+									</ul>
+								</div>
+								<!-- /.card-body -->
+							</div>
+							<!-- /.card -->
+						</div>
+					</div>
+
+				</div>
+			</section>
+
+			<!-- Select Plan -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card border-transparent">
+								<div class="card-header">
+									<h3 class="card-title"
+										style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+										<span class="card-title" style="font-weight: bold;">Select
+											Plan Type</span> <span class="card-title"
+											style="font-size: 1rem !important; color: #b5b5c3 !important">Shared,
+											Dedicated CPU, High Memory</span>
+									</h3>
+								</div>
+								<div class="card-body">
+									<!-- Nav tabs -->
+									<div class="default-tab">
+										<ul class="nav nav-tabs" role="tablist">
+											<li class="nav-item"><a class="nav-link active"
+												data-toggle="tab" href="#shared">Shared CPU Plan</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#dedicated">Dedicated CPU Plan</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#highMemory">High Memory Plan</a></li>
+										</ul>
+										<div class="tab-content">
+											<div class="tab-pane fade show active" id="shared"
+												role="tabpanel">
+												<div class="pt-4">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row">
+																<div class="col-12">
+																	<div class="card">
+																		<div class="card-body">
+																			<table id="sharedPlanTable"
+																				class="table table-bordered table-striped">
+																				<thead>
+																					<tr>
+																						<th>RAM</th>
+																						<th>vPCU</th>
+																						<th>SSD DISK</th>
+																						<th>BANDWIDTH</th>
+																						<th>PLAN</th>
+																						<th>STATUS</th>
+																						<th>PRICE</th>
+																					</tr>
+																				</thead>
+																				<tbody>
+
+																				</tbody>
+
+																			</table>
+
+
+																		</div>
+																		<!-- /.card-body -->
+																	</div>
+
+																</div>
+															</div>
+														</div>
+														<!-- /.container-fluid -->
+													</section>
+
+												</div>
+											</div>
+
+											<!-- Dedicated Plan -->
+											<div class="tab-pane fade" id="dedicated">
+												<div class="pt-4">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row">
+																<div class="col-12">
+																	<div class="card">
+																		<div class="card-body">
+																			<table id="dedicatedPlanTable"
+																				class="table table-bordered table-striped">
+																				<thead>
+																					<tr>
+																						<th>RAM</th>
+																						<th>vPCU</th>
+																						<th>SSD DISK</th>
+																						<th>BANDWIDTH</th>
+																						<th>PLAN</th>
+																						<th>STATUS</th>
+																						<th>PRICE</th>
+																					</tr>
+																				</thead>
+																				<tbody>
+
+																				</tbody>
+
+																			</table>
+
+
+																		</div>
+																		<!-- /.card-body -->
+																	</div>
+
+																</div>
+															</div>
+														</div>
+														<!-- /.container-fluid -->
+													</section>
+
+												</div>
+											</div>
+
+											<!-- High Memory Plan -->
+											<div class="tab-pane fade" id="highMemory">
+												<div class="pt-4">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row">
+																<div class="col-12">
+																	<div class="card">
+																		<div class="card-body">
+																			<table id="highMemoryPlanTable"
+																				class="table table-bordered table-striped">
+																				<thead>
+																					<tr>
+																						<th>RAM</th>
+																						<th>vPCU</th>
+																						<th>SSD DISK</th>
+																						<th>BANDWIDTH</th>
+																						<th>PLAN</th>
+																						<th>STATUS</th>
+																						<th>PRICE</th>
+																					</tr>
+																				</thead>
+																				<tbody>
+
+																				</tbody>
+
+																			</table>
+
+
+																		</div>
+																		<!-- /.card-body -->
+																	</div>
+
+																</div>
+															</div>
+														</div>
+														<!-- /.container-fluid -->
+													</section>
+
+												</div>
+											</div>
+
+											<!-- /.card-body -->
+										</div>
+										<!-- /.card -->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- End Select Plan -->
+			<!-- Cloud Firewall -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card border-transparent">
+								<div class="card-header">
+									<h3 class="card-title"
+										style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+										<span class="card-title" style="font-weight: bold;">Cloud
+											Firewall</span> <span class="card-title"
+											style="font-size: 1rem !important; color: #b5b5c3 !important">Select
+											Firewall</span>
+									</h3>
+								</div>
+								<div class="card-body">
+									<div class="form-group">
+										<select class="form-control select2" id="firewall"
+											name="firewall" multiple="multiple"
+											data-placeholder="Select Firewall" style="width: 100%;">
+										</select>
+									</div>
+								</div>
+								<!-- /.card-body -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- End Cloud Firewall -->
+			
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="template :: jsscript"></div>
+
+
+	<script type="text/javascript" th:src="@{/custom_js/cloudInstance.js}"></script>
+	<script>
+	$(function() {
+		//Initialize Select2 Elements
+		$('.select2').select2()
+
+		//Initialize Select2 Elements
+		$('.select2bs4').select2({
+			theme : 'bootstrap4'
+		})
+
+	});
+	</script>
+</body>
+</html>

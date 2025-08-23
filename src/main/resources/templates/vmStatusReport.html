@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>VM Status Report</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">VM Status Report</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<!-- <div class="col-md-2">
+											<a th:href="@{'/users/view/'}"
+												class="btn btn-block bg-gradient-primary">Report</a>
+										</div> -->
+									</div>
+								</div>
+								<form th:action="${'/report/vmStatusReportData'}" th:method="POST" onsubmit="return validateForm()">
+									<div class="card-body" id="reportForm">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label>Report Date range: </label>
+
+													<div class="input-group">
+														<button type="button" class="btn btn-default float-right"
+															id="daterange-btn" name="daterange-btn">
+															<i class="far fa-calendar-alt"></i> Date range picker <i
+																class="fas fa-caret-down"></i>
+														</button>
+														<input type="text" id='from_date' name='from_date'
+															required class="form-control" readonly /> 
+														<input type="text" id='to_date' required name='to_date' class="form-control" readonly />
+													</div>
+												</div>
+
+												<div class="form-group">
+													<label>Instance name</label> <select tabindex="1"
+														id="instanceIP" required name="instanceIP" multiple="multiple"
+														class="form-control" style="width: 100%;">
+														<option th:each="ob:${instanceNameList}"
+															th:value="${ob[0]}" th:text="${ob[1] + ' ~ ' + ob[0]}" /></option>
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" id="vmStatusBtn"
+											class="btn btn-primary">
+											Generate <i
+												style="margin-left: 10px; color: yellow; display: none"
+												id="reportSpinner" class='fa fa-spinner fa-spin'></i>
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.container-fluid -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+	<!-- <script th:src="@{/custom_js/vmReport.js}"></script> -->
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/multiselect/bootstrap-multiselect.min.js}"></script>
+</body>
+<script type="text/javascript">
+	$('document').ready(function() {
+		
+		$('#instanceIP').multiselect({
+			enableFiltering: true,
+			includeSelectAllOption: true,
+			buttonWidth: '100%',
+			maxHeight: 350,
+
+		});
+		
+		$('#instanceIP').keyup(function(){
+	        var instance = $(this).val();
+	        if(instance != ''){
+	        	this.setCustomValidity('');
+	            $('#vmStatusBtn').prop('disabled', false);
+	        } else {
+	        	this.setCustomValidity('Please select Instance');
+	        }
+	    });
+		
+		
+	});
+	
+	function validateForm(){
+		 var fromDate = document.getElementById('from_date').value;
+	        var toDate = document.getElementById('to_date').value;
+
+	        // Validate from_date and to_date
+	        if (fromDate === "" || toDate === "") {
+	        	Swal.fire({
+					position: 'top',
+					icon: 'warning',
+					title: 'Please select Start and End Dates',
+					showConfirmButton: false,
+					timer: 3000
+				})
+	            return false;
+	        }
+	}
+</script>
+</html>

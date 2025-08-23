@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>CMP</title>
+<head th:include="templateListing :: headFragment"></head>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header_bk :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>View Projects</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">View Projects</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">Projects
+												Details</h3>
+										</div>
+										<!-- 										<div class="col-md-2"> -->
+										<!-- 											<a th:href="@{'/'+${action_name}+'/new/'}" -->
+										<!-- 												class="btn btn-block bg-gradient-primary">Add</a> -->
+										<!-- 										</div> -->
+									</div>
+									<div th:if="${message != null}"
+										class="alert alert-success alert-dismissible fade show text-center message"
+										role="alert">
+										[[${message}]]
+										<button type="button" class="close btn-sm"
+											data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div th:if="${error != null}"
+										class="alert alert-danger alert-dismissible fade show text-center message"
+										role="alert">
+										[[${error}]]
+										<button type="button" class="close btn-sm"
+											data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+								<div class="card-body" th:if="${listObj != null }">
+									<table id="example1" class="table table-bordered table-striped">
+										<thead class="thead-light">
+											<tr>
+												<th scope="col">Sr No.</th>
+												<th>OpenStack IP</th>
+												<th>Project ID</th>
+												<th>Project Name</th>
+												<th>Project Domain ID</th>
+												<th>Project Description</th>
+												<th>Project Enabled</th>
+												<th>Project Parent ID</th>
+												<th>Project Is Domain</th>
+												<th>Links</th>
+												<th>Tags</th>
+												<th>Options</th>
+
+												<th>Cores (Maximum number of CPU cores allowed for the
+													project)</th>
+												<th>Fixed IPs (Maximum number of floating IP addresses
+													allowed for the project. -1 typically means unlimited)</th>
+												<th>Floating IPs (Maximum number of floating IP
+													addresses allowed for the project)</th>
+												<th>Injected File Content Bytes (Maximum number of
+													bytes allowed for the content of injected files. This
+													pertains to file injection through the config drive or
+													metadata service)</th>
+												<th>Injected File Path Bytes (Maximum number of bytes
+													allowed for the file path of injected files)</th>
+												<th>Injected Files (Maximum number of injected files
+													allowed for each instance)</th>
+												<th>Instances (Maximum number of instances (virtual
+													machines) allowed for the project)</th>
+												<th>Key Pairs (Maximum number of key pairs allowed for
+													the project. Key pairs are used for SSH access to
+													instances)</th>
+												<th>Metadata Items (Maximum number of metadata items
+													allowed for each instance. Metadata items are key-value
+													pairs)</th>
+												<th>RAM (Maximum amount of RAM (in MB) allowed for the
+													project)</th>
+												<th>Security Group Rules (Maximum number of security
+													group rules allowed for the project. -1 typically means
+													unlimited)</th>
+												<th>Security Groups (Maximum number of security groups
+													allowed for the project. -1 typically means unlimited)</th>
+												<th>Server Group Members (Maximum number of members
+													allowed per server group. Server groups are used to apply
+													anti-affinity or affinity policies)</th>
+												<th>Server Groups (Maximum number of server groups
+													allowed for the project)</th>
+
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="obj, keyPairStat : ${listObj}">
+												<th scope="row" th:text="${keyPairStat.count}">1</th>
+
+
+
+												<td>[[${obj.openStackIp}]]</td>
+												<td>[[${obj.projectId}]]</td>
+												<td>[[${obj.projectName}]]</td>
+												<td>[[${obj.projectDomainId}]]</td>
+												<td>[[${obj.projectDescription}]]</td>
+												<td>[[${obj.projectEnabled}]]</td>
+												<td>[[${obj.projectParentId}]]</td>
+												<td>[[${obj.projectIsDomain}]]</td>
+												<td>[[${obj.links}]]</td>
+												<td>[[${obj.tags}]]</td>
+												<td>[[${obj.options}]]</td>
+												<td>[[${obj.cores}]]</td>
+												<td>[[${obj.fixedIps}]]</td>
+												<td>[[${obj.floatingIps}]]</td>
+												<td>[[${obj.injectedFileContentBytes}]]</td>
+												<td>[[${obj.injectedFilePathBytes}]]</td>
+												<td>[[${obj.injectedFiles}]]</td>
+												<td>[[${obj.instances}]]</td>
+												<td>[[${obj.keyPairs}]]</td>
+												<td>[[${obj.metadataItems}]]</td>
+												<td>[[${obj.ram}]]</td>
+												<td>[[${obj.securityGroupRules}]]</td>
+												<td>[[${obj.securityGroups}]]</td>
+												<td>[[${obj.serverGroupMembers}]]</td>
+												<td>[[${obj.serverGroups}]]</td>
+
+
+
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div class="modal fade text-center" id="confirmModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Delete Confirmation</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<span id="confirmText"></span>
+					</div>
+					<div class="modal-footer">
+						<a type="button" id="yesBtn" class="btn btn-danger">Yes</a>
+						<button type="button" class="btn btn-secondary"
+							data-dismiss="modal">No</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="templateListing :: jsscript"></div>
+	<script type="text/javascript">
+		$(document).ready(
+				function() {
+					$(".btn-delete").on(
+							"click",
+							function(e) {
+								e.preventDefault();
+								link = $(this);
+
+								tutorialTitle = link.attr("tutorialTitle");
+								$("#yesBtn").attr("href", link.attr("href"));
+								$("#confirmText").html(
+										"Do you want to delete the VM \<strong\>"
+												+ tutorialTitle
+												+ "\<\/strong\>?");
+								$("#confirmModal").modal();
+							});
+
+					$("#btnClear").on("click", function(e) {
+						e.preventDefault();
+						$("#keyword").text("");
+						window.location = "[[@{/'+${action_name}+'/view}]]";
+					});
+				});
+	</script>
+</body>
+
+</html>

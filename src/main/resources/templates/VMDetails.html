@@ -1,0 +1,2306 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud Portal</title>
+
+<!-- Common CSS -->
+
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" th:href="@{/css/fontAwesome.css}">
+<!-- Font Awesome -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
+<!-- Ionicons -->
+<link rel="stylesheet" th:href="@{/css/ionicIcons.css}">
+<!-- Tempusdominus Bootstrap 4 -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css}">
+<!-- iCheck -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
+<!-- JQVMap -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/jqvmap/jqvmap.min.css}">
+<!-- Theme style -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/dist/css/adminlte.min.css}">
+<!-- overlayScrollbars -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/overlayScrollbars/css/OverlayScrollbars.min.css}">
+<!-- Daterange picker -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/daterangepicker/daterangepicker.css}">
+<!-- summernote -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/summernote/summernote-bs4.min.css}">
+
+<!--End Common CSS  -->
+
+
+<link rel="stylesheet"
+	th:href="@{/webtemplate/css/cloudfont-awesome.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/css/font-awesome.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-responsive/css/responsive.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-buttons/css/buttons.bootstrap4.min.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css}">
+
+
+<style>
+.glowBtn {
+	background-color: #1c87c9;
+	-webkit-border-radius: 60px;
+	border-radius: 5px;
+	border: none;
+	color: #eeeeee;
+	cursor: pointer;
+	display: inline-block;
+	font-family: sans-serif;
+	font-size: 20px;
+	padding: 5px 15px;
+	text-align: center;
+	text-decoration: none;
+}
+
+@
+keyframes glowing { 0% {
+	background-color: #2ba805;
+	box-shadow: 0 0 5px #2ba805;
+}
+
+50
+
+
+
+
+%
+{
+background-color
+
+
+
+
+:
+
+
+
+
+#49e819
+
+
+
+
+;
+box-shadow
+
+
+
+
+:
+
+
+
+
+0
+
+
+
+
+0
+
+
+
+
+20
+
+
+
+
+px
+
+
+
+
+#49e819
+
+
+
+
+;
+}
+100
+
+
+
+
+%
+{
+background-color
+
+
+
+
+:
+
+
+
+
+#2ba805
+
+
+
+
+;
+box-shadow
+
+
+
+
+:
+
+
+
+
+0
+
+
+
+
+0
+
+
+
+
+5
+
+
+
+
+px
+
+
+
+
+#2ba805
+
+
+
+
+;
+}
+}
+.glowBtn {
+	animation: glowing 1300ms infinite;
+}
+
+.new-message-box {
+	margin: 15px 0;
+	padding-left: 20px;
+	margin-bottom: 25px !important;
+}
+
+.new-message-box p {
+	font-size: 1em;
+	font-weight: 600;
+}
+
+.info-tab {
+	width: 40px;
+	height: 40px;
+	display: inline-block;
+	position: relative;
+	top: 8px;
+}
+
+.info-tab {
+	float: left;
+	margin-left: -23px;
+}
+
+.info-tab i::before {
+	width: 24px;
+	height: 24px;
+	box-shadow: inset 12px 0 13px rgba(0, 0, 0, 0.5);
+}
+
+.info-tab i::after {
+	width: 0;
+	height: 0;
+	border: 12px solid transparent;
+	border-bottom-color: #fff;
+	border-left-color: #fff;
+	bottom: -18px;
+}
+
+.info-tab i::before, .info-tab i::after {
+	content: "";
+	display: inline-block;
+	position: absolute;
+	left: 0;
+	bottom: -17px;
+	transform: rotateX(60deg);
+}
+
+.note-box, .warning-box, .tip-box-success, .tip-box-danger,
+	.tip-box-warning, .tip-box-info, .tip-box-alert {
+	padding: 12px 8px 3px 26px;
+}
+
+/*******info*******/
+.new-message-box-info {
+	/* background: #eeeeee; */
+	padding: 3px;
+	margin: 10px 0;
+}
+
+.tip-box-info {
+	color: #01579B;
+	background: #f1faff !important;
+	border-radius: 5px;
+}
+
+.tip-icon-info {
+	background: #03A9F4;
+}
+
+.tip-icon-info::before {
+	font-size: 25px;
+	content: "\f129";
+	top: 8px;
+	left: 11px;
+	font-family: FontAwesome;
+	position: absolute;
+	color: white
+}
+
+.tip-icon-info i::before {
+	background: #03A9F4;
+}
+
+.utilization {
+	background-color: aqua;
+}
+</style>
+
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<!-- Header -->
+		<div th:replace="fragments/header_bk :: header"></div>
+		<!--Close Header -->
+
+		<!-- Sidebar -->
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<!-- Close Sidebar -->
+
+		<div class="content-wrapper">
+			<section class="content" style="padding-top: 10px;">
+				<div class="container-fluid">
+
+					<input type="hidden" id="instanceIP"
+						th:value="${vmDetails.instance_ip}"> <input type="hidden"
+						id="instance_vmname" th:value="${vmDetails.instance_name}">
+					<input type="hidden" id="physicalServerIPtemp"
+						th:value="${vmDetails.physicalServerIP}">
+
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card border-transparent">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-1" style="margin-left: 30px">
+											<i class="fa fa-windows"
+												th:if="${#strings.contains(vmDetails.subproduct_id.getSub_product_name, 'Windows')}"
+												style="font-size: 40px; color: dodgerblue; padding-top: 2px"></i>
+											<img
+												th:unless="${#strings.contains(vmDetails.subproduct_id.getSub_product_name, 'Windows')}"
+												src="/webtemplate/dist/img/Ubuntu.png" style="height: 63px;">
+										</div>
+
+										<div class="col-md-3">
+											<h3 class="card-title"
+												style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+
+												<span class="card-title"
+													th:text="${vmDetails.instance_name}"
+													style="font-weight: bold; cursor: pointer; font-size: larger;"
+													oncontextmenu="return showContextMenu(event)"> </span> <span
+													class="card-title"
+													style="font-size: 1rem !important; color: #b5b5c3 !important">
+													<span th:text="${vmDetails.cpuAssigned}+'CPU'"></span> / <span
+													th:text="${vmDetails.memoryAssigned}"></span>
+											</h3>
+										</div>
+
+									</div>
+								</div>
+								<div class="card-body">
+									<!-- Nav tabs -->
+									<div class="default-tab">
+										<ul class="nav nav-tabs" role="tablist">
+											<li class="nav-item"><a class="nav-link active"
+												data-toggle="tab" href="#basicInfo">Basic Info</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#hardware" style="display: none;">Hardware
+													Details</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#vmHealth">Health Details</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#resize">Resize Tab</a></li>
+											<!-- 											<li class="nav-item"><a class="nav-link" -->
+											<!-- 												data-toggle="tab" href="#rebuild">Operating System</a></li> -->
+											<!-- 											<li class="nav-item"><a class="nav-link" -->
+											<!-- 												data-toggle="tab" href="#storage">Storage</a></li> -->
+											<!-- 											<li class="nav-item"><a class="nav-link" -->
+											<!-- 												data-toggle="tab" href="#network">Network</a></li> -->
+											<li class="nav-item" style="display: none;"
+												id="backuptabdefaultmainid"><a class="nav-link"
+												data-toggle="tab" href="#backup">Backup</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#destroy">Destroy</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#start_stop">Start/Stop</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#billing">Usage</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#ReportDetailTab">Report</a></li>
+										</ul>
+										<div class="tab-content">
+
+											<!-- Basic Info -->
+											<div class="tab-pane fade show active" id="basicInfo"
+												role="tabpanel">
+												<div class="pt-4">
+													<section class="content" id="main">
+														<div class="nav-tabs-custom">
+															<div class="card-header utilization">
+																<h3 class="card-title">VM Information</h3>
+															</div>
+															<div class="tab-content">
+																<form style="margin-top: 10px">
+																	<div class="form-row" style="display: flex;">
+																		<div class="form-group col-md-4">
+																			<label for="instanceIP">Instance IP</label> <input
+																				th:value="${vmDetails.instance_ip}" type="text"
+																				class="form-control" readonly id="Node_ip">
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="NodeName">Instance Name</label> <input
+																				th:value="${vmDetails.instance_name}" type="text"
+																				class="form-control" readonly id="NodeName">
+																		</div>
+																		<div class="form-group col-md-4"
+																			th:if="${vmDetails.virtualization_type != 'KVM'}">
+																			<label for="generationType">Generation Type</label> <input
+																				th:value="${vmDetails.generation_type}" type="text"
+																				id="generationType" class="form-control" readonly>
+																		</div>
+
+																	</div>
+																	<div class="form-row" style="display: flex;">
+																		<div class="form-group col-md-4"
+																			th:if="${vmDetails.virtualization_type != 'KVM'}">
+																			<label for="computer_name">Computer Name</label> <input
+																				th:value="${vmDetails.computer_name}" type="text"
+																				id="computer_name" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="mac_address">Mac Address</label> <input
+																				th:value="${vmDetails.mac_address}" type="text"
+																				id="mac_address" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="vm_id">VM ID</label> <input
+																				th:value="${(vmDetails.virtualization_type == 'KVM') ? vmDetails.kvmvmid : vmDetails.vm_id}"
+																				type="text" id="vm_id" class="form-control" readonly>
+																		</div>
+
+																	</div>
+																	<div class="form-row" style="display: flex;">
+																		<div class="form-group col-md-4">
+																			<label for="created_on">Created on</label> <input
+																				th:value="${vmDetails.created_on}" type="text"
+																				id="created_on" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="request_status">Request Status</label> <input
+																				th:value="${vmDetails.request_status}" type="text"
+																				id="request_status" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4"
+																			th:if="${vmDetails.virtualization_type != 'KVM'}">
+																			<label for="size_of_system_files">Size of
+																				System Files</label> <input
+																				th:value="${vmDetails.size_of_system_files}"
+																				type="text" id="size_of_system_files"
+																				class="form-control" readonly>
+																		</div>
+																	</div>
+																	<div class="form-row" style="display: flex;">
+																		<div class="form-group col-md-4"
+																			th:if="${vmDetails.virtualization_type != 'KVM'}">
+																			<label for="vm_state">VM State</label> <input
+																				th:value="${vmDetails.vm_state}" type="text"
+																				id="vm_state" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="vm_status">VM Status</label> <input
+																				th:value="${vmDetails.vm_state}" type="text"
+																				id="vm_status" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4"
+																			th:if="${vmDetails.virtualization_type != 'KVM'}">
+																			<label for="vlan_setting">vLAN Setting</label> <input
+																				th:value="${vmDetails.vlan_setting}" type="text"
+																				id="vlan_setting" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="location">Location</label> <input
+																				type="text"
+																				th:value="${vmDetails.location_id.getLocation_name}"
+																				id="location" class="form-control" readonly>
+																		</div>
+																	</div>
+																	<div class="form-row" style="display: flex;">
+																		<div class="form-group col-md-4"
+																			sec:authorize="hasRole('ROLE_SUPERADMIN')">
+																			<label for="vmLocationPath">Vm Location path</label>
+																			<input th:value="${vmDetails.vm_location_path}"
+																				type="text" id="vmLocationPath" class="form-control"
+																				readonly>
+																		</div>
+																		<div class="form-group col-md-4"
+																			th:if="${vmDetails.virtualization_type != 'KVM'}">
+																			<label for="switch_id">Switch</label> <input
+																				th:value="${vmDetails.switch_id.getSwitch_name}"
+																				type="text" id="switch_id" class="form-control"
+																				readonly>
+																		</div>
+																		<div class="form-group col-md-4"
+																			sec:authorize="hasRole('ROLE_SUPERADMIN')">
+																			<label for="securityGroup">Security Group</label> <input
+																				th:value="${vmDetails.security_group_id.getSecurity_group_name}"
+																				type="text" id="securityGroup" class="form-control"
+																				readonly>
+																		</div>
+																	</div>
+																	<div class="form-row" style="display: flex;">
+																		<div class="form-group col-md-4">
+																			<label for="subproduct_id">OS</label> <input
+																				th:value="${(vmDetails.virtualization_type == 'KVM') ? vmDetails.kvmostype : vmDetails.subproduct_id.getSub_product_name}"
+																				type="text" id="subproduct_id" class="form-control"
+																				readonly>
+																		</div>
+
+
+																		<!-- <div class="form-group col-md-4">
+																			<label for="diskPath">Disk Path</label> <input
+																				th:value="${vmDetails.disk_path}" type="text"
+																				id="diskPath" class="form-control" readonly>
+																		</div>
+
+																		<div class="form-group col-md-4">
+																			<label for="iso_file_path">ISO File Path</label> <input
+																				th:value="${vmDetails.iso_file_path}" type="text"
+																				id="iso_file_path" class="form-control" readonly>
+																		</div> -->
+																		<div class="form-group col-md-4"
+																			sec:authorize="hasRole('ROLE_SUPERADMIN')">
+																			<label for="vpcNetwork">VPC Network</label> <input
+																				th:value="${vmDetails.vpc_id.getVpc_name}"
+																				type="text" id="vpcNetwork" class="form-control"
+																				readonly>
+																		</div>
+
+																	</div>
+																	<div class="form-row" style="display: flex;">
+
+																		<div class="form-group col-md-4">
+																			<label for="cpu">CPU</label> <input
+																				th:value="${vmDetails.cpuAssigned}" type="text"
+																				id="cpu" class="form-control" readonly>
+
+
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="ram">RAM (GB)</label> <input type="text"
+																				th:value="${vmDetails.memoryAssigned}" id="ram"
+																				class="form-control" readonly>
+
+
+																		</div>
+																		<div class="form-group col-md-4"
+																			th:if="${vmDetails.virtualization_type != 'KVM'}">
+																			<label for="ssdDisk">SSD Disk (GB)</label> <input
+																				type="text"
+																				th:value="${diskSize != '-'} ? ${diskSize} : ${vmDetails.price_id.getSsd_disk}"
+																				id="ssdDisk" class="form-control" readonly>
+																		</div>
+																	</div>
+																	<div class="form-row" style="display: flex;">
+
+																		<div class="form-group col-md-4"
+																			th:if="${vmDetails.virtualization_type != 'KVM'}">
+																			<label for="bandwidth"> Bandwidth</label> <input
+																				type="text" id="bandwidth" class="form-control"
+																				th:value="${vmDetails.price_id.getBandwidth}"
+																				readonly>
+																		</div>
+
+																	</div>
+																</form>
+															</div>
+														</div>
+													</section>
+												</div>
+											</div>
+											<!--End Basic Info -->
+
+
+											<!-- report pannel -->
+
+											<div class="tab-pane fade" id="ReportDetailTab"
+												role="tabpanel">
+												<br>
+												<div class="row">
+
+													<div class="col-md-6">
+														<!-- 								<div class="form-group"> -->
+														<div class="input-group">
+															<button type="button" class="btn btn-default float-right"
+																id="daterange-btn" name="daterange-btn">
+																<i class="far fa-calendar-alt"></i> Date range picker <i
+																	class="fas fa-caret-down"></i>
+															</button>
+															<input type="text" id='from_date' name='from_date'
+																required class="form-control" readonly /> <input
+																type="text" id='to_date' required name='to_date'
+																class="form-control" readonly />
+														</div>
+														<!-- 								</div> -->
+													</div>
+
+													<div class="col-md-6">
+														<button type="button" id="generateAllVMReports"
+															th:onclick="generateAllVmReports(
+															[[${vmDetails.instance_name}]])"
+															class="btn btn-info">
+															Generate <i
+																style="margin-left: 10px; color: yellow; display: none"
+																id="vmReportSpinner" class='fa fa-spinner fa-spin'></i>
+														</button>
+													</div>
+
+												</div>
+												<div id="vmUtilizationDiv1" style="display: none">
+													<div class="pt-4">
+														<section class="content" id="main">
+															<div class="nav-tabs-custom">
+																<div class="card-header utilization">
+																	<h3 class="card-title">VM Utilization Report</h3>
+																</div>
+																<div class="tab-content">
+																	<div id="myreporttablehereID">
+																		<table id="example1reporttable"
+																			class="table table-bordered table-striped">
+																			<thead class="thead-light"
+																				style="text-align: center;">
+																				<tr>
+																					<th scope="col">Sr_no</th>
+																					<th scope="col">VM Name</th>
+																					<th scope="col">Total usage Uptime</th>
+																					<th scope="col">Date</th>
+																					<th scope="col">Server IP</th>
+
+																				</tr>
+																			</thead>
+
+																		</table>
+																	</div>
+																</div>
+															</div>
+
+														</section>
+													</div>
+
+													<div class="pt-4" style="">
+														<section class="content" id="main">
+															<div class="nav-tabs-custom">
+																<div class="card-header utilization">
+																	<h3 class="card-title">VM Health History</h3>
+																</div>
+																<div class="tab-content">
+																	<div id="vmHealthDiv">
+																		<table id="vmHealthTable"
+																			class="table table-bordered table-striped">
+																			<thead class="thead-light"
+																				style="text-align: center;">
+																				<tr>
+																					<th scope="col">Sr No.</th>
+																					<th scope="col">Virtual Machine</th>
+																					<th scope="col">Instance IP</th>
+																					<th scope="col">Physical server IP</th>
+																					<th scope="col">CPU utilization</th>
+																					<th scope="col">Memory utilization</th>
+																					<th scope="col">Total Memory</th>
+																					<th scope="col">Used Memory</th>
+																					<th scope="col">Free Memory</th>
+																					<th scope="col">Temperature</th>
+																					<th scope="col">Event Timestamp</th>
+																				</tr>
+																			</thead>
+																			<tbody>
+																			</tbody>
+																		</table>
+																	</div>
+																</div>
+															</div>
+
+														</section>
+													</div>
+
+													<div class="pt-4" style="display: none;">
+														<section class="content" id="main">
+															<div class="nav-tabs-custom">
+																<div class="card-header utilization">
+																	<h3 class="card-title">VM Availability</h3>
+																</div>
+																<div class="tab-content">
+																	<div id="vmAvailabilityDiv">
+																		<table id="vmAvailabilityTable"
+																			class="table table-bordered table-striped">
+																			<thead class="thead-light"
+																				style="text-align: center;">
+																				<tr>
+																					<th scope="col">ID</th>
+																					<th scope="col">Instance IP</th>
+																					<th scope="col">Uptime Percent</th>
+																					<th scope="col">Uptime (DD-HH-MM-SS)</th>
+																					<th scope="col">Downtime percent</th>
+																					<th scope="col">Downtime (DD-HH-MM-SS)</th>
+																					<th scope="col">Event Timestamp</th>
+
+																				</tr>
+																			</thead>
+																			<tbody>
+
+																			</tbody>
+																		</table>
+																	</div>
+																</div>
+															</div>
+
+														</section>
+													</div>
+
+
+													<div class="pt-4" style="">
+														<section class="content" id="main">
+															<div class="nav-tabs-custom">
+																<div class="card-header utilization">
+																	<h3 class="card-title">VM CPU Threshold</h3>
+																</div>
+																<div class="tab-content">
+																	<div id="vmCpuThresholdDiv">
+																		<table id="vmCpuThresholdTable"
+																			class="table table-bordered table-striped">
+																			<thead class="thead-light"
+																				style="text-align: center;">
+																				<tr>
+																					<th scope="col">Sr No.</th>
+																					<th scope="col">Virtual Machine</th>
+																					<th scope="col">Physical server IP</th>
+																					<th scope="col">CPU utilization (%)</th>
+																					<th scope="col">CPU Threshold</th>
+																					<th scope="col">CPU Status</th>
+																					<th scope="col">Event Timestamp</th>
+																				</tr>
+																			</thead>
+																			<tbody>
+
+																			</tbody>
+																		</table>
+																	</div>
+																</div>
+															</div>
+
+														</section>
+													</div>
+
+													<div class="pt-4" style="">
+														<section class="content" id="main">
+															<div class="nav-tabs-custom">
+																<div class="card-header utilization">
+																	<h3 class="card-title">VM Memory Threshold</h3>
+																</div>
+																<div class="tab-content">
+																	<div id="vmMemoryThresholdDiv">
+																		<table id="vmMemoryThresholdTable"
+																			class="table table-bordered table-striped">
+																			<thead class="thead-light"
+																				style="text-align: center;">
+																				<tr>
+																					<th scope="col">Sr No.</th>
+																					<th scope="col">Virtual Machine</th>
+																					<th scope="col">Physical server IP</th>
+																					<th scope="col">Memory utilization (%)</th>
+																					<th scope="col">Memory Threshold</th>
+																					<th scope="col">Memory Status</th>
+																					<th scope="col">Event Timestamp</th>
+																				</tr>
+																			</thead>
+																			<tbody>
+
+																			</tbody>
+																		</table>
+																	</div>
+																</div>
+															</div>
+
+														</section>
+													</div>
+
+												</div>
+
+											</div>
+											<!-- 											end report pannel -->
+
+
+											<!--Windows Hardware Details -->
+											<div class="tab-pane fade"
+												th:if="${#strings.contains(vmDetails.subproduct_id.getSub_product_name, 'Windows')}"
+												id="hardware" role="tabpanel">
+												<div class="pt-4">
+													<section class="content" id="main">
+														<div class="nav-tabs-custom">
+															<div class="card-header utilization">
+																<h3 class="card-title">Hardware Information</h3>
+															</div>
+															<div class="tab-content">
+																<form style="margin-top: 10px">
+																	<div class="form-row" style="display: flex;">
+
+																		<div class="form-group col-md-4">
+																			<label for="macAddress">Mac Address</label> <input
+																				th:value="${hardware.macAddress}" type="text"
+																				id="macAddress" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="manufacturer">Manufacturer</label> <input
+																				th:value="${hardware.manufacturer}" type="text"
+																				id="manufacturer" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="originalSerialNo">Original Serial
+																				No</label> <input th:value="${hardware.originalSerialNo}"
+																				type="text" id="originalSerialNo"
+																				class="form-control" readonly>
+																		</div>
+																	</div>
+
+																	<div class="form-row" style="display: flex;">
+
+																		<div class="form-group col-md-4">
+																			<label for="domain">Domain</label> <input
+																				th:value="${hardware.domain}" type="text"
+																				id="domain" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="buildNumber">Build Number</label> <input
+																				th:value="${hardware.buildNumber}" type="text"
+																				id="buildNumber" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="systemModel">System Model</label> <input
+																				th:value="${hardware.systemModel}" type="text"
+																				id="systemModel" class="form-control" readonly>
+																		</div>
+																	</div>
+
+																	<div class="form-row" style="display: flex;">
+
+																		<div class="form-group col-md-4">
+																			<label for="servicePack">Service Pack</label> <input
+																				th:value="${hardware.servicePack}" type="text"
+																				id="servicePack" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="productId">Product ID</label> <input
+																				th:value="${hardware.productId}" type="text"
+																				id="productId" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="diskSpace">Disk Space</label> <input
+																				th:value="${hardware.diskSpace}" type="text"
+																				id="diskSpace" class="form-control" readonly>
+																		</div>
+																	</div>
+
+																	<div class="form-row" style="display: flex;">
+																		<div class="form-group col-md-4">
+																			<label for="osName">OS Name</label> <input
+																				th:value="${hardware.osName}" type="text"
+																				class="form-control" readonly id="osName">
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="osType">OS Type</label> <input
+																				th:value="${hardware.osType}" type="text"
+																				id="osType" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="osVersion">OS Version</label> <input
+																				th:value="${hardware.osVersion}" type="text"
+																				id="processorManufacturer" class="form-control"
+																				readonly>
+																		</div>
+																	</div>
+
+																	<div class="form-row" style="display: flex;">
+																		<div class="form-group col-md-4">
+																			<label for="processorCount">Processor Count</label> <input
+																				th:value="${hardware.processorCount}" type="text"
+																				class="form-control" readonly id="processorCount">
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="processorName">Processor Name</label> <input
+																				th:value="${hardware.processorName}" type="text"
+																				id="processorName" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="processorManufacturer">Processor
+																				Manufacture</label> <input
+																				th:value="${hardware.processorManufacturer}"
+																				type="text" id="processorManufacturer"
+																				class="form-control" readonly>
+																		</div>
+																	</div>
+																	<div class="form-row" style="display: flex;">
+
+																		<div class="form-group col-md-4">
+																			<label for="biosName">Bios Name</label> <input
+																				th:value="${hardware.biosName}" type="text"
+																				id="biosName" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="biosManufacturer">Bios
+																				Manufacture</label> <input
+																				th:value="${hardware.biosManufacturer}" type="text"
+																				id="biosManufacturer" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="biosVersion">Bios Version</label> <input
+																				th:value="${hardware.biosVersion}" type="text"
+																				id="biosVersion" class="form-control" readonly>
+																		</div>
+																	</div>
+
+																</form>
+															</div>
+														</div>
+													</section>
+												</div>
+											</div>
+											<!--End Hardware Details -->
+
+
+											<!-- Linux Hardware Details -->
+
+											<div class="tab-pane fade"
+												th:unless="${#strings.contains(vmDetails.subproduct_id.getSub_product_name, 'Windows')}"
+												id="hardware" role="tabpanel">
+												<div class="pt-4">
+													<section class="content" id="main">
+														<div class="nav-tabs-custom">
+															<div class="card-header utilization">
+																<h3 class="card-title">Hardware Information</h3>
+															</div>
+															<div class="tab-content">
+																<form style="margin-top: 10px">
+																	<div class="form-row" style="display: flex;">
+
+																		<div class="form-group col-md-4">
+																			<label for="linuxIpAddress">IP Address</label> <input
+																				th:value="${hardware.ipAddress}" type="text"
+																				id="linuxIpAddress" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="linuxPcName">PC Name</label> <input
+																				th:value="${hardware.pcName}" type="text"
+																				id="linuxPcName" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="linuxBranchName">Branch No</label> <input
+																				th:value="${hardware.branchName}" type="text"
+																				id="linuxBranchName" class="form-control" readonly>
+																		</div>
+																	</div>
+
+																	<div class="form-row" style="display: flex;">
+
+																		<div class="form-group col-md-4">
+																			<label for="linuxBiosInfo">Bios Info</label> <input
+																				th:value="${hardware.biosInfo}" type="text"
+																				id="linuxBiosInfo" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="linuxGraphicCard">Graphic Card</label> <input
+																				th:value="${hardware.graphicCard}" type="text"
+																				id="linuxGraphicCard" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="linuxHddDrive">HDD Drive</label> <input
+																				th:value="${hardware.hddDrive}" type="text"
+																				id="linuxHddDrive" class="form-control" readonly>
+																		</div>
+																	</div>
+
+																	<div class="form-row" style="display: flex;">
+
+																		<div class="form-group col-md-4">
+																			<label for="linuxMac">MAC Address</label> <input
+																				th:value="${hardware.macAddress}" type="text"
+																				id="linuxMac" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="linuxMotherboard">Motherboard</label> <input
+																				th:value="${hardware.motherboardName}" type="text"
+																				id="linuxMotherboard" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="linuxOS">OS Name</label> <input
+																				th:value="${hardware.opName}" type="text"
+																				id="linuxOS" class="form-control" readonly>
+																		</div>
+																	</div>
+
+																	<div class="form-row" style="display: flex;">
+																		<div class="form-group col-md-4">
+																			<label for="linuxProcessor">Processor</label> <input
+																				th:value="${hardware.processorName}" type="text"
+																				class="form-control" readonly id="linuxProcessor">
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="linuxRAM">RAM</label> <input
+																				th:value="${hardware.ramDetails}" type="text"
+																				id="linuxRAM" class="form-control" readonly>
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="linuxSerialNo">Serial No</label> <input
+																				th:value="${hardware.serialNo}" type="text"
+																				id="linuxSerialNo" class="form-control" readonly>
+																		</div>
+																	</div>
+
+																	<div class="form-row" style="display: flex;">
+																		<div class="form-group col-md-4">
+																			<label for="linuxDiscoverTime">Discover Time</label>
+																			<input th:value="${hardware.discoverTime}"
+																				type="text" class="form-control" readonly
+																				id="linuxDiscoverTime">
+																		</div>
+																		<div class="form-group col-md-4">
+																			<label for="linuxCtime">CTIME</label> <input
+																				th:value="${hardware.cTime}" type="text"
+																				id="linuxCtime" class="form-control" readonly>
+																		</div>
+
+																	</div>
+
+																</form>
+															</div>
+														</div>
+													</section>
+												</div>
+											</div>
+
+											<!-- End Linux Hardware Details -->
+
+
+											<!--VM Health-->
+											<div class="tab-pane fade" id="vmHealth">
+												<div class="pt-4">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row">
+
+																<div class="col-md-6">
+
+
+																	<div class="card card-primary card-outline">
+																		<div class="card-header utilization">
+																			<h3 class="card-title">
+																				<i class="far fa-chart-bar"></i> Memory Utilization
+																			</h3>
+
+																			<div class="card-tools">
+																				<button type="button" class="btn btn-tool"
+																					data-card-widget="collapse">
+																					<i class="fas fa-minus"></i>
+																				</button>
+																				<button type="button" class="btn btn-tool"
+																					data-card-widget="remove">
+																					<i class="fas fa-times"></i>
+																				</button>
+																			</div>
+																		</div>
+																		<div class="card-body">
+																			<div id="memoryUtilizationChart"
+																				style="height: 300px;"></div>
+																		</div>
+
+																	</div>
+
+																</div>
+
+																<div class="col-md-6">
+																	<div class="card card-primary card-outline">
+																		<div class="card-header utilization">
+																			<h3 class="card-title">
+																				<i class="far fa-chart-bar"></i> CPU Utilization
+																			</h3>
+
+																			<div class="card-tools">
+																				Real time
+																				<div class="btn-group" id="realtime"
+																					data-toggle="btn-toggle">
+																					<button type="button"
+																						class="btn btn-default btn-sm active"
+																						data-toggle="on">On</button>
+																					<button type="button"
+																						class="btn btn-default btn-sm" data-toggle="off">Off</button>
+																				</div>
+																			</div>
+																		</div>
+																		<div class="card-body">
+																			<div id="cpuUtilizationGraph" style="height: 300px;"></div>
+																		</div>
+																		<div class="d-flex flex-row justify-content-end">
+																			<span class="mr-2"> <i
+																				class="fas fa-square text-primary"></i> CPU
+																				Utilization
+																			</span>
+																		</div>
+																	</div>
+																</div>
+															</div>
+
+															<div class="row">
+																<div class="col-lg-6" style="display: none;">
+																	<div class="card">
+																		<div class="card-header utilization">
+																			<h3 class="card-title">RAM</h3>
+																			<div class="card-tools">
+																				<a href="#" class="btn btn-sm btn-tool"> <i
+																					class="fas fa-download"></i>
+																				</a> <a href="#" class="btn btn-sm btn-tool"> <i
+																					class="fas fa-bars"></i>
+																				</a>
+																			</div>
+																		</div>
+																		<div class="card-body">
+																			<div
+																				class="d-flex justify-content-between align-items-center border-bottom mb-3">
+																				<p class="text-success text-xl">
+																					<i class="fa fa-chart-bar"></i>
+																				</p>
+																				<p class="d-flex flex-column text-right">
+																					<span class="font-weight-bold"> <i
+																						class="fa fa-arrow-up text-success"></i><span
+																						id="Total_RAM">[[${healthDetails.totalMemory}/
+																							(1024 * 1024* 1024)]]</span>
+																					</span> <span class="text-muted">Total RAM(GB)</span>
+																				</p>
+																			</div>
+																			<!-- /.d-flex -->
+																			<div
+																				class="d-flex justify-content-between align-items-center border-bottom mb-3">
+																				<p class="text-warning text-xl">
+																					<i class="fa fa-circle-notch"></i>
+																				</p>
+																				<p class="d-flex flex-column text-right">
+																					<span class="font-weight-bold"> <i
+																						class="fa fa-arrow-up text-warning"></i><span
+																						id="Used_RAM">[[${healthDetails.usedMemory}
+																							/ (1024 * 1024* 1024)]]</span>
+																					</span> <span class="text-muted">Used RAM(GB)</span>
+																				</p>
+																			</div>
+																			<!-- /.d-flex -->
+																			<div
+																				class="d-flex justify-content-between align-items-center mb-0">
+																				<p class="text-danger text-xl">
+																					<i class="fa fa-check-circle-o"></i>
+																				</p>
+																				<p class="d-flex flex-column text-right">
+																					<span class="font-weight-bold"> <i
+																						class="fa fa-arrow-down text-danger"></i><span
+																						id="Free_RAM">[[${healthDetails.freeMemory}
+																							/ (1024 * 1024* 1024)]]</span>
+																					</span> <span class="text-muted">Free RAM (GB)</span>
+																				</p>
+																			</div>
+																			<!-- /.d-flex -->
+																		</div>
+																	</div>
+																</div>
+																<div class="col-lg-6">
+																	<div class="card">
+																		<div class="card-header utilization">
+																			<h3 class="card-title">Last Five Alert Details</h3>
+																			<div class="card-tools">
+																				<!-- 																				<a href="#" class="btn btn-tool btn-sm"> <i -->
+																				<!-- 																					class="fas fa-download"></i> -->
+																				<!-- 																				</a> <a href="#" class="btn btn-tool btn-sm"> <i -->
+																				<!-- 																					class="fas fa-bars"></i> -->
+																				</a>
+																			</div>
+																		</div>
+																		<div class="card-body table-responsive p-0">
+																			<table id="examplealerttable"
+																				class="table table-bordered table-striped">
+																				<thead class="thead-light"
+																					style="text-align: center;">
+																					<tr>
+																						<th scope="col">Alert Name</th>
+																						<th scope="col">VM Name</th>
+																						<th scope="col">Physical Server IP</th>
+																						<th scope="col">Memory Utilization</th>
+																						<th scope="col">Memory Threshold</th>
+																						<!-- 																						<th scope="col">Difference</th> -->
+																						<th scope="col">Alert Status</th>
+																						<th scope="col">Event Timestamp</th>
+																					</tr>
+																				</thead>
+																				<tbody>
+																					<tr th:each="alertDash : ${AlertListObjdata}">
+																						<td>[[${alertDash.Alert_Name}]]</td>
+																						<td>[[${alertDash.VM_Name}]]</td>
+																						<td>[[${alertDash.physicalServer_ip}]]</td>
+																						<td>[[${alertDash.MEMORY_UTILIZATION}]]</td>
+																						<td>[[${alertDash.MEMORY_THRESHOLD}]]</td>
+																						<!-- 																						<td>[[${alertDash.Difference}]]</td> -->
+																						<td style="font-weight: bold;">[[${alertDash.Alert_STATUS}]]</td>
+																						<td>[[${alertDash.EVENT_TIMESTAMP}]]</td>
+																					</tr>
+																				</tbody>
+																			</table>
+																		</div>
+																	</div>
+																</div>
+																<div class="col-lg-6">
+																	<div class="card">
+																		<div class="card-header utilization">
+																			<h3 class="card-title">Storage Details</h3>
+																			<div class="card-tools">
+																				<!-- 																				<a href="#" class="btn btn-tool btn-sm"> <i -->
+																				<!-- 																					class="fas fa-download"></i> -->
+																				<!-- 																				</a> <a href="#" class="btn btn-tool btn-sm"> <i -->
+																				<!-- 																					class="fas fa-bars"></i> -->
+																				<!-- 																				</a> -->
+																			</div>
+																		</div>
+																		<div class="card-body table-responsive p-0">
+																			<table
+																				class="table table-striped table-valign-middle"
+																				id="driveDetailsTable"
+																				th:if="${vmDetails.virtualization_type != 'KVM'}">
+																				<thead>
+																					<tr>
+																						<th>Drive Name</th>
+																						<th>Total Space</th>
+																						<th>Free Space</th>
+																						<th>Used Space</th>
+																						<!-- 																						<th>Drive utilization(%)</th> -->
+																					</tr>
+																				</thead>
+																				<tbody>
+																					<tr th:each="obj : ${driveDetails}">
+
+																						<td>[[${obj.driveName}]]</td>
+																						<td>[[${obj.totalSpace}]]</td>
+																						<td>[[${obj.freeSpace}]]</td>
+																						<td>[[${obj.usedSpace}]]</td>
+																						<!-- 																						<td>[[${obj.driveUtilizationPercentage}]]</td> -->
+
+																					</tr>
+																				</tbody>
+																			</table>
+
+																			<table
+																				class="table table-striped table-valign-middle"
+																				id="driveDetailsTable"
+																				th:if="${vmDetails.virtualization_type == 'KVM'}">
+																				<thead>
+																					<tr>
+																						<th>Device</th>
+																						<th>Used</th>
+																						<th>Capacity</th>
+																						<th>Bus</th>
+																						<th>Access</th>
+																						<th>Source</th>
+																						<!-- 																						<th>Drive utilization(%)</th> -->
+																					</tr>
+																				</thead>
+																				<tbody>
+																					<tr th:each="obj33 : ${kvmdriveDetails}">
+
+																						<td th:text="${obj33.device}"></td>
+																						<td th:text="${obj33.used}"></td>
+																						<td th:text="${obj33.capacity}"></td>
+																						<td th:text="${obj33.bus}"></td>
+																						<td th:text="${obj33.access}"></td>
+																						<td th:text="${obj33.source}"></td>
+
+
+																					</tr>
+																				</tbody>
+																			</table>
+
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</section>
+												</div>
+											</div>
+											<!--End VM Health-->
+
+
+											<!-- Resize Tab  -->
+											<div class="tab-pane fade" id="resize"
+												th:with="isSuperAdmin=${#authorization.expression('hasRole(''ROLE_SUPERADMIN'')')}">
+												<div class="pt-4">
+													<form
+														th:action="@{${isSuperAdmin} ? '/cloud_instance/resizeTabSuperadmin' : '/cloud_instance_user/resizeTabUser'}"
+														method="post" enctype="multipart/form-data"
+														th:object="${vmDetails}"
+														onsubmit="return validateForm(event)">
+														<input type="hidden" id="instId" th:field="*{id}" />
+
+														<section class="content">
+															<div class="container-fluid">
+																<div class="row">
+																	<div class="col-md-12">
+																		<!-- PIE CHART -->
+																		<div class="card border-transparent">
+																			<div class="card-header utilization">
+																				<h3 class="card-title"
+																					style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+																					Resize Cloud server</h3>
+																			</div>
+																			<div class="card-body">
+																				<div class="row">
+																					<div class="col-md-4">
+																						<div class="custom-control custom-checkbox">
+																							<input
+																								class="custom-control-input custom-control-input-danger"
+																								type="checkbox" id="ramCheck" name="ramCheck"
+																								onchange="showRamDropdown(this)"> <label
+																								for="ramCheck" class="custom-control-label">RAM</label>
+																						</div>
+																					</div>
+
+																					<div class="col-md-4" id="ramDiv"
+																						style="display: none">
+																						<div class="form-group">
+																							<select tabindex="1" id="newRAM" name="newRAM"
+																								data-placeholder="Select RAM"
+																								class="form-control" style="width: 100%;">
+																								<option value=''>SELECT</option>
+																								<option th:each="ob:${distinctRAM}"
+																									th:value="${ob[0]}" th:text="${ob[0]}" /></option>
+																							</select>
+																						</div>
+																					</div>
+
+																				</div>
+
+																				<div class="row">
+																					<div class="col-md-4">
+																						<div class="custom-control custom-checkbox">
+																							<input
+																								class="custom-control-input custom-control-input-danger"
+																								type="checkbox" id="cpuCheck" name="cpuCheck"
+																								onchange="showCpuDropdown(this)"> <label
+																								for="cpuCheck" class="custom-control-label">CPU</label>
+																						</div>
+																					</div>
+
+																					<div class="col-md-4" id="cpuDiv"
+																						style="display: none">
+																						<div class="form-group">
+																							<select tabindex="1" id="newCpu" name="newCpu"
+																								data-placeholder="Select CPU"
+																								class="form-control" style="width: 100%;">
+																								<option value=''>SELECT</option>
+																								<option th:each="ob:${distinctCPU}"
+																									th:value="${ob[0]}" th:text="${ob[0]}" /></option>
+																							</select>
+																						</div>
+																					</div>
+																				</div>
+
+
+																			</div>
+																			<div class="card-footer clearfix">
+																				<button type="submit" style="width: 15%"
+																					sec:authorize="hasAnyRole('ROLE_SUPERADMIN','ROLE_USER','ROLE_ADMIN')"
+																					class="btn bg-gradient-primary float-left">
+																					Resize Cloud server</button>
+																			</div>
+
+																		</div>
+																		<!-- /.card -->
+																	</div>
+																</div>
+															</div>
+														</section>
+													</form>
+												</div>
+											</div>
+											<!-- End Resize Tab  -->
+
+
+											<!-- Rebuild -->
+											<div class="tab-pane fade" id="rebuild">
+												<div class="pt-4">
+													<form th:action="@{'/'+${action_name}+'/updateOS'}"
+														method="post" enctype="multipart/form-data"
+														th:object="${vmDetails}">
+														<input type="hidden" th:field="*{id}" />
+														<section class="content">
+															<div class="container-fluid">
+
+																<div class="row">
+																	<div class="col-md-12">
+																		<div class="card border-transparent">
+																			<div class="card-header utilization">
+																				<h3 class="card-title" style="font-weight: bold;">Application
+																					and OS Name</h3>
+																			</div>
+																			<div class="card-body">
+																				<!-- Nav tabs -->
+																				<div class="default-tab">
+																					<ul class="nav nav-tabs" role="tablist">
+																						<li class="nav-item"><a
+																							class="nav-link active" onclick="hideDBForm()"
+																							data-toggle="tab" href="#os">Operating System
+																						</a></li>
+																					</ul>
+																					<div class="tab-content">
+																						<div class="tab-pane fade show active" id="os"
+																							role="tabpanel">
+																							<div class="pt-4">
+																								<section class="content">
+																									<div class="container-fluid">
+																										<div class="row">
+																											<div class="col-12 col-sm-6 col-md-4">
+																												<div class="info-box">
+																													<i class="fa fa-windows"
+																														style="font-size: 60px; color: dodgerblue"></i>
+																													<div class="info-box-content">
+																														<span class="info-box-text"
+																															style="cursor: pointer;"
+																															onclick="getSubProduct('Windows')">Windows</span>
+																														<!-- <span class="info-box-number"
+																															style="color: #b5b5c3 !important;">
+																															Select Version </span> -->
+																													</div>
+
+																												</div>
+
+																											</div>
+
+																											<div class="col-12 col-sm-6 col-md-4">
+																												<div class="info-box mb-3">
+																													<img src="/webtemplate/dist/img/Ubuntu.png"
+																														style="height: 63px;">
+																													<div class="info-box-content">
+																														<span class="info-box-text"
+																															style="cursor: pointer;"
+																															onclick="getSubProduct('Ubuntu')">Ubuntu</span>
+																														<!-- <span class="info-box-number"
+																															style="color: #b5b5c3 !important">Select
+																															Version</span> -->
+																													</div>
+
+																												</div>
+
+																											</div>
+																											<div class="col-12 col-sm-6 col-md-4">
+																												<div class="info-box mb-3">
+																													<img src="/webtemplate/dist/img/centos.png"
+																														style="height: 63px; width: 63px">
+																													<div class="info-box-content">
+																														<span class="info-box-text"
+																															style="cursor: pointer;"
+																															onclick="getSubProduct('CentOs')">Centos</span>
+																														<!-- <span class="info-box-number"
+																															style="color: #b5b5c3 !important">Select
+																															Version</span> -->
+																													</div>
+
+																												</div>
+
+																											</div>
+
+																										</div>
+																										<div class="row">
+																											<div class="col-12 col-sm-6 col-md-4">
+																												<div class="info-box mb-3">
+																													<img src="/webtemplate/dist/img/debian.png"
+																														style="height: 63px; width: 63px">
+																													<div class="info-box-content">
+																														<span class="info-box-text"
+																															style="cursor: pointer;"
+																															onclick="getSubProduct('Debian')">Debian</span>
+																														<!-- <span class="info-box-number"
+																															style="color: #b5b5c3 !important">Select
+																															Version</span> -->
+																													</div>
+
+																												</div>
+
+																											</div>
+																											<div class="col-12 col-sm-6 col-md-4">
+																												<div class="info-box mb-3">
+																													<img src="/webtemplate/dist/img/redHat.png"
+																														style="height: 63px;">
+																													<div class="info-box-content">
+																														<span class="info-box-text"
+																															style="cursor: pointer;"
+																															onclick="getSubProduct('Red Hat')">Red
+																															Hat</span>
+																														<!-- <span class="info-box-number"
+																															style="color: #b5b5c3 !important">Select
+																															Version</span> -->
+																													</div>
+
+																												</div>
+
+																											</div>
+																											<!-- <div class="col-12 col-sm-6 col-md-4">
+																												<div class="info-box mb-3">
+																													<span
+																														class="info-box-icon bg-warning elevation-1"><i
+																														class="fas fa-users"></i></span>
+																													<div class="info-box-content">
+																														<span class="info-box-text"
+																															style="cursor: pointer;"
+																															onclick="getSubProduct('macOS')">Mac
+																															OS</span>
+																														<span class="info-box-number"
+																															style="color: #b5b5c3 !important">Select
+																															Version</span>
+																													</div>
+
+																												</div>
+
+																											</div> -->
+																										</div>
+																									</div>
+																									<!-- /.container-fluid -->
+																								</section>
+
+																							</div>
+																						</div>
+
+																					</div>
+																				</div>
+
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</section>
+
+														<!-- Sub Product -->
+														<section class="content">
+															<div class="container-fluid">
+																<div class="row">
+																	<div class="col-md-12">
+																		<!-- PIE CHART -->
+																		<div class="card border-transparent">
+																			<div class="card-header utilization">
+																				<h3 class="card-title"
+																					style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+																					<span class="card-title" style="font-weight: bold;">Sub
+																						Product</span>
+																					<!-- 																						<span class="card-title" -->
+																					<!-- 																						style="font-size: 1rem !important; color: #b5b5c3 !important">Select -->
+																					<!-- 																						Sub Product</span> -->
+																				</h3>
+																			</div>
+																			<div class="card-body">
+																				<div class="form-group">
+																					<select tabindex="1" id="subproduct_id"
+																						th:field="*{subproduct_id}" required
+																						name="subproduct_id" class="form-control select2"
+																						multiple="multiple" style="width: 100%;" disabled>
+																						<option th:value='${vmDetails.subproduct_id}'>[[${vmDetails.subproduct_id.getSub_product_name}]]</option>
+																					</select>
+																				</div>
+																			</div>
+																			<div class="card-footer clearfix">
+																				<button type="submit"
+																					style="width: 15%; display: none"
+																					class="btn bg-gradient-primary float-right">
+																					save</button>
+																			</div>
+																		</div>
+																		<!-- /.card -->
+																	</div>
+																</div>
+															</div>
+														</section>
+														<!-- End Sub Product -->
+													</form>
+												</div>
+											</div>
+											<!--End Rebuild -->
+
+											<!-- Storage  -->
+
+											<!--End Storage  -->
+
+											<!-- Network -->
+											<div class="tab-pane fade" id="network">
+												<div class="pt-4">
+													<form th:action="@{'/'+${action_name}+'/switchUpdate'}"
+														method="post" enctype="multipart/form-data"
+														th:object="${vmDetails}">
+														<input type="hidden" th:field="*{id}" />
+														<section class="content">
+															<div class="container-fluid">
+																<div class="row">
+																	<div class="col-md-12">
+																		<div class="card border-transparent">
+																			<div class="card-header utilization">
+																				<h3 class="card-title"
+																					style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+																					<span class="card-title" style="font-weight: bold;">Switch</span>
+																					<!-- 																					<span class="card-title" -->
+																					<!-- 																						style="font-size: 1rem !important; color: #b5b5c3 !important">Select -->
+																					<!-- 																						switch</span> -->
+																				</h3>
+																			</div>
+																			<div class="card-body">
+																				<div class="form-group col-md-6">
+																					<select tabindex="1" id="switch_id"
+																						th:field="*{switch_id}" required name="switch_id"
+																						class="form-control select2" multiple="multiple"
+																						data-placeholder="Select switch"
+																						style="width: 100%;" disabled>
+																						<option value='-1'>SELECT</option>
+																						<option th:each="ob:${switchList}"
+																							th:value="${ob[0]}" th:text="${ob[1]}" /></option>
+																					</select>
+																				</div>
+																			</div>
+																			<!-- /.card-body -->
+																			<!-- <div class="card-footer clearfix">
+																				<button type="submit" style="width: 15%"
+																					class="btn bg-gradient-primary float-right">
+																					save</button>
+																			</div> -->
+																		</div>
+																		<!-- /.card -->
+																	</div>
+
+																	<div class="col-md-12">
+																		<div class="card border-transparent">
+																			<div class="card-header utilization">
+																				<h3 class="card-title"
+																					style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+																					<span class="card-title" style="font-weight: bold;">Firewall</span>
+																					<!-- 																					<span class="card-title" -->
+																					<!-- 																						style="font-size: 1rem !important; color: #b5b5c3 !important">Select -->
+																					<!-- 																						Firewall</span> -->
+																				</h3>
+																			</div>
+																			<div class="card-body">
+																				<div class="form-group col-md-6">
+																					<select tabindex="1" id="security_group_id"
+																						th:field="*{security_group_id}" disabled
+																						name="security_group_id"
+																						class="form-control select2" multiple="multiple"
+																						data-placeholder="Select switch"
+																						style="width: 100%;" readonly>
+																						<option value='-1'>SELECT</option>
+																						<option th:each="ob:${securityGroupList}"
+																							th:value="${ob[0]}" th:text="${ob[1]}" /></option>
+																					</select>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+
+																	<!-- <div class="col-md-12">
+																		<div class="card border-transparent">
+																			<div class="card-header">
+																				<h3 class="card-title"
+																					style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+																					<span class="card-title" style="font-weight: bold;">VPC</span>
+																					<span class="card-title"
+																						style="font-size: 1rem !important; color: #b5b5c3 !important">Select
+																						VPC</span>
+																				</h3>
+																			</div>
+																			<div class="card-body">
+																				<div class="form-group col-md-6">
+																					<select tabindex="1" id="vpc_id"
+																						th:field="*{vpc_id}" required name="vpc_id"
+																						class="form-control select2" multiple="multiple"
+																						data-placeholder="Select switch"
+																						style="width: 100%;">
+																						<option value='-1'>SELECT</option>
+																						<option th:each="ob:${vpcList}"
+																							th:value="${ob[0]}" th:text="${ob[1]}" /></option>
+																					</select>
+																				</div>
+																			</div>
+																			<div class="card-footer clearfix">
+																				<button type="submit" style="width: 15%"
+																					class="btn bg-gradient-primary float-right">
+																					save</button>
+																			</div>
+																		</div>
+																	</div> -->
+																</div>
+															</div>
+														</section>
+														<!-- End Switch -->
+													</form>
+												</div>
+											</div>
+											<!--End Network -->
+
+
+											<!-- Backup  -->
+											<div class="tab-pane fade" id="backup">
+												<div class="pt-4">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row">
+																<div class="col-md-12">
+																	<!-- PIE CHART -->
+																	<div class="card border-transparent">
+																		<div class="card-header utilization">
+																			<h3 class="card-title"
+																				style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+																				Backups</h3>
+																		</div>
+																		<div class="card-body border-top p-9">
+																			<div
+																				class="notice d-flex rounded border-primary border border-dashed mb-9 p-6"
+																				style="background-color: #f1faff !important; padding: 1.5rem !important;">
+																				<span style="margin-right: 1rem !important;"
+																					class="svg-icon svg-icon-2tx svg-icon-primary me-4"><svg
+																						style="height: 2.75rem !important; width: 2.75rem !important;"
+																						xmlns="http://www.w3.org/2000/svg" width="24"
+																						height="24" viewBox="0 0 24 24" fill="none">
+																						<rect opacity="0.3" x="2" y="2" width="20"
+																							height="20" rx="10" fill="black"></rect>
+																						<rect x="11" y="14" width="7" height="2" rx="1"
+																							transform="rotate(-90 11 14)" fill="black"></rect>
+																						<rect x="11" y="17" width="2" height="2" rx="1"
+																							transform="rotate(-90 11 17)" fill="black"></rect></svg></span>
+																				<div class="d-flex flex-stack flex-grow-1">
+																					<div class="fw-bold">
+																						<h4 class="text-gray-900 fw-bold">Cloud
+																							Server Backup.</h4>
+																						<div class="fs-6 text-gray-700">Backups are
+																							currently disabled for this cloud server We
+																							Charge only 20% cost of your cloud server for
+																							this backup service</div>
+																					</div>
+																				</div>
+																			</div>
+																		</div>
+																		<!-- /.card-body -->
+																		<div class="card-footer clearfix">
+																			<button type="button" style="width: 12%"
+																				class="btn bg-gradient-primary float-left">Enable
+																				Backups</button>
+																		</div>
+																	</div>
+																	<!-- /.card -->
+																</div>
+
+															</div>
+														</div>
+														<!-- /.container-fluid -->
+													</section>
+
+												</div>
+											</div>
+											<!--End Backup  -->
+
+
+											<!-- Destroy -->
+											<div class="tab-pane fade" id="destroy">
+												<div class="pt-4">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row">
+																<div class="col-md-12">
+																	<!-- PIE CHART -->
+																	<div class="card border-transparent">
+																		<div class="card-header utilization">
+																			<h3 class="card-title"
+																				style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+																				Destroy Cloud Servery</h3>
+																		</div>
+																		<div class="card-body">
+																			<div class="row">
+																				<div class="col-md-12">
+																					<div class="new-message-box">
+																						<div class="new-message-box-info">
+																							<div class="info-tab tip-icon-info" title="error">
+																								<i></i>
+																							</div>
+																							<div class="tip-box-info">
+																								<p>This will destroy your cloud server</p>
+																							</div>
+																						</div>
+																					</div>
+																				</div>
+																			</div>
+																			<div class="form-group">
+																				<span style="font-size: 1rem !important;">Please
+																					fill text in below form to delete server "I am
+																					aware this action will delete data and server
+																					permanently"</span> <input type="text"
+																					id="textVerification" class="form-control"
+																					placeholder="I am aware this action will delete data and server permanently" />
+																			</div>
+																		</div>
+																		<!-- /.card-body -->
+																		<div class="card-footer clearfix">
+																			<button sec:authorize="hasRole('ROLE_USER')"
+																				type="button" style="width: 10%"
+																				th:onclick="vmDeletionRequest([[${vmDetails.id}]])"
+																				class="btn bg-gradient-danger float-right">Delete
+																			</button>
+
+																			<button sec:authorize="hasRole('ROLE_ADMIN')"
+																				type="button" style="width: 10%"
+																				th:onclick="vmDeletionRequest([[${vmDetails.id}]])"
+																				class="btn bg-gradient-danger float-right">Delete
+																			</button>
+
+																			<button sec:authorize="hasRole('ROLE_SUPERADMIN')"
+																				type="button" style="width: 10%"
+																				th:onclick="vmDeletion([[${vmDetails.id}]])"
+																				class="btn bg-gradient-danger float-right">
+																				Delete <i
+																					style="margin-left: 10px; color: yellow; display: none"
+																					id="destorySpinner" class='fa fa-spinner fa-spin'></i>
+																			</button>
+																		</div>
+																	</div>
+																	<!-- /.card -->
+																</div>
+															</div>
+														</div>
+														<!-- /.container-fluid -->
+													</section>
+
+												</div>
+											</div>
+											<!--Destroy -->
+
+
+											<!-- Start/Stop -->
+											<div class="tab-pane fade" id="start_stop">
+												<div class="pt-4">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row">
+																<div class="col-md-12">
+																	<!-- PIE CHART -->
+																	<div class="card border-transparent">
+																		<div class="card-header utilization">
+																			<h3 class="card-title"
+																				style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+																				Start/Stop</h3>
+																		</div>
+																		<div class="card-body border-top p-9">
+																			<span>Curent VM State : <span
+																				style="font-size: 85%" class="badge badge-success">[[${vmDetails.vm_state}]]</span></span><br>
+																			<br>
+																			<div
+																				class="notice rounded border-primary border border-dashed mb-9 p-6"
+																				style="background-color: #f1faff !important; padding: 1.5rem !important; display: flex;">
+
+																				<!-- 																				<button type="button" style="width: 10%" -->
+																				<!-- 																					th:if="${vmDetails.vm_start_stop_status == 'stop' || vmDetails.vm_start_stop_status == null}" -->
+																				<!-- 																					th:onclick="startVM([[${vmDetails.id}]])" -->
+																				<!-- 																					class="btn bg-gradient-info float-left"> -->
+																				<!-- 																					Start <i -->
+																				<!-- 																						style="margin-left: 10px; color: yellow; display: none" -->
+																				<!-- 																						id="startSpinner" class='fa fa-spinner fa-spin'></i> -->
+																				<!-- 																				</button> -->
+																				<!-- 																				<button type="button" -->
+																				<!-- 																					th:if="${vmDetails.vm_start_stop_status == 'start' || vmDetails.vm_start_stop_status == null}" -->
+																				<!-- 																					style="width: 10%; margin-left: 5px" -->
+																				<!-- 																					th:onclick="stopVM([[${vmDetails.id}]])" -->
+																				<!-- 																					class="btn bg-gradient-danger float-left"> -->
+																				<!-- 																					Stop <i -->
+																				<!-- 																						style="margin-left: 10px; color: yellow; display: none" -->
+																				<!-- 																						id="stopSpinner" class='fa fa-spinner fa-spin'></i> -->
+																				<!-- 																				</button> -->
+																				<!-- 																				<button -->
+																				<!-- 																					sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
+																				<!-- 																					type="button" style="width: 10%; margin-left: 5px" -->
+																				<!-- 																					th:if="${vmDetails.vm_start_stop_status == 'suspended'}" -->
+																				<!-- 																					th:onclick="changeVMState('active',[[${vmDetails.id}]])" -->
+																				<!-- 																					class="btn bg-gradient-success float-left"> -->
+																				<!-- 																					Activate <i -->
+																				<!-- 																						style="margin-left: 10px; color: yellow; display: none" -->
+																				<!-- 																						id="activeSpinnner" class='fa fa-spinner fa-spin'></i> -->
+																				<!-- 																				</button> -->
+																				<!-- 																				<button -->
+																				<!-- 																					sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
+																				<!-- 																					type="button" style="width: 10%; margin-left: 5px;" -->
+																				<!-- 																					th:if="${vmDetails.vm_start_stop_status == 'start' || vmDetails.vm_start_stop_status == 'stop' || vmDetails.vm_start_stop_status == null}" -->
+																				<!-- 																					th:onclick="changeVMState('suspend',[[${vmDetails.id}]])" -->
+																				<!-- 																					class="btn bg-gradient-warning float-left"> -->
+																				<!-- 																					Suspend <i -->
+																				<!-- 																						style="margin-left: 10px; color: yellow; display: none" -->
+																				<!-- 																						id="activeSpinnner" class='fa fa-spinner fa-spin'></i> -->
+																				<!-- 																				</button> -->
+
+																				<button type="button" style="width: 10%"
+																					th:if="${vmDetails.vm_state == 'shut off' || vmDetails.vm_state == null}"
+																					th:onclick="startVM([[${vmDetails.id}]])"
+																					class="btn bg-gradient-info float-left">
+																					Start <i
+																						style="margin-left: 10px; color: yellow; display: none"
+																						id="startSpinner" class='fa fa-spinner fa-spin'></i>
+																				</button>
+																				<button type="button"
+																					th:if="${vmDetails.vm_state == 'running' || vmDetails.vm_state == null}"
+																					style="width: 10%; margin-left: 5px"
+																					th:onclick="stopVM([[${vmDetails.id}]])"
+																					class="btn bg-gradient-danger float-left">
+																					Stop <i
+																						style="margin-left: 10px; color: yellow; display: none"
+																						id="stopSpinner" class='fa fa-spinner fa-spin'></i>
+																				</button>
+																				<button
+																					sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
+																					type="button" style="width: 10%; margin-left: 5px"
+																					th:if="${vmDetails.vm_start_stop_status == 'suspended'}"
+																					th:onclick="changeVMState('active',[[${vmDetails.id}]])"
+																					class="btn bg-gradient-success float-left">
+																					Activate <i
+																						style="margin-left: 10px; color: yellow; display: none"
+																						id="activeSpinnner" class='fa fa-spinner fa-spin'></i>
+																				</button>
+																				<button
+																					sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
+																					type="button" style="width: 10%; margin-left: 5px;"
+																					th:if="${vmDetails.vm_state == 'running' || vmDetails.vm_state == 'shut off' || vmDetails.vm_state == null}"
+																					th:onclick="changeVMState('suspend',[[${vmDetails.id}]])"
+																					class="btn bg-gradient-warning float-left">
+																					Suspend <i
+																						style="margin-left: 10px; color: yellow; display: none"
+																						id="activeSpinnner" class='fa fa-spinner fa-spin'></i>
+																				</button>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+														<!-- /.container-fluid -->
+													</section>
+
+												</div>
+											</div>
+											<!--End Start/Stop -->
+
+
+											<!-- Billing  -->
+											<div class="tab-pane fade" id="billing">
+												<div class="pt-4">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row">
+																<div class="col-md-12">
+																	<!-- PIE CHART -->
+																	<div class="card border-transparent">
+																		<div class="card-header utilization">
+																			<h3 class="card-title"
+																				style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+																				Usage</h3>
+																		</div>
+																		<div class="card-body border-top p-9">
+																			<div
+																				class="notice rounded border-primary border border-dashed mb-9 p-6"
+																				style="background-color: #f1faff !important; padding: 1.5rem !important; display: grid;">
+																				<span>Curent billing cycle is : <span
+																					class="badge badge-success">Hourly</span></span><br>
+																				<span
+																					sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')">Price
+																					per Hour : <span class="badge badge-success">Rs
+																						[[${vmDetails.price_id.getHourly_price}]]</span>
+																				</span><br> <span>Total Hours : <span
+																					class="badge badge-info"> [[${hours}]]</span>
+																				</span><br> <span
+																					sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')">Total
+																					Price : <span class="badge badge-success">Rs
+																						[[${price}]]</span>
+																				</span>
+																				<!-- <span
+																					class="badge badge-success">Hourly Cost Rs.
+																						[[${vmDetails.price_id.getHourly_price}]]</span> = <span class="badge badge-info">Cloud
+																						Hourly Cost Rs. 2.22</span> + <span
+																					class="badge badge-info">OS Hourly Cost Rs.
+																						2.22</span> 
+
+																				</span> -->
+
+																				<br>
+																				<!-- <span>Additional Storage (INR 9/Per
+																					GB) : <span class="badge badge-success">20GB
+																						= 180Rs</span>
+																				</span> -->
+
+																				<!-- 																				<br> <span style="color: purple;">18% -->
+																				<!-- 																					GST would be extra</span> -->
+																			</div>
+																		</div>
+																		<!-- /.card-body -->
+																		<!-- <div class="card-footer clearfix">
+																			<div class="form-group">
+																				<label for="type">Available Billing Cycles</label> <select
+																					tabindex="1" id="type" required name="type"
+																					multiple="multiple"
+																					data-placeholder="Select New Billing Cycles"
+																					class="form-control select2" style="width: 100%;">
+																					<option value='-1'>Rs. 1495/monthy</option>
+																					<option value='-1'>Rs. 4485/3 month</option>
+																					<option value='-1'>Rs. 17940/12 month</option>
+																					<option value='-1'>Rs. 53820/36 month</option>
+																				</select>
+																			</div>
+																		</div> -->
+																	</div>
+																	<!-- /.card -->
+																</div>
+															</div>
+														</div>
+														<!-- /.container-fluid -->
+													</section>
+
+												</div>
+											</div>
+											<!--End Billing  -->
+
+
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+	</div>
+
+	<!-- Footer -->
+	<div th:replace="fragments/footer :: footer"></div>
+	<!--Close Footer -->
+
+	<!-- ./wrapper -->
+
+	<!-- Common JS  -->
+
+	<!-- jQuery -->
+	<script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
+	<!-- jQuery UI 1.11.4 -->
+	<script th:src="@{/webtemplate/plugins/jquery-ui/jquery-ui.min.js}"></script>
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+		$.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<!-- ChartJS -->
+	<script th:src="@{/webtemplate/plugins/chart.js/Chart.min.js}"></script>
+	<!-- Sparkline -->
+	<script th:src="@{/webtemplate/plugins/sparklines/sparkline.js}"></script>
+	<!-- JQVMap -->
+	<script th:src="@{/webtemplate/plugins/jqvmap/jquery.vmap.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jqvmap/maps/jquery.vmap.usa.js}"></script>
+	<!-- jQuery Knob Chart -->
+	<script th:src="@{/webtemplate/plugins/jquery-knob/jquery.knob.min.js}"></script>
+	<!-- daterangepicker -->
+	<script th:src="@{/webtemplate/plugins/moment/moment.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/daterangepicker/daterangepicker.js}"></script>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js}"></script>
+	<!-- Summernote -->
+	<script
+		th:src="@{/webtemplate/plugins/summernote/summernote-bs4.min.js}"></script>
+	<!-- overlayScrollbars -->
+	<script
+		th:src="@{/webtemplate/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js}"></script>
+	<!-- AdminLTE App -->
+	<script th:src="@{/webtemplate/dist/js/adminlte.js}"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script th:src="@{/webtemplate/dist/js/demo.js}"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+	<script th:src="@{/webtemplate/dist/js/pages/dashboard.js}"></script>
+	<!--End Common JS  -->
+
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+
+	<script
+		th:src="@{/webtemplate/plugins/datatables/jquery.dataTables.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/dataTables.responsive.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/responsive.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/dataTables.buttons.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.bootstrap4.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jszip/jszip.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/pdfmake.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/vfs_fonts.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.html5.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.print.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.colVis.min.js}"></script>
+
+	<script th:src="@{/webtemplate/plugins/flot/jquery.flot.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/flot/plugins/jquery.flot.resize.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/flot/plugins/jquery.flot.pie.js}"></script>
+
+	<script th:src="@{/webtemplate/dist/js/demo.js}"></script>
+	<script th:src="@{/webtemplate/js/highstock.js}"></script>
+
+	<script th:src="@{/custom_js/vm.js}"></script>
+
+	<script type="text/javascript">
+		$(function() {
+			//Initialize Select2 Elements
+			$('.select2').select2()
+
+		});
+	</script>
+
+	<script th:inline="javascript">
+	
+	
+	if ($('#UserRoleMainIDHere').text() === 'SUPER ADMIN') {
+		// Your code here
+
+		$('#backuptabdefaultmainid').show()
+	}else{
+		
+		$('#backuptabdefaultmainid').hide()
+	}
+	
+	
+		var donutData = [{
+			label: 'Used %',
+			data: [[${healthDetails.usedMemory} / (1024 * 1024)]],
+			color: '#DD1C1C'
+		},
+		{
+			label: 'Free %',
+			data: [[${healthDetails.freeMemory} / (1024 * 1024)]],
+			color: '#52ED15'
+		}]
+		$.plot('#memoryUtilizationChart', donutData, {
+			series: {
+				pie: {
+					show: true,
+					radius: 1,
+					innerRadius: 0.5,
+					label: {
+						show: true,
+						radius: 2 / 3,
+						formatter: labelFormatter,
+						threshold: 0.1
+					}
+	
+				}
+			},
+			legend: {
+				show: false
+			}
+		})
+		
+		if ([[${resizeMessage}]]) {
+		Swal.fire({
+			position : "top",
+			icon : "warning",
+			title : [[${resizeMessage}]],
+			showConfirmButton : true,
+			timer : 10000,
+		})
+	}
+		
+		$("#driveDetailsTable").DataTable({
+			"responsive" : true,
+			"lengthChange" : false,
+			"autoWidth" : true,
+			"sScrollX" : "100%",
+			"sScrollXInner" : "130%",
+			"bScrollCollapse" : true,
+			pageLength : 5,
+			searching : false
+		});
+		
+		/* $("#example1reporttable").DataTable({
+
+			"responsive" : false,
+			"paging": true,
+		    "pageLength": 25,
+			//"sScrollX" : "100%",
+			//"sScrollXInner" : "200%",
+			//"bScrollCollapse" : true,
+			"lengthChange" : false,
+			"autoWidth" : false,
+			"buttons" : [ "csv", "excel", "pdf", "print", "colvis" ]
+		}).buttons().container().appendTo(
+				'#example1reporttable_wrapper .col-md-6:eq(0)'); */
+		
+		$("#vmAvailabilityTable").DataTable({
+
+			"responsive" : false,
+			"paging": true,
+		    "pageLength": 25,
+			//"sScrollX" : "100%",
+			//"sScrollXInner" : "200%",
+			//"bScrollCollapse" : true,
+			"lengthChange" : false,
+			"autoWidth" : false,
+			"buttons" : [ "csv", "excel", "pdf", "print", "colvis" ]
+		}).buttons().container().appendTo(
+				'#vmAvailabilityTable_wrapper .col-md-6:eq(0)');
+		
+		$("#vmHealthTable").DataTable({
+
+			"responsive" : false,
+			"paging": true,
+		    "pageLength": 25,
+		    "data" :[[${vmHealthData}]],
+			//"sScrollX" : "100%",
+			//"sScrollXInner" : "200%",
+			//"bScrollCollapse" : true,
+			"lengthChange" : false,
+			"autoWidth" : false,
+			"buttons" : [ "csv", "excel", "pdf", "print", "colvis" ]
+		}).buttons().container().appendTo(
+				'#vmHealthTable_wrapper .col-md-6:eq(0)');
+		
+		$("#vmCpuThresholdTable").DataTable({
+
+			"responsive" : false,
+			"paging": true,
+		    "pageLength": 25,
+			//"sScrollX" : "100%",
+			//"sScrollXInner" : "200%",
+			//"bScrollCollapse" : true,
+			"lengthChange" : false,
+			"autoWidth" : false,
+			"buttons" : [ "csv", "excel", "pdf", "print", "colvis" ]
+		}).buttons().container().appendTo(
+				'#vmCpuThresholdTable_wrapper .col-md-6:eq(0)');
+		
+		
+		$("#vmMemoryThresholdTable").DataTable({
+
+			"responsive" : false,
+			"paging": true,
+		    "pageLength": 25,
+			//"sScrollX" : "100%",
+			//"sScrollXInner" : "200%",
+			//"bScrollCollapse" : true,
+			"lengthChange" : false,
+			"autoWidth" : false,
+			"buttons" : [ "csv", "excel", "pdf", "print", "colvis" ]
+		}).buttons().container().appendTo(
+				'#vmMemoryThresholdTable_wrapper .col-md-6:eq(0)');
+		
+		$("#examplealerttable").DataTable({
+
+			"responsive" : false,
+			"paging": true,
+		    "pageLength": 10,
+			//"sScrollX" : "100%",
+			//"sScrollXInner" : "200%",
+			//"bScrollCollapse" : true,
+			"lengthChange" : false,
+			"autoWidth" : false,
+// 			"buttons" : [ "csv", "excel", "pdf", "print", "colvis" ]
+		}).buttons().container().appendTo(
+				'#examplealerttable_wrapper .col-md-6:eq(0)');
+	
+	
+	</script>
+
+	<script th:inline="javascript">
+	 var vm_resize_result = [[${updateVMCommandOP}]];  // The fallback value 'defaultValue' is used if Thymeleaf doesn't render it correctly.
+//alert(vm_resize_result)
+	if(vm_resize_result==null)
+		{
+		//alert('Blank')
+		}else if(vm_resize_result == 'success'){
+			Swal.fire({
+				position: "top",
+				icon: "success",
+				title: 'VM Resize successfully',
+				showConfirmButton: true
+			})
+		}else {
+			Swal.fire({
+				position: "top",
+				icon: "warning",
+				title: vm_resize_result ,
+				showConfirmButton: true
+			})
+		}
+	
+</script>
+</body>
+</html>

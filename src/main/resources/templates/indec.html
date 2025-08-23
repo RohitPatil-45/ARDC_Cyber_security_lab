@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:include="template :: headFragment(${pageTitle})">
+<title>RDP Connections | Cyber Ranges</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Summernote CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css"
+	rel="stylesheet">
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<!-- Header -->
+		<div th:replace="fragments/header :: header"></div>
+
+		<!-- Sidebar -->
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<!-- Main Content -->
+		<div class="content-wrapper">
+
+			<!-- Page Header -->
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>
+								<i class="fas fa-desktop vm-icon"></i> Connections
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a th:href="@{/}"><i
+										class="fas fa-home"></i> Home</a></li>
+								<li class="breadcrumb-item active"> Connections</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Content Section -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+
+							<div class="card">
+								<div class="card-header">
+									<div class="d-flex justify-content-between align-items-center">
+										<h3 class="card-title">
+											<i class="fas fa-network-wired vm-icon"></i> Manage 
+											Connections
+										</h3>
+										<div class="card-tools">
+											<button type="button" class="btn btn-tool"
+												data-card-widget="collapse">
+												<i class="fas fa-minus"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+
+								<div class="card-body">
+									<p class="text-muted mb-3">Create a new connection or view existing ones.</p>
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item"><i
+											class="fas fa-plus-circle text-success"></i> <a
+											th:href="@{/guac/create}" class="ml-2">Create New
+												Connection</a></li>
+										<li class="list-group-item"><i
+											class="fas fa-list text-primary"></i> <a
+											th:href="@{/guac/list}" class="ml-2">View Existing
+												Connections</a></li>
+									</ul>
+								</div>
+
+								<div class="card-footer text-muted">Manage all your 
+									connections securely and easily.</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- Footer -->
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+
+	<!-- Scripts -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+
+</body>
+</html>

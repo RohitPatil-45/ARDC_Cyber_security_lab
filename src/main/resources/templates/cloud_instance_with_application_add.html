@@ -1,0 +1,1267 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud Portal</title>
+
+<!-- Common CSS -->
+
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" th:href="@{/css/fontAwesome.css}">
+<!-- Font Awesome -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
+<!-- Ionicons -->
+<link rel="stylesheet" th:href="@{/css/ionicIcons.css}">
+<!-- Tempusdominus Bootstrap 4 -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css}">
+<!-- iCheck -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
+<!-- JQVMap -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/jqvmap/jqvmap.min.css}">
+<!-- Theme style -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/dist/css/adminlte.min.css}">
+<!-- overlayScrollbars -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/overlayScrollbars/css/OverlayScrollbars.min.css}">
+<!-- Daterange picker -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/daterangepicker/daterangepicker.css}">
+<!-- summernote -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/summernote/summernote-bs4.min.css}">
+
+<!--End Common CSS  -->
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- <link rel="stylesheet"
+	th:href="@{/css/cloudFlare.css}"> -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-responsive/css/responsive.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-buttons/css/buttons.bootstrap4.min.css}">
+
+<style>
+.glowBtn {
+	background-color: #1c87c9;
+	-webkit-border-radius: 60px;
+	border-radius: 5px;
+	border: none;
+	color: #eeeeee;
+	cursor: pointer;
+	display: inline-block;
+	font-family: sans-serif;
+	font-size: 20px;
+	padding: 5px 15px;
+	text-align: center;
+	text-decoration: none;
+}
+
+@
+keyframes glowing { 0% {
+	background-color: #2ba805;
+	box-shadow: 0 0 5px #2ba805;
+}
+
+50%
+{
+background-color
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+#49e819
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;
+box-shadow
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+0
+0
+20
+px
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+#49e819
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;
+}
+100%
+{
+background-color
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+#2ba805
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;
+box-shadow
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+0
+0
+5
+px
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+#2ba805
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;
+}
+}
+.glowBtn {
+	animation: glowing 1300ms infinite;
+}
+
+th {
+	text-align: center;
+}
+
+td {
+	text-align: center;
+}
+</style>
+
+</head>
+<body class="hold-transition sidebar-mini layout-fixed dark-mode">
+	<div class="wrapper">
+		<!-- Header -->
+		<div th:replace="fragments/header_bk :: header"></div>
+		<!--Close Header -->
+
+		<!-- Sidebar -->
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<!-- Close Sidebar -->
+		<div class="content-wrapper">
+			<div class="container-fluid">
+				<div class="row mb-2">
+					<div class="col-sm-6">
+						<h2 class="m-0">Compute VM - Application</h2>
+					</div>
+				</div>
+			</div>
+			<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+				enctype="multipart/form-data" th:object="${objEnt}">
+				<input type="hidden" th:field="*{id}" />
+				<!-- Instance Name -->
+				<section class="content">
+					<div class="container-fluid">
+
+						<div class="row">
+							<div class="col-md-12" style="padding-top: 10px">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Instance</span>
+											<span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Provide
+												Instance Name</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<input tabindex="2" type="text" th:field="*{instance_name}"
+												required id="instance_name" name="instance_name"
+												class="form-control" placeholder="Enter Cloud Instance Name" />
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Instance Name -->
+
+				<!-- Switch -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Switch</span>
+											<span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Select
+												switch</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<select tabindex="1" id="switch_id" th:field="*{switch_id}"
+												required name="switch_id" class="form-control select2"
+												multiple="multiple" data-placeholder="Select switch"
+												style="width: 100%;">
+												<option value='-1'>SELECT</option>
+												<option th:each="ob:${switchList}" th:value="${ob[0]}"
+													th:text="${ob[1]}" /></option>
+											</select>
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Switch -->
+
+				<!-- Generation Type -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Generation
+												Type</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Select
+												generation type</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<select tabindex="1" id="generation_type"
+												th:field="*{generation_type}" required
+												name="generation_type" class="form-control select2" multiple
+												data-placeholder="Select generation type"
+												style="width: 100%;">
+												<option value='-1'>SELECT</option>
+												<option value='1'>Generation 1</option>
+												<option value='2'>Generation 2</option>
+											</select>
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Generation Type -->
+
+				<!-- DC Location -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">
+												Region</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Select
+												Region</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<!-- <select class="form-control select2" id="location"
+											name="location" multiple="multiple"
+											data-placeholder="Select Location" style="width: 100%;">
+										</select> -->
+											<select tabindex="1" id="location_id"
+												onchange="getVMLocationPath(this.value)"
+												th:field="*{location_id}" required name="location_id"
+												class="form-control select2" multiple="multiple"
+												data-placeholder="Select Location" style="width: 100%;">
+												<option value='-1'>SELECT</option>
+												<option th:each="ob:${dcLocationList}" th:value="${ob[0]}"
+													th:text="${ob[1]}" /></option>
+											</select>
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End DC Location -->
+
+				<!-- VM location path -->
+				<section class="content" style="display: none;">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">VM
+												location path</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Select
+												VM location path</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<input tabindex="2" type="text"
+												th:field="*{vm_location_path}" required
+												id="vm_location_path" name="vm_location_path"
+												class="form-control" />
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End VM location path -->
+
+				<section class="content">
+					<div class="container-fluid">
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title" style="font-weight: bold;">Application
+											and OS Name</h3>
+									</div>
+									<div class="card-body">
+										<!-- Nav tabs -->
+										<div class="default-tab">
+											<ul class="nav nav-tabs" role="tablist">
+												<li class="nav-item"><a class="nav-link active"
+													onclick="hideDBForm()" data-toggle="tab" href="#os">Operating
+														System </a></li>
+												<!-- <li class="nav-item"><a class="nav-link"
+													data-toggle="tab" href="#database">Database</a></li>
+ -->
+												<li class="nav-item"><a class="nav-link"
+													onclick="hideDBForm()" data-toggle="tab"
+													href="#application">Application</a></li>
+											</ul>
+											<div class="tab-content">
+												<div class="tab-pane fade show active" id="os"
+													role="tabpanel">
+													<div class="pt-4">
+														<section class="content">
+															<div class="container-fluid">
+																<div class="row">
+																	<div class="col-12 col-sm-6 col-md-4">
+																		<div class="info-box">
+																			<i class="fa fa-windows"
+																				style="font-size: 60px; color: dodgerblue"></i>
+																			<div class="info-box-content">
+																				<span class="info-box-text" style="cursor: pointer;"
+																					onclick="getSubProduct('Windows')">Windows</span> <span
+																					class="info-box-number"
+																					style="color: #b5b5c3 !important;"> Select
+																					Version </span>
+																			</div>
+
+																		</div>
+
+																	</div>
+
+																	<div class="col-12 col-sm-6 col-md-4">
+																		<div class="info-box mb-3">
+																			<i class="fa fa-linux" style="font-size: 60px;"></i>
+																			<div class="info-box-content">
+																				<span class="info-box-text" style="cursor: pointer;"
+																					onclick="getSubProduct('Ubuntu')">Ubuntu</span> <span
+																					class="info-box-number"
+																					style="color: #b5b5c3 !important">Select
+																					Version</span>
+																			</div>
+
+																		</div>
+
+																	</div>
+																	<div class="col-12 col-sm-6 col-md-4">
+																		<div class="info-box mb-3">
+																			<div class="info-box-content">
+																				<span class="info-box-text" style="cursor: pointer;"
+																					onclick="getSubProduct('CentOs')">Centos</span> <span
+																					class="info-box-number"
+																					style="color: #b5b5c3 !important">Select
+																					Version</span>
+																			</div>
+
+																		</div>
+
+																	</div>
+
+																</div>
+																<div class="row">
+																	<div class="col-12 col-sm-6 col-md-4">
+																		<div class="info-box mb-3">
+																			<span class="info-box-icon bg-warning elevation-1"><i
+																				class="fas fa-users"></i></span>
+																			<div class="info-box-content">
+																				<span class="info-box-text" style="cursor: pointer;"
+																					onclick="getSubProduct('Debian')">Debian</span> <span
+																					class="info-box-number"
+																					style="color: #b5b5c3 !important">Select
+																					Version</span>
+																			</div>
+
+																		</div>
+
+																	</div>
+																	<div class="col-12 col-sm-6 col-md-4">
+																		<div class="info-box mb-3">
+																			<span class="info-box-icon bg-warning elevation-1"><i
+																				class="fas fa-users"></i></span>
+																			<div class="info-box-content">
+																				<span class="info-box-text" style="cursor: pointer;"
+																					onclick="getSubProduct('Red Hat')">Red Hat</span> <span
+																					class="info-box-number"
+																					style="color: #b5b5c3 !important">Select
+																					Version</span>
+																			</div>
+
+																		</div>
+
+																	</div>
+																	<div class="col-12 col-sm-6 col-md-4">
+																		<div class="info-box mb-3">
+																			<span class="info-box-icon bg-warning elevation-1"><i
+																				class="fas fa-users"></i></span>
+																			<div class="info-box-content">
+																				<span class="info-box-text" style="cursor: pointer;"
+																					onclick="getSubProduct('macOS')">Mac OS</span> <span
+																					class="info-box-number"
+																					style="color: #b5b5c3 !important">Select
+																					Version</span>
+																			</div>
+
+																		</div>
+
+																	</div>
+																</div>
+															</div>
+															<!-- /.container-fluid -->
+														</section>
+
+													</div>
+												</div>
+
+												<!-- Application -->
+												<div class="tab-pane fade" id="application">
+													<div class="pt-4">
+														<section class="content">
+															<div class="container-fluid">
+																<div class="row">
+																	<div class="col-12 col-sm-6 col-md-4">
+																		<div class="info-box">
+																			<span class="info-box-icon bg-info elevation-1"><i
+																				class="fas fa-cog"></i></span>
+																			<div class="info-box-content">
+																				<span class="info-box-text" onclick="showDBForm()">Raddix</span>
+																				<span class="info-box-number"
+																					style="color: #b5b5c3 !important"> Select
+																					Version </span>
+																			</div>
+
+																		</div>
+
+																	</div>
+
+																	<div class="col-12 col-sm-6 col-md-4">
+																		<div class="info-box mb-3">
+																			<span class="info-box-icon bg-danger elevation-1"><i
+																				class="fas fa-thumbs-up"></i></span>
+																			<div class="info-box-content">
+																				<span class="info-box-text" onclick="showDBForm()">Tomcat</span>
+																				<span class="info-box-number"
+																					style="color: #b5b5c3 !important">Select
+																					Version</span>
+																			</div>
+
+																		</div>
+
+																	</div>
+
+																</div>
+															</div>
+															<!-- /.container-fluid -->
+														</section>
+
+													</div>
+												</div>
+												<!--End Application -->
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- Sub Product -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Sub
+												Product</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Select
+												Sub Product</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<!-- <select class="form-control select2" id="subProduct"
+												name="subProduct" multiple="multiple"
+												data-placeholder="Select Sub Product" style="width: 100%;">
+											</select> -->
+											<select tabindex="1" id="subproduct_id"
+												th:field="*{subproduct_id}" required name="subproduct_id"
+												class="form-control select2" multiple="multiple"
+												data-placeholder="Select sub product" style="width: 100%;">
+											</select>
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- End Sub Product -->
+
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Select
+												Biling Cycle</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Anuualy,
+												Monthly, Hourly</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<ul class="nav nav-pills ml-auto p-2"
+											style="display: inline-flex;">
+											<li class="nav-item"><a class="nav-link billingTab"
+												href="#tab_1" data-toggle="tab">Hourly</a></li>
+											<li class="nav-item"><a class="nav-link billingTab"
+												href="#tab_2" data-toggle="tab">Daily</a></li>
+											<li class="nav-item"><a class="nav-link billingTab"
+												href="#tab_3" data-toggle="tab">Monthly</a></li>
+											<li class="nav-item"><a class="nav-link billingTab"
+												href="#tab_4" data-toggle="tab">Anuualy</a></li>
+											<li class="nav-item"><a class="nav-link billingTab"
+												href="#tab_5" data-toggle="tab">5 Years</a></li>
+										</ul>
+
+										<div class="form-group" style="padding: 10px;">
+											<label for="discount">Discount</label><input type="text"
+												class="form-control" style="width: 30%;"
+												autocomplete="false" id="discount" name="discount"
+												placeholder="Discount">
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+
+					</div>
+				</section>
+
+				<!-- Select Plan -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Select
+												Plan Type</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Shared,
+												Dedicated CPU, High Memory</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<!-- Nav tabs -->
+										<div class="default-tab">
+											<ul class="nav nav-tabs" role="tablist">
+												<li class="nav-item"><a class="nav-link active"
+													data-toggle="tab" href="#shared">Shared CPU Plan</a></li>
+												<li class="nav-item"><a class="nav-link"
+													data-toggle="tab" href="#dedicated">Dedicated CPU Plan</a></li>
+												<li class="nav-item"><a class="nav-link"
+													data-toggle="tab" href="#highMemory">High Memory Plan</a></li>
+											</ul>
+											<div class="tab-content">
+												<div class="tab-pane fade show active" id="shared"
+													role="tabpanel">
+													<div class="pt-4">
+														<section class="content">
+															<div class="container-fluid">
+																<div class="row">
+																	<div class="col-12">
+																		<div class="card">
+																			<div class="card-body">
+																				<table id="sharedPlanTable"
+																					class="table table-bordered table-striped">
+																					<thead>
+																						<tr>
+																							<th></th>
+																							<th>RAM</th>
+																							<th>vPCU</th>
+																							<th>SSD DISK</th>
+																							<th>BANDWIDTH</th>
+																							<th>PLAN</th>
+																							<!-- <th>STATUS</th> -->
+																							<th>PRICE</th>
+																						</tr>
+																					</thead>
+																					<tbody>
+																						<tr th:each="obj : ${sharedCpuPlan}">
+																							<td><input th:field="*{price_id}" required
+																								th:value="${obj[0]}" id="price_id"
+																								name="price_id" type="radio"></td>
+																							<td>[[${obj[1]}]]</td>
+																							<td>[[${obj[2]}]]</td>
+																							<td>[[${obj[3]}]]</td>
+																							<td>[[${obj[4]}]]</td>
+																							<td><span class='badge badge-success'>Hourly</span></td>
+																							<!-- <td><span class='badge badge-success'>Available</span></td> -->
+																							<td>[[${obj[5]}]]</td>
+																						</tr>
+																					</tbody>
+
+																				</table>
+
+
+																			</div>
+																			<!-- /.card-body -->
+																		</div>
+
+																	</div>
+																</div>
+															</div>
+															<!-- /.container-fluid -->
+														</section>
+
+													</div>
+												</div>
+
+												<!-- Dedicated Plan -->
+												<div class="tab-pane fade" id="dedicated">
+													<div class="pt-4">
+														<section class="content">
+															<div class="container-fluid">
+																<div class="row">
+																	<div class="col-12">
+																		<div class="card">
+																			<div class="card-body">
+																				<table id="dedicatedPlanTable"
+																					class="table table-bordered table-striped">
+																					<thead>
+																						<tr>
+																							<th>
+																							<th>RAM</th>
+																							<th>vPCU</th>
+																							<th>SSD DISK</th>
+																							<th>BANDWIDTH</th>
+																							<th>PLAN</th>
+																							<!-- <th>STATUS</th> -->
+																							<th>PRICE</th>
+																						</tr>
+																					</thead>
+																					<tbody>
+																						<tr th:each="obj : ${dedicatedCpuPlan}">
+																							<td><input th:field="*{price_id}" required
+																								th:value="${obj[0]}" id="price_id"
+																								name="price_id" type="radio"></td>
+																							<td>[[${obj[1]}]]</td>
+																							<td>[[${obj[2]}]]</td>
+																							<td>[[${obj[3]}]]</td>
+																							<td>[[${obj[4]}]]</td>
+																							<td><span class='badge badge-success'>Hourly</span></td>
+																							<!-- <td><span class='badge badge-success'>Available</span></td> -->
+																							<td>[[${obj[5]}]]</td>
+																						</tr>
+																					</tbody>
+
+																				</table>
+
+
+																			</div>
+																			<!-- /.card-body -->
+																		</div>
+
+																	</div>
+																</div>
+															</div>
+															<!-- /.container-fluid -->
+														</section>
+
+													</div>
+												</div>
+
+												<!-- High Memory Plan -->
+												<div class="tab-pane fade" id="highMemory">
+													<div class="pt-4">
+														<section class="content">
+															<div class="container-fluid">
+																<div class="row">
+																	<div class="col-12">
+																		<div class="card">
+																			<div class="card-body">
+																				<table id="highMemoryPlanTable"
+																					class="table table-bordered table-striped">
+																					<thead>
+																						<tr>
+																							<th></th>
+																							<th>RAM@</th>
+																							<th>vPCU</th>
+																							<th>SSD DISK</th>
+																							<th>BANDWIDTH</th>
+																							<th>PLAN</th>
+																							<!-- <th>STATUS</th> -->
+																							<th>PRICE</th>
+																						</tr>
+																					</thead>
+																					<tbody>
+																						<tr th:each="obj : ${highMemoryPlan}">
+																							<td><input th:field="*{price_id}" required
+																								th:value="${obj[0]}" id="price_id"
+																								name="price_id" type="radio"></td>
+																							<td>[[${obj[1]}]]</td>
+																							<td>[[${obj[2]}]]</td>
+																							<td>[[${obj[3]}]]</td>
+																							<td>[[${obj[4]}]]</td>
+																							<td><span class='badge badge-success'>Hourly</span></td>
+																							<td>[[${obj[5]}]]</td>
+																						</tr>
+																					</tbody>
+
+																				</table>
+
+
+																			</div>
+																			<!-- /.card-body -->
+																		</div>
+
+																	</div>
+																</div>
+															</div>
+															<!-- /.container-fluid -->
+														</section>
+
+													</div>
+												</div>
+
+												<!-- /.card-body -->
+											</div>
+											<!-- /.card -->
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Select Plan -->
+
+
+				<!-- VPC Network -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">VPC
+												Network</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Select
+												VPC for Server</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<!-- <select class="form-control select2" id="vpc" name="vpc"
+											multiple="multiple" data-placeholder="Select VPC for Server"
+											style="width: 100%;">
+										</select> -->
+											<select tabindex="1" id="vpc_id" th:field="*{vpc_id}"
+												required name="vpc_id" class="form-control select2"
+												multiple="multiple" data-placeholder="Select VPC for Server"
+												style="width: 100%;">
+												<option value='-1'>SELECT</option>
+												<option th:each="ob:${vpcList}" th:value="${ob[0]}"
+													th:text="${ob[1]}" /></option>
+											</select>
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!--End VPC Network -->
+
+				<!-- Cloud Firewall -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Cloud
+												Firewall</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Select
+												Firewall</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<select tabindex="1" id="security_group_id"
+												th:field="*{security_group_id}" required
+												name="security_group_id" class="form-control select2"
+												multiple="multiple"
+												data-placeholder="Select Firewall for Server"
+												style="width: 100%;">
+												<option value='-1'>SELECT</option>
+												<option th:each="ob:${securityGroupList}"
+													th:value="${ob[0]}" th:text="${ob[1]}" /></option>
+											</select>
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Cloud Firewall -->
+
+				<!-- Cloud Instance Password -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Password</span>
+											<span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Setup
+												Password for Cloud Instance</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+
+											<input tabindex="2" type="password"
+												th:field="*{instance_password}" required
+												id="instance_password" name="instance_password"
+												class="form-control"
+												placeholder="Please Enter Password for Cloud Instance" />
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+						<div class="form-group" style="padding-top: 10px;">
+							<button type="submit" class="glowBtn">Create Instance</button>
+						</div>
+					</div>
+				</section>
+				<!-- End Cloud Instance Password -->
+			</form>
+		</div>
+
+	</div>
+
+	<!-- Footer -->
+	<div th:replace="fragments/footer :: footer"></div>
+	<!--Close Footer -->
+
+	<!-- ./wrapper -->
+
+	<!-- Common JS  -->
+
+	<!-- jQuery -->
+	<script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
+	<!-- jQuery UI 1.11.4 -->
+	<script th:src="@{/webtemplate/plugins/jquery-ui/jquery-ui.min.js}"></script>
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+		$.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<!-- ChartJS -->
+	<script th:src="@{/webtemplate/plugins/chart.js/Chart.min.js}"></script>
+	<!-- Sparkline -->
+	<!-- <script th:src="@{/webtemplate/plugins/sparklines/sparkline.js}"></script> -->
+	<!-- JQVMap -->
+	<!-- <script th:src="@{/webtemplate/plugins/jqvmap/jquery.vmap.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jqvmap/maps/jquery.vmap.usa.js}"></script> -->
+	<!-- jQuery Knob Chart -->
+	<script th:src="@{/webtemplate/plugins/jquery-knob/jquery.knob.min.js}"></script>
+	<!-- daterangepicker -->
+	<script th:src="@{/webtemplate/plugins/moment/moment.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/daterangepicker/daterangepicker.js}"></script>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js}"></script>
+	<!-- Summernote -->
+	<script
+		th:src="@{/webtemplate/plugins/summernote/summernote-bs4.min.js}"></script>
+	<!-- overlayScrollbars -->
+	<script
+		th:src="@{/webtemplate/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js}"></script>
+	<!-- AdminLTE App -->
+	<script th:src="@{/webtemplate/dist/js/adminlte.js}"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script th:src="@{/webtemplate/dist/js/demo.js}"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<!-- 	<script th:src="@{/webtemplate/dist/js/pages/dashboard.js}"></script> -->
+	<!--End Common JS  -->
+
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+
+	<script
+		th:src="@{/webtemplate/plugins/datatables/jquery.dataTables.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/dataTables.responsive.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/responsive.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/dataTables.buttons.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.bootstrap4.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jszip/jszip.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/pdfmake.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/vfs_fonts.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.html5.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.print.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.colVis.min.js}"></script>
+
+	<script th:src="@{/custom_js/cloudInstance.js}"></script>
+
+	<script type="text/javascript">
+		$(function() {
+			//Initialize Select2 Elements
+			$('.select2').select2()
+
+			//Initialize Select2 Elements
+			$('.select2bs4').select2({
+				theme : 'bootstrap4'
+			})
+
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/multiselect/bootstrap-multiselect.css}">
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header_bk :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Add User</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Add User</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/users/view/'}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+								<form th:action="@{/users/save}" method="post"
+									enctype="multipart/form-data" th:object="${objEnt}" onsubmit="return validateForm()">
+									<input type="hidden" id="userId" th:field="*{appUser.userId}" />
+									<div class="card-body">
+										<div class="row">
+
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="exampleInputEmail1">Name</label> <input
+														tabindex="1" type="text" th:field="*{appUser.name}"
+														placeholder="Name" required class="form-control" id="name" />
+												</div>
+												<div class="form-group" id="show_hide_password"
+													th:if="${userID == null}">
+													<label for="exampleInputPassword1">Password</label> <input
+														tabindex="3" type="password"
+														th:field="*{appUser.encrytedPassword}" required
+														id="encrytedPassword" name="encrytedPassword"
+														class="form-control" placeholder="Password" />
+													<div class="input-group-append"
+														style="float: right; margin-top: -38px; height: 38px;">
+														<span class="input-group-text" style="cursor: pointer;"><i
+															class="fa fa-eye-slash" aria-hidden="true"></i></span>
+													</div>
+												</div>
+											</div>
+
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="exampleInputPassword1">Username</label> <input
+														tabindex="2" type="text" id="userName"
+														onchange="checkUsernameExist(this.value)"
+														th:field="*{appUser.userName}" required name="userName"
+														th:attr="disabled=${userID != null}" class="form-control"
+														placeholder="Username" />
+												</div>
+												<div class="form-group" id="show_hide_confirmPassword"
+													th:if="${userID == null}">
+													<label for="exampleInputPassword1">Confirm Password</label>
+													<input type="password"
+														th:field="*{appUser.confirmPassword}" tabindex="4"
+														required id="confirmPassword" name="confirmPassword"
+														class="form-control" placeholder="Confirm Password" />
+													<div class="input-group-append"
+														style="float: right; margin-top: -38px; height: 38px;">
+														<span class="input-group-text" style="cursor: pointer;"><i
+															class="fa fa-eye-slash" aria-hidden="true"></i></span>
+													</div>
+												</div>
+											</div>
+
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="exampleInputEmail1">Email address</label> <input
+														onchange="checkDuplicateEmail(this.value)" tabindex="5"
+														type="email" th:field="*{appUser.email}" required
+														id="email" name="email" class="form-control"
+														placeholder="Enter email" />
+													<div class="alert alert-warning"
+														th:if="${#fields.hasErrors('appUser.email')}"
+														th:errors="*{appUser.email}"></div>
+												</div>
+												<div class="form-group">
+													<label for="exampleInputEmail1">Role</label> <select
+														onchange="roleChange(this.value)" tabindex="1"
+														id="userRole" th:field="*{appRole.roleId}" required
+														name="userRole" class="form-control" style="width: 100%;">
+														<!-- <option value="">Please Select</option> -->
+														<option value="2" selected>User</option>
+														<option value="1">Admin</option>
+														
+														<option value="3">Super Admin</option>
+
+													</select>
+												</div>
+
+												<div class="form-group" style="display: none">
+													<label for="exampleInputEmail1">Switch</label> <select
+														tabindex="1" id="switch_id"
+														th:field="*{appUser.switch_id}" required name="switch_id"
+														class="form-control" style="width: 100%;">
+														<!-- <option value="">Select Switch</option> -->
+														<option th:each="ob:${switchList}" th:value="${ob[0]}"
+															th:text="${ob[1]}" /></option>
+													</select>
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="mobileNo">Mobile No</label> <input tabindex="6"
+														onchange="checkMobileNumber(this.value)" type="text"
+														required pattern="[789][0-9]{9}"
+														th:field="*{appUser.mobileNo}" id="mobileNo"
+														name="mobileNo" class="form-control"
+														placeholder="Enter Mobile Number"
+														title="Please enter a 10-digit mobile number starting with 7, 8, or 9" />
+												</div>
+												<div class="form-group">
+													<label for="exampleInputEmail1">Group name</label> <select
+														tabindex="1" id="appUser.groupName"
+														th:field="*{appUser.groupName}" required
+														name="appUser.groupName" data-placeholder="Select Group"
+														class="form-control select2" multiple="multiple"
+														style="width: 100%;">
+														<option th:each="ob:${groupList}" th:value="${ob[1]}"
+															th:text="${ob[1]}" /></option>
+													</select>
+												</div>
+
+												<div class="form-group" style="display: none">
+													<label for="Generation">Generation</label> <select
+														tabindex="1" id="generationType"
+														th:field="*{appUser.generationType}" required
+														name="generationType" class="form-control"
+														data-placeholder="Select generation type"
+														style="width: 100%;">
+														<!-- <option value=''>SELECT</option> -->
+														<option value='1'>Generation 1</option>
+														<option value='2'>Generation 2</option>
+													</select>
+												</div>
+
+											</div>
+
+
+										</div>
+									</div>
+									<div class="card-footer" id="adduseridd">
+										<button type="submit" id="adduserForm" class="btn btn-primary">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.container-fluid -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+</body>
+<script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+<script
+	th:src="@{/webtemplate/multiselect/bootstrap-multiselect.min.js}"></script>
+<script th:src="@{/webtemplate/multiselect/bootstrap-multi.js}"></script>
+<script th:src="@{/webtemplate/multiselect/bootstrap-multiselect.js}"></script>
+<script
+	th:src="@{/webtemplate/multiselect/bootstrap-multiselect.min.js.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+
+<script th:src="@{/custom_js/user.js}"></script>
+
+<script th:inline="javascript">
+	$(function() {
+
+		$('.select2').select2()
+		
+		
+		 var selectedRole = $('#userRole').val();
+      var $groupName = $('#appUser\\.groupName');
+
+      if (selectedRole == '1' || selectedRole == '3') { // Example condition for Admin and Super Admin
+          $groupName.prop('multiple', true).addClass('select2');
+          $groupName.select2({
+              placeholder: "Select Group",
+              allowClear: true
+          });
+      } else {
+          $groupName.prop('multiple', false).removeClass('select2').select2('destroy');
+      }
+		
+	})
+
+	$(function() {
+		// 		alert("dsads")
+		var selectedValues = [[${objEnt.appUser.groupName}]];
+// 				alert(selectedValues);
+		var selectElement = document.getElementById('appUser.groupName');
+		// 		alert(selectElement);
+
+		for (var i = 0; i < selectElement.options.length; i++) {
+			var option = selectElement.options[i];
+			if (selectedValues.includes(option.value)) {
+				// 				alert("inside")
+				// 			option.selected = true;
+				option.setAttribute('selected', 'selected');
+				// 				option.setAttribute('data-select2-id', '10');
+
+				// 				$("#appUser.groupName").val(option.value).change();
+			}
+			$('.select2').select2()
+		}
+	})
+</script>
+</html>

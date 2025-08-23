@@ -1,0 +1,822 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud Portal</title>
+
+<!-- Common CSS -->
+
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" th:href="@{/css/fontAwesome.css}">
+<!-- Font Awesome -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
+<!-- Ionicons -->
+<link rel="stylesheet" th:href="@{/css/ionicIcons.css}">
+<!-- Tempusdominus Bootstrap 4 -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css}">
+<!-- iCheck -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
+<!-- JQVMap -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/jqvmap/jqvmap.min.css}">
+<!-- Theme style -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/dist/css/adminlte.min.css}">
+<!-- overlayScrollbars -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/overlayScrollbars/css/OverlayScrollbars.min.css}">
+<!-- Daterange picker -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/daterangepicker/daterangepicker.css}">
+<!-- summernote -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/summernote/summernote-bs4.min.css}">
+
+<!--End Common CSS  -->
+
+<!-- <link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">  -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/css/cloudfont-awesome.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/css/font-awesome.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-responsive/css/responsive.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-buttons/css/buttons.bootstrap4.min.css}">
+
+
+<style type="text/css">
+.text-center {
+	text-align: center !important;
+}
+
+/* Style for the span */
+.glow-span {
+	display: inline-block;
+	padding: 10px;
+	background-color: #fff;
+	/* border: 1px solid #ccc; */
+	transition: box-shadow 0.3s;
+	border-radius: 10px;
+	width: -webkit-fill-available;
+	text-align: center;
+}
+
+.glow-span:hover {
+	box-shadow: 0 0 10px 5px rgba(0, 0, 255, 0.5);
+	background-color: blue; /* Blue glow effect */
+}
+
+.glow-span2 {
+	display: inline-block;
+	padding: 10px;
+	background-color: #ffc700;
+	/* border: 1px solid #ccc; */
+	transition: box-shadow 0.3s;
+	border-radius: 10px;
+	width: -webkit-fill-available;
+	text-align: center;
+}
+
+.glow-span2:hover {
+	box-shadow: 0 0 10px 5px rgba(0, 0, 255, 0.5);
+	background-color: #ffc700;
+}
+
+/* right click context menu */
+* {
+	margin: 0px;
+	padding: 0px;
+	box-sizing: border-box;
+}
+
+ul li {
+	list-style: none;
+}
+
+#contextMenu {
+	position: absolute;
+	transform-origin: top left;
+	transform: scale(0);
+	width: 220px;
+	border: 1px solid rgba(100, 100, 100, 0.55);
+	padding: 5px;
+	background: rgba(250, 250, 250, 0.98);
+	box-shadow: 2px 2px 12px 4px rgba(100, 100, 100, 0.4);
+	transition: transform 400ms ease-in-out 50ms;
+}
+
+#contextMenu.visible {
+	transform: scale(1);
+}
+
+#contextMenu ul li {
+	padding: 5px 3px;
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	color: rgba(50, 50, 50, 0.9);
+	font-size: 15px;
+}
+
+#contextMenu ul li:hover {
+	background: rgba(100, 100, 100, 0.12);
+}
+
+#contextMenu ul li.disabled {
+	color: rgba(100, 100, 100, 0.5);
+	cursor: pointer;
+}
+
+#contextMenu ul li.share {
+	/*   height:40px; */
+	width: 100%;
+	flex-direction: column;
+	align-items: left;
+	flex-wrap: wrap;
+}
+
+#contextMenu ul li.share>.name {
+	margin-top: -2px;
+	margin-bottom: 10px;
+	display: block;
+}
+
+#contextMenu ul li.share .icons {
+	width: 100%;
+	display: flex;
+	justify-content: space-around;
+}
+
+#contextMenu ul li.share .icons>i:hover {
+	background: #e7e7e7;
+}
+
+#contextMenu ul li i {
+	width: 20px;
+}
+
+#contextMenu ul li div.name {
+	padding-left: 8px;
+}
+
+#contextMenu div.break {
+	margin: 4px 0px;
+	border-top: 1px solid rgba(100, 100, 100, 0.5);
+}
+
+#pulse {
+	position: fixed;
+	width: 35px;
+	height: 35px;
+	background: rgba(0, 0, 0, 1);
+	opacity: 0;
+	border-radius: 50%;
+	z-index: 100;
+}
+
+#pulse.active {
+	animation: pulse 400ms ease;
+}
+
+@
+keyframes pulse { 0% {
+	opacity: 1;
+	transform: scale(0);
+}
+
+100%
+{
+opacity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0;
+transform
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:scale
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(1
+.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+);
+}
+}
+th {
+	text-align: center;
+}
+
+td {
+	text-align: center;
+}
+</style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<!-- Header -->
+		<div th:replace="fragments/header_bk :: header"></div>
+		<!--Close Header -->
+
+		<!-- Sidebar -->
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<!-- Close Sidebar -->
+
+		<div class="content-wrapper">
+
+			<section class="content" style="padding-top: 15px">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<!-- <div class="col-md-2">
+											<a th:href="@{'/cloud_instance_user/vm_user'}"
+												class="btn btn-block bg-gradient-primary">Create
+												Instance</a>
+										</div> -->
+									</div>
+									<div th:if="${message != null}"
+										class="alert alert-success alert-dismissible fade show text-center message"
+										role="alert">
+										[[${message}]]
+										<button type="button" class="close btn-sm"
+											data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div th:if="${error != null}"
+										class="alert alert-danger alert-dismissible fade show text-center message"
+										role="alert">
+										[[${error}]]
+										<button type="button" class="close btn-sm"
+											data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+							</div>
+							<div>
+								<table id="example1" class="table table-bordered table-striped">
+									<thead style="background-color: #e2e2e2">
+										<tr>
+											<th class="text-center">Billing Start Date</th>
+											<th class="text-center">Instance IP</th>
+											<th class="text-center">Cloud Instances</th>
+											<th class="text-center">VM source</th>
+
+											<th class="text-center">Hostname</th>
+											<th class="text-center">Instance ID</th>
+											<th class="text-center">Status</th>
+											<th class="text-center">VM Status</th>
+											<!-- 											<th class="text-center">VM Status</th> -->
+											<th class="text-center">Created on</th>
+											<th class="text-center">Device Mac</th>
+											<th class="text-center">OS</th>
+											<th sec:authorize="hasRole('ROLE_SUPERADMIN')"
+												class="text-center">Switch</th>
+											<th class="text-center">Location</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="obj : ${listObj}" class="odd"
+											style="background-color: #fff;">
+											<td>[[${obj.created_on}]]</td>
+											<td><span class="glow-span"
+												th:if="${obj.instance_ip != null}"
+												style="background-color: #f1faff; cursor: pointer">[[${obj.instance_ip}]]</span>
+
+												<span th:if="${obj.instance_ip == null}">-</span></td>
+<!-- 											<td> -->
+<!-- 												<div class="row"> -->
+<!-- 													<div class="col-md-2"> -->
+<!-- 														<i class="fa fa-windows" -->
+<!-- 															style="font-size: 35px; color: dodgerblue; padding-top: 2px"></i> -->
+<!-- 													</div> -->
+
+<!-- 													<div class="col-md-10"> -->
+<!-- 														<h3 class="card-title" -->
+<!-- 															style="align-items: flex-start !important; flex-direction: column !important; display: flex;"> -->
+
+<!-- 															<span class="card-title" th:value="${obj.id}" -->
+<!-- 																th:onclick="'viewCloudServerDetails(' + ${obj.id} + ')'" -->
+<!-- 																style="font-weight: bold; cursor: pointer;" -->
+<!-- 																th:oncontextmenu="return showContextMenu(event)"> -->
+<!-- 																[[${obj.instance_name}]]</span> <span class="card-title" -->
+<!-- 																style="font-size: 1rem !important; color: #b5b5c3 !important"> -->
+<!-- 																[[${obj.price_id.getvCpu}]] / [[${obj.price_id.getRam}]] -->
+<!-- 																/ [[${obj.price_id.getSsd_disk}]] /</span> -->
+<!-- 														</h3> -->
+<!-- 													</div> -->
+
+<!-- 												</div> -->
+<!-- 											</td> -->
+<!-- 											<td>HyperV</td> -->
+
+	<td>
+												<div class="row">
+													<div class="col-md-2">
+														<!-- 														<i class="fa fa-windows" -->
+														<!-- 															th:if="${#strings.contains(obj.subproduct_id.getSub_product_name, 'Windows')}" -->
+														<!-- 															style="font-size: 35px; color: dodgerblue; padding-top: 2px"></i> -->
+														<!-- 														<img -->
+														<!-- 															th:unless="${#strings.contains(obj.subproduct_id.getSub_product_name, 'Windows')}" -->
+														<!-- 															src="/webtemplate/dist/img/Ubuntu.png" -->
+														<!-- 															style="height: 63px; width: 61px; margin-left: -10px;"> -->
+													</div>
+
+													<div class="col-md-10">
+														<h3 class="card-title"
+															style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+
+															<span class="card-title" th:value="${obj.id}"
+																th:onclick="'viewCloudServerDetails(' + ${obj.id} + ')'"
+																style="font-weight: bold; cursor: pointer;">
+																[[${obj.instance_name}]]</span>
+															<!--  <span class="card-title"
+																style="font-size: 1rem !important; color: #b5b5c3 !important">
+																[[${obj.cpuAssigned}]] / [[${obj.memoryAssigned}]]
+																/ [[${obj.diskAssigned}]] /</span> -->
+															<span class="card-title"
+																style="font-size: 1rem !important; color: #b5b5c3 !important">
+																<!-- <span
+																th:text="${#strings.isEmpty(obj.cpuAssigned) ? obj.price_id.getvCpu : obj.cpuAssigned + 'CPU'}"></span>
+																 -->
+																 
+																 <span
+																th:text="${obj.cpuAssigned+ ' CPU' }">
+																</span>
+																/
+																
+																 <span
+																th:text="${obj.memoryAssigned+ ' RAM' }">
+																</span>
+																	
+
+														</h3>
+													</div>
+
+												</div>
+											</td>
+											<td><span
+												th:text="${obj.virtualization_type != null && obj.virtualization_type != '' ? obj.virtualization_type : 'HyperV'}"></span></td>
+
+
+											<!-- <td>[[${obj.instance_name}]]</td> -->
+											<td>[[${obj.computer_name}]]</td>
+											<td>[[${obj.Id}]]</td>
+											<td><span style="cursor: pointer">[[${obj.request_status}]]</span>
+											</td>
+											<td th:text="${obj.vm_state != 'off' ? obj.vm_state : 'stop'}"></td>
+											<td>[[${obj.created_on}]]</td>
+											<td>[[${obj.mac_address}]]</td>
+											<td>[[${obj.subproduct_id.getSub_product_name}]]</td>
+
+											<td sec:authorize="hasRole('ROLE_SUPERADMIN')"
+												class="text-center">[[${obj.switch_id.getSwitch_name}]]</td>
+											<td>[[${obj.location_id.getLocation_name}]]</td>
+
+										</tr>
+
+									</tbody>
+								</table>
+
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- End Cloud Instances -->
+
+			<!-- Right Click Context Menu -->
+			<div id="pulse"></div>
+			<div id="contextMenu" style="height: fit-content;">
+				<ul>
+					<li><i class="fa fa-folder-open-o" aria-hidden="true"></i>
+						<div class="name" onclick="passInstanceId()">Manage Cloud</div></li>
+					<li><i class="fa fa-refresh" aria-hidden="true"></i>
+						<div class="name">Console</div></li>
+				</ul>
+			</div>
+			<!--End Right Click Context Menu -->
+
+
+
+		</div>
+
+	</div>
+	<div class="modal fade text-center" id="confirmModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Delete Confirmation</h5>
+					<button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<span id="confirmText"></span>
+				</div>
+				<div class="modal-footer">
+					<a type="button" id="yesBtn" class="btn btn-danger">Yes</a>
+					<button type="button" class="btn btn-secondary"
+						data-dismiss="modal">No</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Footer -->
+	<div th:replace="fragments/footer :: footer"></div>
+	<!--Close Footer -->
+
+	<!-- ./wrapper -->
+
+	<!-- Common JS  -->
+
+	<!-- jQuery -->
+	<script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
+	<!-- jQuery UI 1.11.4 -->
+	<script th:src="@{/webtemplate/plugins/jquery-ui/jquery-ui.min.js}"></script>
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+		$.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<!-- ChartJS -->
+	<script th:src="@{/webtemplate/plugins/chart.js/Chart.min.js}"></script>
+	<!-- Sparkline -->
+	<script th:src="@{/webtemplate/plugins/sparklines/sparkline.js}"></script>
+	<!-- JQVMap -->
+	<script th:src="@{/webtemplate/plugins/jqvmap/jquery.vmap.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jqvmap/maps/jquery.vmap.usa.js}"></script>
+	<!-- jQuery Knob Chart -->
+	<script th:src="@{/webtemplate/plugins/jquery-knob/jquery.knob.min.js}"></script>
+	<!-- daterangepicker -->
+	<script th:src="@{/webtemplate/plugins/moment/moment.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/daterangepicker/daterangepicker.js}"></script>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js}"></script>
+	<!-- Summernote -->
+	<script
+		th:src="@{/webtemplate/plugins/summernote/summernote-bs4.min.js}"></script>
+	<!-- overlayScrollbars -->
+	<script
+		th:src="@{/webtemplate/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js}"></script>
+	<!-- AdminLTE App -->
+	<script th:src="@{/webtemplate/dist/js/adminlte.js}"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script th:src="@{/webtemplate/dist/js/demo.js}"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+	<script th:src="@{/webtemplate/dist/js/pages/dashboard.js}"></script>
+	<!--End Common JS  -->
+
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+
+	<script
+		th:src="@{/webtemplate/plugins/datatables/jquery.dataTables.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/dataTables.responsive.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/responsive.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/dataTables.buttons.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.bootstrap4.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jszip/jszip.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/pdfmake.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/vfs_fonts.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.html5.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.print.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.colVis.min.js}"></script>
+
+	<script th:src="@{/custom_js/cloudServer.js}"></script>
+
+	<script type="text/javascript">
+		$(document).ready(
+				function() {
+					$(".btn-delete").on(
+							"click",
+							function(e) {
+								e.preventDefault();
+								link = $(this);
+
+								tutorialTitle = link.attr("tutorialTitle");
+								$("#yesBtn").attr("href", link.attr("href"));
+								$("#confirmText").html(
+										"Do you want to delete the VM \<strong\>"
+												+ tutorialTitle
+												+ "\<\/strong\>?");
+								$("#confirmModal").modal();
+							});
+
+					$("#btnClear").on("click", function(e) {
+						e.preventDefault();
+						$("#keyword").text("");
+						window.location = "[[@{/'+${action_name}+'/view}]]";
+					});
+				});
+	</script>
+
+	<script type="text/javascript">
+		$(function() {
+			//Initialize Select2 Elements
+			$('.select2').select2()
+
+			//Initialize Select2 Elements
+			$('.select2bs4').select2({
+				theme : 'bootstrap4'
+			})
+
+			$("#example1")
+					.DataTable(
+							{
+								"responsive" : true,
+
+								"lengthChange" : false,
+								"autoWidth" : false,
+								"buttons" : [
+										{
+											extend : 'csv',
+											title : 'Data Export'
+										},
+										{
+											extend : 'excel',
+											title : 'Data Export'
+										},
+										{
+											extend : 'pdf',
+											title : 'Data Export',
+											orientation : 'landscape',
+											pageSize : 'A4',
+											customize : function(doc) {
+												var numColumns = doc.content[1].table.body[0].length;
+												//alert(numColumns+1);
+												// Set column widths (example values, adjust as needed)
+												doc.content[1].table.widths = Array(
+														numColumns + 1).fill(
+														'*');
+
+												// Adjust margins and font sizes
+												// 												doc.pageMargins = [ 10, 10, 10,
+												// 														10 ];
+												doc.defaultStyle.fontSize = 8;
+
+												// Reduce header font size
+												doc.styles.tableHeader.fontSize = 8;
+												doc.styles.tableHeader.alignment = 'center';
+
+												// Center-align table body cells
+												doc.styles.tableBodyEven.alignment = 'center';
+												doc.styles.tableBodyOdd.alignment = 'center';
+
+												// Handle text overflow and wrapping
+												doc.content
+														.forEach(function(item) {
+															if (item.table
+																	&& item.table.body) {
+																item.table.body
+																		.forEach(function(
+																				row) {
+																			row
+																					.forEach(function(
+																							cell) {
+																						cell.margin = [
+																								5,
+																								2,
+																								5,
+																								2 ]; // Add margins for better readability
+																						//	 										cell.fillColor = '#f2f2f2'; // Optional: set background color
+																						cell.alignment = 'left'; // Optional: left-align text
+
+																						if (typeof cell.text === 'string') {
+																							// Insert line breaks every 30 characters (adjust as needed)
+																							cell.text = cell.text
+																									.replace(
+																											/(.{1,30})/g,
+																											'$1\n')
+																									.trim();
+																						}
+																					});
+																		});
+															}
+														});
+
+												var tableWrapper = {
+													table : doc.content[1].table,
+													layout : 'noBorders',
+													alignment : 'center',
+													margin : [ 0, 0, 0, 0 ]
+												// top, right, bottom, left
+												};
+												doc.content[1] = tableWrapper;
+											}
+										},
+										{
+											extend : 'print',
+											customize : function(win) {
+												$(win.document.body).find(
+														'table').addClass(
+														'compact').css(
+														'font-size', '8px')
+														.css('width', '100%');
+											}
+										}, "colvis" ],
+								"sScrollX" : "100%",
+								"sScrollXInner" : "130%",
+								"bScrollCollapse" : true,
+								pageLength : 25,
+								searching : true
+							}).buttons().container().appendTo(
+							'#example1_wrapper .col-md-6:eq(0)');
+
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Add Physical Servers</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Physical Servers</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/'+${action_name}+'/view/'}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+								<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+									enctype="multipart/form-data" th:object="${objEnt}">
+									<input type="hidden" th:field="*{id}" />
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="serverIP">Server IP</label> <input tabindex="2"
+														type="text" th:field="*{serverIP}" required id="serverIP"
+														th:onchange="checkforDuplicatePhysicalServerIP(this.value)"
+														name="serverIP" class="form-control"
+														placeholder="Enter Server IP" />
+												</div>
+
+												<div class="form-group">
+													<label for="hostname">Hostname</label> <input tabindex="2"
+														type="text" th:field="*{hostname}" required id="hostname"
+														name="hostname" class="form-control"
+														placeholder="Enter hostname" />
+												</div>
+												<div class="form-group">
+													<label for="virtualization_type">Virtualization
+														Type</label> <select tabindex="1" id="virtualization_type"
+														th:field="*{virtualization_type}" required
+														name="virtualization_type" class="form-control select2"
+														style="width: 100%;">
+														<option value="" label="Please Select" />
+														<option value="KVM" label="KVM" />
+														<option value="hyperv" label="HyperV" />
+														<option value="OpenStack" label="OpenStack" />
+													</select>
+												</div>
+												<div class="form-group">
+													<label for="ssh_host">SSH Host</label> <input tabindex="2"
+														type="text" th:field="*{ssh_host}" required id="ssh_host"
+														name="ssh_host" class="form-control"
+														placeholder="Enter SSH Host" />
+												</div>
+												<div class="form-group" id="show_hide_password">
+													<label for="ssh_password">SSh Password</label> <input
+														tabindex="2" type="password" th:field="*{ssh_password}"
+														required id="ssh_password" name="ssh_password"
+														class="form-control" placeholder="Enter SSH Password" />
+													<div class="input-group-append"
+														style="float: right; margin-top: -38px; height: 38px;">
+														<span class="input-group-text" style="cursor: pointer;"><i
+															class="fa fa-eye-slash" aria-hidden="true"></i></span>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" id="ipBtn" class="btn btn-primary">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="templateListing :: jsscript"></div>
+	
+</body>
+	<script th:src="@{/custom_js/physicalServer.js}"></script>
+</html>

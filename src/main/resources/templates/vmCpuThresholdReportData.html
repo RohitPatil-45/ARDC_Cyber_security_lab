@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})">
+
+<style>
+.caret {
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	border-top: 6px solid #fff;
+}
+
+.btn {
+	width: 100px;
+	font-weight: 900;
+	border: 0px;
+}
+
+.btn-input {
+	display: block;
+}
+
+.btn-input .btn.form-control {
+	text-align: left;
+}
+
+.btn-input .btn.form-control span:first-child {
+	left: 10px;
+	overflow: hidden;
+	position: absolute;
+	right: 25px;
+}
+
+.btn-input .btn.form-control .caret {
+	margin-top: -1px;
+	position: absolute;
+	right: 10px;
+	top: 50%;
+}
+</style>
+
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>VM CPU Threshold Report</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">VM CPU Threshold</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<!-- <h3 class="card-title">VM Activity Report</h3> -->
+									&nbsp; &nbsp; &nbsp;<b>From Date :</b> [[${fdate}]] <b>&nbsp;
+										&nbsp; &nbsp;To Date :</b> [[${tdate}]]
+
+
+									<div class="container pull-right" style="width: fit-content;">
+										<div class="btn-group">
+											<button type="button" class="btn btn-info dropdown-toggle"
+												data-toggle="dropdown"
+												style="display: inline-block; text-decoration: none; border-radius: 8px; background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(30px); color: rgb(255 255 255/ 81%); font-size: 14px; letter-spacing: 2px; cursor: pointer; text-transform: uppercase;">
+												<span data-bind="label"><i
+													class="fa-solid fa-table fa-lg"></i> Table</span>&nbsp;<span
+													class="caret"></span>
+											</button>
+											<ul class="dropdown-menu" role="menu"
+												style="border-radius: 8px; background-color: rgb(0 0 0/ 16%); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(30px); color: rgb(251 249 249/ 81%); letter-spacing: 2px; position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-5px, 36px, 0px);">
+												<li style="padding: 7%; color: black !important;"
+													onclick="onclickchangetabletype('Table')"><a><i
+														class="fa-solid fa-table fa-lg"></i> Table</a></li>
+												<li style="padding: 7%;"
+													onclick="onclickchangetabletype('Graph')"><a><i
+														class="fa-duotone fa-solid fa-chart-simple fa-lg"></i>
+														Graph</a></li>
+											</ul>
+										</div>
+									</div>
+
+								</div>
+								<div class="card-body">
+									<i
+										style="padding: 1%; font-size: 35px; color: black; display: none;"
+										id="IDSpinner" class='fa fa-spinner fa-spin'></i>
+
+									<div id="mytablehereID">
+										<table id="example1"
+											class="table table-bordered table-striped">
+											<thead class="thead-light" style="text-align: center;">
+												<tr>
+													<th scope="col">Sr No.</th>
+													<th scope="col">Virtual Machine</th>
+													<!-- <th scope="col">Physical server IP</th> -->
+													<th scope="col">CPU utilization (%)</th>
+													<th scope="col">CPU Threshold</th>
+													<th scope="col">CPU Status</th>
+													<th scope="col">Event Timestamp</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr th:each="data, stat : ${data}">
+													<th scope="row" th:text="${stat.count}">1</th>
+													<td>[[${data.vmName}]]</td>
+													<!-- <td>[[${data.nodeIp}]]</td> -->
+													<td>[[${data.cpuUtilization}]]</td>
+													<td>[[${data.cpuThreshold}]]</td>
+													<td>[[${data.cpuStatus}]]</td>
+													<td>[[${data.eventTimestamp}]]</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+									<div id="mygraphhereID" style="display: none;">
+										<button id="toggleMemoryLegends"
+											style="color: black; font-size: 18px; background-color: #6c757d24; border: 3px solid #a3a3a3; border-radius: 5px; text-decoration: none; padding: 1px 10px 1px 10px;">Toggle
+										</button>
+										<div id="PieChartContainer"
+											style="width: 100%; height: 400px;"></div>
+
+
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.container-fluid -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+
+
+
+	<script type="text/javascript"
+		th:src="@{/webtemplate/Highchart/highcharts.js}"></script>
+
+	<script type="text/javascript"
+		th:src="@{/webtemplate/Highchart/exporting.js}"></script>
+	<script th:inline="javascript">
+		$(function() {
+			$("#example1").DataTable({
+
+				"responsive" : false,
+				 "paging": true,
+				    "pageLength": 25,
+				/* "sScrollX" : "100%",
+				"sScrollXInner" : "200%",
+				"bScrollCollapse" : true, */
+				"lengthChange" : false,
+				"autoWidth" : false,
+				"buttons" : [ "csv", "excel", "pdf","print", "colvis" ]
+			}).buttons().container().appendTo(
+					'#example1_wrapper .col-md-6:eq(0)');
+
+		})
+	</script>
+	<script th:inline="javascript">
+		$(document).ready(
+				function() {
+					$(document.body).on(
+							'click',
+							'.dropdown-menu li',
+							function(event) {
+								var $target = $(event.currentTarget);
+
+								$target.closest('.btn-group').find(
+										'[data-bind="label"]').html(
+										$target.html()).end().children(
+										'.dropdown-toggle').css('color',
+										'rgb(255 255 255 / 81%)').dropdown(
+										'toggle');
+
+								return false;
+							});
+				});
+
+		function onclickchangetabletype(myvalue) {
+			$("#IDSpinner").show();
+			if (myvalue === 'Table') {
+				document.getElementById('mytablehereID').style.display = 'block';
+				document.getElementById('mygraphhereID').style.display = 'none';
+				$("#IDSpinner").hide();
+			} else if (myvalue === 'Graph') {
+				document.getElementById('mygraphhereID').style.display = 'block';
+				document.getElementById('mytablehereID').style.display = 'none';
+				graphputupData();
+
+				$("#IDSpinner").hide();
+			}
+		}
+		var Threshholdhighchart="";
+		function graphputupData(){
+			
+			Threshholdhighchart=  Highcharts.chart('PieChartContainer', {
+		                chart: {
+		                    type: 'line' // Use 'line' for multiple lines
+		                },
+		                title: {
+		                    text: 'CPU Utilization Over Time'
+		                },
+		                xAxis: {
+		                    type: 'datetime',
+		                    title: {
+		                        text: 'Time'
+		                    },
+		                    labels: {
+		                        format: '{value:%Y-%m-%d %H:%M:%S}' // Format the datetime labels
+		                    }
+		                },
+		                yAxis: {
+		                    title: {
+		                        text: 'CPU Utilization (%)'
+		                    }
+		                },
+		                series: [[${seriesData}]], // Pass the series data from the controller
+		                tooltip: {
+		                    shared: true,
+		                    crosshairs: true,
+		                    formatter: function() {
+		                        var tooltip = '<b>' + Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '</b>';
+		                        this.points.forEach(function(point) {
+		                            tooltip += '<br/>' + point.series.name + ': ' + point.y + '% (Status: ' + point.point.cpuStatus + ')';
+		                        });
+		                        return tooltip;
+		                    }
+		                },
+		                exporting: {
+		                	enabled: true, // Enable exporting
+				             buttons: {
+				               contextButton: {
+				                 menuItems: ['viewFullscreen', 'printChart']
+				               }
+				             },
+				             fallbackToExportServer: false // Ensure it does not fallback to an online server
+		                }
+		            });
+		}
+		
+		document.getElementById('toggleMemoryLegends').addEventListener('click', function () {
+			  
+		    var series = Threshholdhighchart.series;
+            var allVisible = series.every(s => s.visible);
+
+            series.forEach(s => {
+                if (allVisible) {
+                    s.setVisible(false, false); // Hide series
+                } else {
+                    s.setVisible(true, false); // Show series
+                }
+            });
+
+            // Redraw the chart to apply changes
+            Threshholdhighchart.redraw();
+		});
+		
+		
+	</script>
+</body>
+
+</html>

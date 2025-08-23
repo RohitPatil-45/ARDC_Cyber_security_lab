@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>OpenStack Discover</h1>
+						</div>
+						<!-- 						<div class="col-sm-6"> -->
+						<!-- 							<ol class="breadcrumb float-sm-right"> -->
+						<!-- 								<li class="breadcrumb-item"><a href="#">Home</a></li> -->
+						<!-- 								<li class="breadcrumb-item active">Add Switch</li> -->
+						<!-- 							</ol> -->
+						<!-- 						</div> -->
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<!-- 										<div class="col-md-2"> -->
+										<!-- 											<a th:href="@{'/'+${action_name}+'/view/'}" -->
+										<!-- 												class="btn btn-block bg-gradient-primary">Discover</a> -->
+										<!-- 										</div> -->
+									</div>
+								</div>
+								<form>
+									<!-- 									<input type="hidden" th:field="*{id}" /> -->
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="group_name">Physical Server IP</label> <select
+														tabindex="1" id="serverIP" required name="serverIP"
+														class="form-control"
+														data-placeholder="Select Physical Server IP"
+														style="width: 100%;">
+														<option value=''>SELECT</option>
+														<option value='172.16.5.33'>172.16.5.33</option>
+													</select>
+												</div>
+
+
+
+											</div>
+
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="group_name">Fields</label> <select tabindex="1"
+														id="Switch_VM" required name="Switch_VM"
+														class="form-control select2"
+														data-placeholder="Select Field" style="width: 100%;">
+														<option value=''>SELECT Field</option>
+														<option value="OpenStack_All_Discover">All</option>
+													</select>
+												</div>
+
+
+
+											</div>
+
+										</div>
+									</div>
+									<div class="card-footer">
+										<button id="DiscoverButtonClick" type="button"
+											class="btn btn-primary">
+											Save <i
+												style="margin-left: 10px; color: yellow; display: none"
+												id="discoverSpinner" class='fa fa-spinner fa-spin'></i>
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<!-- <div th:replace="template :: jsscript"></div> -->
+	<script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
+	<!-- jQuery UI 1.11.4 -->
+	<script th:src="@{/webtemplate/plugins/jquery-ui/jquery-ui.min.js}"></script>
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+		// 		$.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<!-- ChartJS -->
+	<script th:src="@{/webtemplate/plugins/chart.js/Chart.min.js}"></script>
+	<!-- Sparkline -->
+	<!-- 	<script th:src="@{/webtemplate/plugins/sparklines/sparkline.js}"></script> -->
+	<!-- JQVMap -->
+	<!-- <script th:src="@{/webtemplate/plugins/jqvmap/jquery.vmap.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jqvmap/maps/jquery.vmap.usa.js}"></script> -->
+	<!-- jQuery Knob Chart -->
+	<script th:src="@{/webtemplate/plugins/jquery-knob/jquery.knob.min.js}"></script>
+	<!-- daterangepicker -->
+	<script th:src="@{/webtemplate/plugins/moment/moment.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/daterangepicker/daterangepicker.js}"></script>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js}"></script>
+	<!-- Summernote -->
+	<script
+		th:src="@{/webtemplate/plugins/summernote/summernote-bs4.min.js}"></script>
+	<!-- overlayScrollbars -->
+	<script
+		th:src="@{/webtemplate/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js}"></script>
+	<!-- AdminLTE App -->
+	<script th:src="@{/webtemplate/dist/js/adminlte.js}"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script th:src="@{/webtemplate/dist/js/demo.js}"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+	<!-- <script th:src="@{/webtemplate/dist/js/pages/dashboard.js}"></script> -->
+	<!--End Common JS  -->
+
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+
+	<script
+		th:src="@{/webtemplate/plugins/datatables/jquery.dataTables.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/dataTables.responsive.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/responsive.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/dataTables.buttons.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.bootstrap4.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jszip/jszip.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/pdfmake.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/vfs_fonts.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.html5.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.print.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.colVis.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+
+	<script type="text/javascript"
+		th:src="@{/custom_js/datatable.checkbox.min.js}"></script>
+	<script th:src="@{/custom_js/openstackCloudInstance.js}"></script>
+
+	<script th:inline="javascript">
+		// 		$(function() {
+		// 			getiplist();
+
+		// 		})
+
+		// 		function getiplist() {
+		// 			// 			alert("hi");
+
+		// 			var s = "<option value=''>SELECT</option>";
+		// 			$.ajax({
+		// 				url : '/discover/getIpList',
+
+		// 				success : function(result) {
+		// 					var result = JSON.parse(result);
+
+		// 					for (var i = 0; i < result.length; i++) {
+
+		// 						s += '<option value="' + result[i][0] + '">'
+		// 								+ result[i][1] + '</option>';
+		// 					}
+		// 					$('#ip_address').html(s);
+		// 				}
+		// 			});
+
+		// 			$('#ip_address').html(s);
+
+		// 		}
+	</script>
+</body>
+</html>

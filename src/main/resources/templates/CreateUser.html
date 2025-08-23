@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/multiselect/bootstrap-multiselect.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css}">
+
+
+<style>
+/* .login { */
+/* 	min-height: 100vh; */
+/* } */
+
+/* .bg-image { */
+/* 	background-image: */
+/* 		url('https://source.unsplash.com/WEQbe2jBg40/600x1200'); */
+/* 	background-size: cover; */
+/* 	background-position: center; */
+/* } */
+
+/* .login-heading { */
+/* 	font-weight: 300; */
+/* } */
+
+/* .btn-login { */
+/* 	font-size: 0.9rem; */
+/* 	letter-spacing: 0.05rem; */
+/* 	padding: 0.75rem 1rem; */
+/* } */
+.homepage-hero-module {
+	position: relative;
+}
+
+.bg-overlay {
+	/* 	background: -webkit-gradient(linear, left top, left bottom, from(#1c7ce0c4), */
+	/* 		to(#150051)); */
+	background: linear-gradient(to right, #ffffff00 0%, #000000 90%);
+	width: 100%;
+	display: block;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+}
+
+.mycard {
+	margin-bottom: 1rem;
+	background: transparent;
+	position: relative;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-flex-direction: column;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	min-width: 0;
+	word-wrap: break-word;
+	background-clip: border-box;
+	border: 0 solid rgba(0, 0, 0, .125);
+	border-radius: .25rem;
+}
+
+.whitetextmy {
+	color: white;
+}
+
+.greytextmy {
+	color: grey;
+}
+</style>
+<body>
+	<!-- 	<div class="wrapper"> -->
+
+
+
+	<!-- 	<div class="content-wrapper"> -->
+
+
+	<!-- Main content -->
+	<section class="pt-5 pb-5 pb-0 homepage-hero-module"
+		style="background-size: cover; min-height: 100vh; background-image: url(&quot;/webtemplate/dist/img/ImageBackgroundLogin.jpg&quot;);">
+		<div class="bg-overlay position-absolute"></div>
+		<div class="container position-relative zindex-1 pt-0 pb-3">
+			<div
+				class="row  text-center align-content-center justify-content-between ">
+				<div class="col-12 col-md-7 pr-md-5 text-left align-self-center ">
+
+				</div>
+				<div class="col-12  col-md-5 ">
+					<div class="mycard text-left h-100">
+
+						<div class="card-body px-4 py-5">
+							<div class="row">
+								<a href="javascript:void(0);" id="logo" class="logo logo-admin">
+									<img src="/webtemplate/dist/img/canarispng.png" style=""
+									width="100px" ; alt="logo">
+								</a>
+							</div>
+
+							<div class="row" style="padding-top: 2%">
+								<h3 class="pb-3 font-weight-bold whitetextmy">Create New
+									User</h3>
+							</div>
+							<div class="text-gray-400 fw-bold fs-4 greytextmy">
+								Already have an account?<a class="link-primary fw-bolder me-1"
+									href="/">&nbsp; Sign in here</a>
+							</div>
+							<br>
+
+
+							<form th:action="@{/users/account}" method="post"
+								enctype="multipart/form-data" th:object="${objEnt}">
+
+								<div class="form-floating mb-3">
+									<label for="exampleInputEmail1" class="greytextmy">Name</label>
+									<input tabindex="1" type="text" th:field="*{appUser.name}"
+										placeholder="Name" required class="form-control" id="name" />
+								</div>
+
+
+								<div class="form-floating mb-3">
+									<label for="exampleInputPassword1" class="greytextmy">Username</label>
+									<input tabindex="2" type="text" id="userName"
+										onchange="checkUsernameExist(this.value)"
+										th:field="*{appUser.userName}" required name="userName"
+										th:attr="disabled=${userID != null}" class="form-control"
+										placeholder="Username" />
+								</div>
+
+
+								<div class="form-floating mb-3" id="show_hide_password"
+									th:if="${userID == null}">
+									<label for="exampleInputPassword1" class="greytextmy">Password</label>
+									<input tabindex="3" type="password"
+										th:field="*{appUser.encrytedPassword}" required
+										id="encrytedPassword" name="encrytedPassword"
+										class="form-control" placeholder="Password" />
+									<div class="input-group-append"
+										style="float: right; margin-top: -38px; height: 38px;">
+										<span class="input-group-text" style="cursor: pointer;"><i
+											class="fa fa-eye-slash" aria-hidden="true"></i></span>
+									</div>
+								</div>
+
+								<div class="form-floating mb-3" id="show_hide_confirmPassword"
+									th:if="${userID == null}">
+									<label for="exampleInputPassword1" class="greytextmy">Confirm
+										Password</label> <input type="password"
+										th:field="*{appUser.confirmPassword}" tabindex="4" required
+										id="confirmPassword" name="confirmPassword"
+										class="form-control" placeholder="Confirm Password" />
+									<div class="input-group-append"
+										style="float: right; margin-top: -38px; height: 38px;">
+										<span class="input-group-text" style="cursor: pointer;"><i
+											class="fa fa-eye-slash" aria-hidden="true"></i></span>
+									</div>
+								</div>
+
+								<div class="form-floating mb-3">
+									<label for="exampleInputEmail1" class="greytextmy">Email
+										address</label> <input onchange="checkDuplicateEmail(this.value)"
+										tabindex="5" type="email" th:field="*{appUser.email}" required
+										id="email" name="email" class="form-control"
+										placeholder="Enter email" />
+									<div class="alert alert-warning"
+										th:if="${#fields.hasErrors('appUser.email')}"
+										th:errors="*{appUser.email}"></div>
+								</div>
+
+								<div class="form-floating mb-3">
+									<label for="mobileNo" class="greytextmy">Mobile No</label> <input
+										tabindex="6" onchange="checkMobileNumber(this.value)"
+										type="text" required pattern="[789][0-9]{9}"
+										th:field="*{appUser.mobileNo}" id="mobileNo" name="mobileNo"
+										class="form-control" placeholder="Enter Mobile Number"
+										title="Please enter a 10-digit mobile number starting with 7, 8, or 9" />
+								</div>
+
+
+								<!-- 								<div class="d-grid"> -->
+								<!-- 									<button -->
+								<!-- 										class="btn btn-lg btn-primary btn-login text-uppercase fw-bold mb-2" -->
+								<!-- 										type="submit">Sign in</button> -->
+								<!-- 									<div class="text-center"> -->
+								<!-- 										<a class="small" href="#">Forgot password?</a> -->
+								<!-- 									</div> -->
+								<!-- 								</div> -->
+
+								<br>
+								<div class="row">
+									<div class="col-md-6">
+										<div class="form-floating mb-3">
+
+											<button type="submit" id="adduserForm"
+												class="btn btn-block bg-gradient-primary">Create
+												Account</button>
+
+											<!-- 									<button type="button" class="btn btn-lg btn-primary w-100" -->
+											<!-- 										id="signup-btn" style="height: 3.1rem;"> -->
+											<!-- 										<span class="indicator-label">Create account</span> -->
+											<!-- 									</button> -->
+										</div>
+									</div>
+								</div>
+								<div class="greytextmy">
+									Copyright © 2024- <a href="https://canaris.in/"
+										style="color: #ffa500bd;">Tarang Pvt Ltd</a>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- /.content -->
+	<!-- 	</div> -->
+	<!-- 	<div th:replace="fragments/footer :: footer"></div> -->
+
+
+	<!-- <div th:replace="template :: jsscript"></div> -->
+</body>
+<!-- jQuery -->
+<script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
+<!-- jQuery UI 1.11.4 -->
+<script th:src="@{/webtemplate/plugins/jquery-ui/jquery-ui.min.js}"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+		$.widget.bridge('uibutton', $.ui.button)
+	</script>
+<!-- Bootstrap 4 -->
+<script
+	th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- ChartJS -->
+<script th:src="@{/webtemplate/plugins/chart.js/Chart.min.js}"></script>
+<!-- Sparkline -->
+<!-- 	<script th:src="@{/webtemplate/plugins/sparklines/sparkline.js}"></script> -->
+<!-- JQVMap -->
+<!-- <script th:src="@{/webtemplate/plugins/jqvmap/jquery.vmap.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jqvmap/maps/jquery.vmap.usa.js}"></script> -->
+<!-- jQuery Knob Chart -->
+<script th:src="@{/webtemplate/plugins/jquery-knob/jquery.knob.min.js}"></script>
+<!-- daterangepicker -->
+<script th:src="@{/webtemplate/plugins/moment/moment.min.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/daterangepicker/daterangepicker.js}"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script
+	th:src="@{/webtemplate/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js}"></script>
+<!-- Summernote -->
+<script
+	th:src="@{/webtemplate/plugins/summernote/summernote-bs4.min.js}"></script>
+<!-- overlayScrollbars -->
+<script
+	th:src="@{/webtemplate/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webtemplate/dist/js/adminlte.js}"></script>
+<!-- AdminLTE for demo purposes -->
+<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<!-- <script th:src="@{/webtemplate/dist/js/pages/dashboard.js}"></script> -->
+<!--End Common JS  -->
+
+<script
+	th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+<script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+
+<script
+	th:src="@{/webtemplate/plugins/datatables/jquery.dataTables.min.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/datatables-responsive/js/dataTables.responsive.min.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/datatables-responsive/js/responsive.bootstrap4.min.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/datatables-buttons/js/dataTables.buttons.min.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.bootstrap4.min.js}"></script>
+<script th:src="@{/webtemplate/plugins/jszip/jszip.min.js}"></script>
+<script th:src="@{/webtemplate/plugins/pdfmake/pdfmake.min.js}"></script>
+<script th:src="@{/webtemplate/plugins/pdfmake/vfs_fonts.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.html5.min.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.print.min.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.colVis.min.js}"></script>
+<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+
+<script th:src="@{/custom_js/user.js}"></script>
+
+<script th:inline="javascript">
+	$(function() {
+		$('.select2').select2()
+
+	})
+	
+           
+	if ([[${message}]]) {
+		Swal.fire({
+			position : "top",
+			icon : "success",
+			title : [[${message}]],
+			showConfirmButton : true,
+			timer : 3000,
+		})
+	}
+</script>
+</html>

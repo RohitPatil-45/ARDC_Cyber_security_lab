@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Add SubProduct</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Add SubProduct</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/'+${action_name}+'/view/'}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+								<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+									enctype="multipart/form-data" th:object="${objEnt}">
+									<input type="hidden" th:field="*{id}" />
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="product_id">Proudct Name</label> <select
+														tabindex="1" id="product_id" th:field="*{product_id}"
+														required name="product_id" class="form-control "
+														style="width: 100%;">
+														<option value=''>SELECT</option>
+														<option th:each="ob:${productList}" th:value="${ob[0]}"
+															th:text="${ob[1]}" /></option>
+													</select>
+												</div>
+												
+												<div class="form-group">
+													<label for="sub_product_name">Sub Product Name</label> <input tabindex="5"
+														type="text" th:field="*{sub_product_name}" required id="sub_product_name"
+														name="sub_product_name" class="form-control"
+														placeholder="Enter Sub Product Name" />
+												</div>
+												
+												<div class="form-group">
+													<label for="sub_product_name">ISO File Path</label> <input tabindex="5"
+														type="text" th:field="*{iso_file_path}" required id="iso_file_path"
+														name="iso_file_path" class="form-control"
+														onblur="validateIsoFilePath()" 
+														placeholder="Enter ISO file path" />
+												</div>
+												
+												<div class="form-group">
+													<label for="variant_name">Variant Name</label> <input tabindex="5"
+														type="text" th:field="*{variant}" required id="variant"
+														name="variant" class="form-control"
+														placeholder="Enter variant name" />
+												</div>
+												
+												<div class="form-group">
+													<label for="os_name">OS Name</label> <input tabindex="5"
+														type="text" th:field="*{osName}" required id="osName"
+														name="osName" class="form-control"
+														placeholder="Enter OS Name name" />
+												</div>
+											</div>
+										
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" id="btn" class="btn btn-primary">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="template :: jsscript"></div>
+</body>
+<script>
+    function validateIsoFilePath() {
+        const inputField = document.getElementById("iso_file_path");
+        const value = inputField.value;
+
+        // Check if the value contains spaces
+        if (value.includes(" ")) {
+        	Swal.fire({
+				position : 'top',
+				icon : 'warning',
+				title : 'The ISO file path cannot contain spaces.',
+				showConfirmButton : false,
+				timer : 3000
+			})
+			$('#btn').attr("disabled", "disabled");
+			$('#iso_file_path').val("");
+        }
+        else {
+			$('#btn').removeAttr("disabled");
+		}
+    }
+</script>
+</html>

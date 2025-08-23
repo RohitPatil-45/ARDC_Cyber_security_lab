@@ -1,0 +1,212 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+
+
+<head th:fragment="headFragment">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport"
+	content="width=device-width,initial-scale=1.0,minimum-scale=1.0" />
+
+<!--  CSS start -->
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script type="text/javascript"
+	th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css}">
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" type="text/css"
+	th:href="@{https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback}">
+<!-- Font Awesome -->
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
+<!-- Ionicons -->
+<link rel="stylesheet" type="text/css"
+	th:href="@{https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css}">
+<!-- Tempusdominus Bootstrap 4 -->
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css}">
+<!-- iCheck -->
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
+<!-- JQVMap -->
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/jqvmap/jqvmap.min.css}">
+<!-- Theme style -->
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/dist/css/adminlte.min.css}">
+<!-- overlayScrollbars -->
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/overlayScrollbars/css/OverlayScrollbars.min.css}">
+<!-- Daterange picker -->
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/daterangepicker/daterangepicker.css}">
+<!-- summernote -->
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/summernote/summernote-bs4.min.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css}">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/css/font-awesome.min.css}">
+<!--  CSS END -->
+
+
+<!-- DataTables -->
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/datatables-responsive/css/responsive.bootstrap4.min.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/datatables-buttons/css/buttons.bootstrap4.min.css}">
+
+<!-- <link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+	integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+	crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+
+</head>
+
+<th:block th:fragment="jsscript">
+
+	<script type="text/javascript"
+		th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+
+	<!-- jQuery -->
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
+	<!-- jQuery UI 1.11.4 -->
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-ui/jquery-ui.min.js}"></script>
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+		$.widget.bridge('uibutton', $.ui.button)
+	</script>
+
+	<!-- Bootstrap 4 -->
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<!-- ChartJS -->
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/chart.js/Chart.min.js}"></script>
+	<!-- Sparkline -->
+<!-- 	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/sparklines/sparkline.js}"></script> -->
+	<!-- JQVMap -->
+<!-- 	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jqvmap/jquery.vmap.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jqvmap/maps/jquery.vmap.usa.js}"></script> -->
+	<!-- jQuery Knob Chart -->
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-knob/jquery.knob.min.js}"></script>
+	<!-- daterangepicker -->
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/moment/moment.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/daterangepicker/daterangepicker.js}"></script>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js}"></script>
+	<!-- Summernote -->
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/summernote/summernote-bs4.min.js}"></script>
+	<!-- overlayScrollbars -->
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js}"></script>
+	<!-- AdminLTE App -->
+	<script type="text/javascript"
+		th:src="@{/webtemplate/dist/js/adminlte.js}"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script type="text/javascript" th:src="@{/webtemplate/dist/js/demo.js}"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+	<!-- <script type="text/javascript"
+		th:src="@{/webtemplate/dist/js/pages/dashboard.js}"></script> -->
+	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+
+
+	<!-- DataTables  & Plugins -->
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/datatables/jquery.dataTables.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/dataTables.responsive.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/responsive.bootstrap4.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/dataTables.buttons.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.bootstrap4.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jszip/jszip.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/pdfmake/pdfmake.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/pdfmake/vfs_fonts.js}"></script>
+
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.html5.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.print.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.colVis.min.js}"></script>
+	<script>
+		$(function() {
+			 $("#example1").DataTable(
+					{
+						
+						"responsive" : true,
+						"paging" : true,
+						"sScrollX": "100%",
+				        "sScrollXInner": "130%",
+				        "bScrollCollapse": true,
+						"pageLength" : 5,
+						"lengthChange" : false,
+						"autoWidth" : false,
+						"buttons" : [ "copy", "csv", "excel", "pdf", "print",
+								"colvis" ]
+					}).buttons().container().appendTo(
+					'#example1_wrapper .col-md-6:eq(0)');
+			
+			 
+			$('#example2').DataTable({
+				"paging" : true,
+				"lengthChange" : false,
+				"searching" : false,
+				"ordering" : true,
+				"info" : true,
+				"autoWidth" : false,
+				"responsive" : true,
+			});
+			
+				$("#currentVMTable").DataTable({
+
+						"responsive" : false,
+						"paging" : false,
+						"sScrollX" : "100%",
+						"sScrollXInner" : "130%",
+						"bScrollCollapse" : true,
+						"lengthChange" : false,
+						"autoWidth" : false,
+					});
+		});
+		
+		
+	</script>
+</th:block>
+
+
+</html>

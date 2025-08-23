@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})">
+
+<style>
+.caret {
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	border-top: 6px solid #fff;
+}
+
+.btn {
+	width: 100px;
+	font-weight: 900;
+	border: 0px;
+}
+
+.btn-input {
+	display: block;
+}
+
+.btn-input .btn.form-control {
+	text-align: left;
+}
+
+.btn-input .btn.form-control span:first-child {
+	left: 10px;
+	overflow: hidden;
+	position: absolute;
+	right: 25px;
+}
+
+.btn-input .btn.form-control .caret {
+	margin-top: -1px;
+	position: absolute;
+	right: 10px;
+	top: 50%;
+}
+</style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>VM Status History Report</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">VM Status History</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<!-- <h3 class="card-title">VM Activity Report</h3> -->
+									&nbsp; &nbsp; &nbsp;<b>From Date :</b> [[${fdate}]] <b>&nbsp;
+										&nbsp; &nbsp;To Date :</b> [[${tdate}]]
+
+									<div class="container pull-right" style="width: fit-content;">
+										<div class="btn-group">
+											<button type="button" class="btn btn-info dropdown-toggle"
+												data-toggle="dropdown"
+												style="display: inline-block; text-decoration: none; border-radius: 8px; background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(30px); color: rgb(255 255 255/ 81%); font-size: 14px; letter-spacing: 2px; cursor: pointer; text-transform: uppercase;">
+												<span data-bind="label"><i
+													class="fa-solid fa-table fa-lg"></i> Table</span>&nbsp;<span
+													class="caret"></span>
+											</button>
+											<ul class="dropdown-menu" role="menu"
+												style="border-radius: 8px; background-color: rgb(0 0 0/ 16%); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(30px); color: rgb(251 249 249/ 81%); letter-spacing: 2px; position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-5px, 36px, 0px);">
+												<li style="padding: 7%; color: black !important;"
+													onclick="onclickchangetabletype('Table')"><a><i
+														class="fa-solid fa-table fa-lg"></i> Table</a></li>
+												<li style="padding: 7%;"
+													onclick="onclickchangetabletype('Graph')"><a><i
+														class="fa-duotone fa-solid fa-chart-simple fa-lg"></i>
+														Graph</a></li>
+											</ul>
+										</div>
+									</div>
+
+								</div>
+								<div class="card-body">
+									<i
+										style="padding: 1%; font-size: 35px; color: black; display: none;"
+										id="IDSpinner" class='fa fa-spinner fa-spin'></i>
+									<div id="mytablehereID">
+										<table id="example1"
+											class="table table-bordered table-striped">
+											<thead class="thead-light" style="text-align: center;">
+												<tr>
+													<th scope="col">Sr No.</th>
+													<th scope="col">Instance name</th>
+
+													<th scope="col">CPU utilization(%)</th>
+													<th scope="col">Memory Utilization(%)</th>
+													<th scope="col">Total Memory(MB)</th>
+													<th scope="col">Used Memory(MB)</th>
+													<th scope="col">Free Memory(MB)</th>
+<!-- 													<th scope="col">Total Disk</th> -->
+<!-- 													<th scope="col">Used Disk</th> -->
+<!-- 													<th scope="col">Free Disk</th> -->
+													<th scope="col">Event Timestamp</th>
+												</tr>
+											</thead>
+											<tbody>
+											</tbody>
+										</table>
+									</div>
+
+									<div id="mygraphhereID" style="display: none;">
+										<button id="toggleCPULegends"
+											style="color: black; font-size: 18px; background-color: #6c757d24; border: 3px solid #a3a3a3; border-radius: 5px; text-decoration: none; padding: 1px 10px 1px 10px;">Toggle
+											CPU</button>
+										<div id="CPUUtilizationHealthChartContainer"
+											style="width: 100%; height: 400px;"></div>
+										<br> <br> <br> <br>
+										<button id="toggleMemoryLegends"
+											style="color: black; font-size: 18px; background-color: #6c757d24; border: 3px solid #a3a3a3; border-radius: 5px; text-decoration: none; padding: 1px 10px 1px 10px;">Toggle
+											Memory</button>
+										<div id="MemoryHealthChartContainer"
+											style="width: 100%; height: 400px;"></div>
+										<br>
+
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.container-fluid -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/Highchart/highcharts.js}"></script>
+
+	<script type="text/javascript"
+		th:src="@{/webtemplate/Highchart/exporting.js}"></script>
+	<script th:inline="javascript">
+	$(function(){
+		$("#example1").DataTable({
+
+				"responsive" : false,
+				 "paging": true,
+				    "pageLength": 25,
+				"data" :[[${data}]],
+				/* "sScrollX" : "100%",
+				"sScrollXInner" : "200%",
+				"bScrollCollapse" : true, */
+				"lengthChange" : false,
+				"autoWidth" : false,
+				"buttons" : [
+					{
+						extend : 'csv',
+						title : 'Data Export'
+					},
+					{
+						extend : 'excel',
+						title : 'Data Export'
+					},
+					{
+						extend : 'pdf',
+						title : 'Data Export',
+						orientation : 'landscape',
+						pageSize : 'A4',
+						customize : function(doc) {
+							var numColumns = doc.content[1].table.body[0].length;
+							//alert(numColumns+1);
+							// Set column widths (example values, adjust as needed)
+							doc.content[1].table.widths = Array(
+									numColumns + 1).fill(
+									'*');
+
+							// Adjust margins and font sizes
+							
+							doc.defaultStyle.fontSize = 8;
+
+							// Reduce header font size
+							doc.styles.tableHeader.fontSize = 8;
+							doc.styles.tableHeader.alignment = 'center';
+
+							// Center-align table body cells
+							doc.styles.tableBodyEven.alignment = 'center';
+							doc.styles.tableBodyOdd.alignment = 'center';
+
+							// Handle text overflow and wrapping
+							doc.content
+									.forEach(function(item) {
+										if (item.table
+												&& item.table.body) {
+											item.table.body
+													.forEach(function(
+															row) {
+														row
+																.forEach(function(
+																		cell) {
+																	cell.margin = [
+																			5,
+																			2,
+																			5,
+																			2 ]; // Add margins for better readability
+																	//	 										cell.fillColor = '#f2f2f2'; // Optional: set background color
+																	cell.alignment = 'left'; // Optional: left-align text
+
+																	if (typeof cell.text === 'string') {
+																		// Insert line breaks every 30 characters (adjust as needed)
+																		cell.text = cell.text
+																				.replace(
+																						/(.{1,30})/g,
+																						'$1\n')
+																				.trim();
+																	}
+																});
+													});
+										}
+									});
+// 							doc.pageMargins = [ 10, 10, 10,
+// 								10 ];
+							var tableWrapper = {
+									table : doc.content[1].table,
+									layout : 'noBorders',
+									alignment : 'center',
+									margin : [ 0, 0, 0, 0 ]
+								// top, right, bottom, left
+								};
+								doc.content[1] = tableWrapper;
+						}
+					},
+					{
+						extend : 'print',
+						customize : function(win) {
+							$(win.document.body).find(
+									'table').addClass(
+									'compact').css(
+									'font-size', '8px')
+									.css('width', '100%');
+						}
+					}, "colvis" ]
+			}).buttons().container().appendTo(
+			'#example1_wrapper .col-md-6:eq(0)');
+
+	})
+	
+	
+	$(document).ready(
+				function() {
+					$(document.body).on(
+							'click',
+							'.dropdown-menu li',
+							function(event) {
+								var $target = $(event.currentTarget);
+
+								$target.closest('.btn-group').find(
+										'[data-bind="label"]').html(
+										$target.html()).end().children(
+										'.dropdown-toggle').css('color',
+										'rgb(255 255 255 / 81%)').dropdown(
+										'toggle');
+
+								return false;
+							});
+				});
+
+		function onclickchangetabletype(myvalue) {
+			 $("#IDSpinner").show();
+			if (myvalue === 'Table') {
+				document.getElementById('mytablehereID').style.display = 'block';
+				document.getElementById('mygraphhereID').style.display = 'none';
+				$("#IDSpinner").hide();
+			} else if (myvalue === 'Graph') {
+				document.getElementById('mygraphhereID').style.display = 'block';
+				document.getElementById('mytablehereID').style.display = 'none';
+				CPUUtilizationgraph();
+				Memorygraph();
+				
+				
+				$("#IDSpinner").hide();
+			}
+		}
+		var memoryhighchart="";
+		function Memorygraph(){
+			
+			 memoryhighchart =Highcharts.chart('MemoryHealthChartContainer', {
+	                chart: {
+	                    type: 'line' // Use 'line' for multiple lines
+	                },
+	                title: {
+	                    text: 'Memory Utiliztion'
+	                },
+	                xAxis: {
+	                    type: 'datetime',
+	                    title: {
+	                        text: 'Time'
+	                    },
+	                    labels: {
+	                        format: '{value:%Y-%m-%d %H:%M:%S}' // Format the datetime labels
+	                    }
+	                },
+	                yAxis: {
+	                    title: {
+	                        text: 'Memory Utilization (%)'
+	                    }
+	                },
+	                series: [[${MemorytilizationSeriesData}]], // Pass the series data from the controller
+	                tooltip: {
+	                    shared: true,
+	                    crosshairs: true,
+	                    formatter: function() {
+	                        var tooltip = '<b>' + Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '</b>';
+	                        this.points.forEach(function(point) {
+	                            tooltip += '<br/>' + point.series.name + ': ' + point.y + '%';
+	                        });
+	                        return tooltip;
+	                    }
+	                },
+	                exporting: {
+			        	 enabled: true, // Enable exporting
+			             buttons: {
+			               contextButton: {
+			                 menuItems: ['viewFullscreen', 'printChart']
+			               }
+			             },
+			             fallbackToExportServer: false // Ensure it does not fallback to an online server
+	                }
+	            });
+		}
+		
+		var CPUhighchart="";
+		
+		function CPUUtilizationgraph(){
+			
+			CPUhighchart= Highcharts.chart('CPUUtilizationHealthChartContainer', {
+	                chart: {
+	                    type: 'line' // Use 'line' for multiple lines
+	                },
+	                title: {
+	                    text: 'CPU Utiliztion'
+	                },
+	                xAxis: {
+	                    type: 'datetime',
+	                    title: {
+	                        text: 'Time'
+	                    },
+	                    labels: {
+	                        format: '{value:%Y-%m-%d %H:%M:%S}' // Format the datetime labels
+	                    }
+	                },
+	                yAxis: {
+	                    title: {
+	                        text: 'CPU Utilization (%)'
+	                    }
+	                },
+	                series: [[${CPUUtilizationSeriesData}]], // Pass the series data from the controller
+	                tooltip: {
+	                    shared: true,
+	                    crosshairs: true,
+	                    formatter: function() {
+	                        var tooltip = '<b>' + Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '</b>';
+	                        this.points.forEach(function(point) {
+	                            tooltip += '<br/>' + point.series.name + ': ' + point.y + '%';
+	                        });
+	                        return tooltip;
+	                    }
+	                },
+	                exporting: {
+			        	 enabled: true, // Enable exporting
+			             buttons: {
+			               contextButton: {
+			                 menuItems: ['viewFullscreen', 'printChart']
+			               }
+			             },
+			             fallbackToExportServer: false // Ensure it does not fallback to an online server
+	                }
+	            });
+		}
+		
+		document.getElementById('toggleMemoryLegends').addEventListener('click', function () {
+		  
+		    var series = memoryhighchart.series;
+            var allVisible = series.every(s => s.visible);
+
+            series.forEach(s => {
+                if (allVisible) {
+                    s.setVisible(false, false); // Hide series
+                } else {
+                    s.setVisible(true, false); // Show series
+                }
+            });
+
+            // Redraw the chart to apply changes
+            memoryhighchart.redraw();
+		});
+		
+		document.getElementById('toggleCPULegends').addEventListener('click', function () {
+			  
+		    var series = CPUhighchart.series;
+            var allVisible = series.every(s => s.visible);
+
+            series.forEach(s => {
+                if (allVisible) {
+                    s.setVisible(false, false); // Hide series
+                } else {
+                    s.setVisible(true, false); // Show series
+                }
+            });
+
+            // Redraw the chart to apply changes
+            CPUhighchart.redraw();
+		});
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,1071 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud Portal</title>
+
+<!-- Common CSS -->
+
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" th:href="@{/css/fontAwesome.css}">
+<!-- Font Awesome -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
+<!-- Ionicons -->
+<link rel="stylesheet" th:href="@{/css/ionicIcons.css}">
+<!-- Tempusdominus Bootstrap 4 -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css}">
+<!-- iCheck -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
+<!-- JQVMap -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/jqvmap/jqvmap.min.css}">
+<!-- Theme style -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/dist/css/adminlte.min.css}">
+<!-- overlayScrollbars -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/overlayScrollbars/css/OverlayScrollbars.min.css}">
+<!-- Daterange picker -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/daterangepicker/daterangepicker.css}">
+<!-- summernote -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/summernote/summernote-bs4.min.css}">
+
+<!--End Common CSS  -->
+
+<!-- <link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">  -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/css/cloudfont-awesome.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/css/font-awesome.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-responsive/css/responsive.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-buttons/css/buttons.bootstrap4.min.css}">
+
+
+<style type="text/css">
+.text-center {
+	text-align: center !important;
+}
+
+/* Style for the span */
+.glow-span {
+	display: inline-block;
+	padding: 10px;
+	background-color: #fff;
+	/* border: 1px solid #ccc; */
+	transition: box-shadow 0.3s;
+	border-radius: 10px;
+	width: -webkit-fill-available;
+	text-align: center;
+}
+
+.glow-span:hover {
+	box-shadow: 0 0 10px 5px rgba(0, 0, 255, 0.5);
+	background-color: blue; /* Blue glow effect */
+}
+
+.glow-span2 {
+	display: inline-block;
+	padding: 10px;
+	background-color: #ffc700;
+	/* border: 1px solid #ccc; */
+	transition: box-shadow 0.3s;
+	border-radius: 10px;
+	width: -webkit-fill-available;
+	text-align: center;
+}
+
+.glow-span2:hover {
+	box-shadow: 0 0 10px 5px rgba(0, 0, 255, 0.5);
+	background-color: #ffc700;
+}
+
+/* right click context menu */
+* {
+	margin: 0px;
+	padding: 0px;
+	box-sizing: border-box;
+}
+
+ul li {
+	list-style: none;
+}
+
+#contextMenu {
+	position: absolute;
+	transform-origin: top left;
+	transform: scale(0);
+	width: 220px;
+	border: 1px solid rgba(100, 100, 100, 0.55);
+	padding: 5px;
+	background: rgba(250, 250, 250, 0.98);
+	box-shadow: 2px 2px 12px 4px rgba(100, 100, 100, 0.4);
+	transition: transform 400ms ease-in-out 50ms;
+}
+
+#contextMenu.visible {
+	transform: scale(1);
+}
+
+#contextMenu ul li {
+	padding: 5px 3px;
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	color: rgba(50, 50, 50, 0.9);
+	font-size: 15px;
+}
+
+#contextMenu ul li:hover {
+	background: rgba(100, 100, 100, 0.12);
+}
+
+#contextMenu ul li.disabled {
+	color: rgba(100, 100, 100, 0.5);
+	cursor: pointer;
+}
+
+#contextMenu ul li.share {
+	/*   height:40px; */
+	width: 100%;
+	flex-direction: column;
+	align-items: left;
+	flex-wrap: wrap;
+}
+
+#contextMenu ul li.share>.name {
+	margin-top: -2px;
+	margin-bottom: 10px;
+	display: block;
+}
+
+#contextMenu ul li.share .icons {
+	width: 100%;
+	display: flex;
+	justify-content: space-around;
+}
+
+#contextMenu ul li.share .icons>i:hover {
+	background: #e7e7e7;
+}
+
+#contextMenu ul li i {
+	width: 20px;
+}
+
+#contextMenu ul li div.name {
+	padding-left: 8px;
+}
+
+#contextMenu div.break {
+	margin: 4px 0px;
+	border-top: 1px solid rgba(100, 100, 100, 0.5);
+}
+
+#pulse {
+	position: fixed;
+	width: 35px;
+	height: 35px;
+	background: rgba(0, 0, 0, 1);
+	opacity: 0;
+	border-radius: 50%;
+	z-index: 100;
+}
+
+#pulse.active {
+	animation: pulse 400ms ease;
+}
+
+@
+keyframes pulse { 0% {
+	opacity: 1;
+	transform: scale(0);
+}
+
+100%
+{
+opacity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0;
+transform
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:scale
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(1
+.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+);
+}
+}
+th {
+	text-align: center;
+}
+
+td {
+	text-align: center;
+}
+
+.card-header {
+	background-color: aqua;
+}
+
+.dropbtn {
+	/* 	background-color: #3498DB; */
+	color: #3498DB;
+	padding: 16px;
+	font-size: 16px;
+	border: none;
+	cursor: pointer;
+}
+
+.dropbtn:hover, .dropbtn:focus {
+	/* 	background-color: #2980B9; */
+	color: red;
+}
+
+.dropdown {
+	float: right !important;
+	position: relative;
+	display: inline-block;
+}
+
+.dropdown-content {
+	display: none;
+	position: absolute;
+	background-color: #f1f1f1;
+	min-width: 160px;
+	overflow: auto;
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+	z-index: 1;
+}
+
+.dropdown-content a {
+	color: black;
+	padding: 12px 16px;
+	text-decoration: none;
+	display: block;
+}
+
+.dropdown a:hover {
+	background-color: #ddd;
+	background-color: #3498DB;
+}
+
+.show {
+	display: block;
+}
+</style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<!-- Header -->
+		<div th:replace="fragments/header_bk :: header"></div>
+		<!--Close Header -->
+
+		<!-- Sidebar -->
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<!-- Close Sidebar -->
+		<input id="PhyIP_name" type="hidden" th:value="${ip}"></input>
+		<div class="content-wrapper">
+
+			<div class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1 class="m-0">Node Details [[${ip}]]</h1>
+						</div>
+
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item mr-4"><button
+										class="btn btn-block btn-default" type="button"
+										style="background-color: dodgerblue; border-radius: 2em; width: 8em;"
+										id="generate">Generate</button></li>
+								<li class="breadcrumb-item "><a
+									href="/cloud_instance/physicalVMDashboard"
+									style="color: Black;">Home</a></li>
+								<li class="breadcrumb-item active" style="color: #008ffd;">Physical
+									Server Dashboard</li>
+							</ol>
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+
+
+			<!-- Main content -->
+			<div class="content">
+				<div class="container-fluid">
+
+					<div class="row">
+
+						<div class="col-md-6">
+							<div class="card">
+								<div class="card-header border-0">
+									<div class="d-flex justify-content-between">
+										<h3 class="card-title">Node Latency</h3>
+
+									</div>
+									<div id="dropdown" style="float: right; margin-top: -5%;">
+										<p onclick="myFunction()" class="dropbtn"
+											style="float: right; margin-top: -6%; color: black">View
+											Report</p>
+										<div id="myDropdown" class="dropdown-content"
+											style="margin-top: 6%; margin-left: -5%;">
+											<a href="#" data-toggle="modal" data-target="#dateModal">Export</a>
+											<a href="#graph">Graph</a>
+
+										</div>
+									</div>
+
+								</div>
+								<div class="card-body">
+									<div class="d-flex"></div>
+
+
+									<div class="position-relative mb-4">
+										<div id="vmLatency" style="height: 400px; min-width: 310px"></div>
+
+									</div>
+
+									<div class="d-flex flex-row justify-content-end">
+										<span class="mr-2"> <i
+											class="fas fa-square text-primary"></i> Latency
+										</span> <span> <i class="fas fa-square text-gray"></i> Packet
+											Drop
+										</span>
+									</div>
+								</div>
+							</div>
+
+
+
+						</div>
+
+						<div class="col-lg-6">
+							<div class="card">
+								<div class="card-header border-0">
+									<h3 class="card-title">Node Status Events</h3>
+									<div class="card-tools">
+										<a href="#" class="btn btn-tool btn-sm"> <i
+											class="fas fa-download"></i>
+										</a> <a href="#" class="btn btn-tool btn-sm"> <i
+											class="fas fa-bars"></i>
+										</a>
+									</div>
+								</div>
+								<div class="card-body table-responsive p-0">
+									<table class="table table-striped table-valign-middle"
+										name="nodeStatusSummary" id="nodeStatusSummary">
+										<thead>
+											<tr>
+												<th>Node IP</th>
+												<th>Status</th>
+												<th>Date</th>
+
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="obj : ${nodeStatus}">
+
+												<td>[[${obj.nodeIP}]]</td>
+												<td>[[${obj.nodeStatus}]]</td>
+												<td>[[${obj.eventTimestamp}]]</td>
+
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+					<div class="row">
+
+						<div class="col-lg-6">
+							<div class="card">
+								<div class="card-header border-0">
+									<div class="d-flex justify-content-between">
+										<h3 class="card-title">Node Availablity</h3>
+
+									</div>
+									<div id="dropdown" style="float: right; margin-top: -5%;">
+
+										<div id="NodeAvailability" class="dropdown-content"
+											style="margin-top: 6%; margin-left: -5%;">
+											<a href="#" data-toggle="modal" data-target="#dateNodeModal">Export</a>
+											<a href="#graph">Graph</a>
+
+										</div>
+									</div>
+								</div>
+								<div class="card-body">
+									<div class="d-flex">
+										<p class="d-flex flex-column">
+											<span class="text-bold text-lg"></span> <span>Uptime
+												Over Time</span>
+										</p>
+										<p class="ml-auto d-flex flex-column text-right">
+
+
+											<span class="text-muted">Date Wise (Avg %)</span>
+										</p>
+									</div>
+
+
+									<div class="position-relative mb-4">
+										<canvas id="sales-chart" height="200"></canvas>
+									</div>
+
+									<div class="d-flex flex-row justify-content-end">
+										<span class="mr-2"> <i
+											class="fas fa-square text-primary"></i> Uptime
+										</span> <span> <i class="fas fa-square text-gray"></i>
+											Downtime
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6">
+							<div class="card">
+								<div class="card-header border-0">
+									<h3 class="card-title">Interface Summary</h3>
+									<div class="card-tools">
+										<a href="#" class="btn btn-tool btn-sm"> <i
+											class="fas fa-download"></i>
+										</a> <a href="#" class="btn btn-tool btn-sm"> <i
+											class="fas fa-bars"></i>
+										</a>
+									</div>
+								</div>
+								<div class="card-body table-responsive p-0">
+									<table class="table table-striped table-valign-middle"
+										name="interfaceStatusSummaryTable"
+										id="interfaceStatusSummaryTable">
+										<thead>
+											<tr>
+												<th>Interface Name</th>
+												<th>Interface IP</th>
+												<th>Status</th>
+												<th>Alias Name</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="obj : ${interfaceSummary}">
+
+												<td>[[${obj.interfaceName}]]</td>
+												<td>[[${obj.interfaceIP}]]</td>
+												<td>[[${obj.operStatus}]]</td>
+												<td>[[${obj.aliasName}]]</td>
+
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+					<div class="row">
+
+
+						<div class="col-lg-6">
+							<div class="card">
+								<div class="card-header border-0">
+									<h3 class="card-title">Drive Details</h3>
+									<div class="card-tools">
+										<a href="#" class="btn btn-tool btn-sm"> <i
+											class="fas fa-download"></i>
+										</a> <a href="#" class="btn btn-tool btn-sm"> <i
+											class="fas fa-bars"></i>
+										</a>
+									</div>
+								</div>
+								<div class="card-body table-responsive p-0">
+									<table class="table table-striped table-valign-middle"
+										id="driveDetailsTable">
+										<thead>
+											<tr>
+												<th>Drive Name</th>
+												<th>Total Space (GB)</th>
+												<th>Free Space (GB)</th>
+												<th>Used Space (GB)</th>
+												<th>Drive utilization(%)</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="obj : ${driveDetails}">
+
+												<td>[[${obj.driveName}]]</td>
+												<td>[[${obj.totalSpace}]]</td>
+												<td>[[${obj.freeSpace}]]</td>
+												<td>[[${obj.usedSpace}]]</td>
+												<td>[[${obj.driveUtilizationPercentage}]]</td>
+
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-lg-6">
+							<div class="card">
+								<div class="card-header border-0">
+									<h3 class="card-title">RAM And CPU Details</h3>
+									<div class="card-tools">
+										<a href="#" class="btn btn-tool btn-sm"> <i
+											class="fas fa-download"></i>
+										</a> <a href="#" class="btn btn-tool btn-sm"> <i
+											class="fas fa-bars"></i>
+										</a>
+									</div>
+								</div>
+								<div class="card-body table-responsive p-0">
+									<table class="table table-striped table-valign-middle"
+										id="driveDetailsTable">
+										<thead>
+											<tr>
+												<th>NODE IP</th>
+												<th>CPU STATUS</th>
+												<th>CPU UTILIZATION</th>
+												<th>MEMORY STATUS</th>
+												<th>RAM FREE MEMORY</th>
+												<th>RAM MEMORY UTILIZATION</th>
+												<th>RAM TOTAL MEMORY</th>
+												<th>RAM USED MEMORY</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="obj : ${NodeHealthMonitoring}">
+
+												<td>[[${obj.NODE_IP}]]</td>
+												<td>[[${obj.CPU_STATUS}]]</td>
+												<td>[[${#numbers.formatDecimal(obj.CPU_UTILIZATION, 2,
+													2)}]]%</td>
+												<td>[[${obj.MEMORY_STATUS}]]</td>
+												<td>[[${#numbers.formatDecimal(obj.FREE_MEMORY / 1024 /
+													1024 / 1024, 2, 2)}]] GB</td>
+												<td>[[${#numbers.formatDecimal(obj.MEMORY_UTILIZATION,
+													2, 2)}]]%</td>
+												<td>[[${#numbers.formatDecimal(obj.TOTAL_MEMORY / 1024
+													/ 1024 / 1024, 2, 2)}]] GB</td>
+												<td>[[${#numbers.formatDecimal(obj.USED_MEMORY / 1024 /
+													1024 / 1024, 2, 2)}]] GB</td>
+
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+
+
+
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+	<!-- Footer -->
+	<div th:replace="fragments/footer :: footer"></div>
+
+	<!-- jQuery -->
+	<script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
+	<!-- jQuery UI 1.11.4 -->
+	<script th:src="@{/webtemplate/plugins/jquery-ui/jquery-ui.min.js}"></script>
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+		$.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<!-- ChartJS -->
+	<script th:src="@{/webtemplate/plugins/chart.js/Chart.min.js}"></script>
+	<!-- Sparkline -->
+	<script th:src="@{/webtemplate/plugins/sparklines/sparkline.js}"></script>
+	<!-- JQVMap -->
+	<script th:src="@{/webtemplate/plugins/jqvmap/jquery.vmap.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jqvmap/maps/jquery.vmap.usa.js}"></script>
+	<!-- jQuery Knob Chart -->
+	<script th:src="@{/webtemplate/plugins/jquery-knob/jquery.knob.min.js}"></script>
+	<!-- daterangepicker -->
+	<script th:src="@{/webtemplate/plugins/moment/moment.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/daterangepicker/daterangepicker.js}"></script>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js}"></script>
+	<!-- Summernote -->
+	<script
+		th:src="@{/webtemplate/plugins/summernote/summernote-bs4.min.js}"></script>
+	<!-- overlayScrollbars -->
+	<script
+		th:src="@{/webtemplate/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js}"></script>
+	<!-- AdminLTE App -->
+	<script th:src="@{/webtemplate/dist/js/adminlte.js}"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script th:src="@{/webtemplate/dist/js/demo.js}"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+	<script th:src="@{/webtemplate/dist/js/pages/dashboard.js}"></script>
+	<!--End Common JS  -->
+
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+
+	<script
+		th:src="@{/webtemplate/plugins/datatables/jquery.dataTables.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/dataTables.responsive.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/responsive.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/dataTables.buttons.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.bootstrap4.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jszip/jszip.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/pdfmake.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/vfs_fonts.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.html5.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.print.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.colVis.min.js}"></script>
+
+	<script th:src="@{/webtemplate/plugins/flot/jquery.flot.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/flot/plugins/jquery.flot.resize.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/flot/plugins/jquery.flot.pie.js}"></script>
+
+	<script th:src="@{/webtemplate/dist/js/demo.js}"></script>
+	<script th:src="@{/webtemplate/js/highstock.js}"></script>
+
+	<script th:src="@{/custom_js/physicalVM.js}"></script>
+
+
+	<script type="text/javascript">
+		function myFunction() {
+
+			document.getElementById("myDropdown").classList.toggle("show");
+		}
+	</script>
+
+	<script th:inline="javascript">
+		$("#driveDetailsTable").DataTable({
+			"responsive" : true,
+			"lengthChange" : false,
+			"autoWidth" : false,
+			"sScrollX" : "100%",
+			"sScrollXInner" : "110%",
+			"bScrollCollapse" : true,
+			pageLength : 5,
+			searching : false
+		});
+
+		$("#interfaceStatusSummaryTable").DataTable({
+			"responsive" : true,
+			"lengthChange" : false,
+			"autoWidth" : false,
+			"sScrollX" : "100%",
+			"sScrollXInner" : "110%",
+			"bScrollCollapse" : true,
+			pageLength : 5,
+			searching : false
+		});
+
+		$("#nodeStatusSummary").DataTable({
+			"responsive" : true,
+			"lengthChange" : false,
+			"autoWidth" : false,
+			"sScrollX" : "100%",
+			"sScrollXInner" : "110%",
+			"bScrollCollapse" : true,
+			pageLength : 5,
+			searching : false
+		});
+	</script>
+</body>
+</html>

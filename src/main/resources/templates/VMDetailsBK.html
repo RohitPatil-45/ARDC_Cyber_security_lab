@@ -1,0 +1,696 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud Portal</title>
+
+<!-- Common CSS -->
+
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" th:href="@{/css/fontAwesome.css}">
+<!-- Font Awesome -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
+<!-- Ionicons -->
+<link rel="stylesheet" th:href="@{/css/ionicIcons.css}">
+<!-- Tempusdominus Bootstrap 4 -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css}">
+<!-- iCheck -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
+<!-- JQVMap -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/jqvmap/jqvmap.min.css}">
+<!-- Theme style -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/dist/css/adminlte.min.css}">
+<!-- overlayScrollbars -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/overlayScrollbars/css/OverlayScrollbars.min.css}">
+<!-- Daterange picker -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/daterangepicker/daterangepicker.css}">
+<!-- summernote -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/summernote/summernote-bs4.min.css}">
+
+<!--End Common CSS  -->
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- <link rel="stylesheet"
+	th:href="@{/css/cloudFlare.css}"> -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-responsive/css/responsive.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-buttons/css/buttons.bootstrap4.min.css}">
+
+
+<style>
+.glowBtn {
+	background-color: #1c87c9;
+	-webkit-border-radius: 60px;
+	border-radius: 5px;
+	border: none;
+	color: #eeeeee;
+	cursor: pointer;
+	display: inline-block;
+	font-family: sans-serif;
+	font-size: 20px;
+	padding: 5px 15px;
+	text-align: center;
+	text-decoration: none;
+}
+
+@
+keyframes glowing { 0% {
+	background-color: #2ba805;
+	box-shadow: 0 0 5px #2ba805;
+}
+
+50%
+{
+background-color
+
+
+
+
+:
+
+
+
+
+#49e819
+
+
+
+
+;
+box-shadow
+
+
+
+
+:
+
+
+
+
+0
+0
+20
+px
+
+
+ 
+
+
+#49e819
+
+
+
+
+;
+}
+100%
+{
+background-color
+
+
+
+
+:
+
+
+
+
+#2ba805
+
+
+
+
+;
+box-shadow
+
+
+
+
+:
+
+
+
+
+0
+0
+5
+px
+
+
+ 
+
+
+#2ba805
+
+
+
+
+;
+}
+}
+.glowBtn {
+	animation: glowing 1300ms infinite;
+}
+
+.new-message-box {
+	margin: 15px 0;
+	padding-left: 20px;
+	margin-bottom: 25px !important;
+}
+
+.new-message-box p {
+	font-size: 1em;
+	font-weight: 600;
+}
+
+.info-tab {
+	width: 40px;
+	height: 40px;
+	display: inline-block;
+	position: relative;
+	top: 8px;
+}
+
+.info-tab {
+	float: left;
+	margin-left: -23px;
+}
+
+.info-tab i::before {
+	width: 24px;
+	height: 24px;
+	box-shadow: inset 12px 0 13px rgba(0, 0, 0, 0.5);
+}
+
+.info-tab i::after {
+	width: 0;
+	height: 0;
+	border: 12px solid transparent;
+	border-bottom-color: #fff;
+	border-left-color: #fff;
+	bottom: -18px;
+}
+
+.info-tab i::before, .info-tab i::after {
+	content: "";
+	display: inline-block;
+	position: absolute;
+	left: 0;
+	bottom: -17px;
+	transform: rotateX(60deg);
+}
+
+.note-box, .warning-box, .tip-box-success, .tip-box-danger,
+	.tip-box-warning, .tip-box-info, .tip-box-alert {
+	padding: 12px 8px 3px 26px;
+}
+
+/*******info*******/
+.new-message-box-info {
+	/* background: #eeeeee; */
+	padding: 3px;
+	margin: 10px 0;
+}
+
+.tip-box-info {
+	color: #01579B;
+	background: #f1faff !important;
+	border-radius: 5px;
+}
+
+.tip-icon-info {
+	background: #03A9F4;
+}
+
+.tip-icon-info::before {
+	font-size: 25px;
+	content: "\f129";
+	top: 8px;
+	left: 11px;
+	font-family: FontAwesome;
+	position: absolute;
+	color: white
+}
+
+.tip-icon-info i::before {
+	background: #03A9F4;
+}
+</style>
+
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<!-- Header -->
+		<div th:replace="fragments/header_bk :: header"></div>
+		<!--Close Header -->
+
+		<!-- Sidebar -->
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<!-- Close Sidebar -->
+
+		<div class="content-wrapper">
+			<section class="content" style="padding-top: 10px;">
+				<div class="container-fluid">
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card border-transparent">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-1" style="margin-left: 30px">
+											<i class="fa fa-windows"
+												style="font-size: 40px; color: dodgerblue; padding-top: 2px"></i>
+										</div>
+
+										<div class="col-md-3">
+											<h3 class="card-title"
+												style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+
+												<span class="card-title"
+													style="font-weight: bold; cursor: pointer; font-size: larger;"
+													oncontextmenu="return showContextMenu(event)">
+													cloudserver-W6yXqzv4.mhc</span> <span class="card-title"
+													style="font-size: 1rem !important; color: #b5b5c3 !important">2
+													vCPU /4 GB / 130 GB Disk /</span>
+											</h3>
+										</div>
+
+									</div>
+								</div>
+								<div class="card-body">
+									<!-- Nav tabs -->
+									<div class="default-tab">
+										<ul class="nav nav-tabs" role="tablist">
+											<li class="nav-item"><a class="nav-link active"
+												data-toggle="tab" href="#basicInfo">Basic Info</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#healthDetails">Health Details</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#resize">Resize Tab</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#rebuild">Rebuild</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#storage">Storage</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#networks">Network</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#backup">Backup</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#destroy">Destroy</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#start_stop">Start/Stop</a></li>
+											<li class="nav-item"><a class="nav-link"
+												data-toggle="tab" href="#biling">Biling</a></li>
+										</ul>
+										<div class="tab-content">
+											<!-- Basic Info -->
+											<div class="tab-pane fade show active" id="basicInfo"
+												role="tabpanel">
+												<div class="pt-4">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row">
+																<div class="col-md-12">
+																	<div class="card">
+																		<div class="card-header border-0">
+																			<h3 class="card-title">Basic Information</h3>
+																			<div class="card-tools">
+																				<a href="#" class="btn btn-tool btn-sm"> <i
+																					class="fas fa-download"></i>
+																				</a> <a href="#" class="btn btn-tool btn-sm"> <i
+																					class="fas fa-bars"></i>
+																				</a>
+																			</div>
+																		</div>
+																		<div class="card-body table-responsive p-0">
+																			<table
+																				class="table table-striped table-valign-middle">
+																				<thead>
+																					<tr>
+																						<th>Label</th>
+																						<th>Information</th>
+
+																					</tr>
+																				</thead>
+
+																				<tbody>
+																					<tr>
+																						<td>Product Name</td>
+																						<td><span id="Node_ip">Windows</span></td>
+																					</tr>
+																					<tr>
+																						<td>OS</td>
+																						<td><span id="NodeNAme">Windows 11 Home</span></td>
+																					</tr>
+																					<tr>
+																						<td>Device Name</td>
+																						<td><span id="Location">Desktop1</span></td>
+																					</tr>
+																					<tr>
+																						<td>Device IP</td>
+																						<td><span id="Company">172.16.5.101</span></td>
+																					</tr>
+
+																					<tr>
+																						<td>CPU</td>
+																						<td><span id="Version">8</span></td>
+																					</tr>
+
+																					<tr>
+																						<td>RAM</td>
+																						<td><span id="Model">32GB</span></td>
+																					</tr>
+																					<tr>
+																						<td>External Storage</td>
+																						<td><span id="District">1TB</span></td>
+																					</tr>
+																					<tr>
+																						<td>Hard Disk</td>
+																						<td><span id="status">1TB</span></td>
+																					</tr>
+																					<tr>
+																					<tr>
+																						<td>Hard Disk Type</td>
+																						<td><span id="status">SSD</span></td>
+																					</tr>
+																					<tr>
+																						<td>Bandwidth</td>
+																						<td><span id="status">100</span></td>
+																					</tr>
+																					<tr>
+																						<td>Location</td>
+																						<td><span id="status">Hyderabad</span></td>
+																					</tr>
+
+
+																				</tbody>
+																			</table>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</section>
+
+												</div>
+											</div>
+											<!--End Basic Info -->
+
+
+											<!-- Storage  -->
+											<div class="tab-pane fade" id="storage">
+												<div class="pt-4">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row">
+																<div class="col-md-12">
+																	<!-- PIE CHART -->
+																	<div class="card border-transparent">
+																		<div class="card-header">
+																			<h3 class="card-title"
+																				style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+																				Add Storage</h3>
+																		</div>
+																		<div class="card-body">
+																			<div class="row">
+																				<div class="col-md-12">
+																					<div class="new-message-box">
+																						<div class="new-message-box-info">
+																							<div class="info-tab tip-icon-info" title="error">
+																								<i></i>
+																							</div>
+																							<div class="tip-box-info">
+																								<p>You can add/remove additional storage on
+																									your server</p>
+																								<span style="color: #b5b5c3 !important">You
+																									will charge INR 9/Per GB monthly for additional
+																									storage</span>
+																							</div>
+																						</div>
+																					</div>
+																				</div>
+																			</div>
+																			<div class="form-group">
+																				<span style="font-size: 1rem !important;">Please
+																					fill size in GB</span> <input type="text" id="name"
+																					class="form-control" />
+																			</div>
+																		</div>
+																		<!-- /.card-body -->
+																		<div class="card-footer clearfix">
+																			<button type="button" style="width: 10%"
+																				class="btn bg-gradient-primary float-left">Add
+																			</button>
+																		</div>
+																	</div>
+																	<!-- /.card -->
+																</div>
+															</div>
+														</div>
+														<!-- /.container-fluid -->
+													</section>
+
+												</div>
+											</div>
+											<!--End Storage  -->
+
+
+											<!-- Backup  -->
+											<div class="tab-pane fade" id="backup">
+												<div class="pt-4">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row">
+																<div class="col-md-12">
+																	<!-- PIE CHART -->
+																	<div class="card border-transparent">
+																		<div class="card-header">
+																			<h3 class="card-title"
+																				style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+																				Backups</h3>
+																		</div>
+																		<div class="card-body border-top p-9">
+																			<div
+																				class="notice d-flex rounded border-primary border border-dashed mb-9 p-6" 
+																				style="background-color: #f1faff !important; padding: 1.5rem !important;">
+																				<span style="margin-right: 1rem !important;"
+																					class="svg-icon svg-icon-2tx svg-icon-primary me-4"><svg style="height: 2.75rem !important;width: 2.75rem !important;"
+																						xmlns="http://www.w3.org/2000/svg" width="24"
+																						height="24" viewBox="0 0 24 24" fill="none">
+																						<rect opacity="0.3" x="2" y="2" width="20"
+																							height="20" rx="10" fill="black"></rect>
+																						<rect x="11" y="14" width="7" height="2" rx="1"
+																							transform="rotate(-90 11 14)" fill="black"></rect>
+																						<rect x="11" y="17" width="2" height="2" rx="1"
+																							transform="rotate(-90 11 17)" fill="black"></rect></svg></span>
+																				<div class="d-flex flex-stack flex-grow-1">
+																					<div class="fw-bold">
+																						<h4 class="text-gray-900 fw-bold">Cloud Server Backup.</h4>
+																						<div class="fs-6 text-gray-700">
+																						Backups are currently disabled for this cloud server We 
+																						Charge only 20% cost of your cloud server for this backup service
+																						</div>
+																					</div>
+																				</div>
+																			</div>
+																		</div>
+																		<!-- /.card-body -->
+																		<div class="card-footer clearfix">
+																			<button type="button" style="width: 10%"
+																				class="btn bg-gradient-primary float-left">Enable Backups
+																			</button>
+																		</div>
+																	</div>
+																	<!-- /.card -->
+																</div>
+															</div>
+														</div>
+														<!-- /.container-fluid -->
+													</section>
+
+												</div>
+											</div>
+											<!--End Backup  -->
+
+
+											<!-- Destroy -->
+											<div class="tab-pane fade" id="destroy">
+												<div class="pt-4">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row">
+																<div class="col-md-12">
+																	<!-- PIE CHART -->
+																	<div class="card border-transparent">
+																		<div class="card-header">
+																			<h3 class="card-title"
+																				style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+																				Destroy Cloud Server</h3>
+																		</div>
+																		<div class="card-body">
+																			<div class="row">
+																				<div class="col-md-12">
+																					<div class="new-message-box">
+																						<div class="new-message-box-info">
+																							<div class="info-tab tip-icon-info" title="error">
+																								<i></i>
+																							</div>
+																							<div class="tip-box-info">
+																								<p>This will destroy your cloud server</p>
+																							</div>
+																						</div>
+																					</div>
+																				</div>
+																			</div>
+																			<div class="form-group">
+																				<span style="font-size: 1rem !important;">Please
+																					fill text in below form to delete server "I am
+																					aware this action will delete data and server
+																					permanently"</span> <input type="text" id="name"
+																					class="form-control"
+																					placeholder="I am aware this action will delete data and server permanently" />
+																			</div>
+																		</div>
+																		<!-- /.card-body -->
+																		<div class="card-footer clearfix">
+																			<button type="button" style="width: 10%"
+																				class="btn bg-gradient-danger float-right">Delete
+																			</button>
+																		</div>
+																	</div>
+																	<!-- /.card -->
+																</div>
+															</div>
+														</div>
+														<!-- /.container-fluid -->
+													</section>
+
+												</div>
+											</div>
+											<!--Destroy -->
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+		</div>
+
+	</div>
+
+	<!-- Footer -->
+	<div th:replace="fragments/footer :: footer"></div>
+	<!--Close Footer -->
+
+	<!-- ./wrapper -->
+
+	<!-- Common JS  -->
+
+	<!-- jQuery -->
+	<script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
+	<!-- jQuery UI 1.11.4 -->
+	<script th:src="@{/webtemplate/plugins/jquery-ui/jquery-ui.min.js}"></script>
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+		$.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<!-- ChartJS -->
+	<script th:src="@{/webtemplate/plugins/chart.js/Chart.min.js}"></script>
+	<!-- Sparkline -->
+	<script th:src="@{/webtemplate/plugins/sparklines/sparkline.js}"></script>
+	<!-- JQVMap -->
+	<script th:src="@{/webtemplate/plugins/jqvmap/jquery.vmap.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jqvmap/maps/jquery.vmap.usa.js}"></script>
+	<!-- jQuery Knob Chart -->
+	<script th:src="@{/webtemplate/plugins/jquery-knob/jquery.knob.min.js}"></script>
+	<!-- daterangepicker -->
+	<script th:src="@{/webtemplate/plugins/moment/moment.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/daterangepicker/daterangepicker.js}"></script>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js}"></script>
+	<!-- Summernote -->
+	<script
+		th:src="@{/webtemplate/plugins/summernote/summernote-bs4.min.js}"></script>
+	<!-- overlayScrollbars -->
+	<script
+		th:src="@{/webtemplate/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js}"></script>
+	<!-- AdminLTE App -->
+	<script th:src="@{/webtemplate/dist/js/adminlte.js}"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script th:src="@{/webtemplate/dist/js/demo.js}"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+	<script th:src="@{/webtemplate/dist/js/pages/dashboard.js}"></script>
+	<!--End Common JS  -->
+
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+
+	<script
+		th:src="@{/webtemplate/plugins/datatables/jquery.dataTables.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/dataTables.responsive.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/responsive.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/dataTables.buttons.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.bootstrap4.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jszip/jszip.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/pdfmake.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/pdfmake/vfs_fonts.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.html5.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.print.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.colVis.min.js}"></script>
+
+	<!-- <script th:src="@{/custom_js/VM.js}"></script> 
+ -->
+	<script type="text/javascript">
+		$(function() {
+			//Initialize Select2 Elements
+			$('.select2').select2()
+
+			//Initialize Select2 Elements
+			$('.select2bs4').select2({
+				theme : 'bootstrap4'
+			})
+
+		});
+	</script>
+</body>
+</html>

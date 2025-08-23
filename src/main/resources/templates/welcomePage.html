@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/multiselect/bootstrap-multiselect.css}">
+
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css}">
+
+<style>
+/* .login { */
+/* 	min-height: 100vh; */
+/* } */
+
+/* .bg-image { */
+/* 	background-image: */
+/* 		url('https://source.unsplash.com/WEQbe2jBg40/600x1200'); */
+/* 	background-size: cover; */
+/* 	background-position: center; */
+/* } */
+
+/* .login-heading { */
+/* 	font-weight: 300; */
+/* } */
+
+/* .btn-login { */
+/* 	font-size: 0.9rem; */
+/* 	letter-spacing: 0.05rem; */
+/* 	padding: 0.75rem 1rem; */
+/* } */
+.homepage-hero-module {
+	position: relative;
+}
+
+.bg-overlay {
+	/* 	background: -webkit-gradient(linear, left top, left bottom, from(#1c7ce0c4), */
+	/* 		to(#150051)); */
+	background: linear-gradient(to right, #ffffff00 0%, #000000 90%);
+	width: 100%;
+	display: block;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+}
+
+.mycard {
+	margin-bottom: 1rem;
+	background: transparent;
+	position: relative;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-flex-direction: column;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	min-width: 0;
+	word-wrap: break-word;
+	background-clip: border-box;
+	border: 0 solid rgba(0, 0, 0, .125);
+	border-radius: .25rem;
+}
+
+.whitetextmy {
+	color: white;
+}
+
+.greytextmy {
+	color: grey;
+}
+</style>
+<body>
+	<!-- 	<div class="wrapper"> -->
+
+
+
+	<!-- 	<div class="content-wrapper"> -->
+
+
+	<!-- Main content -->
+	<section class="pt-5 pb-5 pb-0 homepage-hero-module"
+		style="background-size: cover; min-height: 100vh; background-image: url(&quot;/webtemplate/dist/img/cloud-computing.jpg&quot;);">
+		<div class="bg-overlay position-absolute"></div>
+		<div class="container position-relative zindex-1 pt-3 pb-3">
+			<div
+				class="row  text-center align-content-center justify-content-between ">
+				<div class="col-12 col-md-7 pr-md-5 text-left align-self-center ">
+
+				</div>
+
+				<div class="col-12  col-md-5 ">
+					<div class="mycard text-left h-100">
+						<div class="card-body px-4 py-5" style="margin-top: -68px">
+							<h3 class="text-center mt-0 m-b-15">
+								<a href="javascript:void(0);" id="logo" class="logo logo-admin">
+									<img src="/webtemplate/dist/img/canarispng.png" style=""
+									width="100px" ; alt="logo">
+								</a>
+							</h3>
+							<br>
+							<center>
+
+								<h3 class="pb-3 font-weight-bold whitetextmy">Sign In To
+									CMP</h3>
+							</center>
+							<br>
+
+
+							<form name='f' th:action="@{/j_spring_security_check}"
+								method='POST'>
+
+								<div class="form-floating mb-3">
+									<label for="exampleInputEmail1"
+										class="text-uppercase greytextmy">Username</label> <input
+										type='text' name='username' value='' class="form-control"
+										placeholder="Please Enter Username" />
+								</div>
+
+								<div class="form-floating mb-3" id="show_hide_password">
+									<label for="exampleInputPassword1"
+										class="text-uppercase greytextmy">Password</label> <input
+										type='password' name='password' class="form-control"
+										id="password" placeholder="Please Enter Password" />
+									<div class="input-group-append"
+										style="float: right; margin-top: -38px; height: 38px;">
+										<span class="input-group-text" style="cursor: pointer;"><i
+											class="fa fa-eye-slash" aria-hidden="true"></i></span>
+									</div>
+								</div>
+
+
+								<div class="form-floating mb-3">
+									<label for="exampleiii" class="text-uppercase greytextmy"></label>
+									<input type="checkbox" name="remember-me" />&nbsp;<span
+										class="greytextmy">Remember Me?</span><span class="pull-right"><a
+										class="link-primary fw-bolder me-1" href="/users/signup">&nbsp;
+											Sign Up here</a></span>
+								</div>
+
+
+
+
+								<br>
+								<div class="row">
+									<div class="col-md-6">
+										<div class="form-floating mb-3">
+
+											<button name="submit" type="submit" value="submit"
+												class="btn btn-block bg-gradient-primary float-right">
+												<a style="color: white;">Login</a>
+											</button>
+
+
+										</div>
+									</div>
+
+
+
+
+
+									<div class="col-md-6">
+										<div class="form-floating mb-3">
+
+											<button type="reset" name="resetbtn" id="resetbtn"
+												class="btn btn-block bg-gradient-primary">Reset</button>
+
+
+										</div>
+									</div>
+								</div>
+
+
+								<span class="pull-right"><a
+									class="link-primary fw-bolder me-1" href="/users/ForgetPass">&nbsp;
+										Forget Password?</a></span>
+
+
+
+								<center>
+									<div class="greytextmy" style="display: none;">
+										Copyright © 2024- <a href="https://canaris.in/"
+											style="color: #ffa500bd;">Tarang Pvt Ltd</a>
+									</div>
+								</center>
+
+
+								<!-- 								/login?error=true -->
+								<!-- 								<div th:if="${#request.getParameter('error') == 'true'}" -->
+								<!-- 									id="login-error-message" style="color: red; margin: 10px 0px;"> -->
+								<!-- 									Login Failed!!!<br /> <br /> <br /> <br /> Reason : <span -->
+								<!-- 										th:if="${#session!= null and #session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION') != null}" -->
+								<!-- 										th:utext="${#session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION').message}"> -->
+								<!-- 										Static summary </span> -->
+
+								<!-- 								</div> -->
+
+
+
+								<div th:if="${#request.getParameter('error') == 'true'}"
+									id="login-error-message" style="color: red; margin: 10px 0px;">
+									Login Failed..! <br /> <br />Reason: <br /> <span
+										th:if="${#session != null and #session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION') != null}">
+										<span
+										th:if="${#session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION').message.contains('Bad credentials')}">
+											Incorrect login credentials </span> <span
+										th:unless="${#session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION').message.contains('Bad credentials')}"
+										th:utext="${#session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION').message}">
+									</span>
+									</span>
+								</div>
+
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- /.content -->
+	<!-- 	</div> -->
+	<!-- 	<div th:replace="fragments/footer :: footer"></div> -->
+
+
+	<div th:replace="template :: jsscript"></div>
+</body>
+<script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+<script
+	th:src="@{/webtemplate/multiselect/bootstrap-multiselect.min.js}"></script>
+<script th:src="@{/webtemplate/multiselect/bootstrap-multi.js}"></script>
+<script th:src="@{/webtemplate/multiselect/bootstrap-multiselect.js}"></script>
+<script
+	th:src="@{/webtemplate/multiselect/bootstrap-multiselect.min.js.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+
+<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+
+<!-- <script th:src="@{/custom_js/user.js}"></script> -->
+
+<script th:inline="javascript">
+	if([[${resetPasswordMessage}]] == 'success'){
+		Swal.fire({
+			position: "top",
+			icon: "success",
+			title: 'Your Password has been reset please login with new password..!',
+			showConfirmButton: true,
+			timer: 5000,
+		})
+	}
+
+	document.addEventListener("DOMContentLoaded", function() {
+		var errorMessageDiv = document.getElementById("login-error-message");
+
+		if (errorMessageDiv) {
+			var errorMessage = errorMessageDiv.innerText
+					|| errorMessageDiv.textContent;
+			if (errorMessage.includes("credentials")) {
+				Swal.fire({
+					position : "top",
+					icon : "error",
+					title : errorMessage,
+					showConfirmButton : true,
+					timer : 3000,
+				})
+			} else if (errorMessage.includes("Maximum")) {
+				Swal.fire({
+					position : "top",
+					icon : "error",
+					title : "User is already logged in..!",
+					showConfirmButton : true,
+					timer : 3000,
+				})
+			}
+
+		}
+	});
+
+	/* 	const urlParams = new URLSearchParams(window.location.search);
+	 const invalidSession = urlParams.get('invalid-session');
+
+	 if (invalidSession === 'true') {
+	 Swal.fire({
+	 position: "top",
+	 icon: "error",
+	 title: "User is already logged in..!",
+	 showConfirmButton: true,
+	 timer: 3000,
+	 });
+	 } */
+
+	var input = $("#show_hide_password input");
+	var icon = $("#show_hide_password i");
+	icon.on('click', function(event) {
+		event.preventDefault();
+
+		if (input.attr("type") === "text") {
+			input.attr('type', 'password');
+			icon.addClass("fa-eye-slash");
+			icon.removeClass("fa-eye");
+
+		} else if (input.attr("type") === "password") {
+			input.attr('type', 'text');
+			icon.removeClass("fa-eye-slash");
+			icon.addClass("fa-eye");
+		}
+	});
+</script>
+</html>

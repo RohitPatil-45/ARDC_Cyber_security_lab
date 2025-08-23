@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>View Location</title>
+<head th:include="templateListing :: headFragment"></head>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header_bk :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>View Location Master</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">View Location Master</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">Location
+												Master Details</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/location/new/'}"
+												class="btn btn-block bg-gradient-primary">Add</a>
+										</div>
+									</div>
+									<div th:if="${message != null}"
+										class="alert alert-success alert-dismissible fade show text-center message"
+										role="alert">
+										[[${message}]]
+										<button type="button" class="close btn-sm"
+											data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+								<div class="card-body" th:if="${listObj.size() > 0}">
+									<table id="example1" class="table table-bordered table-striped">
+										<thead class="thead-light">
+											<tr>
+<!-- 												<th scope="col">Sr No.</th> -->
+												<th scope="col">DC Location name</th>
+												<th scope="col">Description</th>
+												<th scope="col">Physical Server IP</th>
+												<th scope="col">VM creation path</th>
+												<th scope="col">Actions</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="obj, locationStat : ${listObj}" th:if="${obj.location_name} == 'DC_Bangalore'">
+<!-- 												<th scope="row" th:text="${locationStat.count}">1</th> -->
+												<td>[[${obj.location_name}]]</td>
+												<td>[[${obj.description}]]</td>
+												<td>[[${obj.physical_server_iP}]]</td>
+												<td>[[${obj.vm_creation_path}]]</td>
+												<td><a th:href="@{'/location/edit/' + ${obj.id}}"
+													title="Edit this Location " class="fa fa-edit"></a> &nbsp; <a
+													th:href="@{'/location/delete/' + ${obj.id}}"
+													th:tutorialTitle="${obj.location_name}" id="btnDelete"
+													title="Delete this Location " class="fa fa-trash btn-delete"></a></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div class="modal fade text-center" id="confirmModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Delete Confirmation</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<span id="confirmText"></span>
+					</div>
+					<div class="modal-footer">
+						<a type="button" id="yesBtn" class="btn btn-danger">Yes</a>
+						<button type="button" class="btn btn-secondary"
+							data-dismiss="modal">No</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="templateListing :: jsscript"></div>
+	<script type="text/javascript">
+		$(document).ready(
+				function() {
+					$(".btn-delete").on(
+							"click",
+							function(e) {
+								e.preventDefault();
+								link = $(this);
+
+								tutorialTitle = link.attr("tutorialTitle");
+								$("#yesBtn").attr("href", link.attr("href"));
+								$("#confirmText").html(
+										"Do you want to delete the Location \<strong\>"
+												+ tutorialTitle
+												+ "\<\/strong\>?");
+								$("#confirmModal").modal();
+							});
+
+					$("#btnClear").on("click", function(e) {
+						e.preventDefault();
+						$("#keyword").text("");
+						window.location = "[[@{/discount/view}]]";
+					});
+				});
+	</script>
+</body>
+
+</html>

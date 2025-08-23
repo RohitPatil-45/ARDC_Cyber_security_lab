@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<title>Approval Request</title>
+
+<style type="text/css">
+th {
+	text-align: center;
+}
+
+td {
+	text-align: center;
+}
+</style>
+<head th:include="templateListing :: headFragment">
+</head>
+
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>View request</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">View request</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">Approval
+												Request Details</h3>
+										</div>
+
+									</div>
+									<div th:if="${message != null}"
+										class="alert alert-success alert-dismissible fade show text-center message"
+										role="alert">
+										[[${message}]]
+										<button type="button" class="close btn-sm"
+											data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div th:if="${error != null}"
+										class="alert alert-danger alert-dismissible fade show text-center message"
+										role="alert">
+										[[${error}]]
+										<button type="button" class="close btn-sm"
+											data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+								<div class="card-body" th:if="${listObj != null }">
+									<table id="example1" class="table table-bordered table-striped">
+										<thead class="thead-light" style="text-align: center;">
+											<tr>
+												<th scope="col">Request ID</th>
+												<th scope="col">VM ID</th>
+												<th scope="col">Request Type</th>
+												<th scope="col">Request by</th>
+												<th scope="col">Admin Approval Status</th>
+												<th scope="col">Request On</th>
+												<th scope="col">Final Approval Status</th>
+												<th scope="col">Approver</th>
+												<th scope="col">Approved On</th>
+												<th scope="col">Description</th>
+												<th scope="col">Action</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="obj, stat : ${listObj}">
+												<!-- <th scope="row" style="text-align: center;"
+													th:text="${stat.count}">1</th> -->
+													<td>[[${obj.id}]]</td>
+												<th scope="row" style="text-align: center;">[[${obj.requestId}]]</th>
+												<td>[[${obj.request_type}]]</td>
+												<td>[[${obj.requesterName}]]</td>
+												<td>[[${obj.adminApproval}]]</td>
+												<td>[[${obj.request_on}]]</td>
+												<td>[[${obj.request_status}]]</td>
+												<td>[[${obj.approver_name}]]</td>
+												<td>[[${obj.approved_on}]]</td>
+												<td>[[${obj.description}]]</td>
+												<td><a sec:authorize="hasRole('ROLE_SUPERADMIN')"
+													th:if="${obj.request_status == 'Pending' && obj.request_type == 'instance create'}"
+													class="fa fa-thumbs-up approve-btn" data-toggle="modal"
+													style="color: green;" th:data-request-id="${obj.Id}"
+													data-target="#approvalModal"></a> <a
+													sec:authorize="hasRole('ROLE_ADMIN')"
+													th:if="${obj.adminApproval == 'Pending'}"
+													class="fa fa-thumbs-up adminApprove-btn"
+													data-toggle="modal" style="color: green;"
+													th:data-request-id="${obj.Id}" data-target="#adminApproval"></a>
+
+													<a sec:authorize="hasRole('ROLE_SUPERADMIN')"
+													th:if="${obj.request_status == 'Pending' && obj.request_type == 'instance delete'}"
+													class="fa fa-thumbs-up approve-btn" data-toggle="modal"
+													style="color: green;" th:data-request-id="${obj.Id}"
+													data-target="#deleteModal"></a> 
+													<a
+													sec:authorize="hasRole('ROLE_SUPERADMIN')"
+													th:if="${obj.request_status == 'Pending' && obj.request_type == 'instance update'}"
+													class="fa fa-thumbs-up update-btn" data-toggle="modal"
+													style="color: green;" th:data-request-id="${obj.Id}"
+													data-target="#updateModal"></a>
+													<a
+													sec:authorize="hasRole('ROLE_SUPERADMIN')"
+													th:if="${obj.request_status == 'Pending' && obj.request_type == 'additional_storage'}"
+													class="fa fa-thumbs-up addStorage-btn" data-toggle="modal"
+													style="color: green;" th:data-request-id="${obj.Id}"
+													data-target="#additionalStorageModal"></a> <a
+													class="fa fa-eye showDetails" data-toggle="modal"
+													onclick="modaltriggeronclick()"
+													data-target="#currentVMModal"
+													th:data-log-id="${obj.log_id.getId}"
+													th:data-instance-name="${obj.log_id.getInstance_name}"
+													th:data-instance-ip="${obj.log_id.getInstance_ip}"
+													th:data-vcpu="${obj.log_id.getPrice_id.getvCpu}"
+													th:data-ram="${obj.log_id.getPrice_id.getRam}"
+													th:data-ssd-disk="${obj.log_id.getPrice_id.getSsd_disk}"
+													th:data-created-on="${obj.log_id.getCreated_on}"
+													th:data-os="${obj.log_id.getSubproduct_id.getSub_product_name}"
+													th:data-switch="${obj.log_id.getSwitch_id.getSwitch_name}"
+													th:data-location="${obj.log_id.getLocation_id.getLocation_name}"
+													th:data-oldData="${obj.oldData}"
+													th:data-newData="${obj.newData}"
+													th:data-requestType="${obj.request_type}"> </a></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div class="modal fade text-center" id="approvalModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Approval</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="action" class="float-left">Action</label> <select
+								tabindex="1" id="approvalAction" class="form-control select2"
+								style="width: 100%;">
+								<option value='-1'>SELECT</option>
+								<option value='Approved'>Approve</option>
+								<option value='Reject'>Reject</option>
+							</select> <br> <label id="remark1" class="float-left"
+								style="display: none">Remark</label>
+							<textarea type="text" id="remark" class="form-control"
+								style="display: none" required></textarea>
+
+							<label id="Virtualizationtypelabel" for="action"
+								class="float-left" style="display: none">Virtualization
+								Type</label> <select tabindex="1" id="VirtualizationtyprSelect"
+								class="form-control select2" style="width: 100%; display: none;"
+								onchange="filterPhysicalServerIP()">
+								<option value='-1'>SELECT</option>
+								<option value='hyperv'>Hyper-V</option>
+								<option value='KVM'>KVM</option>
+							</select> <br> <label id="ipLabel" class="float-left"
+								style="display: none">Physical Server IP</label> <select
+								tabindex="1" id="physical_server_ip" required
+								name="physical_server_iP" class="form-control"
+								data-placeholder="Select Physical Server IP"
+								onchange="getSwitchByIP(this.value)"
+								style="width: 100%; display: none;">
+								<option value='' selected disabled
+									title="Please select a valid option">SELECT</option>
+								<option th:each="ob : ${physicalServerIPList}"
+									th:value="${ob[1]}" th:text="${ob[1]}"
+									th:data-virtualization="${ob[2]}" />
+							</select><br> <label id="switchLabel" class="float-left"
+								style="display: none">Switch</label> <select tabindex="1"
+								id="switch" required name="switch" class="form-control"
+								data-placeholder="Select Switch"
+								style="width: 100%; display: none;"
+								title="Please select a valid option">
+								<option value='' selected disabled>SELECT</option>
+							</select>
+						</div>
+						<input type="hidden" id="requestIdField">
+						<div class="form-group">
+							<button class="btn btn-success" th:onclick="callVMApproval()">
+								Submit <i
+									style="margin-left: 10px; color: yellow; display: none"
+									id="actionSpinner" class='fa fa-spinner fa-spin'></i>
+							</button>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- Admin Approval -->
+		<div class="modal fade text-center" id="adminApproval">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Approval</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="action" class="float-left">Action</label> <select
+								tabindex="1" id="adminApprovalAction"
+								class="form-control select2" style="width: 100%;">
+								<option value='-1'>SELECT</option>
+								<option value='Approved'>Approve</option>
+								<option value='Reject'>Reject</option>
+							</select> <br> <label id="adminRemark" class="float-left"
+								style="display: none">Remark</label>
+							<textarea type="text" id="adminTextArea" class="form-control"
+								style="display: none" required></textarea>
+						</div>
+						<input type="hidden" id="adminRequestIdField">
+						<div class="form-group">
+							<button class="btn btn-success" th:onclick="callAdminApproval()">
+								Submit <i
+									style="margin-left: 10px; color: yellow; display: none"
+									id="adminSpinner" class='fa fa-spinner fa-spin'></i>
+							</button>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Admin Approval -->
+
+
+		<!-- Delete Modal -->
+		<div class="modal fade text-center" id="deleteModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Approval</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+
+							<label for="action" class="float-left">Action</label> <select
+								tabindex="1" id="vmDeleteAction" class="form-control select2"
+								style="width: 100%;">
+								<option value='-1'>SELECT</option>
+								<option value='Approved'>Approve</option>
+								<option value='Reject'>Reject</option>
+							</select> <br> <label id="remark12" class="float-left"
+								style="display: none">Remark</label>
+							<textarea type="text" id="delRemark" class="form-control"
+								style="display: none" required></textarea>
+						</div>
+						<input type="hidden" id="instID">
+						<div class="form-group">
+							<button class="btn btn-success" th:onclick="deleteVMApproval()">
+								Submit <i
+									style="margin-left: 10px; color: yellow; display: none"
+									id="delSpinner" class='fa fa-spinner fa-spin'></i>
+							</button>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End delete Modal -->
+
+		<!-- Update Modal -->
+		<div class="modal fade text-center" id="updateModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Approval</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+
+							<label for="action" class="float-left">Action</label> <select
+								tabindex="1" id="vmUpdateAction" class="form-control select2"
+								style="width: 100%;">
+								<option value='-1'>SELECT</option>
+								<option value='Approved'>Approve</option>
+								<option value='Reject'>Reject</option>
+							</select> <br> <label id="remark123" class="float-left"
+								style="display: none">Remark</label>
+							<textarea type="text" id="updateRemark1" class="form-control"
+								style="display: none" required></textarea>
+						</div>
+						<input type="hidden" id="instID1">
+						<div class="form-group">
+							<button class="btn btn-success" th:onclick="updateVMApproval()">
+								Submit <i
+									style="margin-left: 10px; color: yellow; display: none"
+									id="upSpinner" class='fa fa-spinner fa-spin'></i>
+							</button>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End update Modal -->
+
+		<!-- Update Modal -->
+		<div class="modal fade text-center" id="additionalStorageModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Approval</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+
+							<label for="action" class="float-left">Action</label> <select
+								tabindex="1" id="vmAdsAction" class="form-control select2"
+								style="width: 100%;">
+								<option value='-1'>SELECT</option>
+								<option value='Approved'>Approve</option>
+								<option value='Reject'>Reject</option>
+							</select> <br> <label id="adsRemark" class="float-left"
+								style="display: none">Remark</label>
+							<textarea type="text" id="adsRemark1" class="form-control"
+								style="display: none" required></textarea>
+						</div>
+						<input type="hidden" id="adsInst">
+						<div class="form-group">
+							<button class="btn btn-success"
+								th:onclick="addAdditionalStorage()">
+								Submit <i
+									style="margin-left: 10px; color: yellow; display: none"
+									id="adsSpinner" class='fa fa-spinner fa-spin'></i>
+							</button>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End update Modal -->
+
+
+
+		<div class="modal fade" id="currentVMModal"
+			style="height: 400px; overflow-y: hidden">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">Current VM Details</h4>
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body" id="linkInfoBody">
+						<div class="card-body table-responsive p-0">
+							<div>
+								<table class="table table-striped table-valign-middle"
+									id="currentVMTable">
+									<thead style="background-color: #e2e2e2">
+										<tr>
+											<!-- <th class="text-center">Cloud Instances</th> -->
+											<th class="text-center">Instance Name</th>
+											<th class="text-center">RAM</th>
+											<th class="text-center">CPU</th>
+											<th class="text-center">Disk</th>
+											<!-- <th class="text-center">Old Hardware</th> -->
+											<th class="text-center">New Hardware</th>
+											<th class="text-center">Created on</th>
+											<th class="text-center">OS</th>
+											<th class="text-center">Switch</th>
+											<th class="text-center">Location</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="odd" style="background-color: #fff;">
+											<td>
+												<div class="row">
+													<!-- <div class="col-md-2">
+														<i class="fa fa-windows"
+															style="font-size: 35px; color: dodgerblue; padding-top: 2px"></i>
+													</div> -->
+
+													<div class="col-md-10">
+														<h3 class="card-title"
+															style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+
+															<span class="card-title" id="instanceName1"
+																style="font-weight: bold; cursor: pointer;"></span><!--  <span
+																class="card-title" id="price"
+																style="font-size: 1rem !important; color: #b5b5c3 !important"></span> -->
+														</h3>
+													</div>
+
+												</div>
+											</td>
+											<!-- <td id="instanceName2"></td> -->
+											<td id="ram2"></td>
+											<td id="cpu2"></td>
+											<td id="disk2"></td>
+											<td style="display: none" id="old"></td>
+											<td id="new"></td>
+											<td id="createdOn"></td>
+											<td id="os"></td>
+											<td id="switch"></td>
+											<td id="location"></td>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						</div>
+
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+			</div>
+		</div>
+
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="templateListing :: jsscript"></div>
+	<script th:src="@{/custom_js/approval.js}"></script>
+
+	<script type="text/javascript">
+		$(document).ready(
+				function() {
+					$(".btn-delete").on(
+							"click",
+							function(e) {
+								e.preventDefault();
+								link = $(this);
+								tutorialTitle = link.attr("tutorialTitle");
+								$("#yesBtn").attr("href", link.attr("href"));
+								$("#confirmText").html(
+										"Do you want to delete the VM \<strong\>"
+												+ tutorialTitle
+												+ "\<\/strong\>?");
+								$("#approvalModal").modal();
+							});
+
+					$("#btnClear").on("click", function(e) {
+						e.preventDefault();
+						$("#keyword").text("");
+						window.location = "[[@{/'+${action_name}+'/view}]]";
+					});
+				});
+	</script>
+
+	<script th:inline="javascript">
+		var datatablemy = $("#currentVMTable").DataTable({
+
+			"responsive" : true,
+			"lengthChange" : true,
+			"autoWidth" : true,
+			"sScrollX" : "100%",
+			"sScrollXInner" : "150%",
+			"bScrollCollapse" : true,
+			//pageLength : 5,
+			searching : false
+		});
+		function modaltriggeronclick() {
+			// 			alert("i m innn  ");
+
+			setTimeout(function() {
+				datatablemy.columns.adjust().draw()
+			}, 500);
+			// 			datatablemy.columns.adjust().draw();
+
+			// 			$('#currentVMTable').DataTable().draw();
+
+		}
+
+		// 		$('#currentVMTable').DataTable().draw();
+	</script>
+
+</body>
+
+</html>

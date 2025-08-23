@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:include="template :: headFragment(${pageTitle})">
+<title>View Scenario | Cyber Ranges</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link
+	href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap"
+	rel="stylesheet">
+</head>
+
+<style>
+body {
+	background-color: #121212;
+	color: #e0e0e0;
+	font-family: 'Roboto', sans-serif;
+}
+
+.content-wrapper {
+	background-color: #121212;
+}
+
+/* Card Styling */
+.playlist-card {
+	background-color: #1e1e1e;
+	border: 2px solid #2d4fa6;
+	border-radius: 12px;
+	overflow: hidden;
+	color: #e0e0e0;
+	cursor: pointer;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.card-image img {
+	width: 100%;
+	height: 300px;
+	object-fit: cover;
+	display: block;
+	border-bottom: 2px solid #444;
+}
+
+.card-content {
+	padding: 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.card-title {
+	font-family: 'Poppins', sans-serif;
+	font-size: 1.8rem;
+	font-weight: 700;
+	color: #3b82f6;
+	margin: 0;
+}
+
+.card-description {
+	font-size: 1rem;
+	color: #b0b0b0;
+	margin: 0;
+}
+
+.card-tags {
+	margin-top: 12px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.card-tags .tag {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	background: #2d2d2d;
+	color: #3b82f6;
+	font-size: 0.85rem;
+	font-weight: 500;
+	padding: 6px 12px;
+	border-radius: 12px;
+	text-transform: uppercase;
+}
+
+/* Additional Info outside card */
+.scenario-info {
+	margin-top: 20px;
+	background-color: #1a1a1a;
+	border: 1px solid #333;
+	border-radius: 12px;
+	padding: 20px;
+}
+
+.scenario-info h4 {
+	color: #3b82f6;
+	margin-bottom: 10px;
+}
+
+.scenario-info p {
+	color: #e0e0e0;
+	margin-bottom: 6px;
+	font-size: 0.95rem;
+}
+
+/* Footer & other elements */
+.main-footer {
+	background-color: #1a1a1a;
+	border-top: 1px solid #333;
+	color: #e0e0e0;
+}
+
+.start-btn {
+	background: linear-gradient(90deg, #16a34a, #22c55e);
+	color: #fff;
+	padding: 6px 16px;
+	border-radius: 20px;
+	font-size: 0.9rem;
+	font-weight: 600;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+	transition: all 0.3s ease;
+}
+
+.start-btn:hover {
+	background: linear-gradient(90deg, #15803d, #16a34a);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+	text-decoration: none;
+}
+
+.start-btn i {
+	font-size: 0.9rem;
+}
+</style>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>
+								<i class="fas fa-list-ol playlist-icon"></i> View Scenario
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#"><i
+										class="fas fa-home"></i> Home</a></li>
+								<li class="breadcrumb-item active"><a href="#">Scenario</a></li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid" id="scenarioContainer">
+					<!-- Scenario card and additional info will be dynamically generated here -->
+				</div>
+			</section>
+		</div>
+
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+
+	<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let rawData = '[[${listObj}]]'.replace(/&quot;/g, '"');
+    let jsonData;
+
+    try {
+        jsonData = JSON.parse(rawData);
+    } catch (e) {
+        console.error("Invalid JSON:", e);
+        return;
+    }
+
+    if (!jsonData || !jsonData.length) return;
+
+    const item = jsonData[0];
+    const container = document.getElementById("scenarioContainer");
+
+    const fragment = document.createDocumentFragment();
+
+    // Card HTML
+    const cardHTML = `
+        <div class="col-md-12 mb-4">
+            <div class="playlist-card">
+                <div class="card-image">
+                    <img src="/report/image/${item.Id}" alt="${item.Scenario_Title}" loading="lazy">
+                </div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <div class="card-title-wrapper">
+                            <h3 class="card-title">${item.Scenario_Title}</h3>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/guac/View_Vm_Listing?Id=${item.Id}" class="start-btn">
+                                <i class="fas fa-play"></i> Start
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag"><i class="fas fa-signal"></i> ${item.Difficulty_Level}</span>
+                        <span class="tag"><i class="fas fa-clock"></i> ${item.Duration}</span>
+                        <span class="tag"><i class="fas fa-gamepad"></i> ${item.Mode}</span>
+                        <span class="tag"><i class="fas fa-layer-group"></i> ${item.Scenario_Type}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Info HTML
+    const infoHTML = `
+        <div class="col-md-12 scenario-info">
+            <p><strong>Scenario Name:</strong> ${item.Scenario_Name || 'N/A'}</p>&nbsp;
+            <p><strong>Category:</strong> ${item.Category || 'N/A'}</p>&nbsp;
+            <div class="descriptionContent"></div>
+           
+        </div>
+    `;
+
+    // Create wrapper and append both card and info
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = cardHTML + infoHTML;
+    fragment.appendChild(wrapper);
+    container.appendChild(fragment);
+
+    // Find the description container inside the wrapper
+    const descEl = wrapper.querySelector(".descriptionContent");
+    if (descEl) {
+        // Create a temporary element to decode HTML entities
+        const temp = document.createElement("div");
+        temp.innerHTML = item.Description || 'N/A';
+        descEl.innerHTML = temp.textContent || temp.innerText || 'N/A';
+    }
+
+
+});
+</script>
+
+
+</body>
+</html>

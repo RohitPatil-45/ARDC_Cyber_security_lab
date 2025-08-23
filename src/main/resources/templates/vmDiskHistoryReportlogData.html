@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})">
+
+<style>
+.caret {
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	border-top: 6px solid #fff;
+}
+
+.btn {
+	width: 100px;
+	font-weight: 900;
+	border: 0px;
+}
+
+.btn-input {
+	display: block;
+}
+
+.btn-input .btn.form-control {
+	text-align: left;
+}
+
+.btn-input .btn.form-control span:first-child {
+	left: 10px;
+	overflow: hidden;
+	position: absolute;
+	right: 25px;
+}
+
+.btn-input .btn.form-control .caret {
+	margin-top: -1px;
+	position: absolute;
+	right: 10px;
+	top: 50%;
+}
+</style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>VM Disk History Report</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">VM Disk History</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<!-- <h3 class="card-title">VM Activity Report</h3> -->
+									&nbsp; &nbsp; &nbsp;<b>From Date :</b> [[${fdate}]] <b>&nbsp;
+										&nbsp; &nbsp;To Date :</b> [[${tdate}]]
+
+									
+
+								</div>
+								<div class="card-body">
+									<i
+										style="padding: 1%; font-size: 35px; color: black; display: none;"
+										id="IDSpinner" class='fa fa-spinner fa-spin'></i>
+									<div id="mytablehereID">
+										<table id="example3"
+											class="table table-bordered table-striped">
+											<thead class="thead-light" style="text-align: center;">
+												<tr>
+											
+													<th scope="col">Sr No.</th>
+													<th scope="col">Physical Server Ip</th>
+													<th scope="col">Device</th>
+													<th scope="col">Vmname</th>
+													<th scope="col">Bus</th>
+													<th scope="col">Source</th>
+<!-- 													<th scope="col">Access</th> -->
+													<th scope="col">Used Disk</th>
+													<th scope="col">Total Disk</th>
+													<th scope="col">Free Disk</th>
+<!-- 													<th scope="col">Free Disk</th> -->
+													<th scope="col">Event Timestamp</th>
+												</tr>
+											</thead>
+											<tbody>
+											</tbody>
+										</table>
+									</div>
+
+									
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.container-fluid -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/Highchart/highcharts.js}"></script>
+
+	<script type="text/javascript"
+		th:src="@{/webtemplate/Highchart/exporting.js}"></script>
+	<script>
+		$(function() {
+			let rawData = '[[${data}]]';
+			rawData = rawData.replace(/&quot;/g, '"');
+			let jsonData = JSON.parse(rawData);
+
+			$("#example3").DataTable({
+				"data" : jsonData,
+				// 			    scrollY: '300px',     // Set vertical scroll height
+				scrollX : true, // Enable horizontal scroll
+				"responsive" : false,
+				"lengthChange" : false,
+				"autoWidth" : false,
+				"buttons" : [ "csv", "excel", "print", "colvis" ]
+			}).buttons().container().appendTo(
+					'#example3_wrapper .col-md-6:eq(0)');
+		});
+	</script>
+</body>
+
+</html>

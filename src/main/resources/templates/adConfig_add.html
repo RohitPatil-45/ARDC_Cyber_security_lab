@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Add AD Configuration</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">AD Configuration</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/'+${action_name}+'/view/'}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+								<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+									enctype="multipart/form-data" th:object="${objEnt}">
+									<input type="hidden" th:field="*{id}" />
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="ldap_server">Domain controller / LDAP
+														server</label> <input tabindex="2" type="text"
+														th:field="*{ldap_server}" required id="ldap_server"
+														name="ldap_server" class="form-control"
+														placeholder="Enter LDAP server name" />
+												</div>
+
+												<div class="form-group">
+													<label for="username">Username</label> <input tabindex="2"
+														type="text" th:field="*{username}" required id="username"
+														onchange="checkUsernameExist(this.value)"
+														name="username" class="form-control"
+														placeholder="Enter Username" />
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="logon_domain">Logon Domain</label> <input
+														tabindex="2" type="text" th:field="*{logon_domain}"
+														required id="logon_domain" name="logon_domain"
+														class="form-control" placeholder="Enter Logon Domain" />
+												</div>
+
+												<div class="form-group" id="show_hide_password">
+													<label for="password">Password</label> <input tabindex="2"
+														type="password" th:field="*{password}" required
+														id="password" name="password" class="form-control"
+														placeholder="Enter Password" />
+													<div class="input-group-append"
+														style="float: right; margin-top: -38px; height: 38px;">
+														<span class="input-group-text" style="cursor: pointer;"><i
+															class="fa fa-eye-slash" aria-hidden="true"></i></span>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="server_port">Server Port</label> <input
+														tabindex="2" type="text" th:field="*{server_port}"
+														required id="server_port" name="server_port"
+														class="form-control" placeholder="Enter Server Port" />
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" id="adConfigBtn" class="btn btn-primary">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="template :: jsscript"></div>
+</body>
+<script type="text/javascript">
+$('document').ready(function(){		
+	$('#password').keyup(function(){
+	    var pwd = $(this).val();
+	    var pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+	    if(pattern.test(pwd)){
+	    	password.setCustomValidity('');
+	        $('#adConfigBtn').prop('disabled', false);
+	    } else {
+	    	password.setCustomValidity('Password must be at least 8 characters long and contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.');
+	       // $('#adduserForm').prop('disabled', true);
+	    }
+	});
+});
+
+var input = $("#show_hide_password input");
+var icon = $("#show_hide_password i");
+icon.on('click', function (event) {
+    event.preventDefault();
+
+    if (input.attr("type") === "text") {
+        input.attr('type', 'password');
+        icon.addClass("fa-eye-slash");
+        icon.removeClass("fa-eye");
+
+    } else if (input.attr("type") === "password") {
+        input.attr('type', 'text');
+        icon.removeClass("fa-eye-slash");
+        icon.addClass("fa-eye");
+    }
+});
+
+function checkUsernameExist(username){
+	$.ajax({
+		url : '/adConfig/checkUsernameExist',
+		data : {
+			"username" : username
+		},
+		success : function(result) {
+			if(result == "duplicate")
+			{
+				Swal.fire({
+					position: 'top',
+					icon: 'warning',
+					title: 'Username already Exists',
+					showConfirmButton: false,
+					timer: 3000
+				})
+				$('#adConfigBtn').prop( "disabled", true );
+			}
+			else{
+				$('#adConfigBtn').prop( "disabled", false );
+			}
+		}
+	});
+}
+</script>
+</html>

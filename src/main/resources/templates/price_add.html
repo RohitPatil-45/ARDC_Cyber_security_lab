@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Add Price</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Add Price</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/'+${action_name}+'/view/'}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+								<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+									enctype="multipart/form-data" th:object="${objEnt}">
+									<input type="hidden" th:field="*{id}" />
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="plan_id">Product Name</label> <select
+														tabindex="1" id="product_id" th:field="*{product_id}"
+														required name="product_id" class="form-control"
+														style="width: 100%;">
+														<option value='-1'>SELECT</option>
+														<option th:each="ob:${productList}" th:value="${ob[0]}"
+															th:text="${ob[1]}" /></option>
+													</select>
+												</div>
+												<div class="form-group">
+													<label for="plan_id">Plan Name</label> <select tabindex="1"
+														id="plan_id" th:field="*{plan_id}" required name="plan_id"
+														class="form-control" style="width: 100%;">
+														<option value='-1'>SELECT</option>
+														<option th:each="ob:${planList}" th:value="${ob[0]}"
+															th:text="${ob[1]}" /></option>
+													</select>
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="ram">RAM</label> <input tabindex="3"
+														type="number" th:field="*{ram}" required id="ram"
+														name="ram" class="form-control"
+														placeholder="Provide RAM Size" />
+												</div>
+												<div class="form-group">
+													<label for="vCpu">vCPU</label> <input tabindex="3"
+														type="number" th:field="*{vCpu}" required id="vCpu"
+														name="vCpu" class="form-control"
+														placeholder="Provide CPU Size" />
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="ssd_disk">SSD Disk</label> <input tabindex="3"
+														type="number" th:field="*{ssd_disk}" required
+														id="ssd_disk" name="ssd_disk" class="form-control"
+														placeholder="Provide SSD Size" />
+												</div>
+												<div class="form-group">
+													<label for="bandwidth">Bandwidth</label> <input
+														tabindex="3" type="number" th:field="*{bandwidth}"
+														required id="bandwidth" name="bandwidth"
+														class="form-control" placeholder="Provide Bandwidth Size" />
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="hourly_price">Hourly Price</label> <input
+														tabindex="3" type="text" th:field="*{hourly_price}"
+														required id="hourly_price" name="hourly_price"
+														class="form-control" placeholder="Enter Hourly Price" />
+												</div>
+
+											</div>
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" class="btn btn-primary">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="template :: jsscript"></div>
+	<script>
+		$(document).ready(function() {
+			$('#hourly_price').on('input', function() {
+				// Get the current value
+				let value = $(this).val();
+
+				// Check if the value is a valid number or a decimal number with up to two digits after the decimal point
+				if (!/^\d*\.?\d{0,2}$/.test(value)) {
+					// Remove invalid characters
+					value = value.replace(/[^0-9.]/g, '');
+
+					// Ensure only two decimal places are allowed
+					const decimalIndex = value.indexOf('.');
+					if (decimalIndex !== -1) {
+						value = value.substring(0, decimalIndex + 3);
+					}
+
+					// Set the cleaned value back to the input
+					$(this).val(value);
+				}
+			});
+		});
+	</script>
+</body>
+</html>

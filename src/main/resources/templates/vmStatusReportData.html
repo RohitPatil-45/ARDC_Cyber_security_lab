@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>VM Status History Report</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">VM Status</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<!-- <h3 class="card-title">VM Activity Report</h3> -->
+									&nbsp; &nbsp; &nbsp;<b>From Date :</b> [[${fdate}]] <b>&nbsp;
+										&nbsp; &nbsp;To Date :</b> [[${tdate}]]
+
+								</div>
+								<div class="card-body">
+									<table id="example1" class="table table-bordered table-striped">
+										<thead class="thead-light" style="text-align: center;">
+											<tr>
+												<th scope="col">Sr No.</th>
+												<th scope="col">Instance Name</th>
+												<th scope="col">Instance IP</th>
+												<th scope="col">VM Status</th>
+												<th scope="col">Event Timstamp</th>
+												
+											</tr>
+										</thead>
+										<tbody>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.container-fluid -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+<script th:inline="javascript">
+	$(function(){
+		$("#example1").DataTable({
+
+				"responsive" : false,
+				"paging" : false,
+				"data" :[[${data}]],
+				/* "sScrollX" : "100%",
+				"sScrollXInner" : "200%",
+				"bScrollCollapse" : true, */
+				"lengthChange" : false,
+				"autoWidth" : false,
+				"buttons" : ["csv", "excel", "print",
+					"colvis" ]
+			}).buttons().container().appendTo(
+			'#example1_wrapper .col-md-6:eq(0)');
+
+	})
+	</script>
+</body>
+
+</html>

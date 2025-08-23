@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Assign Public IP</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Assign Public IP</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/'+${action_name}+'/view/'}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+								<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+									enctype="multipart/form-data" th:object="${objEnt}">
+									<input type="hidden" th:field="*{id}" />
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="instance_ip">Cloud Instance IP</label> <select
+														tabindex="1" id="instance_ip" th:field="*{instance_ip}"
+														required name="instance_ip" class="form-control"
+														style="width: 100%;">
+														<option value='-1'>SELECT Instance IP</option>
+														<option th:each="ob:${instanceIPList}" th:value="${ob[0]}"
+															th:text="${ob[1]}" /></option>
+													</select>
+												</div>
+												<div class="form-group">
+													<label for="public_ip">Public IP</label> <select tabindex="1"
+														id="public_ip" th:field="*{public_ip}" required name="public_ip"
+														class="form-control" style="width: 100%;">
+														<option value='-1'>SELECT Public IP</option>
+														<option th:each="ob:${publicIPList}" th:value="${ob[0]}"
+															th:text="${ob[1]}" /></option>
+													</select>
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="ram">DNS Domain</label> <input
+														tabindex="3" type="text" th:field="*{dns_domain}"
+														required id="dns_domain" name="dns_domain"
+														class="form-control" placeholder="Provide DNS Domain" />
+												</div>
+												<div class="form-group">
+													<label for="vCpu">DNS Name</label> <input
+														tabindex="3" type="text" th:field="*{dns_name}"
+														required id="dns_name" name="dns_name"
+														class="form-control" placeholder="Provide DNS Name" />
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="ssd_disk">Hostname  </label> <input
+														tabindex="3" type="text" th:field="*{description}"
+														required id="description" name="description"
+														class="form-control" placeholder="Enter Description" />
+												</div>
+										
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" class="btn btn-primary">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="template :: jsscript"></div>
+</body>
+</html>

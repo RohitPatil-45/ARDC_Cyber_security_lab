@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>CMP</title>
+<head th:include="templateListing :: headFragment"></head>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header_bk :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>View Images</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">View Images</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">Image
+												Details</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/'+${action_name}+'/new/'}"
+												class="btn btn-block bg-gradient-primary">Add</a>
+										</div>
+									</div>
+									<div th:if="${message != null}"
+										class="alert alert-success alert-dismissible fade show text-center message"
+										role="alert">
+										[[${message}]]
+										<button type="button" class="close btn-sm"
+											data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div th:if="${error != null}"
+										class="alert alert-danger alert-dismissible fade show text-center message"
+										role="alert">
+										[[${error}]]
+										<button type="button" class="close btn-sm"
+											data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+								<div class="card-body" th:if="${listObj != null }">
+									<table id="example1" class="table table-bordered table-striped">
+										<thead class="thead-light">
+											<tr>
+												<th scope="col">Sr No.</th>
+												<th scope="col">Image Name</th>
+												<th scope="col">Image ID</th>
+												<th scope="col">Image Description</th>
+												<th scope="col">Visibility</th>
+												<th scope="col">Size(bytes)</th>
+												<th scope="col">Virtual Size(bytes)</th>
+												<th scope="col">Minimum RAM(MB)</th>
+												<th scope="col">Minimum Disk(GB)</th>
+												<th scope="col">Image Status</th>
+												<th scope="col">Protected</th>
+												<th scope="col">Disk Format</th>
+												<th scope="col">Container Format</th>
+												<th scope="col">Image Checksum</th>
+												<th scope="col">Image Owner</th>
+												<th scope="col">OS Hidden</th>
+												<th scope="col">OS Hash Algorithm</th>
+												<th scope="col">OS Hash Value</th>
+												<th scope="col">Created At</th>
+												<th scope="col">Updated At</th>
+												<th scope="col">Self</th>
+												<th scope="col">Image File</th>
+												<th scope="col">Image Schema</th>
+												<th scope="col">Openstack IP</th>
+												<th scope="col">Actions</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="obj, imageStat : ${listObj}">
+												<th scope="row" th:text="${imageStat.count}">1</th>
+												<td>[[${obj.imgName}]]</td>
+												<td>[[${obj.imageId}]]</td>
+												<td>[[${obj.imgDescription}]]</td>
+												<td>[[${obj.visibility}]]</td>
+												<td>[[${obj.size}]]</td>
+												<td>[[${obj.virtualSize}]]</td>
+												<td>[[${obj.minRam}]]</td>
+												<td>[[${obj.minDisk}]]</td>
+												<td>[[${obj.imgStatus}]]</td>
+												<td>[[${obj.isProtected== 1 ? 'true' : 'false'}]]</td>
+												<td>[[${obj.diskFormat}]]</td>
+												<td>[[${obj.containerFormat}]]</td>
+												<td>[[${obj.imgChecksum}]]</td>
+												<td>[[${obj.imgOwner}]]</td>
+												<td>[[${obj.osHidden== 1 ? 'true' : 'false'}]]</td>
+												<td>[[${obj.osHashAlgo}]]</td>
+												<td>[[${obj.osHashValue}]]</td>
+												<td>[[${obj.createdAt}]]</td>
+												<td>[[${obj.updatedAt}]]</td>
+												<td>[[${obj.self}]]</td>
+												<td>[[${obj.imgFile}]]</td>
+												<td>[[${obj.imgSchema}]]</td>
+												<td>[[${obj.openstackIp}]]</td>
+												<td><a th:if="${obj.isProtected == 1}"
+													th:href="@{'/'+${action_name}+'/delete/' + ${obj.imageId}}"
+													th:tutorialTitle="${obj.imgName}" id="btnDeleteimage"
+													title="Delete this tutorial" class="fa fa-trash"
+													style="pointer-events: none; opacity: 0.5; color: gray; text-decoration: none;"></a>
+													<a th:if="${obj.isProtected == 0}"
+													th:href="@{'/'+${action_name}+'/delete/' + ${obj.imageId}}"
+													th:tutorialTitle="${obj.imgName}" id="btnDeleteimage"
+													title="Delete this Image" class="fa fa-trash"></a></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div class="modal fade text-center" id="confirmModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Delete Confirmation</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<span id="confirmText"></span>
+					</div>
+					<div class="modal-footer">
+						<a type="button" id="yesBtn" class="btn btn-danger">Yes</a>
+						<button type="button" class="btn btn-secondary"
+							data-dismiss="modal">No</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="templateListing :: jsscript"></div>
+	<script type="text/javascript">
+		$(document).ready(
+				function() {
+					$(".btn-delete").on(
+							"click",
+							function(e) {
+								e.preventDefault();
+								link = $(this);
+
+								tutorialTitle = link.attr("tutorialTitle");
+								$("#yesBtn").attr("href", link.attr("href"));
+								$("#confirmText").html(
+										"Do you want to delete the VM \<strong\>"
+												+ tutorialTitle
+												+ "\<\/strong\>?");
+								$("#confirmModal").modal();
+							});
+
+					$("#btnClear").on("click", function(e) {
+						e.preventDefault();
+						$("#keyword").text("");
+						window.location = "[[@{/'+${action_name}+'/view}]]";
+					});
+				});
+	</script>
+</body>
+
+</html>

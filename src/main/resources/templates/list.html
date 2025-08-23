@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:include="template :: headFragment(${pageTitle})">
+<title>RDP Connections | Cyber Ranges</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<!-- Header -->
+		<div th:replace="fragments/header :: header"></div>
+
+		<!-- Sidebar -->
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<!-- Main Content -->
+		<div class="content-wrapper">
+
+			<!-- Page Header -->
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>
+								<i class="fas fa-list text-primary"></i> Connections
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a th:href="@{/}"><i
+										class="fas fa-home"></i> Home</a></li>
+								<li class="breadcrumb-item active"> Connections</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Content Section -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row justify-content-center">
+						<div class="col-md-12">
+
+							<div class="card">
+								<div
+									class="card-header bg-white d-flex justify-content-between align-items-center">
+									<h3 class="card-title text-primary mb-0">
+										<i class="fas fa-network-wired"></i> Available Connections
+									</h3>
+									<a th:href="@{/guac/create}"
+										class="btn btn-sm btn-primary ml-auto"> <i
+										class="fas fa-plus-circle"></i> New Connection
+									</a>
+								</div>
+
+								<div class="card-body table-responsive p-0">
+									<table
+										class="table table-bordered table-hover table-striped text-center">
+										<thead style="background-color: darkgrey; color: white;">
+											<tr>
+												<th style="width: 60px;">ID</th>
+												<th>Name</th>
+												<th>Protocol</th>
+												<th>Max Connection Per User</th>
+												<th>Max Connection</th>
+												<th>Active Connection</th>
+												<th>Last Active</th>
+												<th style="width: 150px;">Actions</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="conn : ${connections}">
+												<td th:text="${conn.id}"></td>
+												<td th:text="${conn.name}"></td>
+												<td><span class="badge badge-info"
+													th:text="${conn.protocol}"></span></td>
+												<td th:text="${conn.maxconnectionperuser}"></td>
+												<td th:text="${conn.maxconnection}"></td>
+												<td th:text="${conn.activeconnection}"></td>
+												<td th:text="${conn.lastactive}"></td>
+												<td><a th:href="@{|/guac/view/${conn.id}|}"
+													class="btn btn-sm btn-success mr-1"> <i
+														class="fas fa-play"></i> Start
+												</a></td>
+											</tr>
+											<tr th:if="${#lists.isEmpty(connections)}">
+												<td colspan="4" class="text-muted">No connections
+													found.</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+
+							</div>
+
+
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- Footer -->
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+
+</body>
+</html>

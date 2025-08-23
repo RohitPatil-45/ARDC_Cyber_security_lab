@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Add Image</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Add Image</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/'+${action_name}+'/view/'}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+								<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+									enctype="multipart/form-data" th:object="${objEnt}">
+									<input type="hidden" th:field="*{imageId}" />
+									<div class="card-body">
+										<div class="row">
+
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="exampleInputEmail1">Image Name</label> <input
+														tabindex="1" type="text" th:field="*{imgName}"
+														onchange="checkDuplicateImage(this.value)"
+														placeholder="Image Name" required class="form-control"
+														id="imagename" />
+												</div>
+												<div class="form-group">
+													<label for="exampleInputFile">Image Source</label> <select
+														tabindex="1" id="imgFile" th:field="*{imgFile}" required
+														name="imgFile" class="form-control" style="width: 100%;">
+														<option value="" label="Please Select" disabled selected />
+
+														<option
+															value="C:/ISO/IMG/CentOS-7-x86_64-Everything-2009.iso">CentOS-7-x86_64-Everything-2009.iso</option>
+														<option
+															value="C:/ISO/IMG/ubuntu-20.04.6-desktop-amd64.iso">ubuntu-20.04.6-desktop-amd64.iso</option>
+														<option
+															value="C:/ISO/IMG/ubuntu-20.04-live-server-amd64.iso">ubuntu-20.04-live-server-amd64.iso</option>
+														<option
+															value="C:/ISOimage/ubuntu-22.04.1-live-server-amd64.iso">ubuntu-22.04.1-live-server-amd64.iso</option>
+														<option value="C:/ISOimage/Windows-server-2019.iso">Windows-server-2019.iso</option>
+														<option
+															value="C:/ISO/IMG/17763.3650.221105-1748.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso">17763.3650.221105-1748.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso</option>
+
+
+													</select>
+													<!-- 													<div class="input-group"> -->
+													<!-- 														<div class="custom-file"> -->
+													<!-- 															<input type="file" class="custom-file-input" -->
+													<!-- 																th:field="*{imageSource}" id="imageSource"> <label -->
+													<!-- 																class="custom-file-label" for="exampleInputFile">Choose -->
+													<!-- 																file</label> -->
+													<!-- 														</div> -->
+													<!-- 													</div> -->
+												</div>
+											</div>
+
+											<div class="col-md-6">
+
+
+												<div class="form-group">
+													<label for="exampleInputEmail1">Format</label> <select
+														tabindex="1" id="format" th:field="*{diskFormat}" required
+														name="format" class="form-control" style="width: 100%;">
+														<option value="" label="Please Select" />
+														<option value="ami">AMI - Amazon Machine Image</option>
+														<option value="ari">ARI - Amazon Ramdisk Image</option>
+														<option value="aki">AKI - Amazon Kernel Image</option>
+														<option value="vhd">VHD - Virtual Hard Disk</option>
+														<option value="vhdx">VHDX - Hyper-V Virtual Hard
+															Disk</option>
+														<option value="vmdk">VMDK - Virtual Machine Disk</option>
+														<option value="raw">RAW - Raw Disk Image</option>
+														<option value="qcow2">QCOW2 - QEMU Copy On Write</option>
+														<option value="vdi">VDI - Virtual Disk Image</option>
+														<option value="iso">ISO - Optical Disk Image</option>
+														<option value="ploop">PLOOP - Parallels Disk
+															Image</option>
+														<option value="root-tar">ROOT-TAR - Root
+															Filesystem Archive</option>
+
+													</select>
+												</div>
+											</div>
+
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="exampleInputPassword1">Minimum Disk
+														(GB)</label> <input tabindex="1" type="number"
+														class="form-control" th:field="*{minDisk}"
+														placeholder="Minimum Disk" />
+												</div>
+												<div class="form-group">
+													<label for="exampleInputPassword1">Minimum RAM (MB)</label>
+													<input tabindex="1" type="number" th:field="*{minRam}"
+														class="form-control" placeholder="Minimum RAM" />
+												</div>
+
+											</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="exampleInputEmail1">Visibility</label> <select
+														tabindex="1" id="visibility" th:field="*{visibility}"
+														required name="visibility" class="form-control"
+														style="width: 100%;">
+														<option value="" label="Please Select" />
+														<option value="private" label="Private" />
+														<option value="shared" label="Shared" />
+														<option value="community" label="Community" />
+														<option value="public" label="Public" />
+
+													</select>
+												</div>
+												<div class="form-group">
+													<label for="exampleInputEmail1">Protected</label> <select
+														tabindex="1" id="protect" th:field="*{isProtected}"
+														required name="protect" class="form-control"
+														style="width: 100%;">
+														<option value="" label="Please Select" />
+														<option value=1 label="Yes" />
+														<option value=0 label="No" />
+													</select>
+												</div>
+
+											</div>
+
+
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" id="createImage" class="btn btn-primary">Create
+											Image</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<script th:src="@{/custom_js/image.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/bs-custom-file-input/bs-custom-file-input.min.js}"></script>
+	<script>
+		$(function() {
+			bsCustomFileInput.init();
+		});
+	</script>
+	<div th:replace="templateListing :: jsscript"></div>
+	<script th:inline="javascript">
+	if([[${message}]] == 'success'){
+		Swal.fire({
+			position: "top",
+			icon: "success",
+			title: 'Image has been created successfully',
+			showConfirmButton: true,
+			timer: 5000,
+		})
+	}
+	else if([[${message}]] == 'fail'){
+		Swal.fire({
+			position: "top",
+			icon: "warning",
+			title: 'Failed to create image',
+			showConfirmButton: true,
+			timer: 5000,
+		})
+	}
+</script>
+</body>
+</html>

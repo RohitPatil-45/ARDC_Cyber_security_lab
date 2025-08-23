@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})">
+<style>
+.caret {
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	border-top: 6px solid #fff;
+}
+
+.btn {
+	width: 100px;
+	font-weight: 900;
+	border: 0px;
+}
+
+.btn-input {
+	display: block;
+}
+
+.btn-input .btn.form-control {
+	text-align: left;
+}
+
+.btn-input .btn.form-control span:first-child {
+	left: 10px;
+	overflow: hidden;
+	position: absolute;
+	right: 25px;
+}
+
+.btn-input .btn.form-control .caret {
+	margin-top: -1px;
+	position: absolute;
+	right: 10px;
+	top: 50%;
+}
+</style>
+
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>VM Start/Stop Report</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">VM Activity</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<!-- <h3 class="card-title">VM Activity Report</h3> -->
+									&nbsp; &nbsp; &nbsp;<b>From Date :</b> [[${fdate}]] <b>&nbsp;
+										&nbsp; &nbsp;To Date :</b> [[${tdate}]]
+
+
+									<div class="container pull-right" style="width: fit-content;">
+										<div class="btn-group">
+											<button type="button" class="btn btn-info dropdown-toggle"
+												data-toggle="dropdown"
+												style="display: inline-block; text-decoration: none; border-radius: 8px; background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(30px); color: rgb(255 255 255/ 81%); font-size: 14px; letter-spacing: 2px; cursor: pointer; text-transform: uppercase;">
+												<span data-bind="label"><i
+													class="fa-solid fa-table fa-lg"></i> Table</span>&nbsp;<span
+													class="caret"></span>
+											</button>
+											<ul class="dropdown-menu" role="menu"
+												style="border-radius: 8px; background-color: rgb(0 0 0/ 16%); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(30px); color: rgb(251 249 249/ 81%); letter-spacing: 2px; position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-5px, 36px, 0px);">
+												<li style="padding: 7%; color: black !important;"
+													onclick="onclickchangetabletype('Table')"><a><i
+														class="fa-solid fa-table fa-lg"></i> Table</a></li>
+												<li style="padding: 7%;"
+													onclick="onclickchangetabletype('Graph')"><a><i
+														class="fa-duotone fa-solid fa-chart-simple fa-lg"></i>
+														Graph</a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<div class="card-body">
+									<!-- 									<i -->
+									<!-- 										style="padding: 1%; font-size: 35px; color: black; display: none;" -->
+									<!-- 										id="IDSpinner" class='fa fa-spinner fa-spin'></i> -->
+									<div id="mytablehereID">
+										<table id="example1"
+											class="table table-bordered table-striped">
+											<thead class="thead-light">
+												<tr>
+													<th scope="col">Instance ID</th>
+													<!-- <th scope="col">Instance IP</th> -->
+													<th scope="col">Instance Name</th>
+													<th scope="col">Event type</th>
+													<th scope="col">Event Time</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr th:each="obj : ${activityLog}">
+													<td>[[${obj.instance_id.getId}]]</td>
+													<!-- <td>[[${obj.instance_id.getInstance_ip}]]</td> -->
+													<td>[[${obj.instance_id.getInstance_name}]]</td>
+													<td>[[${obj.event_type}]]</td>
+													<td>[[${obj.event_time}]]</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+
+
+									<div id="mygraphhereID" style="display: none;">
+									<button id="toggleMyChartLegends"
+											style="color: black; font-size: 18px; background-color: #6c757d24; border: 3px solid #a3a3a3; border-radius: 5px; text-decoration: none; padding: 1px 10px 1px 10px;">Toggle
+											</button>
+										<div id="eventChartContainer"
+											style="width: 100%; height: 400px;"></div>
+
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.container-fluid -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+
+	<script type="text/javascript"
+		th:src="@{/webtemplate/Highchart/highcharts.js}"></script>
+
+	<script type="text/javascript"
+		th:src="@{/webtemplate/Highchart/exporting.js}"></script>
+	<!-- 		<script type="text/javascript" -->
+	<!-- 		th:src="@{/webtemplate/Highchart/accessibility.js}"></script> -->
+	<script>
+		$(function() {
+			$("#example1").DataTable({
+
+				"responsive" : false,
+				"paging" : true,
+				"pageLength" : 25,
+				"lengthChange" : false,
+				"autoWidth" : false,
+				"buttons" : [ "csv", "excel", "pdf", "print", "colvis" ]
+			}).buttons().container().appendTo(
+					'#example1_wrapper .col-md-6:eq(0)');
+
+		})
+	</script>
+
+	<script th:inline="javascript">
+		$(document).ready(
+				function() {
+					$(document.body).on(
+							'click',
+							'.dropdown-menu li',
+							function(event) {
+								var $target = $(event.currentTarget);
+
+								$target.closest('.btn-group').find(
+										'[data-bind="label"]').html(
+										$target.html()).end().children(
+										'.dropdown-toggle').css('color',
+										'rgb(255 255 255 / 81%)').dropdown(
+										'toggle');
+
+								return false;
+							});
+				});
+
+		function onclickchangetabletype(myvalue) {
+			$("#IDSpinner").show();
+			if (myvalue === 'Table') {
+				document.getElementById('mytablehereID').style.display = 'block';
+				document.getElementById('mygraphhereID').style.display = 'none';
+				$("#IDSpinner").hide();
+			} else if (myvalue === 'Graph') {
+				document.getElementById('mygraphhereID').style.display = 'block';
+				document.getElementById('mytablehereID').style.display = 'none';
+				plotEventChart();
+
+				$("#IDSpinner").hide();
+			}
+		}
+		var Startstophighchart="";
+
+		function plotEventChart() {
+			
+			const chartData = [[${StartstopChartdata}]];
+			
+			 const seriesData = {};
+
+			    // Organize data by instance name
+			    chartData.forEach(point => {
+			        if (!seriesData[point.name]) {
+			            seriesData[point.name] = [];
+			        }
+			        seriesData[point.name].push(point);
+			    });
+
+			    const series = Object.keys(seriesData).map(instanceName => ({
+			        name: instanceName,
+			        data: seriesData[instanceName],
+// 			        color: instanceName === "start" ? "green" : "red"
+			    }));
+
+			    Startstophighchart=Highcharts.chart('eventChartContainer', {
+			        chart: {
+			            type: 'line'
+			        },
+			        title: {
+			            text: 'VM Start/Stop Events'
+			        },
+			        xAxis: {
+			            type: 'datetime',
+			            title: {
+			                text: 'Event Time'
+			            }
+			        },
+			        yAxis: {
+			           
+			            title: {
+			                text: 'Event Type Start/Stop'
+			            },
+			            labels: {
+			            	 enabled: false,
+			                formatter: function () {
+			                    return this.value === 100 ? 'Start' : 'Stop';
+			                }
+			            },
+			           
+			        },
+			        tooltip: {
+			            formatter: function () {
+			                return 'Event Time: ' + Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br>' +
+			                    'Instance Name: ' + this.point.name + '<br>' +
+			                    'Event Type: ' + this.point.event_type;
+			            }
+			        },
+			        series: series,
+			        exporting: {
+			        	 enabled: true, // Enable exporting
+			             buttons: {
+			               contextButton: {
+			                 menuItems: ['viewFullscreen', 'printChart']
+			               }
+			             },
+			             fallbackToExportServer: false // Ensure it does not fallback to an online server
+	                }
+			    });
+
+		}
+		
+		document.getElementById('toggleMyChartLegends').addEventListener('click', function () {
+			  
+		    var series = Startstophighchart.series;
+            var allVisible = series.every(s => s.visible);
+
+            series.forEach(s => {
+                if (allVisible) {
+                    s.setVisible(false, false); // Hide series
+                } else {
+                    s.setVisible(true, false); // Show series
+                }
+            });
+
+            // Redraw the chart to apply changes
+            Startstophighchart.redraw();
+		});
+	</script>
+</body>
+
+</html>

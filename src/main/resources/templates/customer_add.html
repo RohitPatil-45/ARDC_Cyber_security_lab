@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Add Customer</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Add Customer</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/'+${action_name}+'/view/'}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+								<form th:action="@{'/'+${action_name}+'/save'}" method="post"
+									enctype="multipart/form-data" th:object="${objEnt}">
+									<input type="hidden" th:field="*{id}" />
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+											<div class="form-group">
+													<label for="customer_name">Customer Name</label> <input
+														tabindex="2" type="text" th:field="*{customer_name}"
+														onchange="checkDuplicateCustomer(this.value)"
+														required id="customer_name" name="customer_name"
+														class="form-control" placeholder="Enter Customer Name" />
+												</div>
+
+												<div class="form-group">
+													<label for="email_id">Email ID</label> <input
+														tabindex="2" type="email" th:field="*{email_id}"
+														onchange="checkEmailExist(this.value)"
+														required id="email_id" name="email_id"
+														class="form-control" placeholder="Enter Email ID" />
+												</div>
+												<div class="form-group">
+													<label for="address">Address</label> <input
+														tabindex="2" type="text" th:field="*{address}"
+														required id="address" name="address"
+														class="form-control" placeholder="Enter Address" />
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="card-footer">
+										<button type="submit" id="customerBtn" class="btn btn-primary">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="template :: jsscript"></div>
+</body>
+<script type="text/javascript">
+
+$('document').ready(function(){		
+	var emailID = document.getElementById("email_id")
+	$('#email_id').keyup(function(){
+        var email = $(this).val();
+        var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if(emailPattern.test(email)){
+        	emailID.setCustomValidity('');
+            $('#customerBtn').prop('disabled', false);
+        } else {
+        	emailID.setCustomValidity('Please Enter valid Email Address');
+           // $('#adduserForm').prop('disabled', true);
+        }
+    });
+});
+
+function checkDuplicateCustomer(customer){
+	$.ajax({
+		url : '/customer/checkDuplicateCustomer',
+		data : {
+			"customer" : customer
+		},
+		success : function(result) {
+			if(result == "duplicate")
+			{
+				Swal.fire({
+					position: 'top',
+					icon: 'warning',
+					title: 'Customer name already Exists',
+					showConfirmButton: false,
+					timer: 3000
+				})
+				$('#customerBtn').prop( "disabled", true );
+			}
+			else{
+				$('#customerBtn').prop( "disabled", false );
+			}
+		}
+	});
+}
+
+function checkEmailExist(email){
+	$.ajax({
+		url : '/customer/checkEmailExist',
+		data : {
+			"email" : email
+		},
+		success : function(result) {
+			if(result == "duplicate")
+			{
+				Swal.fire({
+					position: 'top',
+					icon: 'warning',
+					title: 'Email ID already Exists',
+					showConfirmButton: false,
+					timer: 3000
+				})
+				$('#customerBtn').prop( "disabled", true );
+			}
+			else{
+				$('#customerBtn').prop( "disabled", false );
+			}
+		}
+	});
+}
+
+</script>
+</html>
