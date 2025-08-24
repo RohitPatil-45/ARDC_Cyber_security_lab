@@ -153,8 +153,6 @@ public class ReportController {
 	@Autowired
 	private CloudInstanceNodeHealthMonitoringRepository cloudInstanceNodeHealthMonitoringRepository;
 
-	
-
 	@GetMapping("/resourceUtilization")
 	public ModelAndView resourceUtilizationReport() {
 		ModelAndView mav = new ModelAndView("resourceUtilizationReport");
@@ -2499,40 +2497,6 @@ public class ReportController {
 		return mav;
 	}
 
-	@GetMapping("/View_Playlist")
-	public ModelAndView Add_VM(Principal principal) {
-		Authentication authentication = (Authentication) principal;
-		User loginedUser = (User) ((Authentication) principal).getPrincipal();
-		List<CloudInstance> instances = null;
-		String userName = loginedUser.getUsername();
-		String groupName = "";
-		List<AppUser> user1 = userRepository.findByuserName(loginedUser.getUsername());
-		boolean isSuperAdmin = authentication.getAuthorities().stream()
-				.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
-
-		boolean isAdmin = authentication.getAuthorities().stream()
-				.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-		ModelAndView mav = new ModelAndView("View_Playlist");
-		mav.addObject("pageTitle", "Report");
-		if (isSuperAdmin) {
-			mav.addObject("instanceNameList", repository.getInstanceName(true));
-		} else {
-
-			for (AppUser appUser : user1) {
-				groupName = appUser.getGroupName();
-			}
-			List<String> groups = new ArrayList<>();
-			StringTokenizer token = new StringTokenizer(groupName, ",");
-			while (token.hasMoreTokens()) {
-				groups.add(token.nextToken());
-			}
-
-			mav.addObject("instanceNameList", repository.getInstanceNameByGroup(groups, true));
-		}
-
-		return mav;
-	}
-
 	@GetMapping("/View_Scenario")
 	public ModelAndView getView_Scenario(Principal principal) {
 		ModelAndView mav = new ModelAndView("View_Scenario");
@@ -2639,7 +2603,7 @@ public class ReportController {
 	}
 
 	@GetMapping("/image/{id}")
-	public void getStudentImage(@PathVariable int id, HttpServletResponse response) throws IOException {
+	public void getImage(@PathVariable int id, HttpServletResponse response) throws IOException {
 		System.out.println("inside_render_image ::");
 		Optional<Add_Scenario> scenario = ScenarioRepository.findById(id);
 		if (scenario.isPresent() && scenario.get().getCoverImage() != null) {
@@ -2772,88 +2736,6 @@ public class ReportController {
 		return mav;
 	}
 
-	@PostMapping("/savePlaylistData")
-	public ModelAndView savePlaylistData(@RequestParam String playlist_title, @RequestParam String playlist_name,
-			@RequestParam String description, @RequestParam String tag_suggestions,
-			@RequestParam(required = false) MultipartFile cover_image, @RequestParam String labs,
-			@RequestParam String comments) {
-
-		ModelAndView mav = new ModelAndView("Add_Scenario");
-
-		try {
-			// Log all parameters
-//	        System.out.println("Scenario_title: " + Scenario_title);
-//	        System.out.println("Scenario_name: " + Scenario_name);
-//	        System.out.println("description: " + description);
-//	        System.out.println("Category: " + Category);
-//	        System.out.println("type: " + type);
-//	        System.out.println("mode: " + mode);
-//	        System.out.println("Difficulty: " + Difficulty);
-//	        System.out.println("Duration: " + Duration);
-//	        System.out.println("max_players: " + max_players);
-			System.out.println(
-					"cover_image: " + (cover_image != null ? cover_image.getOriginalFilename() : "No file uploaded"));
-			System.out.println("labs: " + labs);
-			System.out.println("comments: " + comments);
-
-//	        // Create new scenario object
-			Add_Scenario scenario = new Add_Scenario();
-//	        scenario.setScenario_Title(Scenario_title);
-//	        scenario.setScenario_Name(Scenario_name);
-//	        scenario.setDescription(description);
-//	        scenario.setCategory(Category);
-//	        scenario.setScenario_Type(type);
-//	        scenario.setMode(mode);
-//	        scenario.setDifficulty_Level(Difficulty);
-//	        scenario.setDuration(Duration);
-//	        scenario.setMax_Players(max_players);
-//	        scenario.setLabs(labs);
-//	        scenario.setComments(comments);
-
-			// Handle the uploaded image file
-			if (cover_image != null && !cover_image.isEmpty()) {
-				// Validate file type
-				String contentType = cover_image.getContentType();
-				if (contentType != null && contentType.startsWith("image/")) {
-					// Store image bytes in database
-					scenario.setCoverImage(cover_image.getBytes());
-					System.out.println("Uploaded image saved to database");
-				} else {
-					// Invalid file type
-					mav.addObject("message", "Invalid file type. Please upload an image file.");
-					mav.addObject("status", "error");
-					return mav;
-				}
-			} else {
-				// No image uploaded - try to set a default image
-				String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
-				try {
-					byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
-					scenario.setCoverImage(defaultImageBytes);
-					System.out.println("Default image loaded and saved to database");
-				} catch (IOException e) {
-					System.err.println("Error loading default image: " + e.getMessage());
-					// Create a minimal placeholder image instead of null
-					scenario.setCoverImage(createPlaceholderImage());
-					System.out.println("Placeholder image created and saved to database");
-				}
-			}
-
-			// Save to database
-			ScenarioRepository.save(scenario);
-
-			mav.addObject("message", "Scenario saved successfully!");
-			mav.addObject("status", "success");
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			mav.addObject("message", "Error while saving scenario: " + e.getMessage());
-			mav.addObject("status", "error");
-		}
-
-		return mav;
-	}
-
 	@PostMapping("/saveScenarioData")
 	public ModelAndView saveScenarioData(@RequestParam String Scenario_title, @RequestParam String Scenario_name,
 			@RequestParam String description, @RequestParam String Category, @RequestParam String type,
@@ -2951,7 +2833,5 @@ public class ReportController {
 			return new byte[0];
 		}
 	}
-
-	
 
 }

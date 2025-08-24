@@ -328,7 +328,7 @@ label {
 									</div>
 								</div>
 
-								<form th:action="${'/playlist/save'}" th:method="POST"
+								<form th:action="${'/guac/playlistsave'}" th:method="POST"
 									onsubmit="return validatePlaylistForm()"
 									enctype="multipart/form-data">
 									<div class="card-body">
@@ -377,9 +377,8 @@ label {
 														<label for="cover_image">Playlist Cover Image</label>
 														<div class="custom-file">
 															<input type="file" class="custom-file-input"
-																id="cover_image" name="cover_image" accept="image/*"
-																onchange="previewImage(this)"> <label
-																class="custom-file-label" for="cover_image">Choose
+																id="cover_image" name="cover_image" accept="image/*">
+															<label class="custom-file-label" for="cover_image">Choose
 																image</label>
 														</div>
 														<small class="form-text text-muted">Recommended
@@ -389,14 +388,13 @@ label {
 												</div>
 												<div class="col-md-6">
 													<div class="form-group">
-														<label for="tags" class="required-field">Tags</label>
+														<label for="tag_input" class="required-field">Tags</label>
 														<div class="tag-input-container">
-															<input type="text" id="tag_input" class="form-control"
+															<input type="text" required id="tag_input"
+																name="tag_input" class="form-control"
 																placeholder="Type to add tags">
-															<div class="tag-suggestions" id="tag_suggestions"></div>
 														</div>
-														<div class="selected-tags" id="selected_tags"></div>
-														<input type="hidden" id="tags" name="tags">
+
 													</div>
 												</div>
 											</div>
@@ -419,110 +417,6 @@ label {
 											</button>
 										</div>
 								</form>
-
-								<style>
-/* Main Card */
-.playlist-card {
-	position: relative;
-	background-color: #000;
-	border: 2px solid #1e3a8a;
-	border-radius: 12px;
-	overflow: hidden;
-	color: #fff;
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-	transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s
-		ease;
-}
-
-/* Hover effect */
-.playlist-card:hover {
-	transform: scale(1.02);
-	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.9);
-	border-color: #3b82f6;
-}
-
-/* Image */
-.playlist-card .card-image img {
-	width: 100%;
-	height: 180px; /* ↓ reduced image height */
-	object-fit: cover; /* keeps image proportional without stretching */
-	display: block;
-	border-bottom: 2px solid #333;
-}
-
-/* Content wrapper */
-.playlist-card .card-content {
-	padding: 16px;
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-}
-
-/* Heading */
-.playlist-card .card-title {
-	font-family: 'Poppins', sans-serif;
-	font-size: 1.2rem;
-	font-weight: 700;
-	line-height: 1.4;
-	color: #3b82f6;
-	margin: 0;
-}
-
-/* Description */
-.playlist-card .card-description {
-	font-family: 'Roboto', sans-serif;
-	font-size: 0.95rem;
-	font-weight: 400;
-	line-height: 1.5;
-	color: #ccc;
-	margin: 0;
-}
-
-/* Tags */
-.playlist-card .card-tags {
-	margin-top: 5px;
-}
-
-.playlist-card .card-tags .tag {
-	display: inline-block;
-	background: #111;
-	color: #3b82f6;
-	font-size: 0.75rem;
-	font-weight: 600;
-	padding: 4px 10px;
-	margin-right: 5px;
-	border-radius: 12px;
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-}
-</style>
-
-
-								<div class="row">
-									<div class="col-md-4">
-										<div class="playlist-card">
-											<div class="card-image">
-												<img
-													src="https://images.unsplash.com/photo-1563089145-599997674d42?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=500&amp;q=80"
-													alt="Web Application Penetration Testing">
-											</div>
-											<div class="card-content">
-												<h3 class="card-title">Web Application Penetration
-													Testing</h3>
-												<p class="card-description">Master the art of finding
-													and exploiting vulnerabilities in modern web applications
-													with this comprehensive playlist.</p>
-												<div class="card-tags">
-													<span class="tag">WEB SECURITY</span> <span class="tag">OWASP
-														TOP 10</span> <span class="tag">BURP SUITE</span>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-
-
-
 
 							</div>
 						</div>

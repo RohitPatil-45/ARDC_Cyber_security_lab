@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:include="template :: headFragment(${pageTitle})">
+<title>View Playlist | Cyber Ranges</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link
+	href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+</head>
+
+<style>
+body {
+	background-color: #121212;
+	color: #e0e0e0;
+	font-family: 'Roboto', sans-serif;
+}
+
+.content-wrapper {
+	background-color: #121212;
+}
+
+/* Playlist Card */
+.playlist-card {
+	background-color: #1e1e1e;
+	border: 2px solid #2d4fa6;
+	border-radius: 12px;
+	overflow: hidden;
+	color: #e0e0e0;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.card-image img {
+	width: 100%;
+	height: 280px;
+	object-fit: cover;
+	border-bottom: 2px solid #444;
+}
+
+.card-content {
+	padding: 20px;
+}
+
+/* Playlist Title */
+.card-title {
+	font-family: 'Poppins', sans-serif;
+	font-size: 1.6rem;
+	font-weight: 700;
+	color: #3b82f6;
+	margin: 0;
+}
+
+/* Playlist Tags */
+.card-tags {
+	margin-top: 12px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.card-tags .tag {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	background: #2d2d2d;
+	color: #3b82f6;
+	font-size: 0.85rem;
+	font-weight: 500;
+	padding: 6px 12px;
+	border-radius: 12px;
+	text-transform: uppercase;
+}
+
+/* Playlist Info */
+.playlist-info {
+	margin-top: 20px;
+	background-color: #1a1a1a;
+	border: 1px solid #333;
+	border-radius: 12px;
+	padding: 20px;
+}
+
+.playlist-info h4 {
+	color: #3b82f6;
+	margin-bottom: 10px;
+}
+
+.playlist-info p {
+	color: #e0e0e0;
+	margin-bottom: 6px;
+	font-size: 0.95rem;
+}
+
+/* Add Scenario Button */
+.add-btn {
+	background: linear-gradient(90deg, #2563eb, #3b82f6);
+	color: #fff;
+	padding: 8px 18px;
+	border-radius: 20px;
+	font-size: 0.9rem;
+	font-weight: 600;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+	transition: all 0.3s ease;
+	border: none;
+}
+
+.add-btn:hover {
+	background: linear-gradient(90deg, #1e40af, #2563eb);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+	color: #fff;
+	text-decoration: none;
+}
+
+.playlist-title-tags {
+	display: flex;
+	align-items: center;
+	gap: 10px; /* space between title and tags */
+}
+
+.card-tags .tag {
+	font-size: 0.85rem;
+	padding: 4px 10px;
+}
+</style>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>
+								<i class="fas fa-list-ol playlist-icon"></i> View Playlist
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#"><i
+										class="fas fa-home"></i> Home</a></li>
+								<li class="breadcrumb-item active"><a href="#">Playlist</a></li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid" id="playlistContainer">
+					<!-- Playlist details will load here -->
+				</div>
+			</section>
+		</div>
+
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="addScenarioModal" tabindex="-1"
+		role="dialog" aria-labelledby="addScenarioModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content bg-dark text-light">
+				<div class="modal-header">
+					<h5 class="modal-title" id="addScenarioModalLabel">Add
+						Scenario to Playlist</h5>
+					<button type="button" class="close text-light" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form id="addScenarioForm">
+						<div class="form-group">
+							<label for="scenarioDropdown">Select Scenario</label> <select
+								id="scenarioDropdown" class="form-control custom-select">
+								<option value="">-- Choose a Scenario --</option>
+								<option th:each="scenario : ${scenarioList}"
+									th:value="${scenario.Id}" th:text="${scenario.ScenarioName}"></option>
+							</select>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-dismiss="modal">Close</button>
+					<button type="submit" form="addScenarioForm"
+						class="btn btn-primary">Add</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Scripts -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+	<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let rawData = '[[${listObj}]]'.replace(/&quot;/g, '"');
+    let jsonData;
+
+    try {
+        jsonData = JSON.parse(rawData);
+    } catch (e) {
+        console.error("Invalid JSON:", e);
+        return;
+    }
+
+    if (!jsonData || !jsonData.length) return;
+
+    const item = jsonData[0];
+    const container = document.getElementById("playlistContainer");
+
+    const fragment = document.createDocumentFragment();
+
+    // Playlist Card
+ const cardHTML = `
+    <!-- Playlist Card -->
+    <div class="col-md-12 mb-4">
+        <div class="playlist-card">
+            <div class="card-image">
+                <img src="/guac/image/${item.Id}" alt="${item.PlaylistTitle}" loading="lazy">
+            </div>
+            <div class="card-content">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h3 class="card-title mb-0">${item.PlaylistName}</h3>
+                    <button class="add-btn" data-toggle="modal" data-target="#addScenarioModal">
+                        <i class="fas fa-plus"></i> Add Scenario
+                    </button>
+                </div>
+                <div class="card-tags mt-2">
+                    <span class="tag"><i class="fas fa-tag"></i> ${item.Tag || 'N/A'}</span>
+                </div>
+               
+            </div>
+        </div>
+    </div>
+`;
+
+
+  
+    const infoHTML = `
+        <div class="col-md-12 playlist-info">
+            <h4>Description</h4>
+            <p>${item.Description || 'N/A'}</p>
+            <br>
+            
+        </div>
+    `;
+
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = cardHTML + infoHTML;
+    fragment.appendChild(wrapper);
+    container.appendChild(fragment);
+});
+</script>
+
+
+	<script>
+    $(document).ready(function () {
+        $("#addScenarioForm").on("submit", function (event) {
+            event.preventDefault(); // prevent default form submission
+
+            let scenarioId = $("#scenarioDropdown").val();
+
+            if (!scenarioId) {
+                alert("Please select a scenario.");
+                return;
+            }
+
+            // Get playlistId from URL (http://localhost:9089/guac/View_Particular_Playlist?Id=2)
+            let urlParams = new URLSearchParams(window.location.search);
+            let playlistId = urlParams.get("Id");
+
+            // Send AJAX request to controller
+            $.ajax({
+                type: "POST",
+                url: "/guac/addplaylist_Scenario",
+                data: { 
+                    playlistId: playlistId, 
+                    scenarioId: scenarioId 
+                },
+                success: function (response) {
+//                     alert("Scenario added successfully!");
+                    $("#addScenarioModal").modal("hide");
+                   
+                },
+                error: function () {
+//                     alert("Failed to add scenario. Try again.");
+                }
+            });
+        });
+    });
+</script>
+
+
+</body>
+</html>

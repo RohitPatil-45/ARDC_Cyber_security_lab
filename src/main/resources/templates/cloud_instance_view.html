@@ -58,6 +58,33 @@
 
 
 <style type="text/css">
+
+.start-btn {
+	background: linear-gradient(90deg, #16a34a, #22c55e);
+	color: #fff;
+	padding: 6px 16px;
+	border-radius: 20px;
+	font-size: 0.9rem;
+	font-weight: 600;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+	transition: all 0.3s ease;
+}
+
+.start-btn:hover {
+	background: linear-gradient(90deg, #15803d, #16a34a);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+	text-decoration: none;
+}
+
+.start-btn i {
+	font-size: 0.9rem;
+}
+
 .text-center {
 	text-align: center !important;
 }
@@ -197,515 +224,18 @@ keyframes pulse { 0% {
 	transform: scale(0);
 }
 
-100%
+100
+%
 {
 opacity
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 :
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 0;
 transform
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-:scale
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-(1
+:
+scale
+(
+1
 .1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 );
 }
 }
@@ -915,8 +445,8 @@ td {
 
 											<th class="text-center">Device Mac</th>
 											<th class="text-center">Location</th>
-											<!-- 											<th class="text-center">Password</th> -->
-											<!-- <th class="text-center">Action</th> -->
+											<th class="text-center">Create VM</th>
+											<th class="text-center">Console</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -961,18 +491,9 @@ td {
 																style="font-size: 1rem !important; color: #b5b5c3 !important">
 																<!-- <span
 																th:text="${#strings.isEmpty(obj.cpuAssigned) ? obj.price_id.getvCpu : obj.cpuAssigned + 'CPU'}"></span>
-																 -->
-																 
-																 <span
-																th:text="${obj.cpuAssigned+ ' CPU' }">
-																</span>
-																/
-																
-																 <span
-																th:text="${obj.memoryAssigned+ ' RAM' }">
-																</span>
-																	
-
+																 --> <span th:text="${obj.cpuAssigned+ ' CPU' }">
+															</span> / <span th:text="${obj.memoryAssigned+ ' RAM' }">
+															</span>
 														</h3>
 													</div>
 
@@ -991,8 +512,7 @@ td {
 											<!-- 												th:text="${obj.vm_state != 'Off' ? obj.vm_state : 'stop'}"></td> -->
 											<!-- 											<td -->
 											<!-- 												th:text="${(obj.vm_state != 'off' && obj.vm_state != 'Off') ? obj.vm_state :'stop'}"></td> -->
-											<td
-												th:text="${obj.vm_state}"></td>
+											<td th:text="${obj.vm_state}"></td>
 
 											<!-- 											<td>[[${obj.vm_start_stop_status}]]</td> -->
 											<td>[[${obj.created_on}]]</td>
@@ -1010,13 +530,12 @@ td {
 
 											<td>[[${obj.mac_address}]]</td>
 											<td>[[${obj.location_id.getLocation_name}]]</td>
-											<!-- 											<td>[[${obj.getInstance_password}]]</td> -->
-											<!-- <td><a
-												th:href="@{'/cloud_instance_user/delete/' + ${obj.id}+'~'+${obj.instance_name}}"
-												th:tutorialTitle="${obj.instance_name}" id="btnDelete"
-												title="Delete this tutorial" class="fa fa-trash btn-delete"></a>
-												<a class="fa fa-edit"></a></td> -->
-
+											<td><a href="#" class="start-btn"> <i
+													class="fas fa-play"></i> Create VM
+											</a></td>
+											<td><a href="#" class="start-btn"> <i
+													class="fas fa-play"></i> Console
+											</a></td>
 										</tr>
 
 									</tbody>

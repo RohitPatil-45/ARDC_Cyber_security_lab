@@ -1,11 +1,15 @@
 package in.canaris.cloud.openstack.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -63,6 +67,9 @@ public class Add_Scenario {
 
 	@Column(name = "Comments", nullable = false, length = 255)
 	private String Comments;
+
+	@ManyToMany(mappedBy = "scenarios")
+	private Set<Playlist> playlists = new HashSet<>();
 
 	public int getId() {
 		return Id;
@@ -172,5 +179,4 @@ public class Add_Scenario {
 		return serialVersionUID;
 	}
 
-	
 }
