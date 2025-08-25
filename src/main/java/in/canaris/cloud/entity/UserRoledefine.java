@@ -2,8 +2,10 @@ package in.canaris.cloud.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "userroledefine")
 public class UserRoledefine {
 	@Id
 	private Long id;

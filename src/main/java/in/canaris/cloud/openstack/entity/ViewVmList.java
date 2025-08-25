@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "ViewVmList")
+@Table(name = "viewvmlist")
 public class ViewVmList {
 
 	private static final long serialVersionUID = 1L;

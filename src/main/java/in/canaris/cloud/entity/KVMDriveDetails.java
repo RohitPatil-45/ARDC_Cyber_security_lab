@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "KVM_Drive_Details")
+@Table(name = "kvm_drive_details")
 public class KVMDriveDetails {
 	
 	@Id

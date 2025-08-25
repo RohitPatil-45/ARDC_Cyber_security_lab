@@ -20,7 +20,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "App_User")
+@Table(name = "app_user")
 //@Table(name = "App_User", //
 //		uniqueConstraints = { //
 //				@UniqueConstraint(name = "APP_USER_UK", columnNames = "User_Name") })
