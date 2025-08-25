@@ -210,6 +210,8 @@ body {
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
+
+
 	<script>
 document.addEventListener("DOMContentLoaded", function () {
     let rawData = '[[${listObj}]]'.replace(/&quot;/g, '"');
@@ -224,90 +226,234 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!jsonData || !jsonData.length) return;
 
-    const item = jsonData[0];
-    const container = document.getElementById("playlistContainer");
+  
+    const playlistItem = jsonData.find(obj => obj.PlaylistName !== undefined);
+    const scenarioItems = jsonData.filter(obj => obj.Scenario_Name !== undefined);
 
+    const container = document.getElementById("playlistContainer");
     const fragment = document.createDocumentFragment();
 
-    // Playlist Card
- const cardHTML = `
-    <!-- Playlist Card -->
-    <div class="col-md-12 mb-4">
-        <div class="playlist-card">
-            <div class="card-image">
-                <img src="/guac/image/${item.Id}" alt="${item.PlaylistTitle}" loading="lazy">
-            </div>
-            <div class="card-content">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h3 class="card-title mb-0">${item.PlaylistName}</h3>
-                    <button class="add-btn" data-toggle="modal" data-target="#addScenarioModal">
-                        <i class="fas fa-plus"></i> Add Scenario
-                    </button>
+   
+    const cardHTML = `
+        <div class="col-md-12 mb-4">
+            <div class="playlist-card">
+                <div class="card-image">
+                    <img src="/guac/Playlistimage/${playlistItem.Id}" alt="${playlistItem.PlaylistTitle}" loading="lazy">
                 </div>
-                <div class="card-tags mt-2">
-                    <span class="tag"><i class="fas fa-tag"></i> ${item.Tag || 'N/A'}</span>
+                <div class="card-content">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h3 class="card-title mb-0">${playlistItem.PlaylistName}</h3>
+                        <button class="add-btn" data-toggle="modal" data-target="#addScenarioModal">
+                            <i class="fas fa-plus"></i> Add Scenario
+                        </button>
+                    </div>
+                    <div class="card-tags mt-2">
+                        <span class="tag"><i class="fas fa-tag"></i> ${playlistItem.Tag || 'N/A'}</span>
+                    </div>
+                    <div class="playlist-info mt-2">
+                        <h4>Description</h4>
+                        <div class="descriptionContent">
+                            ${playlistItem.Description || 'N/A'}
+                        </div>
+                    </div>
                 </div>
-               
             </div>
-        </div>
-    </div>
-`;
-
-
-  
-    const infoHTML = `
-        <div class="col-md-12 playlist-info">
-            <h4>Description</h4>
-            <p>${item.Description || 'N/A'}</p>
-            <br>
-            
         </div>
     `;
 
+    
+    
+
+
+let scenariosHTML = `
+    <div class="col-md-12 mt-4">
+        <h4>Scenarios</h4>
+        <div class="scenario-list">
+`;
+
+scenarioItems.forEach(scenario => {
+    scenariosHTML += `
+        <div class="scenario-card d-flex align-items-center p-3 mb-3" style="background:#1e2533; border-radius:8px;">
+            <!-- Left Image -->
+            <div class="scenario-image" style="flex:0 0 120px; margin-right:15px;">
+                <img src="/guac/Scenarioimage/${scenario.Id}" alt="${scenario.Scenario_Title}" 
+                     style="width:120px; height:80px; object-fit:cover; border-radius:4px;" loading="lazy">
+            </div>
+
+            <!-- Middle Content -->
+            <div class="scenario-content flex-grow-1">
+                <h5 class="mb-1" style="color:#fff;">${scenario.Scenario_Title}</h5>
+                <div class="d-flex flex-wrap text-muted small mb-1">
+                    <span class="mr-3">${scenario.Scenario_Type || 'N/A'} (${scenario.Mode || 'N/A'})</span>
+                    <span class="mr-3">${scenario.Difficulty_Level || 'N/A'}</span>
+                    <span>${scenario.Duration || 'N/A'}</span>
+                </div>
+                <p class="mb-0 text-light small">${scenario.Description || ''}</p>
+            </div>
+
+            <!-- Right Buttons -->
+            <div class="scenario-actions ml-3 text-right">
+                <button class="btn btn-sm btn-primary" style="background:#1a73e8; border:none;" onclick='ScenerioCardClick("${scenario.Id}")'>
+                    <i class="fas fa-play"></i> START
+                </button>
+                <button class="btn btn-sm btn-link text-muted ml-2" onclick='ScenerioRemoveCardClick("${scenario.Id}")'>
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    `;
+});
+
+scenariosHTML += `</div></div>`; // close list and wrapper
+
+
     const wrapper = document.createElement("div");
-    wrapper.innerHTML = cardHTML + infoHTML;
+    wrapper.innerHTML = cardHTML + scenariosHTML;
     fragment.appendChild(wrapper);
     container.appendChild(fragment);
 });
+
+function ScenerioCardClick(id) {
+    window.location.href = "/report/View_Particular_Scenerio?Id=" + id;
+}
+
+
 </script>
 
 
+
+	<!-- SweetAlert2 -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 	<script>
-    $(document).ready(function () {
-        $("#addScenarioForm").on("submit", function (event) {
-            event.preventDefault(); // prevent default form submission
+$(document).ready(function () {
+    $("#addScenarioForm").on("submit", function (event) {
+        event.preventDefault(); // prevent default form submission
 
-            let scenarioId = $("#scenarioDropdown").val();
+        let scenarioId = $("#scenarioDropdown").val();
 
-            if (!scenarioId) {
-                alert("Please select a scenario.");
-                return;
+        if (!scenarioId) {
+            Swal.fire({
+                icon: "warning",
+                title: "No Scenario Selected",
+                text: "Please select a scenario before adding."
+            });
+            return;
+        }
+
+        // Get playlistId from URL (http://localhost:9089/guac/View_Particular_Playlist?Id=2)
+        let urlParams = new URLSearchParams(window.location.search);
+        let playlistId = urlParams.get("Id");
+
+        // Send AJAX request to controller
+        $.ajax({
+            type: "POST",
+            url: "/guac/addplaylist_Scenario",
+            data: { 
+                playlistId: playlistId, 
+                scenarioId: scenarioId 
+            },
+            success: function (response) {
+                $("#addScenarioModal").modal("hide");
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Scenario Added",
+                    text: "Scenario has been added successfully!",
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    // reload page to refresh list
+                    location.reload();
+                });
+            },
+            error: function () {
+                Swal.fire({
+                    icon: "error",
+                    title: "Failed",
+                    text: "Failed to add scenario. Try again."
+                });
             }
+        });
+    });
+});
 
-            // Get playlistId from URL (http://localhost:9089/guac/View_Particular_Playlist?Id=2)
-            let urlParams = new URLSearchParams(window.location.search);
-            let playlistId = urlParams.get("Id");
+function ScenerioRemoveCardClick(id) {
+    let urlParams = new URLSearchParams(window.location.search);
+    let playlistId = urlParams.get("Id");
+    let scenarioId = id;
 
-            // Send AJAX request to controller
+    Swal.fire({
+        title: "Are you sure?",
+        text: "This scenario will be removed from the playlist.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, remove it",
+        cancelButtonText: "Cancel"
+    }).then((result) => {
+        if (result.isConfirmed) {
             $.ajax({
-                type: "POST",
-                url: "/guac/addplaylist_Scenario",
+                type: "GET",
+                url: "/guac/Remove_Particular_ScenerioPlaylist",
                 data: { 
                     playlistId: playlistId, 
                     scenarioId: scenarioId 
                 },
                 success: function (response) {
-//                     alert("Scenario added successfully!");
-                    $("#addScenarioModal").modal("hide");
-                   
+                    if (response === "success") {
+                        $("#scenarioCard_" + id).remove();
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Removed",
+                            text: "Scenario removed successfully!",
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            // reload page to refresh list
+                            location.reload();
+                        });
+                    } else if (response === "not_found") {
+                        Swal.fire({
+                            icon: "info",
+                            title: "Not Found",
+                            text: "Scenario not found in this playlist."
+                        }).then(() => {
+                            // reload page to refresh list
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Failed",
+                            text: "Failed to remove scenario."
+                        }).then(() => {
+                            // reload page to refresh list
+                            location.reload();
+                        });
+                    }
                 },
                 error: function () {
-//                     alert("Failed to add scenario. Try again.");
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "Error while removing scenario. Please try again."
+                    }).then(() => {
+                        // reload page to refresh list
+                        location.reload();
+                    });
                 }
             });
-        });
+        }
     });
+}
 </script>
+
+
+
+
 
 
 </body>

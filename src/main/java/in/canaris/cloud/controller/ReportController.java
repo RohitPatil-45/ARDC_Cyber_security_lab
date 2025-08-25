@@ -2444,8 +2444,12 @@ public class ReportController {
 				.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
 		ModelAndView mav = new ModelAndView("Add_Scenario");
 		mav.addObject("pageTitle", "Report");
+
 		if (isSuperAdmin) {
-			mav.addObject("instanceNameList", repository.getInstanceName(true));
+//			mav.addObject("instanceNameList", repository.getInstanceNameNotAssigned());
+
+			instances = repository.getInstanceNameNotAssigned();
+			mav.addObject("instanceNameList", instances);
 		} else {
 
 			for (AppUser appUser : user1) {
@@ -2457,7 +2461,9 @@ public class ReportController {
 				groups.add(token.nextToken());
 			}
 
-			mav.addObject("instanceNameList", repository.getInstanceNameByGroup(groups, true));
+			instances = repository.getInstanceNameNotAssigned();
+			mav.addObject("instanceNameList", instances);
+//			mav.addObject("instanceNameList", repository.getInstanceNameByGroup(groups, true));
 		}
 
 		return mav;
@@ -2643,6 +2649,7 @@ public class ReportController {
 				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
 				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
 				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
+				String LabId = temp.getLabId() != null ? temp.getLabId() : "";
 //				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
 				String Cover_Image = "";
 				int SrNo = temp.getId();
@@ -2660,11 +2667,12 @@ public class ReportController {
 				obj.put("Labs", Labs);
 				obj.put("Cover_Image", Cover_Image);
 				obj.put("Id", SrNo);
+				obj.put("LabId", LabId);
 
 				Finalarray.put(obj);
 			}
 
-//			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
+			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
 
 			mav.addObject("listObj", Finalarray.toString());
 
@@ -2741,8 +2749,7 @@ public class ReportController {
 			@RequestParam String description, @RequestParam String Category, @RequestParam String type,
 			@RequestParam String mode, @RequestParam String Difficulty, @RequestParam String Duration,
 			@RequestParam(required = false) String max_players,
-			@RequestParam(required = false) MultipartFile cover_image, @RequestParam String labs,
-			@RequestParam String comments) {
+			@RequestParam(required = false) MultipartFile cover_image, @RequestParam String labsn) {
 
 		ModelAndView mav = new ModelAndView("Add_Scenario");
 
@@ -2759,8 +2766,13 @@ public class ReportController {
 			System.out.println("max_players: " + max_players);
 			System.out.println(
 					"cover_image: " + (cover_image != null ? cover_image.getOriginalFilename() : "No file uploaded"));
-			System.out.println("labs: " + labs);
-			System.out.println("comments: " + comments);
+
+//			System.out.println("comments: " + comments);
+
+			System.out.println("labs: " + labsn);
+			String[] parts = labsn.split("~");
+			String labId = parts[0];
+			String labName = parts[1];
 
 			// Create new scenario object
 			Add_Scenario scenario = new Add_Scenario();
@@ -2773,8 +2785,17 @@ public class ReportController {
 			scenario.setDifficultyLevel(Difficulty);
 			scenario.setDuration(Duration);
 			scenario.setMaxPlayers(max_players);
-			scenario.setLabs(labs);
-			scenario.setComments(comments);
+			scenario.setLabs(labName);
+			scenario.setLabId(labId);
+			scenario.setComments("");
+
+			int instances = 0;
+			try {
+				instances = repository.updateInstanceNameAssigned();
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.err.println("Exption_update_AssignedLab" + e);
+			}
 
 			// Handle the uploaded image file
 			if (cover_image != null && !cover_image.isEmpty()) {

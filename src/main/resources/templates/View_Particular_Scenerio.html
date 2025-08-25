@@ -191,38 +191,53 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const fragment = document.createDocumentFragment();
 
-    // Card HTML
+ // Card HTML
     const cardHTML = `
-        <div class="col-md-12 mb-4">
-            <div class="playlist-card">
-                <div class="card-image">
-                    <img src="/report/image/${item.Id}" alt="${item.Scenario_Title}" loading="lazy">
+      <div class="col-md-12 mb-4">
+        <div class="playlist-card">
+          <!-- Larger Image -->
+          <div class="card-image">
+            <img src="/report/image/${item.Id}" alt="${item.Scenario_Title}" loading="lazy">
+          </div>
+
+          <div class="card-content">
+            <div class="card-header">
+              <div class="card-title-wrapper" style="display: flex; flex-direction: column; gap: 5px;">
+                <!-- First row: Title -->
+                <h3 class="card-title" style="margin: 0; font-weight: 700;">
+                  ${item.Scenario_Title}
+                </h3>
+
+                <!-- Second row: Scenario Name and Start Button aligned -->
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <h5 class="card-subtitle" style="margin: 0; font-weight: 500; color: #555;">
+                    ${item.Scenario_Name || 'N/A'}
+                  </h5>
+                  <a href="/guac/View_Vm_Listing?Id=${item.LabId}" class="start-btn">
+                    <i class="fas fa-play"></i> Start
+                  </a>
                 </div>
-                <div class="card-content">
-                    <div class="card-header">
-                        <div class="card-title-wrapper">
-                            <h3 class="card-title">${item.Scenario_Title}</h3>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <a href="/guac/View_Vm_Listing?Id=${item.Id}" class="start-btn">
-                                <i class="fas fa-play"></i> Start
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag"><i class="fas fa-signal"></i> ${item.Difficulty_Level}</span>
-                        <span class="tag"><i class="fas fa-clock"></i> ${item.Duration}</span>
-                        <span class="tag"><i class="fas fa-gamepad"></i> ${item.Mode}</span>
-                        <span class="tag"><i class="fas fa-layer-group"></i> ${item.Scenario_Type}</span>
-                    </div>
-                </div>
+              </div>
             </div>
+
+            <div class="card-tags" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px;">
+              <span class="tag"><i class="fas fa-signal"></i> ${item.Difficulty_Level}</span>
+              <span class="tag"><i class="fas fa-clock"></i> ${item.Duration}</span>
+              <span class="tag"><i class="fas fa-gamepad"></i> ${item.Mode}</span>
+              <span class="tag"><i class="fas fa-layer-group"></i> ${item.Scenario_Type}</span>
+            </div>
+          </div>
         </div>
+      </div>
     `;
+
+
+
 
     // Info HTML
     const infoHTML = `
         <div class="col-md-12 scenario-info">
-            <p><strong>Scenario Name:</strong> ${item.Scenario_Name || 'N/A'}</p>&nbsp;
+           
             <p><strong>Category:</strong> ${item.Category || 'N/A'}</p>&nbsp;
             <div class="descriptionContent"></div>
            

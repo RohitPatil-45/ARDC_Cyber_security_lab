@@ -112,6 +112,19 @@ public class CloudInstance implements Serializable {
 
 	@Column
 	private String web_id;
+	
+	@Column
+	private String ConsoleUsername;
+	
+	@Column
+	private String ConsolePassword;
+	
+	@Column
+	private String ConsoleProtocol;
+	
+	@Column
+	private String AssignedLab;
+	
 
 	@Lob
 	@Column(name = "description", nullable = true)
@@ -552,6 +565,38 @@ public class CloudInstance implements Serializable {
 
 	public void setVm_instructions(String vm_instructions) {
 		this.vm_instructions = vm_instructions;
+	}
+
+	public String getConsoleUsername() {
+		return ConsoleUsername;
+	}
+
+	public void setConsoleUsername(String consoleUsername) {
+		ConsoleUsername = consoleUsername;
+	}
+
+	public String getConsolePassword() {
+		return ConsolePassword;
+	}
+
+	public void setConsolePassword(String consolePassword) {
+		ConsolePassword = consolePassword;
+	}
+
+	public String getConsoleProtocol() {
+		return ConsoleProtocol;
+	}
+
+	public void setConsoleProtocol(String consoleProtocol) {
+		ConsoleProtocol = consoleProtocol;
+	}
+
+	public String getAssignedLab() {
+		return AssignedLab;
+	}
+
+	public void setAssignedLab(String assignedLab) {
+		AssignedLab = assignedLab;
 	}
 	
 	

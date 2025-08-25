@@ -175,73 +175,60 @@ table tr:hover {
 								</div>
 								<div class="card-body" id="table-container">
 									<div class="row">
-										<div class="col-md-8">
-											<!-- 											<table id="example3" -->
-											<!-- 												class="table table-bordered table-striped"> -->
-											<!-- 												<thead> -->
-											<!-- 													<tr> -->
-											<!-- 														<th>Sr No.</th> -->
-											<!-- 														<th>Scenario Name</th> -->
-											<!-- 														<th>Device</th> -->
-											<!-- 														<th>Vm Name</th> -->
-											<!-- 														<th>Action</th> -->
-											<!-- 													</tr> -->
-											<!-- 												</thead> -->
-											<!-- 												<tbody> -->
-											<!-- 													<tr> -->
-											<!-- 														<td>1</td> -->
-											<!-- 														<td>Scenario A</td> -->
-											<!-- 														<td>Router</td> -->
-											<!-- 														<td>VM1</td> -->
-											<!-- 														<td><button class="btn btn-sm btn-primary">Run</button></td> -->
-											<!-- 													</tr> -->
-											<!-- 													<tr> -->
-											<!-- 														<td>2</td> -->
-											<!-- 														<td>Scenario B</td> -->
-											<!-- 														<td>Switch</td> -->
-											<!-- 														<td>VM2</td> -->
-											<!-- 														<td><button class="btn btn-sm btn-primary">Run</button></td> -->
-											<!-- 													</tr> -->
-											<!-- 												</tbody> -->
-											<!-- 											</table> -->
-
+										<!-- Left side: Table -->
+										<div class="col-md-7">
 											<table class="table table-bordered table-striped">
 												<thead style="background-color: darkgrey; color: white;">
 													<tr>
 														<th style="width: 60px;">ID</th>
-														<th>Name</th>
-														<th>Protocol</th>
-														<th>Max Connection Per User</th>
-														<th>Max Connection</th>
-														<th>Active Connection</th>
-														<th>Last Active</th>
+														<th>Lab Name</th>
+														<th>Instance Ip</th>
+														<th>Physical Server Ip</th>
+														<th>Location Path</th>
+														<th>Tag</th>
 														<th style="width: 150px;">Actions</th>
 													</tr>
 												</thead>
 												<tbody>
-													<tr th:each="conn : ${connections}">
+													<tr th:each="conn : ${connections}"
+														th:if="${connections != null and !connections.empty}">
 														<td th:text="${conn.id}"></td>
-														<td th:text="${conn.name}"></td>
+														<td th:text="${conn.instance_name}"></td>
 														<td><span class="badge badge-info"
-															th:text="${conn.protocol}"></span></td>
-														<td th:text="${conn.maxconnectionperuser}"></td>
-														<td th:text="${conn.maxconnection}"></td>
-														<td th:text="${conn.activeconnection}"></td>
-														<td th:text="${conn.lastactive}"></td>
-														<td><a th:href="@{|/guac/view/${conn.id}|}"
-															class="btn btn-sm btn-success mr-1"> <i
-																class="fas fa-play"></i> Start
-														</a></td>
+															th:text="${conn.instance_ip}"></span></td>
+														<td th:text="${conn.physicalServerIP}"></td>
+														<td th:text="${conn.vm_location_path}"></td>
+														<td th:text="${conn.lab_tag}"></td>
+														<td><a class="btn btn-sm btn-success mr-1"><i
+																class="fas fa-play"></i> Start</a></td>
 													</tr>
-													<tr th:if="${#lists.isEmpty(connections)}">
-														<td colspan="4" class="text-muted">No connections
+													<tr th:if="${connections == null or connections.empty}">
+														<td colspan="7" class="text-muted">No connection
 															found.</td>
 													</tr>
 												</tbody>
 											</table>
 										</div>
+
+										<!-- Right side: Instructions -->
+										<div class="col-md-5">
+											<div class="card"
+												style="background: #1a1a1a; border: 1px solid #333; padding: 15px;">
+												<h3
+													style="color: #00f2ff; font-family: 'Roboto Mono', monospace;">Instructions</h3>
+												<div th:if="${instructions != null}">
+													<p th:utext="${instructions}"
+														style="white-space: pre-line; color: #e0e0e0;"></p>
+												</div>
+												<div th:if="${instructions == null}">
+													<p class="text-muted">No instructions available for
+														this VM.</p>
+												</div>
+											</div>
+										</div>
 									</div>
 								</div>
+
 								<!-- card-body -->
 							</div>
 						</div>

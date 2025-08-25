@@ -26,13 +26,16 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import in.canaris.cloud.entity.AppUser;
+import in.canaris.cloud.entity.CloudInstance;
 import in.canaris.cloud.entity.PlaylistScenario;
+import in.canaris.cloud.entity.PlaylistScenarioId;
 import in.canaris.cloud.openstack.entity.Add_Scenario;
 import in.canaris.cloud.openstack.entity.Playlist;
 import in.canaris.cloud.repository.ScenarioRepository;
 import in.canaris.cloud.repository.UserRepository;
 import in.canaris.cloud.repository.CloudInstanceRepository;
 import in.canaris.cloud.repository.PlaylistRepository;
+import in.canaris.cloud.repository.PlaylistsSenarioRepository;
 import in.canaris.cloud.service.GuacamoleService;
 
 @Controller
@@ -56,6 +59,9 @@ public class GuacamoleController {
 
 	@Autowired
 	private CloudInstanceRepository repository;
+
+	@Autowired
+	private PlaylistsSenarioRepository PlaylistsSenarioRepository;
 
 	@GetMapping("/")
 	public String home() {
@@ -90,9 +96,27 @@ public class GuacamoleController {
 		return "list";
 	}
 
-	@GetMapping(value = "/View_Vm_Listing", params = "Id=4")
-	public String View_Vm_ListingConnections(Model model) {
-		model.addAttribute("connections", guacService.listConnections());
+	@GetMapping("/View_Vm_Listing")
+	public String View_Vm_ListingConnections(@RequestParam("Id") int id, Model model) {
+		System.out.println("Requested Id = " + id);
+
+		CloudInstance instance = repository.findById(id).orElse(null);
+		System.out.println("vvvvFound instance: " + instance);
+		if (instance != null) {
+			System.out.println("getVm_instructions: " + instance.getVm_instructions());
+			System.out.println("IP: " + instance.getInstance_ip());
+		} else {
+			System.out.println("No instance found for ID: " + id);
+		}
+
+		List<CloudInstance> connections = new ArrayList<>();
+		if (instance != null) {
+			connections.add(instance);
+		}
+
+		System.out.println("connectionsFound instance: " + connections);
+		model.addAttribute("connections", connections);
+		model.addAttribute("instructions", instance.getVm_instructions());
 		return "View_Vm_Listing";
 	}
 
@@ -286,9 +310,9 @@ public class GuacamoleController {
 		return mav;
 	}
 
-	@GetMapping("/image/{id}")
-	public void getImage(@PathVariable int id, HttpServletResponse response) throws IOException {
-		System.out.println("inside_render_image ::");
+	@GetMapping("/Playlistimage/{id}")
+	public void getPlaylistImage(@PathVariable int id, HttpServletResponse response) throws IOException {
+		System.out.println("inside_render_image_getPlaylistImage ::");
 		Optional<Playlist> scenario = PlaylistRepository.findById(id);
 		if (scenario.isPresent() && scenario.get().getCoverImage() != null) {
 			byte[] imageBytes = scenario.get().getCoverImage();
@@ -301,20 +325,72 @@ public class GuacamoleController {
 		}
 	}
 
+	@GetMapping("/Scenarioimage/{id}")
+	public void getScenarioImage(@PathVariable int id, HttpServletResponse response) throws IOException {
+		System.out.println("inside_render_image_getScenarioImage ::");
+		Optional<Add_Scenario> scenario = ScenarioRepository.findById(id);
+		if (scenario.isPresent() && scenario.get().getCoverImage() != null) {
+			byte[] imageBytes = scenario.get().getCoverImage();
+			response.setContentType("image/jpeg");
+			response.getOutputStream().write(imageBytes);
+			response.getOutputStream().close();
+		} else {
+
+			response.sendRedirect("/images/default-student.jpg");
+		}
+	}
+
 	@GetMapping("/View_Particular_Playlist")
 	public ModelAndView getView_Particular_Scenerio(@RequestParam String Id) {
 
 		ModelAndView mav = new ModelAndView("View_Particular_Playlist");
 		JSONArray Finalarray = new JSONArray();
 		List<Playlist> dataList;
-		// List<Add_Scenario> cenariodataList;
+
+		Optional<Add_Scenario> ScenariodataList;
+
 		try {
 
 			int SRNO = Integer.parseInt(Id);
 
 			dataList = PlaylistRepository.getView_Particular_Scenerio(SRNO);
 
-//			cenariodataList = ScenarioRepository.ScenarioName();
+			List<Add_Scenario> scenarioDataList = PlaylistsSenarioRepository.getScenariosByPlaylist(SRNO);
+
+			for (Add_Scenario temp : scenarioDataList) {
+				System.out.println("Scenario ID: " + temp.getId() + ", Name: " + temp.getScenarioName());
+
+				JSONObject obj = new JSONObject();
+
+				String Scenario_Name = temp.getScenarioName() != null ? temp.getScenarioName() : "";
+				String Scenario_Title = temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "";
+				String Description = temp.getDescription() != null ? temp.getDescription() : "";
+				String Category = temp.getCategory() != null ? temp.getCategory() : "";
+				String Scenario_Type = temp.getScenarioType() != null ? temp.getScenarioType() : "";
+				String Mode = temp.getMode() != null ? temp.getMode() : "";
+				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
+				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
+				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
+//				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
+				String Cover_Image = "";
+				int SrNo = temp.getId();
+
+//				srno++;
+
+				obj.put("Scenario_Name", Scenario_Name);
+				obj.put("Scenario_Title", Scenario_Title);
+//				obj.put("Description", Description);
+				obj.put("Category", Category);
+				obj.put("Scenario_Type", Scenario_Type);
+				obj.put("Mode", Mode);
+				obj.put("Difficulty_Level", Difficulty_Level);
+				obj.put("Duration", Duration);
+//				obj.put("Labs", Labs);
+				obj.put("Cover_Image", Cover_Image);
+				obj.put("Id", SrNo);
+
+				Finalarray.put(obj);
+			}
 
 			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
 			int srno = 0;
@@ -466,22 +542,55 @@ public class GuacamoleController {
 	@ResponseBody
 	public String addScenarioToPlaylist(@RequestParam("playlistId") int playlistId,
 			@RequestParam("scenarioId") int scenarioId) {
-
 		try {
+			// fetch Playlist and Scenario
+			Playlist playlist = PlaylistRepository.findById(playlistId)
+					.orElseThrow(() -> new RuntimeException("Playlist not found"));
 
-			PlaylistScenario list = new PlaylistScenario();
-			System.out.println("Playlist ID: " + playlistId + ", Scenario ID: " + scenarioId);
-			
-			
+			Add_Scenario scenario = ScenarioRepository.findById(scenarioId)
+					.orElseThrow(() -> new RuntimeException("Scenario not found"));
 
-			// Example: call service to map scenario to playlist
-			// playlistService.addScenarioToPlaylist(playlistId, scenarioId);
+			// create composite key
+			PlaylistScenarioId id = new PlaylistScenarioId(playlistId, scenarioId);
+
+			// create entity
+			PlaylistScenario ps = new PlaylistScenario();
+			ps.setId(id);
+			ps.setPlaylist(playlist);
+			ps.setScenario(scenario);
+
+			// save
+			PlaylistsSenarioRepository.save(ps);
+
+			return "success";
 
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
+			return "error: " + e.getMessage();
 		}
+	}
 
-		return "success";
+	@GetMapping("/Remove_Particular_ScenerioPlaylist")
+	@ResponseBody
+	public String removeParticularScenarioPlaylist(@RequestParam("playlistId") int playlistId,
+			@RequestParam("scenarioId") int scenarioId) {
+		String result = "fail";
+		try {
+			// Create composite key
+			PlaylistScenarioId id = new PlaylistScenarioId(playlistId, scenarioId);
+
+			// Check if record exists
+			if (PlaylistsSenarioRepository.existsById(id)) {
+				PlaylistsSenarioRepository.deleteById(id);
+				result = "success";
+			} else {
+				result = "not_found";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Error deleting data: " + e.getMessage());
+		}
+		return result;
 	}
 
 }

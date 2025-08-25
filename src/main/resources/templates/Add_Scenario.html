@@ -372,7 +372,7 @@ label {
 											</div>
 											<div class="col-md-6">
 
-												<div class="form-group">
+												<!-- 												<div class="form-group"> 
 													<label for="labs">Labs <span class="text-danger">*</span></label>
 													<select required id="labs" name="labs" class="form-control">
 														<option value="">-- Select Labs --</option>
@@ -382,43 +382,55 @@ label {
 														<option value="Metasploitable">Metasploitable</option>
 													</select> <small class="form-text text-muted">Select the lab
 														environment for this scenario</small>
-												</div>
+												</div> -->
 
-											</div>
-										</div>
-									</div>
-
-									<div class="form-section">
-										<h5 class="form-section-title">
-											<i class="fas fa-comments mr-2"></i>Comments
-										</h5>
-										<div class="row">
-											<div class="col-md-12">
 												<div class="form-group">
-													<div class="d-flex align-items-start">
-														<!-- User avatar/icon -->
+													<label for="labslabel">Labs <span
+														class="text-danger">*</span></label> <select id="labsn"
+														name="labsn" class="form-control custom-select">
+														<option value="">-- Choose a Scenario --</option>
+														<option th:each="scenario : ${instanceNameList}"
+															th:value="${scenario.id + '~' + scenario.instance_name}"
+															th:text="${scenario.instance_name}"></option>
 
-
-														<!-- Comment input with styling -->
-														<div class="flex-grow-1">
-
-															<div class="comment-box">
-																<textarea id="comments" name="comments"
-																	class="form-control" rows="3"
-																	placeholder="Write your comment here..." required></textarea>
-																<div
-																	class="comment-actions mt-2 d-flex justify-content-between">
-
-
-																</div>
-															</div>
-
-														</div>
-													</div>
+													</select>
 												</div>
+
 											</div>
 										</div>
 									</div>
+
+									<!-- 									<div class="form-section"> -->
+									<!-- 										<h5 class="form-section-title"> -->
+									<!-- 											<i class="fas fa-comments mr-2"></i>Comments -->
+									<!-- 										</h5> -->
+									<!-- 										<div class="row"> -->
+									<!-- 											<div class="col-md-12"> -->
+									<!-- 												<div class="form-group"> -->
+									<!-- 													<div class="d-flex align-items-start"> -->
+									<!-- 														User avatar/icon -->
+
+
+									<!-- 														Comment input with styling -->
+									<!-- 														<div class="flex-grow-1"> -->
+
+									<!-- 															<div class="comment-box"> -->
+									<!-- 																<textarea id="comments" name="comments" -->
+									<!-- 																	class="form-control" rows="3" -->
+									<!-- 																	placeholder="Write your comment here..." required></textarea> -->
+									<!-- 																<div -->
+									<!-- 																	class="comment-actions mt-2 d-flex justify-content-between"> -->
+
+
+									<!-- 																</div> -->
+									<!-- 															</div> -->
+
+									<!-- 														</div> -->
+									<!-- 													</div> -->
+									<!-- 												</div> -->
+									<!-- 											</div> -->
+									<!-- 										</div> -->
+									<!-- 									</div> -->
 
 
 

@@ -370,13 +370,15 @@ public class CloudInstanceController {
 
 			if (isSuperAdmin) {
 
-				instances = repository.findByIsMonitoringOrderByIdDesc(true);
+//				instances = repository.findByIsMonitoringOrderByIdDesc(true);
+				instances = repository.findAllByOrderByIdDesc();
 
 			} else if (isAdmin) {
 
 				System.out.println("Inoperator groupName = " + groupName);
 
-				instances = repository.findByIsMonitoringAndGroupNameOrderByIdDesc(true, groupName);
+//				instances = repository.findByIsMonitoringAndGroupNameOrderByIdDesc(true, groupName);
+				instances = repository.findByGroupNameOrderByIdDesc(groupName);
 
 			} else {
 				// List<Integer> li = approvalRepository.findByRequesterNameCustom(username);
@@ -386,7 +388,8 @@ public class CloudInstanceController {
 				// System.out.println(li.toString());
 				// instances = repository.findByidInAndIsMonitoring(li, true);
 
-				instances = repository.findByIsMonitoringAndGroupNameOrderByIdDesc(true, groupName);
+//				instances = repository.findByIsMonitoringAndGroupNameOrderByIdDesc(true, groupName);
+				instances = repository.findByGroupNameOrderByIdDesc(groupName);
 			}
 
 			for (CloudInstance data : instances) {
