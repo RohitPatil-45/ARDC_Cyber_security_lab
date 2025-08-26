@@ -11,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "emailConfig_master")
+@Table(name = "emailconfig_master")
 public class EmailConfig implements Serializable{
 	
 	private static final long serialVersionUID = -2264642949863409860L;

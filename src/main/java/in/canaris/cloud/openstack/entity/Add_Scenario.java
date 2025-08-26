@@ -13,7 +13,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "add_Scenario")
+@Table(name = "add_scenario")
 public class Add_Scenario {
 
 	private static final long serialVersionUID = 1L;

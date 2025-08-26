@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class GuacamoleService {
 
-	private static final String GUAC_URL = "http://localhost:8080/guacamole";
+	private static final String GUAC_URL = "http://localhost:8086/guacamole";
 	private static final String USERNAME = "guacadmin";
 	private static final String PASSWORD = "guacadmin";
 

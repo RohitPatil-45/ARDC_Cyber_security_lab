@@ -2791,7 +2791,7 @@ public class ReportController {
 
 			int instances = 0;
 			try {
-				instances = repository.updateInstanceNameAssigned();
+				instances = repository.updateInstanceNameAssigned(Integer.valueOf(labId));
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.err.println("Exption_update_AssignedLab" + e);

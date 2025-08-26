@@ -190,23 +190,30 @@ table tr:hover {
 													</tr>
 												</thead>
 												<tbody>
-													<tr th:each="conn : ${connections}"
-														th:if="${connections != null and !connections.empty}">
-														<td th:text="${conn.id}"></td>
-														<td th:text="${conn.instance_name}"></td>
-														<td><span class="badge badge-info"
-															th:text="${conn.instance_ip}"></span></td>
-														<td th:text="${conn.physicalServerIP}"></td>
-														<td th:text="${conn.vm_location_path}"></td>
-														<td th:text="${conn.lab_tag}"></td>
-														<td><a class="btn btn-sm btn-success mr-1"><i
-																class="fas fa-play"></i> Start</a></td>
-													</tr>
-													<tr th:if="${connections == null or connections.empty}">
-														<td colspan="7" class="text-muted">No connection
-															found.</td>
-													</tr>
+												  <!-- Show table rows only if connections is not null and not empty -->
+												  <th:block th:if="${connections != null and !connections.empty}">
+												    <tr th:each="conn : ${connections}">
+												      <td th:text="${conn.id}"></td>
+												      <td th:text="${conn.instance_name}"></td>
+												      <td><span class="badge badge-info" th:text="${conn.instance_ip}"></span></td>
+												      <td th:text="${conn.physicalServerIP}"></td>
+												      <td th:text="${conn.vm_location_path}"></td>
+												      <td th:text="${conn.lab_tag}"></td>
+													  
+													  <td><a th:href="@{|/guac/view/${conn.guacamoleId}|}"
+													  													class="btn btn-sm btn-success mr-1"> <i
+													  														class="fas fa-play"></i> Start
+													  												</a></td>
+																									
+												    </tr>
+												  </th:block>
+
+												  <!-- Show message if connections is null or empty -->
+												  <tr th:if="${connections == null or connections.empty}">
+												    <td colspan="7" class="text-muted">No connection found.</td>
+												  </tr>
 												</tbody>
+
 											</table>
 										</div>
 
@@ -242,7 +249,7 @@ table tr:hover {
 
 	<div th:replace="template :: jsscript"></div>
 
-	<script>
+<!--	<script>
     // Cyber loader logic
     document.addEventListener("DOMContentLoaded", function () {
       let loader = document.getElementById("loader-bar");
@@ -278,6 +285,19 @@ table tr:hover {
         }
       }, 100); // 10 seconds
     });
+  </script>-->
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Hide the loader container
+      const container = document.getElementById("loader-container");
+      if (container) container.style.display = "none";
+
+      // Show the main content
+      const tableContainer = document.getElementById("table-container");
+      if (tableContainer) tableContainer.style.display = "block";
+    });
   </script>
+
 </body>
 </html>

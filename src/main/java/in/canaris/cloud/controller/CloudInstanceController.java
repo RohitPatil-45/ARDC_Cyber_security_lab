@@ -3304,5 +3304,98 @@ public class CloudInstanceController {
 
 		return mav;
 	}
+	
+	// Docker Container
+		@PostMapping("/docker")
+		public @ResponseBody String docker(@RequestParam("instanceID") int instanceID) {
+
+			String result = null;
+
+			try {
+
+				Optional<CloudInstance> obj = repository.findById(instanceID);
+				CloudInstance instance = obj.get();
+				String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+
+				if (os.equalsIgnoreCase("windows")) {
+					result = createWindowsDockerContainer(instance.getInstance_name(), instance.getInstance_password());
+				} else {
+//					result = createLinuxDockerContainer(instance.getInstance_name(), instance.getContainerIp(),
+//							instance.getWeb_id(), instance.getVnc_port(), instance.getNetworkName(), instance.getSubnet(),
+//							instance.getGateway(), instance.getInstance_password());
+				}
+
+			} catch (Exception e) {
+				result = "fail";
+			}
+
+			return "success";
+		}
+
+		public String createLinuxDockerContainer(String containerName, String containerIp, String webPort, String vnc_port,
+				String networkName, String subnet, String gateway, String password) {
+
+			String scriptPath = "/home/canaris/Desktop/Docker/container.sh"; // update with actual path
+
+			try {
+				ProcessBuilder pb = new ProcessBuilder("bash", scriptPath, containerName, networkName, "kali", password);
+
+				pb.redirectErrorStream(true); // merge stdout & stderr
+				Process process = pb.start();
+
+				try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+					String line;
+					while ((line = reader.readLine()) != null) {
+						System.out.println(line); // Print script logs
+					}
+				}
+
+				int exitCode = process.waitFor();
+				if (exitCode == 0) {
+					return "sucess";
+				} else {
+					return "fail";
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				return "fail";
+			}
+
+		}
+
+		public String createWindowsDockerContainer(String containerName, String password) {
+
+			String scriptPath = "/home/canaris/Desktop/Docker/Windows-Docker/windows.sh";
+
+
+			try {
+				ProcessBuilder pb = new ProcessBuilder("bash", scriptPath, containerName, "kalinet101", "win11", containerName, password);
+
+				pb.redirectErrorStream(true);
+				Process process = pb.start();
+
+				StringBuilder output = new StringBuilder();
+				try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+					String line;
+					while ((line = reader.readLine()) != null) {
+						output.append(line).append("\n");
+						System.out.println(line); 
+					}
+				}
+
+				int exitCode = process.waitFor();
+				if (exitCode == 0) {
+					return "success";
+				} else {
+					return "fail";
+				}
+
+			} catch (Exception e) {
+				return "fail";
+			}
+
+		}
+
 
 }

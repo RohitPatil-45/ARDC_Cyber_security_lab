@@ -44,7 +44,7 @@ public interface CloudInstanceRepository extends JpaRepository<CloudInstance, In
 
 	List<CloudInstance> findByIsMonitoring(boolean monitoring);
 
-//	List<CloudInstance> findByIsMonitoringOrderByIdDesc(boolean monitoring);
+	List<CloudInstance> findByIsMonitoringOrderByIdDesc(boolean monitoring);
 	List<CloudInstance> findAllByOrderByIdDesc();
 
 	@Query("SELECT  c.instance_name FROM CloudInstance c WHERE c.isMonitoring=:monitoring")
@@ -83,8 +83,8 @@ public interface CloudInstanceRepository extends JpaRepository<CloudInstance, In
 	@Query("SELECT  c FROM CloudInstance c WHERE c.groupName IN :groupName AND c.isMonitoring=:monitoring")
 	List<CloudInstance> findByIsMonitoringAndGroupName(boolean monitoring, List<String> groupName);
 
-//	@Query("SELECT  c FROM CloudInstance c WHERE c.groupName IN :groupName AND c.isMonitoring=:monitoring order by c.id desc")
-//	List<CloudInstance> findByIsMonitoringAndGroupNameOrderByIdDesc(boolean monitoring, List<String> groupName);
+	@Query("SELECT  c FROM CloudInstance c WHERE c.groupName IN :groupName AND c.isMonitoring=:monitoring order by c.id desc")
+	List<CloudInstance> findByIsMonitoringAndGroupNameOrderByIdDesc(boolean monitoring, List<String> groupName);
 
 	@Query("SELECT  c FROM CloudInstance c WHERE c.groupName IN :groupName order by c.id desc")
 	List<CloudInstance> findByGroupNameOrderByIdDesc(List<String> groupName);
@@ -150,6 +150,6 @@ public interface CloudInstanceRepository extends JpaRepository<CloudInstance, In
 
 	@Modifying
 	@Transactional
-	@Query("UPDATE CloudInstance c SET c.AssignedLab = 'Yes'")
-	int updateInstanceNameAssigned();
+	@Query("UPDATE CloudInstance c SET c.AssignedLab = 'Yes' WHERE c.id = :labId")
+	int updateInstanceNameAssigned(int labId);
 }

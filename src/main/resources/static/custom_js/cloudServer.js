@@ -99,6 +99,23 @@ $("#addVMtoGroupBtn").click(function() {
 	});
 })
 
+function createDockerContainer(instanceID) {
+		$('#createSpinner').show();
+		$.ajax({
+			type: "POST",
+			url : '/cloud_instance/docker',
+			data : {
+				"instanceID" :instanceID
+			},
+			success : function(result) {
+				$('#createSpinner').hide();
+				
+				alert(result);
+			}
+		});
+}
+
+
 
 
 $("#addCustomerNameToVM").click(function() {

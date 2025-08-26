@@ -15,7 +15,7 @@ import javax.persistence.Table;
 import javax.persistence.JoinColumn;
 
 @Entity
-@Table(name = "Playlist")
+@Table(name = "playlist")
 public class Playlist {
 
 	private static final long serialVersionUID = 1L;

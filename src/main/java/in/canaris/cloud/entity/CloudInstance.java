@@ -202,6 +202,9 @@ public class CloudInstance implements Serializable {
 
 	@Column(name = "kvm_vm_id")
 	private String kvmvmid;
+	
+	@Column
+	private String guacamoleId;
 
 	public String getKvmostype() {
 		return kvmostype;
@@ -597,6 +600,14 @@ public class CloudInstance implements Serializable {
 
 	public void setAssignedLab(String assignedLab) {
 		AssignedLab = assignedLab;
+	}
+
+	public String getGuacamoleId() {
+		return guacamoleId;
+	}
+
+	public void setGuacamoleId(String guacamoleId) {
+		this.guacamoleId = guacamoleId;
 	}
 	
 	
