@@ -2744,17 +2744,116 @@ public class ReportController {
 		return mav;
 	}
 
+//	@PostMapping("/saveScenarioData")
+//	public ModelAndView saveScenarioData(@RequestParam String Scenario_title, @RequestParam String Scenario_name,
+//			@RequestParam String description, @RequestParam String Category, @RequestParam String type,
+//			@RequestParam String mode, @RequestParam String Difficulty, @RequestParam String Duration,
+//			@RequestParam(required = false) String max_players,
+//			@RequestParam(required = false) MultipartFile cover_image, @RequestParam String labsn) {
+//
+//		ModelAndView mav = new ModelAndView("Add_Scenario");
+//
+//		try {
+//			// Log all parameters
+//			System.out.println("Scenario_title: " + Scenario_title);
+//			System.out.println("Scenario_name: " + Scenario_name);
+//			System.out.println("description: " + description);
+//			System.out.println("Category: " + Category);
+//			System.out.println("type: " + type);
+//			System.out.println("mode: " + mode);
+//			System.out.println("Difficulty: " + Difficulty);
+//			System.out.println("Duration: " + Duration);
+//			System.out.println("max_players: " + max_players);
+//			System.out.println(
+//					"cover_image: " + (cover_image != null ? cover_image.getOriginalFilename() : "No file uploaded"));
+//
+////			System.out.println("comments: " + comments);
+//
+//			System.out.println("labs: " + labsn);
+//			String[] parts = labsn.split("~");
+//			String labId = parts[0];
+//			String labName = parts[1];
+//
+//			// Create new scenario object
+//			Add_Scenario scenario = new Add_Scenario();
+//			scenario.setScenarioTitle(Scenario_title);
+//			scenario.setScenarioName(Scenario_name);
+//			scenario.setDescription(description);
+//			scenario.setCategory(Category);
+//			scenario.setScenarioType(type);
+//			scenario.setMode(mode);
+//			scenario.setDifficultyLevel(Difficulty);
+//			scenario.setDuration(Duration);
+//			scenario.setMaxPlayers(max_players);
+//			scenario.setLabs(labName);
+//			scenario.setLabId(labId);
+//			scenario.setComments("");
+//
+//			int instances = 0;
+//			try {
+//				instances = repository.updateInstanceNameAssigned(Integer.valueOf(labId));
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				System.err.println("Exption_update_AssignedLab" + e);
+//			}
+//
+//			// Handle the uploaded image file
+//			if (cover_image != null && !cover_image.isEmpty()) {
+//				// Validate file type
+//				String contentType = cover_image.getContentType();
+//				if (contentType != null && contentType.startsWith("image/")) {
+//					// Store image bytes in database
+//					scenario.setCoverImage(cover_image.getBytes());
+//					System.out.println("Uploaded image saved to database");
+//				} else {
+//					// Invalid file type
+//					mav.addObject("message", "Invalid file type. Please upload an image file.");
+//					mav.addObject("status", "error");
+//					return mav;
+//				}
+//			} else {
+//				// No image uploaded - try to set a default image
+//				String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
+//				try {
+//					byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
+//					scenario.setCoverImage(defaultImageBytes);
+//					System.out.println("Default image loaded and saved to database");
+//				} catch (IOException e) {
+//					System.err.println("Error loading default image: " + e.getMessage());
+//					// Create a minimal placeholder image instead of null
+//					scenario.setCoverImage(createPlaceholderImage());
+//					System.out.println("Placeholder image created and saved to database");
+//				}
+//			}
+//
+//			// Save to database
+//			ScenarioRepository.save(scenario);
+//
+//			mav.addObject("message", "Scenario saved successfully!");
+//			mav.addObject("status", "success");
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			mav.addObject("message", "Error while saving scenario: " + e.getMessage());
+//			mav.addObject("status", "error");
+//		}
+//
+//		return mav;
+//	}
+	
 	@PostMapping("/saveScenarioData")
 	public ModelAndView saveScenarioData(@RequestParam String Scenario_title, @RequestParam String Scenario_name,
 			@RequestParam String description, @RequestParam String Category, @RequestParam String type,
 			@RequestParam String mode, @RequestParam String Difficulty, @RequestParam String Duration,
 			@RequestParam(required = false) String max_players,
-			@RequestParam(required = false) MultipartFile cover_image, @RequestParam String labsn) {
+			@RequestParam(required = false) MultipartFile cover_image, @RequestParam("labsn") String[] labsnArray) { // <--
+																														// change
+																														// to
+																														// array
 
 		ModelAndView mav = new ModelAndView("Add_Scenario");
 
 		try {
-			// Log all parameters
 			System.out.println("Scenario_title: " + Scenario_title);
 			System.out.println("Scenario_name: " + Scenario_name);
 			System.out.println("description: " + description);
@@ -2767,14 +2866,27 @@ public class ReportController {
 			System.out.println(
 					"cover_image: " + (cover_image != null ? cover_image.getOriginalFilename() : "No file uploaded"));
 
-//			System.out.println("comments: " + comments);
+			// Process multiple selected labs
+			List<String> labIds = new ArrayList<>();
+			List<String> labNames = new ArrayList<>();
 
-			System.out.println("labs: " + labsn);
-			String[] parts = labsn.split("~");
-			String labId = parts[0];
-			String labName = parts[1];
+			for (String lab : labsnArray) {
+				String[] parts = lab.split("~");
+				if (parts.length == 2) {
+					labIds.add(parts[0]);
+					labNames.add(parts[1]);
+					System.out.println("Selected lab: ID=" + parts[0] + ", Name=" + parts[1]);
 
-			// Create new scenario object
+					// Optional: Update instance assigned count for each lab
+					try {
+						repository.updateInstanceNameAssigned(Integer.valueOf(parts[0]));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+			// Create scenario object
 			Add_Scenario scenario = new Add_Scenario();
 			scenario.setScenarioTitle(Scenario_title);
 			scenario.setScenarioName(Scenario_name);
@@ -2785,48 +2897,34 @@ public class ReportController {
 			scenario.setDifficultyLevel(Difficulty);
 			scenario.setDuration(Duration);
 			scenario.setMaxPlayers(max_players);
-			scenario.setLabs(labName);
-			scenario.setLabId(labId);
+
+			// Save all labs as comma-separated values
+			scenario.setLabs(String.join(",", labNames));
+			scenario.setLabId(String.join(",", labIds));
 			scenario.setComments("");
 
-			int instances = 0;
-			try {
-				instances = repository.updateInstanceNameAssigned(Integer.valueOf(labId));
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.err.println("Exption_update_AssignedLab" + e);
-			}
-
-			// Handle the uploaded image file
+			// Handle image (same as your code)
 			if (cover_image != null && !cover_image.isEmpty()) {
-				// Validate file type
 				String contentType = cover_image.getContentType();
 				if (contentType != null && contentType.startsWith("image/")) {
-					// Store image bytes in database
 					scenario.setCoverImage(cover_image.getBytes());
-					System.out.println("Uploaded image saved to database");
 				} else {
-					// Invalid file type
 					mav.addObject("message", "Invalid file type. Please upload an image file.");
 					mav.addObject("status", "error");
 					return mav;
 				}
 			} else {
-				// No image uploaded - try to set a default image
+				// Load default image
 				String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
 				try {
 					byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
 					scenario.setCoverImage(defaultImageBytes);
-					System.out.println("Default image loaded and saved to database");
 				} catch (IOException e) {
-					System.err.println("Error loading default image: " + e.getMessage());
-					// Create a minimal placeholder image instead of null
 					scenario.setCoverImage(createPlaceholderImage());
-					System.out.println("Placeholder image created and saved to database");
 				}
 			}
 
-			// Save to database
+			// Save scenario
 			ScenarioRepository.save(scenario);
 
 			mav.addObject("message", "Scenario saved successfully!");

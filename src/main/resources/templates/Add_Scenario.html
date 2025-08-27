@@ -9,6 +9,11 @@
 <link
 	href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css"
 	rel="stylesheet">
+
+<link
+	href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+	rel="stylesheet" />
+
 <style>
 :root {
 	--primary: #3498db;
@@ -184,6 +189,47 @@ label {
 .comment-actions .btn-link:hover {
 	color: var(--primary) !important;
 }
+
+.select2-container--default .select2-selection--multiple {
+	border: 1px solid #ced4da;
+	border-radius: 6px;
+	padding: 4px;
+	min-height: 42px;
+	font-size: 14px;
+}
+
+/* Selected tags */
+.select2-container--default .select2-selection--multiple .select2-selection__choice
+	{
+	background-color: #007bff;
+	border: none;
+	border-radius: 4px;
+	color: #fff;
+	padding: 4px 8px;
+	margin-top: 4px;
+	margin-right: 4px;
+	font-size: 13px;
+}
+
+/* X (remove button) inside tag */
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove
+	{
+	color: #fff;
+	margin-right: 6px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover
+	{
+	color: #ffdddd;
+}
+
+/* Dropdown styling */
+.select2-container--default .select2-results__option--highlighted {
+	background-color: #007bff;
+	color: #fff;
+}
 </style>
 </head>
 
@@ -272,167 +318,120 @@ label {
 												</div>
 											</div>
 										</div>
-									</div>
 
-									<div class="form-section">
-										<h5 class="form-section-title">
-											<i class="fas fa-cog mr-2"></i>Configuration
-										</h5>
-										<div class="row">
-											<div class="col-md-4">
-												<div class="form-group">
-													<label for="Category">Category <span
-														class="text-danger">*</span></label> <select required
-														id="Category" name="Category" class="form-control">
-														<option value="">-- Select Category --</option>
-														<option value="Mobile Security">Mobile Security</option>
-														<option value="Forensic">Forensic</option>
-														<option value="Networking">Networking</option>
-														<option value="Cloud Security">Cloud Security</option>
-														<option value="Web Application">Web Application</option>
-													</select>
-												</div>
-											</div>
-											<div class="col-md-4">
-												<div class="form-group">
-													<label for="type">Scenario Type <span
-														class="text-danger">*</span></label> <select required id="type"
-														name="type" class="form-control">
-														<option value="">-- Select Type --</option>
-														<option value="openrange">Open Range</option>
-														<option value="guided">Guided</option>
-														<option value="challenge">Challenge</option>
-													</select>
-												</div>
-											</div>
-											<div class="col-md-4">
-												<div class="form-group">
-													<label for="mode">Play Mode <span
-														class="text-danger">*</span></label> <select required id="mode"
-														name="mode" class="form-control">
-														<option value="">-- Select Mode --</option>
-														<option value="singleplayer">Single Player</option>
-														<option value="multiplayer">Multi Player</option>
-														<option value="both">Both</option>
-													</select>
-												</div>
-											</div>
-										</div>
-
-										<div class="row">
-											<div class="col-md-4">
-												<div class="form-group">
-													<label for="Difficulty">Difficulty Level <span
-														class="text-danger">*</span></label> <select required
-														id="Difficulty" name="Difficulty" class="form-control">
-														<option value="">-- Select Difficulty --</option>
-														<option value="Easy">Easy</option>
-														<option value="Intermediate">Intermediate</option>
-														<option value="Advanced">Advanced</option>
-														<option value="Expert">Expert</option>
-													</select>
-												</div>
-											</div>
-											<div class="col-md-4">
-												<div class="form-group">
-													<label for="Duration">Duration (minutes) <span
-														class="text-danger">*</span></label> <input type="number" min="5"
-														max="240" required id="Duration" name="Duration"
-														class="form-control" placeholder="30">
-												</div>
-											</div>
-											<div class="col-md-4">
-												<div class="form-group">
-													<label for="max_players">Max Players (if
-														multiplayer)</label> <input type="number" min="1" max="20"
-														id="max_players" name="max_players" class="form-control"
-														placeholder="5">
-												</div>
-											</div>
-										</div>
-									</div>
-
-									<div class="form-section">
-										<h5 class="form-section-title">
-											<i class="fas fa-image mr-2"></i>Media & Resources
-										</h5>
-										<div class="row">
-											<div class="col-md-6">
-												<div class="form-group">
-													<label for="cover_image">Cover Image</label>
-													<div class="custom-file">
-														<input type="file" class="custom-file-input"
-															id="cover_image" name="cover_image" accept="image/*">
-														<label class="custom-file-label" for="cover_image">Choose
-															file</label>
+										<div class="form-section">
+											<h5 class="form-section-title">
+												<i class="fas fa-cog mr-2"></i>Configuration
+											</h5>
+											<div class="row">
+												<div class="col-md-4">
+													<div class="form-group">
+														<label for="Category">Category <span
+															class="text-danger">*</span></label> <select required
+															id="Category" name="Category" class="form-control">
+															<option value="">-- Select Category --</option>
+															<option value="Mobile Security">Mobile Security</option>
+															<option value="Forensic">Forensic</option>
+															<option value="Networking">Networking</option>
+															<option value="Cloud Security">Cloud Security</option>
+															<option value="Web Application">Web Application</option>
+														</select>
 													</div>
-													<small class="form-text text-muted">Recommended
-														size: 1200x630 pixels</small>
+												</div>
+												<div class="col-md-4">
+													<div class="form-group">
+														<label for="type">Scenario Type <span
+															class="text-danger">*</span></label> <select required id="type"
+															name="type" class="form-control">
+															<option value="">-- Select Type --</option>
+															<option value="openrange">Open Range</option>
+															<option value="guided">Guided</option>
+															<option value="challenge">Challenge</option>
+														</select>
+													</div>
+												</div>
+												<div class="col-md-4">
+													<div class="form-group">
+														<label for="mode">Play Mode <span
+															class="text-danger">*</span></label> <select required id="mode"
+															name="mode" class="form-control">
+															<option value="">-- Select Mode --</option>
+															<option value="singleplayer">Single Player</option>
+															<option value="multiplayer">Multi Player</option>
+															<option value="both">Both</option>
+														</select>
+													</div>
 												</div>
 											</div>
-											<div class="col-md-6">
 
-												<!-- 												<div class="form-group"> 
-													<label for="labs">Labs <span class="text-danger">*</span></label>
-													<select required id="labs" name="labs" class="form-control">
-														<option value="">-- Select Labs --</option>
-														<option value="Kali">Kali Linux</option>
-														<option value="TargetWebServer">Target Web Server</option>
-														<option value="WindowsClient">Windows Client</option>
-														<option value="Metasploitable">Metasploitable</option>
-													</select> <small class="form-text text-muted">Select the lab
-														environment for this scenario</small>
-												</div> -->
-
-												<div class="form-group">
-													<label for="labslabel">Labs <span
-														class="text-danger">*</span></label> <select id="labsn"
-														name="labsn" class="form-control custom-select">
-														<option value="">-- Choose a Scenario --</option>
-														<option th:each="scenario : ${instanceNameList}"
-															th:value="${scenario.id + '~' + scenario.instance_name}"
-															th:text="${scenario.instance_name}"></option>
-
-													</select>
+											<div class="row">
+												<div class="col-md-4">
+													<div class="form-group">
+														<label for="Difficulty">Difficulty Level <span
+															class="text-danger">*</span></label> <select required
+															id="Difficulty" name="Difficulty" class="form-control">
+															<option value="">-- Select Difficulty --</option>
+															<option value="Easy">Easy</option>
+															<option value="Intermediate">Intermediate</option>
+															<option value="Advanced">Advanced</option>
+															<option value="Expert">Expert</option>
+														</select>
+													</div>
 												</div>
+												<div class="col-md-4">
+													<div class="form-group">
+														<label for="Duration">Duration (minutes) <span
+															class="text-danger">*</span></label> <input type="number" min="5"
+															max="240" required id="Duration" name="Duration"
+															class="form-control" placeholder="30">
+													</div>
+												</div>
+												<div class="col-md-4">
+													<div class="form-group">
+														<label for="max_players">Max Players (if
+															multiplayer)</label> <input type="number" min="1" max="20"
+															id="max_players" name="max_players" class="form-control"
+															placeholder="5">
+													</div>
+												</div>
+											</div>
+										</div>
 
+										<div class="form-section">
+											<h5 class="form-section-title">
+												<i class="fas fa-image mr-2"></i>Media & Resources
+											</h5>
+											<div class="row">
+												<div class="col-md-6">
+													<div class="form-group">
+														<label for="cover_image">Cover Image</label>
+														<div class="custom-file">
+															<input type="file" class="custom-file-input"
+																id="cover_image" name="cover_image" accept="image/*">
+															<label class="custom-file-label" for="cover_image">Choose
+																file</label>
+														</div>
+														<small class="form-text text-muted">Recommended
+															size: 1200x630 pixels</small>
+													</div>
+												</div>
+												<div class="col-md-6">
+													<div class="form-group">
+														<label for="labsn" class="form-label fw-bold">Select
+															Labs <span class="text-danger">*</span>
+														</label> <select id="labsn" name="labsn" class="form-control"
+															multiple="multiple">
+															<option th:each="scenario : ${instanceNameList}"
+																th:value="${scenario.id + '~' + scenario.instance_name}"
+																th:text="${scenario.instance_name}"></option>
+														</select>
+													</div>
+
+
+												</div>
 											</div>
 										</div>
 									</div>
-
-									<!-- 									<div class="form-section"> -->
-									<!-- 										<h5 class="form-section-title"> -->
-									<!-- 											<i class="fas fa-comments mr-2"></i>Comments -->
-									<!-- 										</h5> -->
-									<!-- 										<div class="row"> -->
-									<!-- 											<div class="col-md-12"> -->
-									<!-- 												<div class="form-group"> -->
-									<!-- 													<div class="d-flex align-items-start"> -->
-									<!-- 														User avatar/icon -->
-
-
-									<!-- 														Comment input with styling -->
-									<!-- 														<div class="flex-grow-1"> -->
-
-									<!-- 															<div class="comment-box"> -->
-									<!-- 																<textarea id="comments" name="comments" -->
-									<!-- 																	class="form-control" rows="3" -->
-									<!-- 																	placeholder="Write your comment here..." required></textarea> -->
-									<!-- 																<div -->
-									<!-- 																	class="comment-actions mt-2 d-flex justify-content-between"> -->
-
-
-									<!-- 																</div> -->
-									<!-- 															</div> -->
-
-									<!-- 														</div> -->
-									<!-- 													</div> -->
-									<!-- 												</div> -->
-									<!-- 											</div> -->
-									<!-- 										</div> -->
-									<!-- 									</div> -->
-
-
 
 									<div class="card-footer text-right">
 										<button type="reset" class="btn btn-outline-secondary mr-2">
@@ -458,14 +457,28 @@ label {
 
 	<div th:replace="template :: jsscript"></div>
 
+	<!-- jQuery (needed for Bootstrap and multiselect) -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+	<!-- Bootstrap JS -->
+	<script
+		src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
 	<script
 		src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
 	<!-- Summernote JS -->
 	<script
 		src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
 
+	<script
+		src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
 	<script type="text/javascript">
         $(document).ready(function() {
+        	
+        	
+        	
             // Initialize custom file input
             bsCustomFileInput.init();
             
@@ -490,6 +503,20 @@ label {
                 fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana', 'Roboto'],
                 fontNamesIgnoreCheck: ['Roboto']
             });
+            
+            // Initialize Bootstrap Multiselect
+            $('#labsn').multiselect({
+                includeSelectAllOption: true,
+                enableFiltering: true,
+                enableCaseInsensitiveFiltering: true,
+                buttonWidth: '100%',
+                maxHeight: 300,
+                nonSelectedText: '-- Select Labs --',
+                selectAllText: 'Select All',
+                allSelectedText: 'All Labs Selected',
+                nSelectedText: ' labs selected',
+                numberDisplayed: 2
+            });
         });
 
         function validateScenarioForm() {
@@ -510,6 +537,15 @@ label {
                 }
             });
             
+            // Validate labs selection
+            const selectedLabs = $('#labsn').val();
+            if (!selectedLabs || selectedLabs.length === 0) {
+                $('#labsn').closest('.form-group').find('.btn-group').addClass('is-invalid');
+                isValid = false;
+            } else {
+                $('#labsn').closest('.form-group').find('.btn-group').removeClass('is-invalid');
+            }
+            
             // Get Summernote content and check if it's empty
             const summernoteContent = $('#description').summernote('code').replace(/<[^>]*>/g, '').trim();
             if (!summernoteContent) {
@@ -520,12 +556,8 @@ label {
             }
             
             if (!isValid) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Missing Information',
-                    text: 'Please fill all required fields marked with *',
-                    confirmButtonColor: '#3498db'
-                });
+                // Use basic alert if SweetAlert is not available
+                alert('Please fill all required fields marked with *');
                 return false;
             }
             
@@ -536,26 +568,21 @@ label {
             return true;
         }
         
-        // Check if scenario name already exists
-        function checkScenarioExist(scenarioName) {
-            if(scenarioName.length > 3) {
-                // AJAX call to check scenario name availability
-                // Implement your logic here
-            }
-        }
+ 
     </script>
 
 	<script>
-// Show filename in custom file input
-
-document.getElementById('cover_image').addEventListener('change', function(e) {
-    if (this.files && this.files[0]) {
-        var fileName = this.files[0].name;
-        var nextSibling = e.target.nextElementSibling;
-        nextSibling.innerText = fileName;
-    }
-
-});
+    $(function () {
+        // Initialize Select2 on the multi-select dropdown
+        $('#labsn').select2({
+            placeholder: "-- Choose Scenarios --",
+            allowClear: true,
+            width: '100%'
+        });
+    });
 </script>
+
+
+
 </body>
 </html>

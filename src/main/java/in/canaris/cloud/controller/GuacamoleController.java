@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -96,27 +97,72 @@ public class GuacamoleController {
 		return "list";
 	}
 
+//	@GetMapping("/View_Vm_Listing")
+//	public String View_Vm_ListingConnections(@RequestParam("Id") int id, Model model) {
+//		System.out.println("Requested Id = " + id);
+//
+//		CloudInstance instance = repository.findById(id).orElse(null);
+//		System.out.println("vvvvFound instance: " + instance);
+//		if (instance != null) {
+//			System.out.println("getVm_instructions: " + instance.getVm_instructions());
+//			System.out.println("IP: " + instance.getInstance_ip());
+//		} else {
+//			System.out.println("No instance found for ID: " + id);
+//		}
+//
+//		List<CloudInstance> connections = new ArrayList<>();
+//		if (instance != null) {
+//			connections.add(instance);
+//		}
+//
+//		System.out.println("connectionsFound instance: " + connections);
+//		model.addAttribute("connections", connections);
+//		model.addAttribute("instructions", instance.getVm_instructions());
+//		return "View_Vm_Listing";
+//	}
+	
 	@GetMapping("/View_Vm_Listing")
-	public String View_Vm_ListingConnections(@RequestParam("Id") int id, Model model) {
-		System.out.println("Requested Id = " + id);
+	public String viewVmListing(@RequestParam("Id") int scenarioId, Model model) {
+		System.out.println("Requested scenario Id = " + scenarioId);
 
-		CloudInstance instance = repository.findById(id).orElse(null);
-		System.out.println("vvvvFound instance: " + instance);
-		if (instance != null) {
-			System.out.println("getVm_instructions: " + instance.getVm_instructions());
-			System.out.println("IP: " + instance.getInstance_ip());
-		} else {
-			System.out.println("No instance found for ID: " + id);
+		// Fetch scenario
+		Add_Scenario scenario = ScenarioRepository.findById(scenarioId).orElse(null);
+		if (scenario == null) {
+			System.out.println("No scenario found for ID: " + scenarioId);
+			model.addAttribute("connections", Collections.emptyList());
+			model.addAttribute("instructions", "");
+			return "View_Vm_Listing";
 		}
 
+		System.out.println("Found scenario: " + scenario.getScenarioTitle());
+
+		// Extract Lab IDs
+		String labIdsStr = scenario.getLabId(); // e.g., "287,289,290,295"
+		List<Integer> labIds = new ArrayList<>();
+		if (labIdsStr != null && !labIdsStr.isEmpty()) {
+			for (String idStr : labIdsStr.split(",")) {
+				try {
+					labIds.add(Integer.valueOf(idStr.trim()));
+				} catch (NumberFormatException e) {
+					System.err.println("Invalid LabId: " + idStr);
+				}
+			}
+		}
+
+		// Fetch all CloudInstance objects for these lab IDs
 		List<CloudInstance> connections = new ArrayList<>();
-		if (instance != null) {
-			connections.add(instance);
+		if (!labIds.isEmpty()) {
+			connections = repository.findAllById(labIds); // Spring Data JPA method
 		}
 
-		System.out.println("connectionsFound instance: " + connections);
+		// Debug logs
+		connections.forEach(ci -> {
+			System.out.println("CloudInstance: ID=" + ci.getId() + ", IP=" + ci.getInstance_ip());
+		});
+
+		// Pass to view
 		model.addAttribute("connections", connections);
-		model.addAttribute("instructions", instance.getVm_instructions());
+//		model.addAttribute("instructions", connections.getVm_instructions()); // If scenario has instructions
 		return "View_Vm_Listing";
 	}
 
