@@ -475,112 +475,125 @@ label {
 
 
 	<script type="text/javascript">
-        $(document).ready(function() {
-        	
-        	
-        	
-            // Initialize custom file input
-            bsCustomFileInput.init();
-            
-            // Initialize any other plugins
-            $('[data-toggle="tooltip"]').tooltip();
-            
-            // Initialize Summernote
-            $('.summernote').summernote({
-                height: 200,
-                toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'italic', 'underline', 'clear']],
-                    ['fontname', ['fontname']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['height', ['height']],
-                    ['table', ['table']],
-                    ['insert', ['link', 'picture', 'video']],
-                    ['view', ['fullscreen', 'codeview', 'help']]
-                ],
-                styleTags: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-                fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana', 'Roboto'],
-                fontNamesIgnoreCheck: ['Roboto']
-            });
-            
-            // Initialize Bootstrap Multiselect
-            $('#labsn').multiselect({
-                includeSelectAllOption: true,
-                enableFiltering: true,
-                enableCaseInsensitiveFiltering: true,
-                buttonWidth: '100%',
-                maxHeight: 300,
-                nonSelectedText: '-- Select Labs --',
-                selectAllText: 'Select All',
-                allSelectedText: 'All Labs Selected',
-                nSelectedText: ' labs selected',
-                numberDisplayed: 2
-            });
-        });
+$(document).ready(function() {
+    // Initialize custom file input
+    bsCustomFileInput.init();
 
-        function validateScenarioForm() {
-            const requiredFields = [
-                'Scenario_title', 'Scenario_name', 'Category', 'type', 
-                'mode', 'Difficulty', 'Duration'
-            ];
-            
-            let isValid = true;
-            
-            requiredFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (!field.value.trim()) {
-                    field.classList.add('is-invalid');
-                    isValid = false;
-                } else {
-                    field.classList.remove('is-invalid');
-                }
-            });
-            
-            // Validate labs selection
-            const selectedLabs = $('#labsn').val();
-            if (!selectedLabs || selectedLabs.length === 0) {
-                $('#labsn').closest('.form-group').find('.btn-group').addClass('is-invalid');
-                isValid = false;
-            } else {
-                $('#labsn').closest('.form-group').find('.btn-group').removeClass('is-invalid');
-            }
-            
-            // Get Summernote content and check if it's empty
-            const summernoteContent = $('#description').summernote('code').replace(/<[^>]*>/g, '').trim();
-            if (!summernoteContent) {
-                $('#description').closest('.form-group').find('.note-editor').addClass('is-invalid');
-                isValid = false;
-            } else {
-                $('#description').closest('.form-group').find('.note-editor').removeClass('is-invalid');
-            }
-            
-            if (!isValid) {
-                // Use basic alert if SweetAlert is not available
-                alert('Please fill all required fields marked with *');
-                return false;
-            }
-            
-            // Show loading state
-            $('#scenarioSpinner').removeClass('d-none');
-            $('#saveScenarioBtn').prop('disabled', true);
-            
-            return true;
-        }
-        
- 
-    </script>
+    // Initialize Summernote
+    $('.summernote').summernote({
+        height: 200,
+        toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'italic', 'underline', 'clear']],
+            ['fontname', ['fontname']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['height', ['height']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'video']],
+            ['view', ['fullscreen', 'codeview', 'help']]
+        ],
+        styleTags: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+        fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana', 'Roboto'],
+        fontNamesIgnoreCheck: ['Roboto']
+    });
 
-	<script>
-    $(function () {
-        // Initialize Select2 on the multi-select dropdown
-        $('#labsn').select2({
-            placeholder: "-- Choose Scenarios --",
-            allowClear: true,
-            width: '100%'
+    // Initialize Select2
+    $('#labsn').select2({
+        placeholder: "-- Choose Labs --",
+        allowClear: true,
+        width: '100%'
+    });
+
+    // Inline validation on input change
+    const requiredFields = [
+        'Scenario_title', 'Scenario_name', 'Category', 'type', 
+        'mode', 'Difficulty', 'Duration'
+    ];
+
+    requiredFields.forEach(fieldId => {
+        $('#' + fieldId).on('input change', function() {
+            if ($(this).val().trim()) {
+                $(this).removeClass('is-invalid');
+            } else {
+                $(this).addClass('is-invalid');
+            }
         });
     });
+
+    // Summernote inline validation
+    $('#description').on('summernote.change', function() {
+        const content = $(this).summernote('code').replace(/<[^>]*>/g, '').trim();
+        if (content) {
+            $(this).closest('.form-group').find('.note-editor').removeClass('is-invalid');
+        } else {
+            $(this).closest('.form-group').find('.note-editor').addClass('is-invalid');
+        }
+    });
+
+    // Labs select inline validation
+    $('#labsn').on('change', function() {
+        if ($(this).val() && $(this).val().length > 0) {
+            $(this).closest('.form-group').find('.select2-selection').removeClass('is-invalid');
+        } else {
+            $(this).closest('.form-group').find('.select2-selection').addClass('is-invalid');
+        }
+    });
+});
+
+function validateScenarioForm() {
+    let isValid = true;
+
+    // Validate required fields
+    const requiredFields = [
+        'Scenario_title', 'Scenario_name', 'Category', 'type', 
+        'mode', 'Difficulty', 'Duration'
+    ];
+
+    requiredFields.forEach(fieldId => {
+        const field = $('#' + fieldId);
+        if (!field.val().trim()) {
+            field.addClass('is-invalid');
+            isValid = false;
+        } else {
+            field.removeClass('is-invalid');
+        }
+    });
+
+    // Validate Summernote
+    const summernoteContent = $('#description').summernote('code').replace(/<[^>]*>/g, '').trim();
+    if (!summernoteContent) {
+        $('#description').closest('.form-group').find('.note-editor').addClass('is-invalid');
+        isValid = false;
+    } else {
+        $('#description').closest('.form-group').find('.note-editor').removeClass('is-invalid');
+    }
+
+    // Validate Labs selection
+    const selectedLabs = $('#labsn').val();
+    if (!selectedLabs || selectedLabs.length === 0) {
+        $('#labsn').closest('.form-group').find('.select2-selection').addClass('is-invalid');
+        isValid = false;
+    } else {
+        $('#labsn').closest('.form-group').find('.select2-selection').removeClass('is-invalid');
+    }
+
+    if (!isValid) {
+        // Scroll to first invalid field
+        $('html, body').animate({
+            scrollTop: $('.is-invalid:first').offset().top - 100
+        }, 500);
+        return false;
+    }
+
+    // Show loading spinner
+    $('#scenarioSpinner').removeClass('d-none');
+    $('#saveScenarioBtn').prop('disabled', true);
+
+    return true;
+}
 </script>
+
 
 
 

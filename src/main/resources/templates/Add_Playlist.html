@@ -499,5 +499,94 @@ label {
 							initializeTagInput();
 						});
 	</script>
+
+	<script type="text/javascript">
+		$(document).ready(
+				function() {
+					bsCustomFileInput.init();
+
+					// Initialize Summernote
+					$('.summernote').summernote({
+						height : 200
+					});
+
+					// Real-time validation
+					$('input, textarea').on('input change', function() {
+						$(this).removeClass('is-invalid');
+						$(this).next('.invalid-feedback').addClass('d-none');
+					});
+
+					$('#description')
+							.on(
+									'summernote.change',
+									function() {
+										const content = $(this).summernote(
+												'code').replace(/<[^>]*>/g, '')
+												.trim();
+										if (content) {
+											$('#description').removeClass(
+													'is-invalid');
+											$('#descError').addClass('d-none');
+										}
+									});
+
+					$('#tag_input').on('input', function() {
+						if ($(this).val().trim()) {
+							$(this).removeClass('is-invalid');
+							$('#tagError').addClass('d-none');
+						}
+					});
+				});
+
+		function validatePlaylistForm() {
+			let isValid = true;
+
+			// Playlist Name
+			if (!$('#playlist_name').val().trim()) {
+				$('#playlist_name').addClass('is-invalid');
+				$('#playlist_name').next('.invalid-feedback').removeClass(
+						'd-none');
+				isValid = false;
+			}
+
+			// Playlist Title
+			if (!$('#playlist_title').val().trim()) {
+				$('#playlist_title').addClass('is-invalid');
+				$('#playlist_title').next('.invalid-feedback').removeClass(
+						'd-none');
+				isValid = false;
+			}
+
+			// Description (Summernote)
+			const descContent = $('#description').summernote('code').replace(
+					/<[^>]*>/g, '').trim();
+			if (!descContent) {
+				$('#description').addClass('is-invalid');
+				$('#descError').removeClass('d-none');
+				isValid = false;
+			}
+
+			// Tags
+			if (!$('#tag_input').val().trim()) {
+				$('#tag_input').addClass('is-invalid');
+				$('#tagError').removeClass('d-none');
+				isValid = false;
+			}
+
+			if (!isValid) {
+				$('html, body').animate({
+					scrollTop : $('.is-invalid:first').offset().top - 100
+				}, 500);
+				return false;
+			}
+
+			// Show spinner
+			$('#playlistSpinner').removeClass('d-none');
+			$('#savePlaylistBtn').prop('disabled', true);
+
+			return true;
+		}
+	</script>
+
 </body>
 </html>
