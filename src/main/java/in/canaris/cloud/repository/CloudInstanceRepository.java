@@ -45,6 +45,7 @@ public interface CloudInstanceRepository extends JpaRepository<CloudInstance, In
 	List<CloudInstance> findByIsMonitoring(boolean monitoring);
 
 	List<CloudInstance> findByIsMonitoringOrderByIdDesc(boolean monitoring);
+
 	List<CloudInstance> findAllByOrderByIdDesc();
 
 	@Query("SELECT  c.instance_name FROM CloudInstance c WHERE c.isMonitoring=:monitoring")
@@ -152,4 +153,6 @@ public interface CloudInstanceRepository extends JpaRepository<CloudInstance, In
 	@Transactional
 	@Query("UPDATE CloudInstance c SET c.AssignedLab = 'Yes' WHERE c.id = :labId")
 	int updateInstanceNameAssigned(int labId);
+
+	List<CloudInstance> findByGuacamoleId(String guacamoleId);
 }

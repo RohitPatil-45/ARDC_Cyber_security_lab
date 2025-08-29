@@ -190,49 +190,53 @@ table tr:hover {
 													</tr>
 												</thead>
 												<tbody>
-												  <!-- Show table rows only if connections is not null and not empty -->
-												  <th:block th:if="${connections != null and !connections.empty}">
-												    <tr th:each="conn : ${connections}">
-												      <td th:text="${conn.id}"></td>
-												      <td th:text="${conn.instance_name}"></td>
-												      <td><span class="badge badge-info" th:text="${conn.instance_ip}"></span></td>
-												      <td th:text="${conn.physicalServerIP}"></td>
-												      <td th:text="${conn.vm_location_path}"></td>
-												      <td th:text="${conn.lab_tag}"></td>
-													  
-													  <td><a th:href="@{|/guac/view/${conn.guacamoleId}|}"
-													  													class="btn btn-sm btn-success mr-1"> <i
-													  														class="fas fa-play"></i> Start
-													  												</a></td>
-																									
-												    </tr>
-												  </th:block>
+													<!-- Show table rows only if connections is not null and not empty -->
+													<th:block
+														th:if="${connections != null and !connections.empty}">
+														<tr th:each="conn : ${connections}">
+															<td th:text="${conn.id}"></td>
+															<td th:text="${conn.instance_name}"></td>
+															<td><span class="badge badge-info"
+																th:text="${conn.instance_ip}"></span></td>
+															<td th:text="${conn.physicalServerIP}"></td>
+															<td th:text="${conn.vm_location_path}"></td>
+															<td th:text="${conn.lab_tag}"></td>
 
-												  <!-- Show message if connections is null or empty -->
-												  <tr th:if="${connections == null or connections.empty}">
-												    <td colspan="7" class="text-muted">No connection found.</td>
-												  </tr>
+															<td><a
+																th:href="@{|/guac/viewPlaylistConnection/${conn.guacamoleId}|}"
+																class="btn btn-sm btn-success mr-1"> <i
+																	class="fas fa-play"></i> Start
+															</a></td>
+
+														</tr>
+													</th:block>
+
+													<!-- Show message if connections is null or empty -->
+													<tr th:if="${connections == null or connections.empty}">
+														<td colspan="7" class="text-muted">No connection
+															found.</td>
+													</tr>
 												</tbody>
 
 											</table>
 										</div>
 
 										<!-- Right side: Instructions -->
-<!--										<div class="col-md-5">-->
-<!--											<div class="card"-->
-<!--												style="background: #1a1a1a; border: 1px solid #333; padding: 15px;">-->
-<!--												<h3-->
-<!--													style="color: #00f2ff; font-family: 'Roboto Mono', monospace;">Instructions</h3>-->
-<!--												<div th:if="${instructions != null}">-->
-<!--													<p th:utext="${instructions}"-->
-<!--														style="white-space: pre-line; color: #e0e0e0;"></p>-->
-<!--												</div>-->
-<!--												<div th:if="${instructions == null}">-->
-<!--													<p class="text-muted">No instructions available for-->
-<!--														this VM.</p>-->
-<!--												</div>-->
-<!--											</div>-->
-<!--										</div>-->
+										<!--										<div class="col-md-5">-->
+										<!--											<div class="card"-->
+										<!--												style="background: #1a1a1a; border: 1px solid #333; padding: 15px;">-->
+										<!--												<h3-->
+										<!--													style="color: #00f2ff; font-family: 'Roboto Mono', monospace;">Instructions</h3>-->
+										<!--												<div th:if="${instructions != null}">-->
+										<!--													<p th:utext="${instructions}"-->
+										<!--														style="white-space: pre-line; color: #e0e0e0;"></p>-->
+										<!--												</div>-->
+										<!--												<div th:if="${instructions == null}">-->
+										<!--													<p class="text-muted">No instructions available for-->
+										<!--														this VM.</p>-->
+										<!--												</div>-->
+										<!--											</div>-->
+										<!--										</div>-->
 									</div>
 								</div>
 
@@ -249,7 +253,7 @@ table tr:hover {
 
 	<div th:replace="template :: jsscript"></div>
 
-<!--	<script>
+	<!--	<script>
     // Cyber loader logic
     document.addEventListener("DOMContentLoaded", function () {
       let loader = document.getElementById("loader-bar");
@@ -286,18 +290,20 @@ table tr:hover {
       }, 100); // 10 seconds
     });
   </script>-->
-  
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      // Hide the loader container
-      const container = document.getElementById("loader-container");
-      if (container) container.style.display = "none";
 
-      // Show the main content
-      const tableContainer = document.getElementById("table-container");
-      if (tableContainer) tableContainer.style.display = "block";
-    });
-  </script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			// Hide the loader container
+			const container = document.getElementById("loader-container");
+			if (container)
+				container.style.display = "none";
+
+			// Show the main content
+			const tableContainer = document.getElementById("table-container");
+			if (tableContainer)
+				tableContainer.style.display = "block";
+		});
+	</script>
 
 </body>
 </html>

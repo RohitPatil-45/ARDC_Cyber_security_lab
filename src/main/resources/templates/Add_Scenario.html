@@ -246,7 +246,8 @@ label {
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>Create New Scenario</h1>
+							<!-- 							<h1>Create New Scenario</h1> -->
+							<h1>[[${pageTitle}]]</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
@@ -279,9 +280,10 @@ label {
 									</div>
 								</div>
 
-								<form th:action="${'/report/saveScenarioData'}" th:method="POST"
-									enctype="multipart/form-data"
-									onsubmit="return validateScenarioForm()">
+								<form th:action="@{/guac/saveScenarioData}"
+									th:object="${scenario}" method="post"
+									enctype="multipart/form-data">
+									<input type="hidden" th:field="*{Id}" />
 									<div class="card-body">
 										<div class="form-section">
 											<h5 class="form-section-title">
@@ -292,8 +294,9 @@ label {
 													<div class="form-group">
 														<label for="title">Scenario Title <span
 															class="text-danger">*</span></label> <input type="text" required
-															id="Scenario_title" name="Scenario_title"
-															class="form-control" placeholder="Enter scenario title">
+															id="ScenarioTitle" name="ScenarioTitle"
+															th:field="*{ScenarioTitle}" class="form-control"
+															placeholder="Enter scenario title">
 													</div>
 												</div>
 												<div class="col-md-6">
@@ -301,8 +304,9 @@ label {
 													<div class="form-group">
 														<label for="title">Scenario Name <span
 															class="text-danger">*</span></label> <input type="text" required
-															id="Scenario_name" name="Scenario_name"
-															class="form-control" placeholder="Enter scenario Name">
+															id="ScenarioName" name="ScenarioName"
+															th:field="*{ScenarioName}" class="form-control"
+															placeholder="Enter scenario Name">
 													</div>
 												</div>
 											</div>
@@ -311,8 +315,9 @@ label {
 												<div class="col-md-12">
 													<div class="form-group">
 														<label for="description">Description</label>
-														<textarea id="description" name="description"
-															class="summernote form-control" rows="3"
+														<textarea id="Description" name="Description"
+															th:field="*{Description}" class="summernote form-control"
+															rows="3"
 															placeholder="Briefly describe the scenario objectives"></textarea>
 													</div>
 												</div>
@@ -328,7 +333,8 @@ label {
 													<div class="form-group">
 														<label for="Category">Category <span
 															class="text-danger">*</span></label> <select required
-															id="Category" name="Category" class="form-control">
+															th:field="*{Category}" id="Category" name="Category"
+															class="form-control">
 															<option value="">-- Select Category --</option>
 															<option value="Mobile Security">Mobile Security</option>
 															<option value="Forensic">Forensic</option>
@@ -341,8 +347,9 @@ label {
 												<div class="col-md-4">
 													<div class="form-group">
 														<label for="type">Scenario Type <span
-															class="text-danger">*</span></label> <select required id="type"
-															name="type" class="form-control">
+															class="text-danger">*</span></label> <select required
+															id="ScenarioType" th:field="*{ScenarioType}"
+															name="ScenarioType" class="form-control">
 															<option value="">-- Select Type --</option>
 															<option value="openrange">Open Range</option>
 															<option value="guided">Guided</option>
@@ -353,8 +360,8 @@ label {
 												<div class="col-md-4">
 													<div class="form-group">
 														<label for="mode">Play Mode <span
-															class="text-danger">*</span></label> <select required id="mode"
-															name="mode" class="form-control">
+															class="text-danger">*</span></label> <select required id="Mode"
+															th:field="*{Mode}" name="Mode" class="form-control">
 															<option value="">-- Select Mode --</option>
 															<option value="singleplayer">Single Player</option>
 															<option value="multiplayer">Multi Player</option>
@@ -369,7 +376,8 @@ label {
 													<div class="form-group">
 														<label for="Difficulty">Difficulty Level <span
 															class="text-danger">*</span></label> <select required
-															id="Difficulty" name="Difficulty" class="form-control">
+															th:field="*{DifficultyLevel}" id="DifficultyLevel"
+															name="DifficultyLevel" class="form-control">
 															<option value="">-- Select Difficulty --</option>
 															<option value="Easy">Easy</option>
 															<option value="Intermediate">Intermediate</option>
@@ -382,16 +390,16 @@ label {
 													<div class="form-group">
 														<label for="Duration">Duration (minutes) <span
 															class="text-danger">*</span></label> <input type="number" min="5"
-															max="240" required id="Duration" name="Duration"
-															class="form-control" placeholder="30">
+															th:field="*{Duration}" max="240" required id="Duration"
+															name="Duration" class="form-control" placeholder="30">
 													</div>
 												</div>
 												<div class="col-md-4">
 													<div class="form-group">
 														<label for="max_players">Max Players (if
 															multiplayer)</label> <input type="number" min="1" max="20"
-															id="max_players" name="max_players" class="form-control"
-															placeholder="5">
+															th:field="*{MaxPlayers}" id="MaxPlayers"
+															name="MaxPlayers" class="form-control" placeholder="5">
 													</div>
 												</div>
 											</div>
@@ -417,14 +425,25 @@ label {
 												</div>
 												<div class="col-md-6">
 													<div class="form-group">
-														<label for="labsn" class="form-label fw-bold">Select
+														<label for="Labs" class="form-label fw-bold">Select
 															Labs <span class="text-danger">*</span>
-														</label> <select id="labsn" name="labsn" class="form-control"
-															multiple="multiple">
+														</label> <select id="Labs" name="Labs" class="form-control "
+															th:field="*{Labs}" multiple="multiple">
 															<option th:each="scenario : ${instanceNameList}"
 																th:value="${scenario.id + '~' + scenario.instance_name}"
 																th:text="${scenario.instance_name}"></option>
 														</select>
+
+
+														<!-- 														<select id="Labs" name="Labs" class="form-control" -->
+														<!-- 															multiple="multiple" th:field="*{Labs}"> -->
+														<!-- 															<option th:each="scenarioInst : ${instanceNameList}" -->
+														<!-- 																th:value="${scenarioInst.id + '~' + scenarioInst.instance_name}" -->
+														<!-- 																th:text="${scenarioInst.instance_name}" -->
+														<!-- 																th:selected="${#lists.contains(#strings.arraySplit(scenario.labs, ','), scenarioInst.id + '~' + scenarioInst.instance_name)}"> -->
+														<!-- 															</option> -->
+														<!-- 														</select> -->
+
 													</div>
 
 
@@ -499,17 +518,17 @@ $(document).ready(function() {
     });
 
     // Initialize Select2
-    $('#labsn').select2({
+    $('#Labs').select2({
         placeholder: "-- Choose Labs --",
         allowClear: true,
         width: '100%'
     });
 
     // Inline validation on input change
-    const requiredFields = [
-        'Scenario_title', 'Scenario_name', 'Category', 'type', 
-        'mode', 'Difficulty', 'Duration'
-    ];
+  const requiredFields = [
+  'ScenarioTitle', 'ScenarioName', 'Category', 'ScenarioType', 
+  'Mode', 'DifficultyLevel', 'Duration'
+];
 
     requiredFields.forEach(fieldId => {
         $('#' + fieldId).on('input change', function() {
@@ -532,7 +551,7 @@ $(document).ready(function() {
     });
 
     // Labs select inline validation
-    $('#labsn').on('change', function() {
+    $('#Labs').on('change', function() {
         if ($(this).val() && $(this).val().length > 0) {
             $(this).closest('.form-group').find('.select2-selection').removeClass('is-invalid');
         } else {
@@ -570,12 +589,12 @@ function validateScenarioForm() {
     }
 
     // Validate Labs selection
-    const selectedLabs = $('#labsn').val();
+    const selectedLabs = $('#Labs').val();
     if (!selectedLabs || selectedLabs.length === 0) {
-        $('#labsn').closest('.form-group').find('.select2-selection').addClass('is-invalid');
+        $('#Labs').closest('.form-group').find('.select2-selection').addClass('is-invalid');
         isValid = false;
     } else {
-        $('#labsn').closest('.form-group').find('.select2-selection').removeClass('is-invalid');
+        $('#Labs').closest('.form-group').find('.select2-selection').removeClass('is-invalid');
     }
 
     if (!isValid) {

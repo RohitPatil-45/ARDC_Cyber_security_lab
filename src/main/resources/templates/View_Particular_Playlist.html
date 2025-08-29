@@ -241,12 +241,34 @@ document.addEventListener("DOMContentLoaded", function () {
                     <img src="/guac/Playlistimage/${playlistItem.Id}" alt="${playlistItem.PlaylistTitle}" loading="lazy">
                 </div>
                 <div class="card-content">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h3 class="card-title mb-0">${playlistItem.PlaylistName}</h3>
-                        <button class="add-btn" data-toggle="modal" data-target="#addScenarioModal">
-                            <i class="fas fa-plus"></i> Add Scenario
-                        </button>
-                    </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3 class="card-title mb-0">${playlistItem.PlaylistName}</h3>
+
+                <div class="d-flex align-items-center">
+                    <!-- Pencil Icon Dropdown -->
+                   
+                
+                  
+                
+                <div class="form-group mb-0">
+                <select required id="Actions_${playlistItem.Id}" name="Actions"
+                        class="form-control btn btn-outline-primary"
+                        style="padding: 8px 12px; height: 38px; font-weight: 500;"
+                        onchange="handleActionChange(this, '${playlistItem.Id}')">
+                  <option value="">-- Select --</option>
+                  <option value="edit">Edit</option>
+                  <option value="delete">Delete</option>
+                </select>
+              </div>
+
+
+                    <!-- Add Scenario Button -->
+                    <button class="add-btn" data-toggle="modal" data-target="#addScenarioModal">
+                        <i class="fas fa-plus"></i> Add Scenario
+                    </button>
+                </div>
+            </div>
+
                     <div class="card-tags mt-2">
                         <span class="tag"><i class="fas fa-tag"></i> ${playlistItem.Tag || 'N/A'}</span>
                     </div>
@@ -448,6 +470,58 @@ function ScenerioRemoveCardClick(id) {
             });
         }
     });
+}
+
+function handleActionChange(selectElement, playlistId) {
+    const action = selectElement.value;
+
+    if (action === "edit") {
+        editPlaylist(playlistId);
+    } else if (action === "delete") {
+        deletePlaylist(playlistId);
+    }
+
+    // Reset dropdown
+    selectElement.value = "";
+}
+
+function editPlaylist(id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You are about to edit this playlist (ID: " + id + ").",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Edit it!',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = '/guac/editplaylist/' + id;
+        }
+    });
+}
+
+function deletePlaylist(id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This action will permanently delete the playlist (ID: " + id + ").",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Delete it!',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#e74c3c',
+        cancelButtonColor: '#6c757d'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = '/guac/deletplaylist/' + id;
+        }
+    });
+}
+
+
+function ScenerioCardClick(id) {
+    window.location.href = "/report/View_Particular_Scenerio?Id=" + id;
 }
 </script>
 

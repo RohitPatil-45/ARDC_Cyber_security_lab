@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Cloud Portal</title>
+<head th:include="templateListing :: headFragment"></head>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>View Playlist Monitoring</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">View Playlist Monitoring</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">View
+												Playlist Report Details</h3>
+										</div>
+										<div class="col-md-2"></div>
+									</div>
+									<!-- 									<div th:if="${message != null}" -->
+									<!-- 										class="alert alert-success alert-dismissible fade show text-center message" -->
+									<!-- 										role="alert"> -->
+									<!-- 										[[${message}]] -->
+									<!-- 										<button type="button" class="close btn-sm" -->
+									<!-- 											data-dismiss="alert" aria-label="Close"> -->
+									<!-- 											<span aria-hidden="true">&times;</span> -->
+									<!-- 										</button> -->
+									<!-- 									</div> -->
+									<!-- 									<div th:if="${error != null}" -->
+									<!-- 										class="alert alert-danger alert-dismissible fade show text-center message" -->
+									<!-- 										role="alert"> -->
+									<!-- 										[[${error}]] -->
+									<!-- 										<button type="button" class="close btn-sm" -->
+									<!-- 											data-dismiss="alert" aria-label="Close"> -->
+									<!-- 											<span aria-hidden="true">&times;</span> -->
+									<!-- 										</button> -->
+									<!-- 									</div> -->
+								</div>
+								<div class="card-body">
+									<table id="example3" class="table table-bordered table-striped">
+										<thead class="thead-light">
+											<tr>
+												<th scope="col">playlistName</th>
+												<th scope="col">playlistTitle</th>
+												<th scope="col">Description</th>
+												<th scope="col">Tag</th>
+												<th scope="col">CreatedBy</th>
+
+
+
+												<!-- 																								<th scope="col">Status</th> -->
+
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="data : ${listObj}">
+
+												<td>[[${data.playlistName} ?: '-']]</td>
+												<td>[[${data.playlistTitle} ?: '-']]</td>
+												<td>[[${data.Description} ?: '-']]</td>
+												<td>[[${data.Tag} ?: '-']]</td>
+												<td>[[${data.CreatedBy} ?: '-']]</td>
+
+
+
+
+
+
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<!-- 		<div class="modal fade text-center" id="confirmModal"> -->
+		<!-- 			<div class="modal-dialog"> -->
+		<!-- 				<div class="modal-content"> -->
+		<!-- 					<div class="modal-header"> -->
+		<!-- 						<h5 class="modal-title">Delete Confirmation</h5> -->
+		<!-- 						<button type="button" class="close" data-dismiss="modal"> -->
+		<!-- 							<span aria-hidden="true">&times;</span> -->
+		<!-- 						</button> -->
+		<!-- 					</div> -->
+		<!-- 					<div class="modal-body"> -->
+		<!-- 						<span id="confirmText"></span> -->
+		<!-- 					</div> -->
+		<!-- 					<div class="modal-footer"> -->
+		<!-- 						<a type="button" id="yesBtn" class="btn btn-danger">Yes</a> -->
+		<!-- 						<button type="button" class="btn btn-secondary" -->
+		<!-- 							data-dismiss="modal">No</button> -->
+		<!-- 					</div> -->
+		<!-- 				</div> -->
+		<!-- 			</div> -->
+		<!-- 		</div> -->
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+
+	<div th:replace="templateListing :: jsscript"></div>
+
+
+</body>
+<script th:inline="javascript">
+	$(function() {
+		$("#example3").DataTable({
+
+			"responsive" : false,
+			"lengthChange" : false,
+			"autoWidth" : false,
+			"buttons" : [ "csv", "excel", "print", "colvis" ]
+		}).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
+
+	})
+</script>
+</html>

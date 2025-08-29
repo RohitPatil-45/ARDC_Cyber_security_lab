@@ -57,6 +57,7 @@ import in.canaris.cloud.entity.CloudInstanceUsage;
 import in.canaris.cloud.entity.Discount;
 import in.canaris.cloud.entity.KVMDriveDetails;
 import in.canaris.cloud.openstack.entity.Add_Scenario;
+import in.canaris.cloud.openstack.entity.Playlist;
 import in.canaris.cloud.repository.AppUserRepository;
 import in.canaris.cloud.repository.CloudInstanceCpuThresholdHistoryRepository;
 import in.canaris.cloud.repository.CloudInstanceLogRepository;
@@ -70,6 +71,7 @@ import in.canaris.cloud.repository.DiscountRepository;
 import in.canaris.cloud.repository.GroupRepository;
 import in.canaris.cloud.repository.KVMDriveDetailsRepository;
 import in.canaris.cloud.repository.NodeUtilizationRepository;
+import in.canaris.cloud.repository.PlaylistRepository;
 import in.canaris.cloud.repository.RequestApprovalRepository;
 import in.canaris.cloud.repository.ScenarioRepository;
 import in.canaris.cloud.repository.UserRepository;
@@ -152,6 +154,9 @@ public class ReportController {
 
 	@Autowired
 	private CloudInstanceNodeHealthMonitoringRepository cloudInstanceNodeHealthMonitoringRepository;
+
+	@Autowired
+	private PlaylistRepository PlaylistRepository;
 
 	@GetMapping("/resourceUtilization")
 	public ModelAndView resourceUtilizationReport() {
@@ -2124,6 +2129,144 @@ public class ReportController {
 		return mav;
 	}
 
+	@GetMapping("/View_PlaylistAcion")
+	public ModelAndView getView_PlaylistAcionAll(Principal principal) {
+		ModelAndView mav = new ModelAndView("View_PlaylistAcion");
+		List<Playlist> dataList;
+
+		try {
+			// start
+
+			Authentication authentication = (Authentication) principal;
+			User loginedUser = (User) authentication.getPrincipal();
+
+			String userName = loginedUser.getUsername();
+			String groupName = "";
+			StringBuilder vmNamesBuilder = new StringBuilder();
+
+			List<AppUser> userList = userRepository.findByuserName(userName);
+
+			boolean isSuperAdmin = authentication.getAuthorities().stream()
+					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+
+			boolean isAdmin = authentication.getAuthorities().stream()
+					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+
+			if (isSuperAdmin) {
+				dataList = PlaylistRepository.findAll();
+			} else {
+				// Get group names
+				for (AppUser appUser : userList) {
+					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
+				}
+
+				List<String> groups = new ArrayList<>();
+				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
+				while (groupTokenizer.hasMoreTokens()) {
+					groups.add(groupTokenizer.nextToken());
+				}
+
+				// Get VM names by group
+				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
+				for (Object[] vmEntry : vmList) {
+					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
+				}
+
+				// Split VM names string into a list
+				List<String> vmGroups = new ArrayList<>();
+				String vmNames = vmNamesBuilder.toString();
+				if (!vmNames.isEmpty()) {
+					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
+					while (vmTokenizer.hasMoreTokens()) {
+						vmGroups.add(vmTokenizer.nextToken());
+					}
+				}
+
+//				dataList = PlaylistRepository.findByHealthMonitoring(vmGroups);
+				dataList = PlaylistRepository.findAll();
+
+			}
+
+//			dataList = cloudInstanceNodeHealthMonitoringRepository.findByHealthMonitoring();
+
+			mav.addObject("listObj", dataList);
+		} catch (Exception e) {
+			mav.addObject("data", null);
+			mav.addObject("error", e.getMessage());
+			System.out.println("Error fetching data: " + e.getMessage());
+		}
+		return mav;
+	}
+
+	@GetMapping("/View_ScenerioAcion")
+	public ModelAndView getView_ScenerioAcion(Principal principal) {
+		ModelAndView mav = new ModelAndView("View_ScenerioAcion");
+		List<Add_Scenario> dataList;
+
+		try {
+			// start
+
+			Authentication authentication = (Authentication) principal;
+			User loginedUser = (User) authentication.getPrincipal();
+
+			String userName = loginedUser.getUsername();
+			String groupName = "";
+			StringBuilder vmNamesBuilder = new StringBuilder();
+
+			List<AppUser> userList = userRepository.findByuserName(userName);
+
+			boolean isSuperAdmin = authentication.getAuthorities().stream()
+					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+
+			boolean isAdmin = authentication.getAuthorities().stream()
+					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+
+			if (isSuperAdmin) {
+				dataList = ScenarioRepository.findAll();
+			} else {
+				// Get group names
+				for (AppUser appUser : userList) {
+					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
+				}
+
+				List<String> groups = new ArrayList<>();
+				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
+				while (groupTokenizer.hasMoreTokens()) {
+					groups.add(groupTokenizer.nextToken());
+				}
+
+				// Get VM names by group
+				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
+				for (Object[] vmEntry : vmList) {
+					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
+				}
+
+				// Split VM names string into a list
+				List<String> vmGroups = new ArrayList<>();
+				String vmNames = vmNamesBuilder.toString();
+				if (!vmNames.isEmpty()) {
+					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
+					while (vmTokenizer.hasMoreTokens()) {
+						vmGroups.add(vmTokenizer.nextToken());
+					}
+				}
+
+//				dataList = PlaylistRepository.findByHealthMonitoring(vmGroups);
+				dataList = ScenarioRepository.findAll();
+
+			}
+
+//			dataList = cloudInstanceNodeHealthMonitoringRepository.findByHealthMonitoring();
+
+			mav.addObject("listObj", dataList);
+		} catch (Exception e) {
+			mav.addObject("data", null);
+			mav.addObject("error", e.getMessage());
+			System.out.println("Error fetching data: " + e.getMessage());
+		}
+		return mav;
+	}
+
 	@GetMapping("/DiskandHealthviewPage")
 	public ModelAndView getDiskandHealthPage(Principal principal) {
 		ModelAndView mav = new ModelAndView("Disk_Health_Utilization");
@@ -2429,184 +2572,148 @@ public class ReportController {
 //	        }
 //	    }
 
-	@GetMapping("/Scenario_Details")
-	public ModelAndView Scenario_Details(Principal principal) {
-		Authentication authentication = (Authentication) principal;
-		User loginedUser = (User) ((Authentication) principal).getPrincipal();
-		List<CloudInstance> instances = null;
-		String userName = loginedUser.getUsername();
-		String groupName = "";
-		List<AppUser> user1 = userRepository.findByuserName(loginedUser.getUsername());
-		boolean isSuperAdmin = authentication.getAuthorities().stream()
-				.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
 
-		boolean isAdmin = authentication.getAuthorities().stream()
-				.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-		ModelAndView mav = new ModelAndView("Add_Scenario");
-		mav.addObject("pageTitle", "Report");
 
-		if (isSuperAdmin) {
-//			mav.addObject("instanceNameList", repository.getInstanceNameNotAssigned());
-
-			instances = repository.getInstanceNameNotAssigned();
-			mav.addObject("instanceNameList", instances);
-		} else {
-
-			for (AppUser appUser : user1) {
-				groupName = appUser.getGroupName();
-			}
-			List<String> groups = new ArrayList<>();
-			StringTokenizer token = new StringTokenizer(groupName, ",");
-			while (token.hasMoreTokens()) {
-				groups.add(token.nextToken());
-			}
-
-			instances = repository.getInstanceNameNotAssigned();
-			mav.addObject("instanceNameList", instances);
+//	@GetMapping("/Add_Playlist")
+//	public ModelAndView Add_Playlist(Principal principal) {
+//		Authentication authentication = (Authentication) principal;
+//		User loginedUser = (User) ((Authentication) principal).getPrincipal();
+//		List<CloudInstance> instances = null;
+//		String userName = loginedUser.getUsername();
+//		String groupName = "";
+//		List<AppUser> user1 = userRepository.findByuserName(loginedUser.getUsername());
+//		boolean isSuperAdmin = authentication.getAuthorities().stream()
+//				.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+//
+//		boolean isAdmin = authentication.getAuthorities().stream()
+//				.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+//		ModelAndView mav = new ModelAndView("Add_Playlist");
+//		mav.addObject("pageTitle", "Report");
+//		if (isSuperAdmin) {
+//			mav.addObject("instanceNameList", repository.getInstanceName(true));
+//		} else {
+//
+//			for (AppUser appUser : user1) {
+//				groupName = appUser.getGroupName();
+//			}
+//			List<String> groups = new ArrayList<>();
+//			StringTokenizer token = new StringTokenizer(groupName, ",");
+//			while (token.hasMoreTokens()) {
+//				groups.add(token.nextToken());
+//			}
+//
 //			mav.addObject("instanceNameList", repository.getInstanceNameByGroup(groups, true));
-		}
+//		}
+//
+//		return mav;
+//	}
 
-		return mav;
-	}
 
-	@GetMapping("/Add_Playlist")
-	public ModelAndView Add_Playlist(Principal principal) {
-		Authentication authentication = (Authentication) principal;
-		User loginedUser = (User) ((Authentication) principal).getPrincipal();
-		List<CloudInstance> instances = null;
-		String userName = loginedUser.getUsername();
-		String groupName = "";
-		List<AppUser> user1 = userRepository.findByuserName(loginedUser.getUsername());
-		boolean isSuperAdmin = authentication.getAuthorities().stream()
-				.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
 
-		boolean isAdmin = authentication.getAuthorities().stream()
-				.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-		ModelAndView mav = new ModelAndView("Add_Playlist");
-		mav.addObject("pageTitle", "Report");
-		if (isSuperAdmin) {
-			mav.addObject("instanceNameList", repository.getInstanceName(true));
-		} else {
-
-			for (AppUser appUser : user1) {
-				groupName = appUser.getGroupName();
-			}
-			List<String> groups = new ArrayList<>();
-			StringTokenizer token = new StringTokenizer(groupName, ",");
-			while (token.hasMoreTokens()) {
-				groups.add(token.nextToken());
-			}
-
-			mav.addObject("instanceNameList", repository.getInstanceNameByGroup(groups, true));
-		}
-
-		return mav;
-	}
-
-	@GetMapping("/View_Scenario")
-	public ModelAndView getView_Scenario(Principal principal) {
-		ModelAndView mav = new ModelAndView("View_Scenario");
-		JSONArray Finalarray = new JSONArray();
-		List<Add_Scenario> dataList;
-		try {
-			// start
-
-			Authentication authentication = (Authentication) principal;
-			User loginedUser = (User) authentication.getPrincipal();
-
-			String userName = loginedUser.getUsername();
-			String groupName = "";
-			StringBuilder vmNamesBuilder = new StringBuilder();
-
-			List<AppUser> userList = userRepository.findByuserName(userName);
-
-			boolean isSuperAdmin = authentication.getAuthorities().stream()
-					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
-
-			boolean isAdmin = authentication.getAuthorities().stream()
-					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-
-			if (isSuperAdmin) {
-				dataList = ScenarioRepository.findAll();
-			} else {
-				// Get group names
-				for (AppUser appUser : userList) {
-					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
-				}
-
-				List<String> groups = new ArrayList<>();
-				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
-				while (groupTokenizer.hasMoreTokens()) {
-					groups.add(groupTokenizer.nextToken());
-				}
-
-				// Get VM names by group
-				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
-				for (Object[] vmEntry : vmList) {
-					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
-				}
-
-				// Split VM names string into a list
-				List<String> vmGroups = new ArrayList<>();
-				String vmNames = vmNamesBuilder.toString();
-				if (!vmNames.isEmpty()) {
-					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
-					while (vmTokenizer.hasMoreTokens()) {
-						vmGroups.add(vmTokenizer.nextToken());
-					}
-				}
-//				dataList = ScenarioRepository.getView_Scenario(vmGroups);
-				dataList = ScenarioRepository.findAll();
-			}
-
-//			 dataList = kVMDriveDetailsRepository.findBykVMDetails();
-			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
-			int srno = 0;
-			for (Add_Scenario temp : dataList) {
-				JSONObject obj = new JSONObject();
-
-				String Scenario_Name = temp.getScenarioName() != null ? temp.getScenarioName() : "";
-				String Scenario_Title = temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "";
-				String Description = temp.getDescription() != null ? temp.getDescription() : "";
-				String Category = temp.getCategory() != null ? temp.getCategory() : "";
-				String Scenario_Type = temp.getScenarioType() != null ? temp.getScenarioType() : "";
-				String Mode = temp.getMode() != null ? temp.getMode() : "";
-				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
-				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
-				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
-//				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
-				String Cover_Image = "";
-				int SrNo = temp.getId();
-
-//				srno++;
-
-				obj.put("Scenario_Name", Scenario_Name);
-				obj.put("Scenario_Title", Scenario_Title);
-//				obj.put("Description", Description);
-				obj.put("Category", Category);
-				obj.put("Scenario_Type", Scenario_Type);
-				obj.put("Mode", Mode);
-				obj.put("Difficulty_Level", Difficulty_Level);
-				obj.put("Duration", Duration);
-//				obj.put("Labs", Labs);
-				obj.put("Cover_Image", Cover_Image);
-				obj.put("Id", SrNo);
-
-				Finalarray.put(obj);
-			}
-
-//			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
-
-			mav.addObject("listObj", Finalarray.toString());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			mav.addObject("listObj", null);
-			mav.addObject("error", e.getMessage());
-			System.out.println("Error fetching data: " + e.getMessage());
-		}
-		return mav;
-	}
+//	@GetMapping("/View_Scenario")
+//	public ModelAndView getView_Scenario(Principal principal) {
+//		ModelAndView mav = new ModelAndView("View_Scenario");
+//		JSONArray Finalarray = new JSONArray();
+//		List<Add_Scenario> dataList;
+//		try {
+//			// start
+//
+//			Authentication authentication = (Authentication) principal;
+//			User loginedUser = (User) authentication.getPrincipal();
+//
+//			String userName = loginedUser.getUsername();
+//			String groupName = "";
+//			StringBuilder vmNamesBuilder = new StringBuilder();
+//
+//			List<AppUser> userList = userRepository.findByuserName(userName);
+//
+//			boolean isSuperAdmin = authentication.getAuthorities().stream()
+//					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+//
+//			boolean isAdmin = authentication.getAuthorities().stream()
+//					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+//
+//			if (isSuperAdmin) {
+//				dataList = ScenarioRepository.findAll();
+//			} else {
+//				// Get group names
+//				for (AppUser appUser : userList) {
+//					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
+//				}
+//
+//				List<String> groups = new ArrayList<>();
+//				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
+//				while (groupTokenizer.hasMoreTokens()) {
+//					groups.add(groupTokenizer.nextToken());
+//				}
+//
+//				// Get VM names by group
+//				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
+//				for (Object[] vmEntry : vmList) {
+//					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
+//				}
+//
+//				// Split VM names string into a list
+//				List<String> vmGroups = new ArrayList<>();
+//				String vmNames = vmNamesBuilder.toString();
+//				if (!vmNames.isEmpty()) {
+//					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
+//					while (vmTokenizer.hasMoreTokens()) {
+//						vmGroups.add(vmTokenizer.nextToken());
+//					}
+//				}
+////				dataList = ScenarioRepository.getView_Scenario(vmGroups);
+//				dataList = ScenarioRepository.findAll();
+//			}
+//
+////			 dataList = kVMDriveDetailsRepository.findBykVMDetails();
+//			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
+//			int srno = 0;
+//			for (Add_Scenario temp : dataList) {
+//				JSONObject obj = new JSONObject();
+//
+//				String Scenario_Name = temp.getScenarioName() != null ? temp.getScenarioName() : "";
+//				String Scenario_Title = temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "";
+//				String Description = temp.getDescription() != null ? temp.getDescription() : "";
+//				String Category = temp.getCategory() != null ? temp.getCategory() : "";
+//				String Scenario_Type = temp.getScenarioType() != null ? temp.getScenarioType() : "";
+//				String Mode = temp.getMode() != null ? temp.getMode() : "";
+//				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
+//				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
+//				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
+////				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
+//				String Cover_Image = "";
+//				int SrNo = temp.getId();
+//
+////				srno++;
+//
+//				obj.put("Scenario_Name", Scenario_Name);
+//				obj.put("Scenario_Title", Scenario_Title);
+////				obj.put("Description", Description);
+//				obj.put("Category", Category);
+//				obj.put("Scenario_Type", Scenario_Type);
+//				obj.put("Mode", Mode);
+//				obj.put("Difficulty_Level", Difficulty_Level);
+//				obj.put("Duration", Duration);
+////				obj.put("Labs", Labs);
+//				obj.put("Cover_Image", Cover_Image);
+//				obj.put("Id", SrNo);
+//
+//				Finalarray.put(obj);
+//			}
+//
+////			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
+//
+//			mav.addObject("listObj", Finalarray.toString());
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			mav.addObject("listObj", null);
+//			mav.addObject("error", e.getMessage());
+//			System.out.println("Error fetching data: " + e.getMessage());
+//		}
+//		return mav;
+//	}
 
 	@GetMapping("/image/{id}")
 	public void getImage(@PathVariable int id, HttpServletResponse response) throws IOException {
@@ -2840,104 +2947,8 @@ public class ReportController {
 //
 //		return mav;
 //	}
-	
-	@PostMapping("/saveScenarioData")
-	public ModelAndView saveScenarioData(@RequestParam String Scenario_title, @RequestParam String Scenario_name,
-			@RequestParam String description, @RequestParam String Category, @RequestParam String type,
-			@RequestParam String mode, @RequestParam String Difficulty, @RequestParam String Duration,
-			@RequestParam(required = false) String max_players,
-			@RequestParam(required = false) MultipartFile cover_image, @RequestParam("labsn") String[] labsnArray) { // <--
-																														// change
-																														// to
-																														// array
 
-		ModelAndView mav = new ModelAndView("Add_Scenario");
 
-		try {
-			System.out.println("Scenario_title: " + Scenario_title);
-			System.out.println("Scenario_name: " + Scenario_name);
-			System.out.println("description: " + description);
-			System.out.println("Category: " + Category);
-			System.out.println("type: " + type);
-			System.out.println("mode: " + mode);
-			System.out.println("Difficulty: " + Difficulty);
-			System.out.println("Duration: " + Duration);
-			System.out.println("max_players: " + max_players);
-			System.out.println(
-					"cover_image: " + (cover_image != null ? cover_image.getOriginalFilename() : "No file uploaded"));
-
-			// Process multiple selected labs
-			List<String> labIds = new ArrayList<>();
-			List<String> labNames = new ArrayList<>();
-
-			for (String lab : labsnArray) {
-				String[] parts = lab.split("~");
-				if (parts.length == 2) {
-					labIds.add(parts[0]);
-					labNames.add(parts[1]);
-					System.out.println("Selected lab: ID=" + parts[0] + ", Name=" + parts[1]);
-
-					// Optional: Update instance assigned count for each lab
-					try {
-						repository.updateInstanceNameAssigned(Integer.valueOf(parts[0]));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-
-			// Create scenario object
-			Add_Scenario scenario = new Add_Scenario();
-			scenario.setScenarioTitle(Scenario_title);
-			scenario.setScenarioName(Scenario_name);
-			scenario.setDescription(description);
-			scenario.setCategory(Category);
-			scenario.setScenarioType(type);
-			scenario.setMode(mode);
-			scenario.setDifficultyLevel(Difficulty);
-			scenario.setDuration(Duration);
-			scenario.setMaxPlayers(max_players);
-
-			// Save all labs as comma-separated values
-			scenario.setLabs(String.join(",", labNames));
-			scenario.setLabId(String.join(",", labIds));
-			scenario.setComments("");
-
-			// Handle image (same as your code)
-			if (cover_image != null && !cover_image.isEmpty()) {
-				String contentType = cover_image.getContentType();
-				if (contentType != null && contentType.startsWith("image/")) {
-					scenario.setCoverImage(cover_image.getBytes());
-				} else {
-					mav.addObject("message", "Invalid file type. Please upload an image file.");
-					mav.addObject("status", "error");
-					return mav;
-				}
-			} else {
-				// Load default image
-				String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
-				try {
-					byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
-					scenario.setCoverImage(defaultImageBytes);
-				} catch (IOException e) {
-					scenario.setCoverImage(createPlaceholderImage());
-				}
-			}
-
-			// Save scenario
-			ScenarioRepository.save(scenario);
-
-			mav.addObject("message", "Scenario saved successfully!");
-			mav.addObject("status", "success");
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			mav.addObject("message", "Error while saving scenario: " + e.getMessage());
-			mav.addObject("status", "error");
-		}
-
-		return mav;
-	}
 
 	// Method to create a minimal placeholder image
 	private byte[] createPlaceholderImage() {
