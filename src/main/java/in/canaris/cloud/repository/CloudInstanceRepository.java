@@ -155,4 +155,6 @@ public interface CloudInstanceRepository extends JpaRepository<CloudInstance, In
 	int updateInstanceNameAssigned(int labId);
 
 	List<CloudInstance> findByGuacamoleId(String guacamoleId);
+
+	
 }

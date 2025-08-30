@@ -8,7 +8,9 @@ import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
@@ -33,13 +35,20 @@ import in.canaris.cloud.entity.Discount;
 import in.canaris.cloud.entity.PlaylistScenario;
 import in.canaris.cloud.entity.PlaylistScenarioId;
 import in.canaris.cloud.openstack.entity.Add_Scenario;
+import in.canaris.cloud.openstack.entity.CommandHistory;
+import in.canaris.cloud.openstack.entity.InstructionCommand;
 import in.canaris.cloud.openstack.entity.Playlist;
 import in.canaris.cloud.repository.ScenarioRepository;
 import in.canaris.cloud.repository.UserRepository;
 import in.canaris.cloud.repository.CloudInstanceRepository;
 import in.canaris.cloud.repository.PlaylistRepository;
 import in.canaris.cloud.repository.PlaylistsSenarioRepository;
+import in.canaris.cloud.repository.InstructionCommandRepository;
+import in.canaris.cloud.repository.CommandHistoryRepository;
+
 import in.canaris.cloud.service.GuacamoleService;
+
+
 
 @Controller
 @RequestMapping("/guac")
@@ -65,6 +74,14 @@ public class GuacamoleController {
 
 	@Autowired
 	private PlaylistsSenarioRepository PlaylistsSenarioRepository;
+	
+	@Autowired
+	private InstructionCommandRepository InstructionCommandRepository;
+	
+	@Autowired
+	private CommandHistoryRepository CommandHistoryRepository;
+	
+	
 
 	@GetMapping("/")
 	public String home() {
@@ -179,12 +196,50 @@ public class GuacamoleController {
 	public String viewPlaylistConnection(@PathVariable String id, Model model) {
 		String url = guacService.getEmbedUrl(id);
 		model.addAttribute("embedUrl", url);
-		
+
 		List<CloudInstance> instances = null;
 		instances = repository.findByGuacamoleId(id);
+
 		model.addAttribute("instructionsdata", instances);
+
+		List<InstructionCommand> instrucion = null;
+		instrucion = InstructionCommandRepository.findByLabId(id);
+		
+		model.addAttribute("instructionscommanddata", instrucion);
 		return "viewConnection";
 	}
+	
+	@PostMapping("/continueActionforLAb")
+	@ResponseBody
+	public Map<String, Object> continueActionForLab(@RequestParam String command, @RequestParam String labId) {
+	    // Simulate getting the new instruction and command based on the labId and command
+	    String newInstruction = "New Instruction for Lab " + labId;
+	    String newCommand = "New Command for " + command;
+	    
+	    // Check if the given labId and command already exist in the CommandHistory
+	    Optional<CommandHistory> commandHistory = CommandHistoryRepository.findByLabIdAndCommand(labId, command);
+
+	    Map<String, Object> response = new HashMap<>();
+	    if (commandHistory.isPresent()) {
+	        // If CommandHistory exists for the given labId and command, proceed to fetch InstructionCommand data
+	        List<InstructionCommand> instructionCommands = InstructionCommandRepository.findByLabId(labId);
+
+	        response.put("success", true);
+	        response.put("instruction", newInstruction);
+	        response.put("command", newCommand);
+	        response.put("instructionscommanddata", instructionCommands);  // Optional if you want to return the list of commands
+
+	    } else {
+	        // If no matching CommandHistory found
+	        response.put("success", false);
+	        response.put("error", "No matching Command found for the given LabId and Command.");
+	    }
+
+	    return response; // Spring will automatically convert this Map to JSON
+	}
+
+
+
 
 //	@PostMapping("/playlistsave")
 //	public ModelAndView savePlaylistData(@RequestParam String playlist_title, @RequestParam String playlist_name,
@@ -860,7 +915,7 @@ public class GuacamoleController {
 		instances = repository.getInstanceNameNotAssigned();
 		mav.addObject("pageTitle", "Create New Scenario");
 		mav.addObject("instanceNameList", instances);
-		mav.addObject("scenario", new Add_Scenario()); 
+		mav.addObject("scenario", new Add_Scenario());
 		return mav;
 	}
 

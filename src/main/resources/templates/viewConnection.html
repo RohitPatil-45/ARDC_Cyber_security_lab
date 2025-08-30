@@ -18,6 +18,32 @@ body {
 	background-color: #0f172a;
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+.continue-button {
+	background-color: #007bff; /* Blue background */
+	color: white; /* White text */
+	border: none; /* Remove border */
+	border-radius: 25px; /* Rounded corners */
+	padding: 10px 20px; /* Padding inside the button */
+	font-size: 16px; /* Text size */
+	cursor: pointer; /* Pointer cursor on hover */
+	text-align: center; /* Center the text inside the button */
+	display: inline-block; /* Make it inline element */
+	transition: background-color 0.3s;
+	/* Smooth transition for hover effect */
+}
+
+.continue-button:hover {
+	background-color: #0056b3; /* Darker blue on hover */
+}
+
+.messageoutgoing {
+	background-color: #2a2d3000;
+	color: white;
+	align-self: flex-end;
+	margin-left: 10rem;
+	align-self: flex-end;
+}
 </style>
 
 <link rel="stylesheet" th:href="@{/webtemplate/css/style_connetion.css}">
@@ -69,9 +95,9 @@ body {
 					<button class="sidebar-tab active" data-tab="instructions">
 						<i class="fas fa-list-ol"></i> Instructions
 					</button>
-										<button class="sidebar-tab" data-tab="chat">
-											<i class="fas fa-comments"></i> Chat Support
-										</button>
+					<button class="sidebar-tab" data-tab="chat">
+						<i class="fas fa-comments"></i> Chat Support
+					</button>
 					<button class="sidebar-tab" data-tab="details">
 						<i class="fas fa-info-circle"></i> Details
 					</button>
@@ -85,9 +111,9 @@ body {
 
 							<div class="instruction-content">
 								<div th:each="instance : ${instructionsdata}">
-<!-- 									<div th:utext="${instance.guacamoleId}"></div> -->
-<!-- 									<div th:text="${instance.instance_name}"></div> -->
-<!-- 									<div th:text="${instance.vm_status}"></div> -->
+									<!-- 									<div th:utext="${instance.guacamoleId}"></div> -->
+									<!-- 									<div th:text="${instance.instance_name}"></div> -->
+									<!-- 									<div th:text="${instance.vm_status}"></div> -->
 									<div th:text="${instance.vm_instructions}"></div>
 									<!-- Add other fields as needed -->
 								</div>
@@ -97,64 +123,81 @@ body {
 					</div>
 
 					<!-- Chat Tab -->
-										<div class="tab-pane" id="chat-tab">
-											<div class="chat-container">
-												<div class="chat-messages" id="chat-messages">
-													<div class="message incoming">
-														<div class="message-sender">Support Bot</div>
-														<div class="message-content">Hello! How can I help you
-															with your lab today?</div>
-														<div class="message-time">10:24 AM</div>
-													</div>
-												</div>
+					<div class="tab-pane" id="chat-tab">
+						<div class="chat-container">
+							<div th:each="instructions : ${instructionscommanddata}">
+								<!-- Message for Instruction -->
+								<div class="message incoming">
+									<div class="message-content"
+										th:text="${instructions.Instruction}"></div>
+								</div>
 
-												<div class="chat-input">
-													<input type="text" placeholder="Type your message..."
-														id="chat-input">
-													<button id="send-message">
-														<i class="fas fa-paper-plane"></i>
-													</button>
-												</div>
-											</div>
-										</div>
+								<!-- Message for Command -->
+								<div class="message incoming">
+									<div class="message-content" th:text="${instructions.Command}"></div>
+								</div>
+
+								<!-- Continue button for each Command -->
+								<div class="messageoutgoing">
+									<button class="continue-button"
+										th:data-command="${instructions.Command}"
+										th:data-lab-id="${instructions.LabId}"
+										onclick="continueAction(this.dataset.command, this.dataset.labId)">
+										Continue</button>
+								</div>
+							</div>
+
+
+
+							<!-- 							<div class="chat-input"> -->
+							<!-- 								<input type="text" placeholder="Type your message..." -->
+							<!-- 									id="chat-input"> -->
+							<!-- 								<button id="send-message"> -->
+							<!-- 									<i class="fas fa-paper-plane"></i> -->
+							<!-- 								</button> -->
+							<!-- 							</div> -->
+						</div>
+					</div>
+
 
 					<!-- Details Tab -->
 					<div class="tab-pane" id="details-tab">
 						<h5 class="mb-3">Connection Details</h5>
 
 
-<!-- 	<div class="instruction-content"> -->
-<!-- 								<div th:each="instance : ${instructionsdata}"> -->
-<!-- 									<div th:utext="${instance.guacamoleId}"></div> -->
-<!-- 									<div th:text="${instance.instance_name}"></div> -->
-<!-- 									<div th:text="${instance.vm_status}"></div> -->
-<!-- 									<div th:text="${instance.vm_instructions}"></div> -->
-<!-- 									Add other fields as needed -->
-<!-- 								</div> -->
-								
-								
+						<!-- 	<div class="instruction-content"> -->
+						<!-- 								<div th:each="instance : ${instructionsdata}"> -->
+						<!-- 									<div th:utext="${instance.guacamoleId}"></div> -->
+						<!-- 									<div th:text="${instance.instance_name}"></div> -->
+						<!-- 									<div th:text="${instance.vm_status}"></div> -->
+						<!-- 									<div th:text="${instance.vm_instructions}"></div> -->
+						<!-- 									Add other fields as needed -->
+						<!-- 								</div> -->
+
+
 						<div class="details-grid">
-						<div th:each="instance : ${instructionsdata}">
-							<div class="detail-label">Name:</div>
-							<div th:text="${instance.instance_name}">Windows Server 2022</div>
+							<div th:each="instance : ${instructionsdata}">
+								<div class="detail-label">Name:</div>
+								<div th:text="${instance.instance_name}">Windows Server
+									2022</div>
 
-							<div class="detail-label">Protocol:</div>
-							<div>RDP</div>
+								<div class="detail-label">Protocol:</div>
+								<div>RDP</div>
 
-							<div class="detail-label">Status:</div>
-							<div>
-								<span class="status-indicator"></span> Connected
+								<div class="detail-label">Status:</div>
+								<div>
+									<span class="status-indicator"></span> Connected
+								</div>
+
+								<div class="detail-label">Duration:</div>
+								<div id="connection-duration">00:00:00</div>
+
+								<div class="detail-label">Address:</div>
+								<div th:text="${serverAddress}">192.168.1.105</div>
+
+								<div class="detail-label">Username:</div>
+								<div th:text="${username}">Administrator</div>
 							</div>
-
-							<div class="detail-label">Duration:</div>
-							<div id="connection-duration">00:00:00</div>
-
-							<div class="detail-label">Address:</div>
-							<div th:text="${serverAddress}">192.168.1.105</div>
-
-							<div class="detail-label">Username:</div>
-							<div th:text="${username}">Administrator</div>
-						</div>
 						</div>
 
 						<!-- 						<h6 class="mt-4 mb-3">System Resources</h6> -->
@@ -308,6 +351,71 @@ body {
                 $('#network-out').text((Math.random() * 3 + 0.5).toFixed(1) + ' Mbps');
             }, 5000);
         });
+        
+        
+        function continueAction(command, labId) {
+            // Display an alert with the Command and LabId values
+            alert("Command: " + command + "\nLabId: " + labId);
+
+            // AJAX call to get new instruction and command for the next step
+            $.ajax({
+                type: "POST",
+                url: "/guac/continueActionforLAb", // Your endpoint to handle the "Continue" action
+                data: {
+                    command: command,
+                    labId: labId
+                },
+                success: function(response) {
+                    // Now 'response' is a JavaScript object (parsed from JSON by the browser)
+                    // Check if the response indicates success
+                    if (response.success) {
+                        const newInstruction = response.instruction; // Get new instruction from the response
+                        const newCommand = response.command;         // Get new command from the response
+
+                        // Create the new instruction and command elements
+                        const newMessageIncomingInstruction = `
+                            <div class="message incoming">
+                                <div class="message-content">${newInstruction}</div>
+                            </div>
+                        `;
+
+                        const newMessageIncomingCommand = `
+                            <div class="message incoming">
+                                <div class="message-content">${newCommand}</div>
+                            </div>
+                        `;
+
+                        // Append the new instruction and command to the chat container
+                        $('#chat-messages').append(newMessageIncomingInstruction);
+                        $('#chat-messages').append(newMessageIncomingCommand);
+
+                        // Optionally scroll to the bottom after appending the new message
+                        const chatMessages = $('#chat-messages');
+                        chatMessages.scrollTop(chatMessages[0].scrollHeight);
+                    } else {
+                        // Handle the case where the server response indicates failure
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed',
+                            text: response.error || 'Failed to load new instruction and command.'
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while fetching new data. Please try again.'
+                    });
+                }
+            });
+        }
+
+
+
+    
+
+
     </script>
 </body>
 </html>
