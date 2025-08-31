@@ -48,8 +48,6 @@ import in.canaris.cloud.repository.CommandHistoryRepository;
 
 import in.canaris.cloud.service.GuacamoleService;
 
-
-
 @Controller
 @RequestMapping("/guac")
 public class GuacamoleController {
@@ -74,14 +72,12 @@ public class GuacamoleController {
 
 	@Autowired
 	private PlaylistsSenarioRepository PlaylistsSenarioRepository;
-	
+
 	@Autowired
 	private InstructionCommandRepository InstructionCommandRepository;
-	
+
 	@Autowired
 	private CommandHistoryRepository CommandHistoryRepository;
-	
-	
 
 	@GetMapping("/")
 	public String home() {
@@ -141,16 +137,16 @@ public class GuacamoleController {
 //	}
 
 	@GetMapping("/View_Vm_Listing")
-	public String viewVmListing(@RequestParam("Id") int scenarioId, Model model) {
+	public ModelAndView viewVmListing(@RequestParam("Id") int scenarioId, Model model) {
 		System.out.println("Requested scenario Id = " + scenarioId);
-
+		ModelAndView mav = new ModelAndView("View_Vm_Listing");
 		// Fetch scenario
 		Add_Scenario scenario = ScenarioRepository.findById(scenarioId).orElse(null);
 		if (scenario == null) {
 			System.out.println("No scenario found for ID: " + scenarioId);
 			model.addAttribute("connections", Collections.emptyList());
 			model.addAttribute("instructions", "");
-			return "View_Vm_Listing";
+			return mav;
 		}
 
 		System.out.println("Found scenario: " + scenario.getScenarioTitle());
@@ -181,8 +177,11 @@ public class GuacamoleController {
 
 		// Pass to view
 		model.addAttribute("connections", connections);
+		
+		mav.addObject("pageTitle","Scenerio Name : "+ scenario.getScenarioName());
+		
 //		model.addAttribute("instructions", connections.getVm_instructions()); // If scenario has instructions
-		return "View_Vm_Listing";
+		return mav;
 	}
 
 	@GetMapping("/view/{id}")
@@ -202,44 +201,237 @@ public class GuacamoleController {
 
 		model.addAttribute("instructionsdata", instances);
 
-		List<InstructionCommand> instrucion = null;
-		instrucion = InstructionCommandRepository.findByLabId(id);
-		
-		model.addAttribute("instructionscommanddata", instrucion);
+//		List<InstructionCommand> instrucion = null;
+//		instrucion = InstructionCommandRepository.findByLabId(id);
+//		
+//		model.addAttribute("instructionscommanddata", instrucion);
 		return "viewConnection";
 	}
-	
-	@PostMapping("/continueActionforLAb")
+
+	@PostMapping("/loadInitialInstruction")
 	@ResponseBody
-	public Map<String, Object> continueActionForLab(@RequestParam String command, @RequestParam String labId) {
-	    // Simulate getting the new instruction and command based on the labId and command
-	    String newInstruction = "New Instruction for Lab " + labId;
-	    String newCommand = "New Command for " + command;
-	    
-	    // Check if the given labId and command already exist in the CommandHistory
-	    Optional<CommandHistory> commandHistory = CommandHistoryRepository.findByLabIdAndCommand(labId, command);
+	public Map<String, Object> loadInitialInstruction(@RequestParam String labId) {
+		Map<String, Object> response = new HashMap<>();
+		try {
+			InstructionCommand instructionCommand = InstructionCommandRepository.findNextUnexecutedByLabId(labId);
 
-	    Map<String, Object> response = new HashMap<>();
-	    if (commandHistory.isPresent()) {
-	        // If CommandHistory exists for the given labId and command, proceed to fetch InstructionCommand data
-	        List<InstructionCommand> instructionCommands = InstructionCommandRepository.findByLabId(labId);
+			if (instructionCommand != null) {
+				response.put("success", true);
+				response.put("instruction", instructionCommand.getInstruction());
+				response.put("command", instructionCommand.getCommand());
+				response.put("isLast", false); // Set this properly if needed
+			} else {
+				response.put("success", false);
+				response.put("error", "No unexecuted instructions found.");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("success", false);
+			response.put("error", "Failed to load instruction.");
+		}
 
-	        response.put("success", true);
-	        response.put("instruction", newInstruction);
-	        response.put("command", newCommand);
-	        response.put("instructionscommanddata", instructionCommands);  // Optional if you want to return the list of commands
-
-	    } else {
-	        // If no matching CommandHistory found
-	        response.put("success", false);
-	        response.put("error", "No matching Command found for the given LabId and Command.");
-	    }
-
-	    return response; // Spring will automatically convert this Map to JSON
+		return response;
 	}
 
+//	@PostMapping("/continueActionInstruction")
+//	@ResponseBody
+//	public Map<String, Object> continueActionInstruction(@RequestParam String labId, @RequestParam String labcommand) {
+//		Map<String, Object> response = new HashMap<>();
+//		try {
+////			InstructionCommand instructionCommand = InstructionCommandRepository.findNextUnexecutedByLabId(labId);
+//
+////			if (instructionCommand != null) {
+//
+////				String instructionI = instructionCommand.getInstruction();
+////				String commandI = instructionCommand.getCommand();
+//
+//			CommandHistory commandH = CommandHistoryRepository.FindLabIDCommand(labId);
+//
+//			if (labcommand.equalsIgnoreCase(commandH.getCommand())) {
+//
+//				response.put("success", true);
+//				response.put("instruction", "Execute This Command First");
+//				response.put("command", labcommand);
+//				response.put("isLast", false);
+//			} else {
+//				// update query
+//				
+//				InstructionCommand instructionCommandUpdate = InstructionCommandRepository.modifyCommandByLabId(labId,labcommand);
+//
+//				InstructionCommand instructionCommand = InstructionCommandRepository.findNextUnexecutedByLabId(labId);
+//
+//				response.put("success", true);
+//				response.put("instruction", instructionCommand.getInstruction());
+//				response.put("command", instructionCommand.getCommand());
+//				response.put("isLast", false); // Set this properly if needed
+//			}
+//
+////			} else {
+////				response.put("success", false);
+////				response.put("error", "No unexecuted instructions found.");
+////			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			response.put("success", false);
+//			response.put("error", "Failed to load instruction.");
+//		}
+//
+//		return response;
+//	}
 
+//	@PostMapping("/continueActionInstruction")
+//	@ResponseBody
+//	public Map<String, Object> continueActionInstruction(@RequestParam String labId, @RequestParam String labcommand) {
+//		Map<String, Object> response = new HashMap<>();
+//		try {
+//			CommandHistory commandH = CommandHistoryRepository.FindLabIDCommand(labId);
+//
+//			if (commandH != null && labcommand.equalsIgnoreCase(commandH.getCommand())) {
+//				System.out.println("labcommand :" + labcommand);
+//				System.out.println("commandH :" + commandH.getCommand());
+//				System.out.println("Inside data is present in commandHistory");
+//				int updatedRows = InstructionCommandRepository.modifyCommandByLabId(labId, labcommand);
+//
+//				if (updatedRows > 0) {
+//					InstructionCommand instructionCommand = InstructionCommandRepository
+//							.findNextUnexecutedByLabId(labId);
+//
+//					if (instructionCommand != null) {
+//						response.put("success", true);
+//						response.put("instruction", instructionCommand.getInstruction());
+//						response.put("command", instructionCommand.getCommand());
+//						response.put("isLast", false); // Later: make logic to check last step
+//					} else {
+//						response.put("success", true);
+//						response.put("instruction", "Lab is completed.");
+//						response.put("command", "");
+//						response.put("isLast", true); // no more commands left
+//					}
+//				} else {
+//					response.put("success", false);
+//					response.put("error", "Command update failed.");
+//				}
+//
+////				response.put("success", true);
+////				response.put("instruction", "Execute This Command First");
+////				response.put("command", labcommand);
+////				response.put("isLast", false);
+//			} else {
+//
+//				System.out.println("Inside data is Not in commandHistory Nooottt");
+//
+//				response.put("success", true);
+//				response.put("instruction", "Execute This Command First");
+//				response.put("command", labcommand);
+//				response.put("isLast", false);
+//
+//				// ✅ Update the executed command in DB
+////				int updatedRows = InstructionCommandRepository.modifyCommandByLabId(labId, labcommand);
+////
+////				if (updatedRows > 0) {
+////					InstructionCommand instructionCommand = InstructionCommandRepository
+////							.findNextUnexecutedByLabId(labId);
+////
+////					if (instructionCommand != null) {
+////						response.put("success", true);
+////						response.put("instruction", instructionCommand.getInstruction());
+////						response.put("command", instructionCommand.getCommand());
+////						response.put("isLast", false); // Later: make logic to check last step
+////					} else {
+////						response.put("success", true);
+////						response.put("instruction", "Lab is completed.");
+////						response.put("command", "");
+////						response.put("isLast", true); // no more commands left
+////					}
+////				} else {
+////					response.put("success", false);
+////					response.put("error", "Command update failed.");
+////				}
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			response.put("success", false);
+//			response.put("error", "Failed to process command.");
+//		}
+//
+//		return response;
+//	}
 
+	@PostMapping("/continueActionInstruction")
+	@ResponseBody
+	public Map<String, Object> continueActionInstruction(@RequestParam String labId, @RequestParam String labcommand) {
+		Map<String, Object> response = new HashMap<>();
+		try {
+			List<CommandHistory> commandHistoryList = CommandHistoryRepository.findByLabId(labId);
+
+			boolean commandMatched = false;
+
+			for (CommandHistory ch : commandHistoryList) {
+				if (ch.getCommand().equalsIgnoreCase(labcommand)) {
+					commandMatched = true;
+					break;
+				}
+			}
+
+			if (commandMatched) {
+				System.out.println("Inside: command matched in history");
+				int updatedRows = InstructionCommandRepository.modifyCommandByLabId(labId, labcommand);
+
+				if (updatedRows > 0) {
+					InstructionCommand instructionCommand = InstructionCommandRepository
+							.findNextUnexecutedByLabId(labId);
+
+					if (instructionCommand != null) {
+						response.put("success", true);
+						response.put("instruction", instructionCommand.getInstruction());
+						response.put("command", instructionCommand.getCommand());
+						response.put("isLast", false);
+					} else {
+						response.put("success", true);
+						response.put("instruction", "Lab is completed.");
+						response.put("command", "");
+						response.put("isLast", true);
+					}
+				} else {
+					response.put("success", false);
+					response.put("error", "Command update failed.");
+				}
+			} else {
+				System.out.println("Command not found in history");
+				response.put("success", true);
+				response.put("instruction", "Execute This Command First");
+				response.put("command", labcommand);
+				response.put("isLast", false);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("success", false);
+			response.put("error", "Failed to process command.");
+		}
+
+		return response;
+	}
+
+//	@PostMapping("/guac/continueInstruction")
+//	@ResponseBody
+//	public InstructionResponse continueInstruction(@RequestParam String labId) {
+//	    InstructionResponse response = new InstructionResponse();
+//	    try {
+//	        // Dummy dynamic response (replace with real state logic)
+//	        Random rand = new Random();
+//	        int step = rand.nextInt(5);
+//
+//	        response.setSuccess(true);
+//	        response.setInstruction("Step " + (step + 1) + ": Do something...");
+//	        response.setCommand("Command: echo Step" + (step + 1));
+//	        response.setLast(step >= 3); // Stop after 4 steps
+//	    } catch (Exception e) {
+//	        response.setSuccess(false);
+//	        response.setError("Failed to continue.");
+//	    }
+//	    return response;
+//	}
 
 //	@PostMapping("/playlistsave")
 //	public ModelAndView savePlaylistData(@RequestParam String playlist_title, @RequestParam String playlist_name,

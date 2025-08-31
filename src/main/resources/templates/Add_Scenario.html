@@ -433,18 +433,20 @@ label {
 																th:value="${scenario.id + '~' + scenario.instance_name}"
 																th:text="${scenario.instance_name}"></option>
 														</select>
-
-
-														<!-- 														<select id="Labs" name="Labs" class="form-control" -->
-														<!-- 															multiple="multiple" th:field="*{Labs}"> -->
-														<!-- 															<option th:each="scenarioInst : ${instanceNameList}" -->
-														<!-- 																th:value="${scenarioInst.id + '~' + scenarioInst.instance_name}" -->
-														<!-- 																th:text="${scenarioInst.instance_name}" -->
-														<!-- 																th:selected="${#lists.contains(#strings.arraySplit(scenario.labs, ','), scenarioInst.id + '~' + scenarioInst.instance_name)}"> -->
-														<!-- 															</option> -->
-														<!-- 														</select> -->
-
 													</div>
+
+													<!-- 													<div class="form-group"> -->
+													<!-- 														<label for="Labs">Select Labs</label> <select tabindex="1" -->
+													<!-- 															id="Add_Scenario.instance_name" -->
+													<!-- 															th:field="*{Add_Scenario.instance_name}" required -->
+													<!-- 															name="Add_Scenario.instance_name" -->
+													<!-- 															data-placeholder="Select Group" -->
+													<!-- 															class="form-control select2" multiple="multiple" -->
+													<!-- 															style="width: 100%;"> -->
+													<!-- 															<option th:each="scenario : ${instanceNameList}" -->
+													<!-- 																th:value="${scenario[0]}" th:text="${scenario[0]}" /></option> -->
+													<!-- 														</select> -->
+													<!-- 													</div> -->
 
 
 												</div>

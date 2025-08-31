@@ -3,6 +3,8 @@
 
 <head th:include="template :: headFragment(${pageTitle})">
 <title>Create Playlist | Cyber Ranges</title>
+
+<!-- Fonts & Icons -->
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link
@@ -15,154 +17,218 @@
 
 </head>
 <style>
-/* Base Dark Theme */
+/* Professional Cyberpunk Theme with Blue Accents */
 body {
-	background-color: #0d0d0d;
+	background-color: #1e293b;
 	color: #e0e0e0;
 	font-family: 'Poppins', sans-serif;
 	margin: 0;
 }
 
-.wrapper, .content-wrapper {
-	background-color: #0d0d0d;
+.content-wrapper {
+	padding: 1rem;
 }
 
 h1, h3 {
-	color: #00f2ff;
-	text-shadow: 0 0 8px #00f2ff, 0 0 15px #3b82f6;
-	font-family: 'Roboto Mono', monospace;
+	color: #2b7fff;
+	font-weight: 600;
+	text-shadow: 0 0 5px rgba(43, 127, 255, 0.3);
 }
 
-/* Cyber Loader */
-#loader-container {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 6px;
-	background: #1a1a1a;
-	overflow: hidden;
-	z-index: 9999;
-}
-
-#loader-bar {
-	height: 100%;
-	width: 0%;
-	background: linear-gradient(90deg, #00f2ff, #3b82f6, #00f2ff);
-	box-shadow: 0 0 12px #00f2ff, 0 0 24px #3b82f6;
-	transition: width 0.1s linear;
-}
-
-/* Card Styling */
 .card {
-	background-color: #141414;
-	border: 1px solid #222;
-	border-radius: 10px;
-	box-shadow: 0 0 12px rgba(0, 242, 255, 0.2);
+	background-color: #1a1a1a;
+	border: 1px solid #2a2a2a;
+	border-radius: 4px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .card-header {
-	background-color: #1a1a1a;
-	border-bottom: 1px solid #222;
-	color: #00f2ff;
+	border-bottom: 1px solid #2a2a2a;
+	background: linear-gradient(to right, #151515, #1e1e1e);
+}
+
+.card-title {
 	font-weight: 600;
+	font-size: 1.2rem;
+	color: #2b7fff;
 }
 
-/* Table Styling */
-#table-container {
-	display: none;
+.table th {
+	background: linear-gradient(to bottom, #1a2b47, #152540);
+	color: #2b7fff;
+	border-bottom: 1px solid #2a2a2a;
+	font-weight: 600;
+	padding: 12px 15px;
 }
 
-table {
-	border-collapse: collapse;
-	width: 100%;
-	margin-top: 15px;
-	font-family: 'Roboto Mono', monospace;
+.table td {
+	vertical-align: middle;
+	border-color: #2a2a2a;
+	padding: 12px 15px;
+	background-color: #1a1a1a;
+	color: #d0d0d0;
 }
 
-table th, table td {
-	border: 1px solid #2a2a2a;
-	padding: 10px;
-	text-align: left;
-}
-
-table th {
+.table-striped tbody tr:nth-of-type(odd) {
 	background-color: #1e1e1e;
-	color: #00f2ff;
+}
+
+.table-hover tbody tr:hover {
+	background-color: #252525;
+}
+
+.btn-cyber {
+	background: linear-gradient(to bottom, #2b7fff, #1a5dd0);
+	color: #fff;
+	border: none;
 	font-weight: 600;
-	text-transform: uppercase;
+	border-radius: 3px;
+	padding: 8px 16px;
+	transition: all 0.2s ease;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-table tr {
-	background-color: #121212;
+.btn-cyber:hover {
+	background: linear-gradient(to bottom, #3d8aff, #2470e0);
+	color: #fff;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
-table tr:nth-child(even) {
-	background-color: #1a1a1a;
+.btn-success {
+	background: linear-gradient(to bottom, #2b7fff, #1a5dd0);
+	border: none;
+	border-radius: 3px;
+	padding: 6px 12px;
+	font-size: 0.875rem;
+	transition: all 0.2s ease;
 }
 
-table tr:hover {
-	background-color: #222;
-	color: #00f2ff;
-	transition: 0.3s;
+.btn-success:hover {
+	background: linear-gradient(to bottom, #3d8aff, #2470e0);
+	transform: translateY(-1px);
 }
 
-/* Breadcrumb Styling */
+.badge-info {
+	background-color: #2b7fff;
+	color: #fff;
+	font-weight: 600;
+	padding: 5px 10px;
+	border-radius: 12px;
+}
+
 .breadcrumb {
-	background: transparent;
+	background-color: transparent;
+	padding: 0;
+	margin-bottom: 1rem;
 }
 
 .breadcrumb-item a {
-	color: #b0b0b0;
+	color: #2b7fff;
 	text-decoration: none;
 }
 
 .breadcrumb-item.active {
-	color: #00f2ff;
+	color: #a0a0a0;
 }
 
-/* Footer */
-.main-footer {
-	background-color: #111;
-	border-top: 1px solid #222;
-	color: #777;
-	text-align: center;
-	padding: 10px;
+.breadcrumb-item + .breadcrumb-item::before {
+	color: #555;
 }
+
+.text-section {
+	margin-bottom: 2rem;
+	padding: 20px;
+	background-color: #1a1a1a;
+	border-radius: 4px;
+	border-left: 4px solid #2b7fff;
+}
+
+.text-section h1 {
+	margin-top: 0;
+	font-size: 1.8rem;
+}
+
+.text-section p {
+	line-height: 1.6;
+	margin-bottom: 0.5rem;
+	color: #d0d0d0;
+}
+
+/* Table responsiveness */
+.table-responsive {
+	overflow-x: auto;
+	border-radius: 4px;
+}
+
+/* Content header improvements */
+.content-header {
+	margin-bottom: 1.5rem;
+}
+
+/* Card body padding */
+.card-body {
+	padding: 1.5rem;
+}
+
+/* SweetAlert customization */
+.swal2-popup {
+	background-color: #1a1a1a !important;
+	color: #e0e0e0 !important;
+	border: 1px solid #2a2a2a;
+}
+
+.swal2-title {
+	color: #2b7fff !important;
+}
+
+.swal2-confirm {
+	background: linear-gradient(to bottom, #2b7fff, #1a5dd0) !important;
+}
+
+/* Remove loader styles */
 </style>
-<body class="hold-transition sidebar-mini layout-fixed">
-
+<body class="hold-transition sidebar-mini layout-fixed dark-mode">
 	<div class="wrapper">
 
-		<!-- Cyber Loader -->
-		<div id="loader-container">
-			<div id="loader-bar"></div>
-		</div>
-
+		<!-- Header & Sidebar -->
 		<div th:replace="fragments/header :: header"></div>
 		<div th:replace="fragments/sidebar :: aside"></div>
 
+		<!-- Main Content -->
 		<div class="content-wrapper">
 			<section class="content-header">
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>
-								<i class="fas fa-list-ol playlist-icon"></i> View VM Connetion
-							</h1>
+							<h1>[[${pageTitle}]]</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
 								<li class="breadcrumb-item"><a href="#"><i
 										class="fas fa-home"></i> Home</a></li>
-								<li class="breadcrumb-item active"><a href="#">VM
-										Connetion</a></li>
+								<li class="breadcrumb-item active">VM Connection</li>
 							</ol>
 						</div>
 					</div>
 				</div>
 			</section>
 
+			<!-- Lab Access Instructions -->
+			<div class="row" style="margin-left: 1rem;">
+				<div class="col-md-12">
+					<div class="text-section">
+						<h1>LAB ACCESS GUIDELINES</h1>
+						<p>To support the completion of this scenario, you have access
+							to a C2 Server running Kali Linux for receiving reverse
+							connections.</p>
+						<p>Browser-based access is provided via a web GUI service and
+							SSH for Webshell access.</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Table and Instructions -->
 			<section class="content">
 				<div class="container-fluid">
 					<div class="row">
@@ -170,77 +236,47 @@ table tr:hover {
 							<div class="card">
 								<div class="card-header">
 									<h3 class="card-title">
-										<i class="text-primary"></i> Overview
+										<i class="fas fa-network-wired"></i> Overview
 									</h3>
 								</div>
-								<div class="card-body" id="table-container">
-									<div class="row">
-										<!-- Left side: Table -->
-										<div class="col-md-7">
-											<table class="table table-bordered table-striped">
-												<thead style="background-color: darkgrey; color: white;">
-													<tr>
-														<th style="width: 60px;">ID</th>
-														<th>Lab Name</th>
-														<th>Instance Ip</th>
-														<th>Physical Server Ip</th>
-														<th>Location Path</th>
-														<th>Tag</th>
-														<th style="width: 150px;">Actions</th>
-													</tr>
-												</thead>
-												<tbody>
-													<!-- Show table rows only if connections is not null and not empty -->
-													<th:block
-														th:if="${connections != null and !connections.empty}">
-														<tr th:each="conn : ${connections}">
-															<td th:text="${conn.id}"></td>
-															<td th:text="${conn.instance_name}"></td>
-															<td><span class="badge badge-info"
-																th:text="${conn.instance_ip}"></span></td>
-															<td th:text="${conn.physicalServerIP}"></td>
-															<td th:text="${conn.vm_location_path}"></td>
-															<td th:text="${conn.lab_tag}"></td>
-
-															<td><a
-																th:href="@{|/guac/viewPlaylistConnection/${conn.guacamoleId}|}"
-																class="btn btn-sm btn-success mr-1"> <i
-																	class="fas fa-play"></i> Start
-															</a></td>
-
-														</tr>
-													</th:block>
-
-													<!-- Show message if connections is null or empty -->
-													<tr th:if="${connections == null or connections.empty}">
-														<td colspan="7" class="text-muted">No connection
-															found.</td>
-													</tr>
-												</tbody>
-
-											</table>
-										</div>
-
-										<!-- Right side: Instructions -->
-										<!--										<div class="col-md-5">-->
-										<!--											<div class="card"-->
-										<!--												style="background: #1a1a1a; border: 1px solid #333; padding: 15px;">-->
-										<!--												<h3-->
-										<!--													style="color: #00f2ff; font-family: 'Roboto Mono', monospace;">Instructions</h3>-->
-										<!--												<div th:if="${instructions != null}">-->
-										<!--													<p th:utext="${instructions}"-->
-										<!--														style="white-space: pre-line; color: #e0e0e0;"></p>-->
-										<!--												</div>-->
-										<!--												<div th:if="${instructions == null}">-->
-										<!--													<p class="text-muted">No instructions available for-->
-										<!--														this VM.</p>-->
-										<!--												</div>-->
-										<!--											</div>-->
-										<!--										</div>-->
-									</div>
+								<div class="card-body table-responsive" id="table-container">
+									<table class="table table-bordered table-striped table-hover">
+										<thead>
+											<tr>
+												<th>ID</th>
+												<th>Lab Name</th>
+												<th>Instance IP</th>
+												<th>Physical Server IP</th>
+												<th>Location Path</th>
+												<th>Tag</th>
+												<th>Actions</th>
+											</tr>
+										</thead>
+										<tbody>
+											<th:block
+												th:if="${connections != null and !connections.empty}">
+												<tr th:each="conn : ${connections}">
+													<td th:text="${conn.id}"></td>
+													<td th:text="${conn.instance_name}"></td>
+													<td><span class="badge badge-info"
+														th:text="${conn.instance_ip}"></span></td>
+													<td th:text="${conn.physicalServerIP}"></td>
+													<td th:text="${conn.vm_location_path}"></td>
+													<td th:text="${conn.lab_tag}"></td>
+													<td><a
+														th:href="@{|/guac/viewPlaylistConnection/${conn.guacamoleId}|}"
+														class="btn btn-sm btn-success"> <i class="fas fa-play"></i>
+															Start
+													</a></td>
+												</tr>
+											</th:block>
+											<tr th:if="${connections == null or connections.empty}">
+												<td colspan="7" class="text-muted text-center">No
+													connection found.</td>
+											</tr>
+										</tbody>
+									</table>
 								</div>
-
-								<!-- card-body -->
 							</div>
 						</div>
 					</div>
@@ -248,62 +284,14 @@ table tr:hover {
 			</section>
 		</div>
 
+		<!-- Footer -->
 		<div th:replace="fragments/footer :: footer"></div>
 	</div>
 
 	<div th:replace="template :: jsscript"></div>
 
-	<!--	<script>
-    // Cyber loader logic
-    document.addEventListener("DOMContentLoaded", function () {
-      let loader = document.getElementById("loader-bar");
-      let container = document.getElementById("loader-container");
-      let width = 0;
-
-      let interval = setInterval(() => {
-        width += 1;
-        loader.style.width = width + "%";
-
-        if (width >= 100) {
-          clearInterval(interval);
-
-          // Show Swal after load complete
-          Swal.fire({
-            title: 'Simulation Ready',
-            text: "Do you want to start ?",
-            icon: 'info',
-            background: '#1a1a1a',
-            color: '#e0e0e0',
-            showCancelButton: true,
-            confirmButtonText: '🚀 Start',
-            cancelButtonText: '❌ Cancel',
-            confirmButtonColor: '#00f2ff',
-            cancelButtonColor: '#444'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              document.getElementById("table-container").style.display = "block";
-            }
-            // Hide loader after swal
-            container.style.display = "none";
-          });
-        }
-      }, 100); // 10 seconds
-    });
-  </script>-->
-
-	<script>
-		document.addEventListener("DOMContentLoaded", function() {
-			// Hide the loader container
-			const container = document.getElementById("loader-container");
-			if (container)
-				container.style.display = "none";
-
-			// Show the main content
-			const tableContainer = document.getElementById("table-container");
-			if (tableContainer)
-				tableContainer.style.display = "block";
-		});
-	</script>
-
+	
+	
 </body>
+
 </html>

@@ -44,6 +44,15 @@ body {
 	margin-left: 10rem;
 	align-self: flex-end;
 }
+
+/* Added for tab switching functionality */
+.tab-pane {
+	display: none;
+}
+
+.tab-pane.active {
+	display: block;
+}
 </style>
 
 <link rel="stylesheet" th:href="@{/webtemplate/css/style_connetion.css}">
@@ -91,16 +100,20 @@ body {
 
 			<!-- Sidebar with instructions and chat -->
 			<div class="sidebar" id="instruction-sidebar">
-				<div class="sidebar-tabs">
+				<div class="sidebar-tabs" th:each="instance : ${instructionsdata}">
 					<button class="sidebar-tab active" data-tab="instructions">
-						<i class="fas fa-list-ol"></i> Instructions
+						<i class="fas fa-book"></i> Instructions
 					</button>
-					<button class="sidebar-tab" data-tab="chat">
+
+					<button class="sidebar-tab" data-tab="chat"
+						th:attr="data-id=${instance.guacamoleId}">
 						<i class="fas fa-comments"></i> Chat Support
 					</button>
+
 					<button class="sidebar-tab" data-tab="details">
 						<i class="fas fa-info-circle"></i> Details
 					</button>
+
 				</div>
 
 				<div class="tab-content">
@@ -111,51 +124,30 @@ body {
 
 							<div class="instruction-content">
 								<div th:each="instance : ${instructionsdata}">
-									<!-- 									<div th:utext="${instance.guacamoleId}"></div> -->
-									<!-- 									<div th:text="${instance.instance_name}"></div> -->
-									<!-- 									<div th:text="${instance.vm_status}"></div> -->
 									<div th:text="${instance.vm_instructions}"></div>
-									<!-- Add other fields as needed -->
 								</div>
-
 							</div>
 						</div>
 					</div>
 
-					<!-- Chat Tab -->
+
+
 					<div class="tab-pane" id="chat-tab">
 						<div class="chat-container">
-							<div th:each="instructions : ${instructionscommanddata}">
-								<!-- Message for Instruction -->
-								<div class="message incoming">
-									<div class="message-content"
-										th:text="${instructions.Instruction}"></div>
-								</div>
-
-								<!-- Message for Command -->
-								<div class="message incoming">
-									<div class="message-content" th:text="${instructions.Command}"></div>
-								</div>
-
-								<!-- Continue button for each Command -->
-								<div class="messageoutgoing">
-									<button class="continue-button"
-										th:data-command="${instructions.Command}"
-										th:data-lab-id="${instructions.LabId}"
-										onclick="continueAction(this.dataset.command, this.dataset.labId)">
-										Continue</button>
-								</div>
+							<div id="chat-messages">
+								<!-- 🔧 This was missing -->
+								<!-- Messages will be dynamically appended here -->
 							</div>
 
+							<!-- Continue button for each Command -->
+							<div class="messageoutgoing">
+								<!-- 								<button class="continue-button" -->
+								<!-- 									onclick="continueAction(labid,command)">Continue</button> -->
+								<button class="continue-button" data-labid="" data-command=""
+									onclick="handleContinueClick(this)">Continue</button>
 
 
-							<!-- 							<div class="chat-input"> -->
-							<!-- 								<input type="text" placeholder="Type your message..." -->
-							<!-- 									id="chat-input"> -->
-							<!-- 								<button id="send-message"> -->
-							<!-- 									<i class="fas fa-paper-plane"></i> -->
-							<!-- 								</button> -->
-							<!-- 							</div> -->
+							</div>
 						</div>
 					</div>
 
@@ -163,18 +155,6 @@ body {
 					<!-- Details Tab -->
 					<div class="tab-pane" id="details-tab">
 						<h5 class="mb-3">Connection Details</h5>
-
-
-						<!-- 	<div class="instruction-content"> -->
-						<!-- 								<div th:each="instance : ${instructionsdata}"> -->
-						<!-- 									<div th:utext="${instance.guacamoleId}"></div> -->
-						<!-- 									<div th:text="${instance.instance_name}"></div> -->
-						<!-- 									<div th:text="${instance.vm_status}"></div> -->
-						<!-- 									<div th:text="${instance.vm_instructions}"></div> -->
-						<!-- 									Add other fields as needed -->
-						<!-- 								</div> -->
-
-
 						<div class="details-grid">
 							<div th:each="instance : ${instructionsdata}">
 								<div class="detail-label">Name:</div>
@@ -199,27 +179,6 @@ body {
 								<div th:text="${username}">Administrator</div>
 							</div>
 						</div>
-
-						<!-- 						<h6 class="mt-4 mb-3">System Resources</h6> -->
-
-						<!-- 						<div class="system-stats"> -->
-						<!-- 							<div class="stat-card"> -->
-						<!-- 								<div class="stat-value" id="cpu-usage">12%</div> -->
-						<!-- 								<div class="stat-label">CPU Usage</div> -->
-						<!-- 							</div> -->
-						<!-- 							<div class="stat-card"> -->
-						<!-- 								<div class="stat-value" id="memory-usage">64%</div> -->
-						<!-- 								<div class="stat-label">Memory Usage</div> -->
-						<!-- 							</div> -->
-						<!-- 							<div class="stat-card"> -->
-						<!-- 								<div class="stat-value" id="network-in">3.2 Mbps</div> -->
-						<!-- 								<div class="stat-label">Network In</div> -->
-						<!-- 							</div> -->
-						<!-- 							<div class="stat-card"> -->
-						<!-- 								<div class="stat-value" id="network-out">1.5 Mbps</div> -->
-						<!-- 								<div class="stat-label">Network Out</div> -->
-						<!-- 							</div> -->
-						<!-- 						</div> -->
 					</div>
 				</div>
 			</div>
@@ -227,21 +186,190 @@ body {
 	</div>
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<!-- SweetAlert2 -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script>
-        $(document).ready(function() {
-            // Tab switching functionality
-            $('.sidebar-tab').click(function() {
-                const tabId = $(this).data('tab');
-                
-                // Update active tab
-                $('.sidebar-tab').removeClass('active');
-                $(this).addClass('active');
-                
-                // Show corresponding content
-                $('.tab-pane').removeClass('active');
-                $(`#${tabId}-tab`).addClass('active');
+       
+   document.querySelectorAll('.sidebar-tab').forEach(button => {
+    button.addEventListener('click', function () {
+        const tab = this.getAttribute('data-tab');
+
+        // Activate the correct tab visually and functionally
+        switchTab(tab);
+
+        // If it's the chat tab, also handle guacamoleId
+        if (tab === 'chat') {
+            const guacamoleId = this.getAttribute('data-id');
+            if (guacamoleId) {
+                // Optional: use guacamoleId for something
+//                 alert('Chat tab selected with ID: ' + guacamoleId);
+                continueActionforLAbOnload(guacamoleId)
+//                 continueAction(guacamoleId);
+            }
+        }
+    });
+});
+   
+
+function continueActionforLAbOnload(id) {
+    $.ajax({
+        type: "POST",
+        url: "/guac/loadInitialInstruction",
+        data: { labId: id },
+        success: function (response) {
+            if (response.success) {
+                const newInstruction = response.instruction;
+                const newCommand = response.command;
+                const isLast = response.isLast || false;
+
+                const instructionHtml = `
+                    <div class="message incoming">
+                        <div class="message-content">${newInstruction}</div>
+                    </div>
+                `;
+
+                const commandHtml = `
+                    <div class="message incoming">
+                        <div class="message-content">${newCommand}</div>
+                    </div>
+                `;
+
+                $('#chat-messages').append(instructionHtml).append(commandHtml);
+
+                // ✅ Update the Continue button with latest data
+                $('.continue-button')
+                    .attr('data-labid', id)
+                    .attr('data-command', newCommand);
+
+                // Auto-scroll
+                const chatMessages = $('#chat-messages');
+                chatMessages.scrollTop(chatMessages[0].scrollHeight);
+
+                if (isLast) {
+                    $('.continue-button').prop('disabled', true).text("Completed");
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: response.error || 'Failed to load instruction.'
+                });
+            }
+        },
+        error: function () {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while fetching data.'
             });
-            
+        }
+    });
+}
+
+$('.continue-button')
+.attr('data-labid', id)
+.attr('data-command', newCommand);
+
+   
+   function handleContinueClick(button) {
+	    const labId = button.getAttribute('data-labid');
+	    const command = button.getAttribute('data-command');
+// 	    alert("labId :"+labId)
+// 	     alert("command :"+command)
+	    continueAction(labId, command);
+	}
+
+   
+   function continueAction(id,command) {
+	    $.ajax({
+	        type: "POST",
+	        url: "/guac/continueActionInstruction",
+	        data: {
+	            labId: id,
+	            labcommand: command
+	        },
+	        success: function (response) {
+	            if (response.success) {
+	            	
+	                const newInstruction = response.instruction;
+// 	                alert("newInstruction :"+newInstruction)
+	                const newCommand = response.command;
+// 	                alert("newCommand :"+newCommand)
+	                const isLast = response.isLast || false;
+	                $('.continue-button')
+	                .attr('data-labid', id)
+	                .attr('data-command', newCommand);
+	                // Instruction HTML
+	                const instructionHtml = `
+	                    <div class="message incoming">
+	                        <div class="message-content">${newInstruction}</div>
+	                    </div>
+	                `;
+
+	                // Command HTML
+	                const commandHtml = `
+	                    <div class="message incoming">
+	                        <div class="message-content">${newCommand}</div>
+	                    </div>
+	                `;
+
+	                // Append to chat window
+	                $('#chat-messages').append(instructionHtml).append(commandHtml);
+
+	                // Auto scroll to bottom
+	                const chatMessages = $('#chat-messages');
+	                chatMessages.scrollTop(chatMessages[0].scrollHeight);
+
+	                // Disable button if it's the last step
+	                if (isLast) {
+	                    $('.continue-button').prop('disabled', true).text("Completed");
+	                }
+	            } else {
+	                Swal.fire({
+	                    icon: 'error',
+	                    title: 'Failed',
+	                    text: response.error || 'Failed to load instruction.'
+	                });
+	            }
+	        },
+	        error: function () {
+	            Swal.fire({
+	                icon: 'error',
+	                title: 'Error',
+	                text: 'An error occurred while fetching data.'
+	            });
+	        }
+	    });
+	}
+
+
+function switchTab(tabName) {
+    // Remove active class from all tabs
+    document.querySelectorAll('.sidebar-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+
+    // Highlight the clicked tab
+    document.querySelectorAll('.sidebar-tab').forEach(tab => {
+        if (tab.getAttribute('data-tab') === tabName) {
+            tab.classList.add('active');
+        }
+    });
+
+    // Hide all tab content
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.remove('active');
+    });
+
+    // Show selected tab
+    const tabContent = document.getElementById(tabName + '-tab');
+    if (tabContent) {
+        tabContent.classList.add('active');
+    }
+}
+
+
+        $(document).ready(function() {
             // Toggle sidebar visibility
             $('#toggle-sidebar').click(function() {
                 $('#instruction-sidebar').toggle();
@@ -351,71 +479,6 @@ body {
                 $('#network-out').text((Math.random() * 3 + 0.5).toFixed(1) + ' Mbps');
             }, 5000);
         });
-        
-        
-        function continueAction(command, labId) {
-            // Display an alert with the Command and LabId values
-            alert("Command: " + command + "\nLabId: " + labId);
-
-            // AJAX call to get new instruction and command for the next step
-            $.ajax({
-                type: "POST",
-                url: "/guac/continueActionforLAb", // Your endpoint to handle the "Continue" action
-                data: {
-                    command: command,
-                    labId: labId
-                },
-                success: function(response) {
-                    // Now 'response' is a JavaScript object (parsed from JSON by the browser)
-                    // Check if the response indicates success
-                    if (response.success) {
-                        const newInstruction = response.instruction; // Get new instruction from the response
-                        const newCommand = response.command;         // Get new command from the response
-
-                        // Create the new instruction and command elements
-                        const newMessageIncomingInstruction = `
-                            <div class="message incoming">
-                                <div class="message-content">${newInstruction}</div>
-                            </div>
-                        `;
-
-                        const newMessageIncomingCommand = `
-                            <div class="message incoming">
-                                <div class="message-content">${newCommand}</div>
-                            </div>
-                        `;
-
-                        // Append the new instruction and command to the chat container
-                        $('#chat-messages').append(newMessageIncomingInstruction);
-                        $('#chat-messages').append(newMessageIncomingCommand);
-
-                        // Optionally scroll to the bottom after appending the new message
-                        const chatMessages = $('#chat-messages');
-                        chatMessages.scrollTop(chatMessages[0].scrollHeight);
-                    } else {
-                        // Handle the case where the server response indicates failure
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Failed',
-                            text: response.error || 'Failed to load new instruction and command.'
-                        });
-                    }
-                },
-                error: function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'An error occurred while fetching new data. Please try again.'
-                    });
-                }
-            });
-        }
-
-
-
-    
-
-
     </script>
 </body>
 </html>

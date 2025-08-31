@@ -1,5 +1,6 @@
 package in.canaris.cloud.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +11,11 @@ import in.canaris.cloud.openstack.entity.CommandHistory;
 
 public interface CommandHistoryRepository extends JpaRepository<CommandHistory, Integer> {
 
+//	 @Query("SELECT ch FROM CommandHistory ch WHERE ch.ContainerName = :labId AND ch.Command = :command")
+//	    Optional<CommandHistory> findByLabIdAndCommand(@Param("labId") String labId, @Param("command") String command);
+
+	@Query("SELECT ch FROM CommandHistory ch WHERE ch.ContainerId = :labId")
+	List<CommandHistory> findByLabId(String labId);
+
 	
-	 @Query("SELECT ch FROM CommandHistory ch WHERE ch.ContainerName = :labId AND ch.Command = :command")
-	    Optional<CommandHistory> findByLabIdAndCommand(@Param("labId") String labId, @Param("command") String command);
 }
