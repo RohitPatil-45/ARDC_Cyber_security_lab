@@ -189,6 +189,118 @@ body {
 	<!-- SweetAlert2 -->
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script>
+	
+	  $(document).ready(function() {
+          // Toggle sidebar visibility
+          $('#toggle-sidebar').click(function() {
+              $('#instruction-sidebar').toggle();
+              const isVisible = $('#instruction-sidebar').is(':visible');
+              $(this).html(isVisible ? 
+                  '<i class="fas fa-times"></i> Close' : 
+                  '<i class="fas fa-comments"></i> Instructions');
+          });
+          
+          // Fullscreen functionality
+          $('#fullscreen-btn').click(function() {
+              const elem = $('.connection-container')[0];
+              
+              if (!document.fullscreenElement) {
+                  if (elem.requestFullscreen) {
+                      elem.requestFullscreen();
+                  } else if (elem.webkitRequestFullscreen) {
+                      elem.webkitRequestFullscreen();
+                  } else if (elem.msRequestFullscreen) {
+                      elem.msRequestFullscreen();
+                  }
+                  $(this).html('<i class="fas fa-compress"></i> Exit Fullscreen');
+              } else {
+                  if (document.exitFullscreen) {
+                      document.exitFullscreen();
+                  } else if (document.webkitExitFullscreen) {
+                      document.webkitExitFullscreen();
+                  } else if (document.msExitFullscreen) {
+                      document.msExitFullscreen();
+                  }
+                  $(this).html('<i class="fas fa-expand"></i> Fullscreen');
+              }
+          });
+          
+          // Session timer
+          let startTime = Date.now();
+          function updateTimer() {
+              const elapsed = Date.now() - startTime;
+              const seconds = Math.floor((elapsed / 1000) % 60);
+              const minutes = Math.floor((elapsed / (1000 * 60)) % 60);
+              const hours = Math.floor(elapsed / (1000 * 60 * 60));
+              
+              const timeString = [
+                  hours.toString().padStart(2, '0'),
+                  minutes.toString().padStart(2, '0'),
+                  seconds.toString().padStart(2, '0')
+              ].join(':');
+              
+              $('#session-timer').text(timeString);
+              $('#connection-duration').text(timeString);
+          }
+          setInterval(updateTimer, 1000);
+          
+          // Simulate connection loading
+          $('#rdp-frame').on('load', function() {
+              $('#loading-indicator').fadeOut();
+          });
+          
+          // Chat functionality
+          $('#send-message').click(sendMessage);
+          $('#chat-input').keypress(function(e) {
+              if (e.which === 13) { // Enter key
+                  sendMessage();
+              }
+          });
+          
+          function sendMessage() {
+              const messageText = $('#chat-input').val().trim();
+              if (messageText) {
+                  const now = new Date();
+                  const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                  
+                  // Add user message
+                  $('#chat-messages').append(`
+                      <div class="message outgoing">
+                          <div class="message-content">${messageText}</div>
+                          <div class="message-time">${timeString}</div>
+                      </div>
+                  `);
+                  
+                  // Clear input
+                  $('#chat-input').val('');
+                  
+                  // Scroll to bottom
+                  const chatMessages = $('#chat-messages');
+                  chatMessages.scrollTop(chatMessages[0].scrollHeight);
+                  
+                  // Simulate bot response after a delay
+                  setTimeout(() => {
+                      $('#chat-messages').append(`
+                          <div class="message incoming">
+                              <div class="message-sender">Support Bot</div>
+                              <div class="message-content">Thanks for your message. Our support team will respond shortly.</div>
+                              <div class="message-time">${timeString}</div>
+                          </div>
+                      `);
+                      chatMessages.scrollTop(chatMessages[0].scrollHeight);
+                  }, 1000);
+              }
+          }
+          
+          // Simulate resource usage updates
+          setInterval(() => {
+              $('#cpu-usage').text(Math.floor(Math.random() * 30 + 5) + '%');
+              $('#memory-usage').text(Math.floor(Math.random() * 30 + 50) + '%');
+              $('#network-in').text((Math.random() * 5 + 1).toFixed(1) + ' Mbps');
+              $('#network-out').text((Math.random() * 3 + 0.5).toFixed(1) + ' Mbps');
+          }, 5000);
+      });
+	  
        
    document.querySelectorAll('.sidebar-tab').forEach(button => {
     button.addEventListener('click', function () {
@@ -249,11 +361,11 @@ function continueActionforLAbOnload(id) {
                     $('.continue-button').prop('disabled', true).text("Completed");
                 }
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Failed',
-                    text: response.error || 'Failed to load instruction.'
-                });
+//                 Swal.fire({
+//                     icon: 'error',
+//                     title: 'Failed',
+//                     text: response.error || 'Failed to load instruction.'
+//                 });
             }
         },
         error: function () {
@@ -368,117 +480,6 @@ function switchTab(tabName) {
     }
 }
 
-
-        $(document).ready(function() {
-            // Toggle sidebar visibility
-            $('#toggle-sidebar').click(function() {
-                $('#instruction-sidebar').toggle();
-                const isVisible = $('#instruction-sidebar').is(':visible');
-                $(this).html(isVisible ? 
-                    '<i class="fas fa-times"></i> Close' : 
-                    '<i class="fas fa-comments"></i> Instructions');
-            });
-            
-            // Fullscreen functionality
-            $('#fullscreen-btn').click(function() {
-                const elem = $('.connection-container')[0];
-                
-                if (!document.fullscreenElement) {
-                    if (elem.requestFullscreen) {
-                        elem.requestFullscreen();
-                    } else if (elem.webkitRequestFullscreen) {
-                        elem.webkitRequestFullscreen();
-                    } else if (elem.msRequestFullscreen) {
-                        elem.msRequestFullscreen();
-                    }
-                    $(this).html('<i class="fas fa-compress"></i> Exit Fullscreen');
-                } else {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    } else if (document.webkitExitFullscreen) {
-                        document.webkitExitFullscreen();
-                    } else if (document.msExitFullscreen) {
-                        document.msExitFullscreen();
-                    }
-                    $(this).html('<i class="fas fa-expand"></i> Fullscreen');
-                }
-            });
-            
-            // Session timer
-            let startTime = Date.now();
-            function updateTimer() {
-                const elapsed = Date.now() - startTime;
-                const seconds = Math.floor((elapsed / 1000) % 60);
-                const minutes = Math.floor((elapsed / (1000 * 60)) % 60);
-                const hours = Math.floor(elapsed / (1000 * 60 * 60));
-                
-                const timeString = [
-                    hours.toString().padStart(2, '0'),
-                    minutes.toString().padStart(2, '0'),
-                    seconds.toString().padStart(2, '0')
-                ].join(':');
-                
-                $('#session-timer').text(timeString);
-                $('#connection-duration').text(timeString);
-            }
-            setInterval(updateTimer, 1000);
-            
-            // Simulate connection loading
-            $('#rdp-frame').on('load', function() {
-                $('#loading-indicator').fadeOut();
-            });
-            
-            // Chat functionality
-            $('#send-message').click(sendMessage);
-            $('#chat-input').keypress(function(e) {
-                if (e.which === 13) { // Enter key
-                    sendMessage();
-                }
-            });
-            
-            function sendMessage() {
-                const messageText = $('#chat-input').val().trim();
-                if (messageText) {
-                    const now = new Date();
-                    const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                    
-                    // Add user message
-                    $('#chat-messages').append(`
-                        <div class="message outgoing">
-                            <div class="message-content">${messageText}</div>
-                            <div class="message-time">${timeString}</div>
-                        </div>
-                    `);
-                    
-                    // Clear input
-                    $('#chat-input').val('');
-                    
-                    // Scroll to bottom
-                    const chatMessages = $('#chat-messages');
-                    chatMessages.scrollTop(chatMessages[0].scrollHeight);
-                    
-                    // Simulate bot response after a delay
-                    setTimeout(() => {
-                        $('#chat-messages').append(`
-                            <div class="message incoming">
-                                <div class="message-sender">Support Bot</div>
-                                <div class="message-content">Thanks for your message. Our support team will respond shortly.</div>
-                                <div class="message-time">${timeString}</div>
-                            </div>
-                        `);
-                        chatMessages.scrollTop(chatMessages[0].scrollHeight);
-                    }, 1000);
-                }
-            }
-            
-            // Simulate resource usage updates
-            setInterval(() => {
-                $('#cpu-usage').text(Math.floor(Math.random() * 30 + 5) + '%');
-                $('#memory-usage').text(Math.floor(Math.random() * 30 + 50) + '%');
-                $('#network-in').text((Math.random() * 5 + 1).toFixed(1) + ' Mbps');
-                $('#network-out').text((Math.random() * 3 + 0.5).toFixed(1) + ' Mbps');
-            }, 5000);
-        });
     </script>
 </body>
 </html>

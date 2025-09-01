@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +41,7 @@ import in.canaris.cloud.openstack.entity.Add_Scenario;
 import in.canaris.cloud.openstack.entity.CommandHistory;
 import in.canaris.cloud.openstack.entity.InstructionCommand;
 import in.canaris.cloud.openstack.entity.Playlist;
+import in.canaris.cloud.openstack.entity.ScenarioComments;
 import in.canaris.cloud.repository.ScenarioRepository;
 import in.canaris.cloud.repository.UserRepository;
 import in.canaris.cloud.repository.CloudInstanceRepository;
@@ -45,6 +49,7 @@ import in.canaris.cloud.repository.PlaylistRepository;
 import in.canaris.cloud.repository.PlaylistsSenarioRepository;
 import in.canaris.cloud.repository.InstructionCommandRepository;
 import in.canaris.cloud.repository.CommandHistoryRepository;
+import in.canaris.cloud.repository.ScenarioCommentsRepository;
 
 import in.canaris.cloud.service.GuacamoleService;
 
@@ -78,6 +83,9 @@ public class GuacamoleController {
 
 	@Autowired
 	private CommandHistoryRepository CommandHistoryRepository;
+
+	@Autowired
+	private ScenarioCommentsRepository ScenarioCommentsRepository;
 
 	@GetMapping("/")
 	public String home() {
@@ -177,9 +185,9 @@ public class GuacamoleController {
 
 		// Pass to view
 		model.addAttribute("connections", connections);
-		
-		mav.addObject("pageTitle","Scenerio Name : "+ scenario.getScenarioName());
-		
+
+		mav.addObject("pageTitle", "Scenerio Name : " + scenario.getScenarioName());
+
 //		model.addAttribute("instructions", connections.getVm_instructions()); // If scenario has instructions
 		return mav;
 	}
@@ -208,6 +216,33 @@ public class GuacamoleController {
 		return "viewConnection";
 	}
 
+//	@PostMapping("/loadInitialInstruction")
+//	@ResponseBody
+//	public Map<String, Object> loadInitialInstruction(@RequestParam String labId) {
+//		Map<String, Object> response = new HashMap<>();
+//		try {
+//			InstructionCommand instructionCommand = InstructionCommandRepository.findNextUnexecutedByLabId(labId);
+//
+//			if (instructionCommand != null) {
+//				response.put("success", true);
+//				response.put("instruction", instructionCommand.getInstruction());
+//				response.put("command", instructionCommand.getCommand());
+//				response.put("isLast", false); // Set this properly if needed
+//			} else {
+//				response.put("success", false);
+//				response.put("error", "No unexecuted instructions found.");
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			response.put("success", false);
+//			response.put("error", "Failed to load instruction.");
+//		}
+//
+//		return response;
+//	}
+
+	private final ConcurrentHashMap<String, String> lastCommandMap = new ConcurrentHashMap<>();
+
 	@PostMapping("/loadInitialInstruction")
 	@ResponseBody
 	public Map<String, Object> loadInitialInstruction(@RequestParam String labId) {
@@ -216,10 +251,24 @@ public class GuacamoleController {
 			InstructionCommand instructionCommand = InstructionCommandRepository.findNextUnexecutedByLabId(labId);
 
 			if (instructionCommand != null) {
-				response.put("success", true);
-				response.put("instruction", instructionCommand.getInstruction());
-				response.put("command", instructionCommand.getCommand());
-				response.put("isLast", false); // Set this properly if needed
+				String newCommand = instructionCommand.getCommand();
+
+				// ✅ Compare with the last stored command
+				String lastCommand = lastCommandMap.get(labId + "~" + newCommand);
+
+				if (newCommand != null && newCommand.equals(lastCommand)) {
+//					response.put("success", false);
+//					response.put("error", "Duplicate command. Nothing new to return.");
+//					return response;
+				} else {
+
+					response.put("success", true);
+					response.put("instruction", instructionCommand.getInstruction());
+					response.put("command", newCommand);
+					response.put("isLast", false);
+					lastCommandMap.put(labId + "~" + newCommand, newCommand);
+				}
+
 			} else {
 				response.put("success", false);
 				response.put("error", "No unexecuted instructions found.");
@@ -1413,5 +1462,99 @@ public class GuacamoleController {
 		}
 		return result;
 	}
+
+//	
+
+	@PostMapping("/addComment")
+	@ResponseBody
+	public String addComment(@RequestParam("comment") String comment, @RequestParam("scenarioId") Long scenarioId,
+			Principal principal) {
+		String result = "fail";
+		try {
+			// Get the logged-in user
+			User loginedUser = (User) ((Authentication) principal).getPrincipal();
+			String username = loginedUser.getUsername();
+
+			ScenarioComments savedComment = new ScenarioComments();
+			savedComment.setScenarioId(scenarioId);
+			savedComment.setComment(comment);
+			savedComment.setCreateBy(username);
+			savedComment.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+
+			ScenarioCommentsRepository.save(savedComment);
+
+			result = "success";
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Error saving comment: " + e.getMessage());
+		}
+		return result;
+	}
+
+	@GetMapping("/getComments")
+	@ResponseBody
+	public List<Map<String, Object>> getComments(@RequestParam("scenarioId") Long scenarioId) {
+		List<ScenarioComments> comments = ScenarioCommentsRepository.findByScenarioId(scenarioId);
+
+		List<Map<String, Object>> response = new ArrayList<>();
+		for (ScenarioComments c : comments) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("id", c.getId());
+			map.put("content", c.getComment());
+			map.put("author", c.getCreateBy());
+			map.put("createdAt", c.getCreatedAt());
+			response.add(map);
+		}
+
+		return response;
+	}
+
+	@PostMapping("/updateComment")
+	@ResponseBody
+	public String updateComment(@RequestParam("commentId") Long commentId, @RequestParam("comment") String comment,
+			Principal principal) {
+
+		String result = "fail";
+		try {
+			User loginedUser = (User) ((Authentication) principal).getPrincipal();
+			String username = loginedUser.getUsername();
+
+			Timestamp updatedTime = Timestamp.valueOf(LocalDateTime.now());
+
+			int updatedRows = ScenarioCommentsRepository.updateCommentById(commentId, comment, username, updatedTime);
+
+			if (updatedRows > 0) {
+				result = "success";
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Error updating comment: " + e.getMessage());
+		}
+
+		return result;
+	}
+	
+	
+	@PostMapping("/deleteComment")
+	@ResponseBody
+	public String deleteComment(@RequestParam("commentId") Long commentId) {
+	    String result = "fail";
+	    try {
+	        int deletedRows = ScenarioCommentsRepository.deleteByIdCustom(commentId);
+
+	        if (deletedRows > 0) {
+	            result = "success";
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        System.out.println("Error deleting comment: " + e.getMessage());
+	    }
+
+	    return result;
+	}
+
 
 }

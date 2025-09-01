@@ -133,9 +133,114 @@ body {
 .start-btn i {
 	font-size: 0.9rem;
 }
+
+/* Comments Section Styles */
+.comment {
+	background-color: #2a2a2a;
+	border-radius: 8px;
+	padding: 15px;
+	margin-bottom: 15px;
+	position: relative;
+}
+
+.comment-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+.comment-author {
+	font-weight: 600;
+	color: #3b82f6;
+}
+
+.comment-date {
+	color: #888;
+	font-size: 0.85rem;
+}
+
+.comment-content {
+	color: #e0e0e0;
+	line-height: 1.5;
+	margin-bottom: 10px;
+}
+
+.comment-actions {
+	display: flex;
+	gap: 15px;
+}
+
+.comment-action-btn {
+	background: none;
+	border: none;
+	color: #3b82f6;
+	cursor: pointer;
+	font-size: 0.9rem;
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	transition: color 0.2s;
+}
+
+.comment-action-btn:hover {
+	color: #60a5fa;
+}
+
+.comment-form {
+	background-color: #2a2a2a;
+	border-radius: 8px;
+	padding: 20px;
+	margin-bottom: 20px;
+}
+
+.comment-textarea {
+	width: 100%;
+	background-color: #1e1e1e;
+	border: 1px solid #444;
+	border-radius: 6px;
+	color: #e0e0e0;
+	padding: 12px;
+	resize: vertical;
+	min-height: 100px;
+	margin-bottom: 15px;
+	font-family: 'Roboto', sans-serif;
+}
+
+.comment-form-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+}
+
+.comment-submit-btn, .comment-cancel-btn {
+	padding: 8px 16px;
+	border-radius: 6px;
+	font-weight: 500;
+	cursor: pointer;
+	border: none;
+}
+
+.comment-submit-btn {
+	background-color: #3b82f6;
+	color: white;
+}
+
+.comment-cancel-btn {
+	background-color: #6b7280;
+	color: white;
+}
+
+.comment-edit-form {
+	margin-top: 10px;
+}
+
+.hidden {
+	display: none;
+}
 </style>
 
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed dark-mode">
 	<div class="wrapper">
 		<div th:replace="fragments/header :: header"></div>
 		<div th:replace="fragments/sidebar :: aside"></div>
@@ -165,6 +270,35 @@ body {
 					<!-- Scenario card and additional info will be dynamically generated here -->
 				</div>
 			</section>
+
+			<!-- Comments Section -->
+			<div class="col-md-12 mt-4">
+				<div class="card playlist-card">
+					<div class="card-content">
+						<h4 style="margin-bottom: 16px; color: #3b82f6;">Comments</h4>
+
+						<!-- Comment Form (initially hidden) -->
+						<div id="commentForm" class="comment-form hidden">
+							<textarea id="commentText" class="comment-textarea"
+								placeholder="Write your comment here..."></textarea>
+							<div class="comment-form-actions">
+								<button id="cancelCommentBtn" class="comment-cancel-btn">Cancel</button>
+								<button id="submitCommentBtn" class="comment-submit-btn">Submit</button>
+							</div>
+						</div>
+
+						<div id="commentsContainer">
+							<p id="noComments" style="color: #aaa;">No comments available
+								for this scenario.</p>
+							<!-- Comments will be dynamically inserted here -->
+						</div>
+
+						<button id="addCommentBtn" class="btn btn-primary mt-3">
+							<i class="fas fa-plus"></i> Add Comment
+						</button>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<div th:replace="fragments/footer :: footer"></div>
@@ -173,9 +307,13 @@ body {
 	<div th:replace="template :: jsscript"></div>
 
 	<script>
+// Global variables
+let jsonData;
+let scenarioId;
+let editingCommentId = null;
+
 document.addEventListener("DOMContentLoaded", function () {
     let rawData = '[[${listObj}]]'.replace(/&quot;/g, '"');
-    let jsonData;
 
     try {
         jsonData = JSON.parse(rawData);
@@ -187,84 +325,60 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!jsonData || !jsonData.length) return;
 
     const item = jsonData[0];
+    scenarioId = item.Id; // Store scenario ID for later use
     const container = document.getElementById("scenarioContainer");
 
     const fragment = document.createDocumentFragment();
 
- // Card HTML
+    // Card HTML
     const cardHTML = `
-  <div class="col-md-12 mb-4">
-    <div class="playlist-card">
-
-      <!-- Image -->
-      <div class="card-image">
-        <img src="/report/image/${item.Id}" alt="${item.Scenario_Title}" loading="lazy">
-      </div>
-
-      <!-- Content -->
-      <div class="card-content">
-
-        <!-- Title Row -->
-        <div class="mb-2">
-          <h3 class="card-title" style="font-weight: 700; margin: 0;">
-            ${item.Scenario_Title}
-          </h3>
-        </div>
-
-        <!-- Second Row: Scenario Name + Actions -->
-        <div class="d-flex justify-content-between align-items-center flex-wrap mb-3" style="gap: 10px;">
-          
-          <!-- Scenario Name (left side) -->
-          <h5 class="card-subtitle mb-0" style="font-weight: 500; color: #555;">
-            ${item.Scenario_Name || 'N/A'}
-          </h5>
-
-          <!-- Right Side: Start + Dropdown -->
-          <div class="d-flex align-items-center" style="gap: 10px;">
-            
-            <!-- Dropdown -->
-            <div class="form-group mb-0">
-              <select required id="Actions_${item.Id}" name="Actions"
-                      class="form-control btn btn-outline-primary"
-                      style="padding: 8px 12px; height: 38px; font-weight: 500;"
-                      onchange="handleActionChange(this, '${item.Id}')">
-                <option value="">-- Select --</option>
-                <option value="edit">Edit</option>
-                <option value="delete">Delete</option>
-              </select>
+        <div class="col-md-12 mb-4">
+            <div class="playlist-card">
+                <div class="card-image">
+                    <img src="/report/image/${item.Id}" alt="${item.Scenario_Title}" loading="lazy">
+                </div>
+                <div class="card-content">
+                    <div class="mb-2">
+                        <h3 class="card-title" style="font-weight: 700; margin: 0;">
+                            ${item.Scenario_Title}
+                        </h3>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap mb-3" style="gap: 10px;">
+                        <h5 class="card-subtitle mb-0" style="font-weight: 500; color: #555;">
+                            ${item.Scenario_Name || 'N/A'}
+                        </h5>
+                        <div class="d-flex align-items-center" style="gap: 10px;">
+                            <div class="form-group mb-0">
+                                <select required id="Actions_${item.Id}" name="Actions"
+                                        class="form-control btn btn-outline-primary"
+                                        style="padding: 8px 12px; height: 38px; font-weight: 500;"
+                                        onchange="handleActionChange(this, '${item.Id}')">
+                                    <option value="">-- Select --</option>
+                                    <option value="edit">Edit</option>
+                                    <option value="delete">Delete</option>
+                                </select>
+                            </div>
+                            <a href="/guac/View_Vm_Listing?Id=${item.Id}" class="start-btn btn btn-primary" style="font-weight: 500;">
+                                <i class="fas fa-play"></i> Start
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-tags mt-3 d-flex flex-wrap gap-2">
+                        <span class="tag"><i class="fas fa-signal"></i> ${item.Difficulty_Level}</span>
+                        <span class="tag"><i class="fas fa-clock"></i> ${item.Duration}</span>
+                        <span class="tag"><i class="fas fa-gamepad"></i> ${item.Mode}</span>
+                        <span class="tag"><i class="fas fa-layer-group"></i> ${item.Scenario_Type}</span>
+                    </div>
+                </div>
             </div>
-
-            <!-- Start Button -->
-            <a href="/guac/View_Vm_Listing?Id=${item.Id}" class="start-btn btn btn-primary" style="font-weight: 500;">
-              <i class="fas fa-play"></i> Start
-            </a>
-
-          </div>
         </div>
-
-        <!-- Tags -->
-        <div class="card-tags mt-3 d-flex flex-wrap gap-2">
-          <span class="tag"><i class="fas fa-signal"></i> ${item.Difficulty_Level}</span>
-          <span class="tag"><i class="fas fa-clock"></i> ${item.Duration}</span>
-          <span class="tag"><i class="fas fa-gamepad"></i> ${item.Mode}</span>
-          <span class="tag"><i class="fas fa-layer-group"></i> ${item.Scenario_Type}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-`;
-
-
-
-
+    `;
 
     // Info HTML
     const infoHTML = `
         <div class="col-md-12 scenario-info">
-           
             <p><strong>Category:</strong> ${item.Category || 'N/A'}</p>&nbsp;
             <div class="descriptionContent"></div>
-           
         </div>
     `;
 
@@ -282,10 +396,180 @@ document.addEventListener("DOMContentLoaded", function () {
         temp.innerHTML = item.Description || 'N/A';
         descEl.innerHTML = temp.textContent || temp.innerText || 'N/A';
     }
-
-
+    
+    // Load comments for this scenario
+    loadComments();
 });
 
+// Event listeners for comment functionality
+document.getElementById("addCommentBtn").addEventListener("click", showCommentForm);
+document.getElementById("cancelCommentBtn").addEventListener("click", hideCommentForm);
+document.getElementById("submitCommentBtn").addEventListener("click", submitComment);
+
+function showCommentForm() {
+    document.getElementById("commentForm").classList.remove("hidden");
+    document.getElementById("addCommentBtn").classList.add("hidden");
+    document.getElementById("commentText").focus();
+}
+
+function hideCommentForm() {
+    document.getElementById("commentForm").classList.add("hidden");
+    document.getElementById("addCommentBtn").classList.remove("hidden");
+    document.getElementById("commentText").value = "";
+    editingCommentId = null;
+}
+
+function submitComment() {
+    const commentText = document.getElementById("commentText").value.trim();
+    
+    if (!commentText) {
+        Swal.fire("Error", "Comment cannot be empty!", "error");
+        return;
+    }
+    
+    // Prepare data for submission
+    const data = {
+        scenarioId: scenarioId,
+        comment: commentText
+    };
+    
+    // If we're editing an existing comment, add the comment ID
+    if (editingCommentId) {
+        data.commentId = editingCommentId;
+    }
+    
+    // Determine the appropriate endpoint
+    const endpoint = editingCommentId ? "/guac/updateComment" : "/guac/addComment";
+    
+ // Send the request
+    $.ajax({
+        url: endpoint,
+        type: "POST",
+        data: {
+            scenarioId: scenarioId,
+            comment: commentText,
+            ...(editingCommentId && { commentId: editingCommentId }) // add only if editing
+        },
+        success: function (data) {
+            if (data === "success") {
+                Swal.fire("Success", editingCommentId ? "Comment updated successfully!" : "Comment added successfully!", "success");
+                hideCommentForm();
+                loadComments();
+            } else {
+                Swal.fire("Error", data.message || "Failed to save comment.", "error");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("AJAX Error:", error);
+            Swal.fire("Error", "An error occurred while saving the comment.", "error");
+        }
+    });
+
+
+}
+
+function loadComments() {
+    $.ajax({
+        url: `/guac/getComments`,
+        type: "GET",
+        data: { scenarioId: scenarioId }, // Pass scenarioId as query param
+        dataType: "json", // Expect JSON response
+        success: function (comments) {
+            const commentsContainer = document.getElementById("commentsContainer");
+            const noCommentsText = document.getElementById("noComments");
+
+            // Remove all comment blocks
+            commentsContainer.querySelectorAll(".comment").forEach(el => el.remove());
+
+            if (comments && comments.length > 0) {
+                noCommentsText.style.display = 'none';
+
+                comments.forEach(comment => {
+                    const commentEl = createCommentElement(comment);
+                    commentsContainer.appendChild(commentEl);
+                });
+            } else {
+                noCommentsText.style.display = 'block';
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error loading comments:", error);
+        }
+    });
+}
+
+
+function createCommentElement(comment) {
+    const commentEl = document.createElement("div");
+    commentEl.className = "comment";
+    commentEl.dataset.commentId = comment.id;
+    
+    // Format date
+    const commentDate = new Date(comment.createdAt);
+    const formattedDate = commentDate.toLocaleDateString() + ' ' + commentDate.toLocaleTimeString();
+    
+    commentEl.innerHTML = `
+        <div class="comment-header">
+            <span class="comment-author">${comment.author || 'Anonymous'}</span>
+            <span class="comment-date">${formattedDate}</span>
+        </div>
+        <div class="comment-content">${comment.content}</div>
+        <div class="comment-actions">
+            <button class="comment-action-btn edit-comment-btn">
+                <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="comment-action-btn delete-comment-btn">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+    `;
+    
+    // Add event listeners for edit and delete buttons
+    commentEl.querySelector(".edit-comment-btn").addEventListener("click", () => editComment(comment));
+    commentEl.querySelector(".delete-comment-btn").addEventListener("click", () => deleteComment(comment.id));
+    
+    return commentEl;
+}
+
+function editComment(comment) {
+    // Show the comment form with the existing content
+    document.getElementById("commentText").value = comment.content;
+    editingCommentId = comment.id;
+    showCommentForm();
+}
+
+function deleteComment(commentId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This comment will be permanently deleted.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Delete it!',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#e74c3c',
+        cancelButtonColor: '#6c757d'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "/guac/deleteComment",
+                type: "POST",
+                data: ({ commentId: commentId }),
+                success: function(data) {
+                    if (data==="success") {
+                        Swal.fire("Success", "Comment deleted successfully!", "success");
+                        loadComments(); // Reload comments
+                    } else {
+                        Swal.fire("Error", data.message || "Delete operation failed", "error");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error deleting comment:", error);
+                    Swal.fire("Error", "Failed to delete comment!", "error");
+                }
+            });
+        }
+    });
+}
 
 
 function handleActionChange(selectElement, SceneriotId) {
@@ -334,9 +618,6 @@ function deleteScenerio(id) {
         }
     });
 }
-
 </script>
-
-
 </body>
 </html>
