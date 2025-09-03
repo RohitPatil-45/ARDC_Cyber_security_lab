@@ -19,12 +19,12 @@ public interface InstructionCommandRepository extends JpaRepository<InstructionC
 //	@Query(value = "SELECT TOP 1 * FROM InstructionCommand i WHERE i.LabId = :id AND i.IsExecuted = 'false' ORDER BY i.Id ASC", nativeQuery = true)
 //	List<InstructionCommand> findFirstByLabId(@Param("id") String id);
 
-	@Query(value = "SELECT * FROM instructioncommand WHERE LabId = :labId AND IsExecuted = 'false' ORDER BY Id ASC LIMIT 1", nativeQuery = true)
-	InstructionCommand findNextUnexecutedByLabId(@Param("labId") String labId);
-
-	@Modifying
-	@Transactional
-	@Query(value = "UPDATE instructioncommand SET IsExecuted = 'true' WHERE LabId = :labId AND Command = :labcommand", nativeQuery = true)
-	int modifyCommandByLabId(@Param("labId") String labId, @Param("labcommand") String labcommand);
+//	@Query(value = "SELECT * FROM instructioncommand WHERE LabId = :labId AND IsExecuted = 'false' ORDER BY Id ASC LIMIT 1", nativeQuery = true)
+//	InstructionCommand findNextUnexecutedByLabId(@Param("TemplateName") String TemplateName);
+//
+//	@Modifying
+//	@Transactional
+//	@Query(value = "UPDATE instructioncommand SET IsExecuted = 'true' WHERE LabId = :labId AND Command = :labcommand", nativeQuery = true)
+//	int modifyCommandByLabId(@Param("labId") String labId, @Param("labcommand") String labcommand);
 
 }

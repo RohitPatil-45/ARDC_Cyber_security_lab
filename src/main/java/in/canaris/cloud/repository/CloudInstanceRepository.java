@@ -146,7 +146,7 @@ public interface CloudInstanceRepository extends JpaRepository<CloudInstance, In
 	@Query("UPDATE CloudInstance c SET c.cpuAssigned = :cpuAssigned WHERE c.id = :id")
 	int updateVMCPU(int id, String cpuAssigned);
 
-	@Query("SELECT c FROM CloudInstance c where c.AssignedLab = 'No'")
+	@Query("SELECT c FROM CloudInstance c order by instance_name ")
 	List<CloudInstance> getInstanceNameNotAssigned();
 
 	@Modifying

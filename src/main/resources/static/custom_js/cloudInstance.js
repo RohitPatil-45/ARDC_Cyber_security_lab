@@ -148,7 +148,7 @@ function checkforDuplicateVM(instanceName) {
 					Swal.fire({
 						position: 'top',
 						icon: 'warning',
-						title: 'VM already Exists',
+						title: 'Lab already Exists',
 						showConfirmButton: false,
 						timer: 3000
 					})
@@ -163,7 +163,7 @@ function checkforDuplicateVM(instanceName) {
 		Swal.fire({
 			position: 'top',
 			icon: 'warning',
-			title: 'VM name should contain only letters and numbers, without spaces or special characters !',
+			title: 'Lab name should contain only letters and numbers, without spaces or special characters !',
 			showConfirmButton: false,
 			timer: 5000
 		})

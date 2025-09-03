@@ -50,6 +50,10 @@ public class Add_Scenario {
 
 	@Column(name = "MaxPlayers", nullable = false, length = 255)
 	private String MaxPlayers;
+	
+	@Column(name = "number_of_instance", nullable = false, length = 255)
+	private String NumberofInstance;
+	
 
 //	@Column(name = "Cover_Image", nullable = false, length = 255)
 //	private String Cover_Image;
@@ -197,5 +201,15 @@ public class Add_Scenario {
 	public void setPlaylists(Set<Playlist> playlists) {
 		this.playlists = playlists;
 	}
+
+	public String getNumberofInstance() {
+		return NumberofInstance;
+	}
+
+	public void setNumberofInstance(String numberofInstance) {
+		NumberofInstance = numberofInstance;
+	}
+	
+	
 
 }

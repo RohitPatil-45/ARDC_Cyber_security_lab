@@ -171,9 +171,29 @@ keyframes glowing { 0% {
 
 
 
+
+
+
+
+
+
+
+
+
+
 %
 {
 background-color
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -343,7 +363,27 @@ background-color
 
 
 
+
+
+
+
+
+
+
+
+
+
 #49e819
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -514,6 +554,16 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
+
+
 :
 
 
@@ -599,6 +649,16 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
+
+
 0
 
 
@@ -684,7 +744,27 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
+
+
 0
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -854,6 +934,16 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
+
+
 px
 
 
@@ -939,7 +1029,27 @@ px
 
 
 
+
+
+
+
+
+
+
+
+
+
 #49e819
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1111,9 +1221,29 @@ px
 
 
 
+
+
+
+
+
+
+
+
+
+
 %
 {
 background-color
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1283,7 +1413,27 @@ background-color
 
 
 
+
+
+
+
+
+
+
+
+
+
 #2ba805
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1454,6 +1604,16 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
+
+
 :
 
 
@@ -1539,6 +1699,16 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
+
+
 0
 
 
@@ -1624,7 +1794,27 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
+
+
 0
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1794,7 +1984,27 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
+
+
 px
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1964,6 +2174,16 @@ px
 
 
 
+
+
+
+
+
+
+
+
+
+
 ;
 }
 }
@@ -1999,7 +2219,7 @@ td {
 			<div class="container-fluid">
 				<div class="row mb-2">
 					<div class="col-sm-6">
-						<h2 class="m-0">Create LAB</h2>
+						<h2 class="m-0">Create LAB Template</h2>
 					</div>
 				</div>
 			</div>
@@ -2380,37 +2600,172 @@ td {
 				<!-- End Lab Description -->
 
 
-				<!-- Start Lab Instructions -->
+				<!-- 				Start Lab Instructions -->
+				<!-- 				<section class="content"> -->
+				<!-- 					<div class="container-fluid"> -->
+				<!-- 						<div class="row"> -->
+				<!-- 							<div class="col-md-12"> -->
+				<!-- 								PIE CHART -->
+				<!-- 								<div class="card border-transparent"> -->
+				<!-- 									<div class="card-header"> -->
+				<!-- 										<h3 class="card-title" -->
+				<!-- 											style="align-items: flex-start !important; flex-direction: column !important; display: flex;"> -->
+				<!-- 											<span class="card-title" style="font-weight: bold;">Setup -->
+				<!-- 												Instructions </span> <span class="card-title" -->
+				<!-- 												style="font-size: 1rem !important; color: #b5b5c3 !important">Setup -->
+				<!-- 												Instructions </span> -->
+				<!-- 										</h3> -->
+				<!-- 									</div> -->
+				<!-- 									<div class="card-body"> -->
+				<!-- 										<div class="form-group"> -->
+				<!-- 											<textarea id="vm_instructions" name="vm_instructions" -->
+				<!-- 												class="summernote form-control" rows="3" -->
+				<!-- 												placeholder="Provide setup and configuration instructions for this VM"></textarea> -->
+				<!-- 										</div> -->
+				<!-- 									</div> -->
+				<!-- 									/.card-body -->
+				<!-- 								</div> -->
+				<!-- 								/.card -->
+				<!-- 							</div> -->
+				<!-- 						</div> -->
+				<!-- 					</div> -->
+				<!-- 				</section> -->
+				<!-- 				End Lab Instructions -->
+
+
+				<!-- Main UI -->
 				<section class="content">
 					<div class="container-fluid">
 						<div class="row">
 							<div class="col-md-12">
-								<!-- PIE CHART -->
 								<div class="card border-transparent">
 									<div class="card-header">
 										<h3 class="card-title"
-											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
-											<span class="card-title" style="font-weight: bold;">Setup
-												Instructions </span> <span class="card-title"
-												style="font-size: 1rem !important; color: #b5b5c3 !important">Setup
-												Instructions </span>
+											style="display: flex; flex-direction: column;">
+											<span style="font-weight: bold;">Setup Instructions</span> <span
+												style="font-size: 1rem; color: #b5b5c3;">Add
+												instructions and commands for this VM setup</span>
 										</h3>
 									</div>
+
 									<div class="card-body">
-										<div class="form-group">
-											<textarea id="vm_instructions" name="vm_instructions"
-												class="summernote form-control" rows="3"
-												placeholder="Provide setup and configuration instructions for this VM"></textarea>
+										<!-- Dynamic Fields Container -->
+										<!-- Wrapper with scroll -->
+										<div id="instructions-wrapper"
+											style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+											<div id="instructions-container">
+												<!-- First Instruction-Command Pair -->
+												<div class="instruction-group mb-4 border p-3"
+													data-index="0">
+													<label><strong>Instruction</strong></label>
+													<textarea name="instructions[0].instructionText"
+														class="form-control summernote mb-2"
+														placeholder="Enter setup instruction"></textarea>
+
+													<label><strong>Command</strong></label>
+													<textarea name="instructions[0].commandText"
+														class="form-control command" rows="2"
+														placeholder="Enter command to run"></textarea>
+
+													<button type="button"
+														class="btn btn-sm btn-danger mt-2 remove-btn"
+														style="display: none;">❌ Remove</button>
+												</div>
+											</div>
 										</div>
+
+										<!-- Add More Button -->
+										<button type="button" class="btn btn-sm btn-primary mt-3"
+											onclick="addInstructionGroup()">➕ Add Instruction &
+											Command</button>
+
+
+
 									</div>
-									<!-- /.card-body -->
 								</div>
-								<!-- /.card -->
 							</div>
 						</div>
 					</div>
 				</section>
-				<!-- End Lab Instructions -->
+
+				<!-- JavaScript -->
+				<script>
+				
+				  let instructionIndex = 1; 
+
+				  function addInstructionGroup() {
+				    const container = $('#instructions-container');
+
+				    const newGroup = $(`
+				      <div class="instruction-group mb-4 border p-3" data-index="${instructionIndex}">
+				        <label><strong>Instruction</strong></label>
+				        <textarea name="instructions[${instructionIndex}].instructionText" class="form-control summernote mb-2"
+				          placeholder="Enter setup instruction"></textarea>
+
+				        <label><strong>Command</strong></label>
+				        <textarea name="instructions[${instructionIndex}].commandText" class="form-control command" rows="2"
+				          placeholder="Enter command to run"></textarea>
+
+				        <button type="button" class="btn btn-sm btn-danger mt-2 remove-btn">❌ Remove</button>
+				      </div>
+				    `);
+
+				    container.append(newGroup);
+
+				    // Initialize summernote for the new textarea
+				    newGroup.find('.summernote').summernote({
+				      height: 150,
+				      toolbar: [
+				        ['style', ['bold', 'italic', 'underline', 'clear']],
+				        ['fontsize', ['fontsize']],
+				        ['para', ['ul', 'ol', 'paragraph']],
+				        ['insert', ['picture', 'link']],
+				        ['view', ['fullscreen', 'codeview']]
+				      ]
+				    });
+
+				    // Show all remove buttons if more than one group
+				    $('.instruction-group .remove-btn').show();
+
+				    instructionIndex++; // Increase index for next group
+				  }
+
+				  // Remove button logic
+				  $(document).on('click', '.remove-btn', function () {
+				    $(this).closest('.instruction-group').remove();
+
+				    // Recalculate indexes after removal
+				    $('#instructions-container .instruction-group').each(function (idx, el) {
+				      $(el).attr('data-index', idx);
+				      $(el).find('textarea[name*="instructionText"]').attr('name', `instructions[${idx}].instructionText`);
+				      $(el).find('textarea[name*="commandText"]').attr('name', `instructions[${idx}].commandText`);
+				    });
+
+				    instructionIndex = $('#instructions-container .instruction-group').length;
+
+				    if (instructionIndex === 1) {
+				      $('.instruction-group .remove-btn').hide(); // Hide remove if only one left
+				    }
+				  });
+
+				  // Initialize summernote on page load
+				  $(document).ready(function () {
+				    $('.summernote').summernote({
+				      height: 150,
+				      toolbar: [
+				        ['style', ['bold', 'italic', 'underline', 'clear']],
+				        ['fontsize', ['fontsize']],
+				        ['para', ['ul', 'ol', 'paragraph']],
+				        ['insert', ['picture', 'link']],
+				        ['view', ['fullscreen', 'codeview']]
+				      ]
+				    });
+				  });
+				
+
+					  
+				
+</script>
 
 				<!-- virtualization type -->
 				<section class="content">
@@ -3429,47 +3784,7 @@ td {
 
 	<script th:src="@{/custom_js/cloudInstance.js}"></script>
 
-	<script type="text/javascript">
-	$(document).ready(function() {
-		$('.toggle-password').on('click', function() {
-			let input = $($(this).data('toggle'));
-			let icon = $(this).find('i');
 
-			if (input.attr('type') === 'password') {
-				input.attr('type', 'text');
-				icon.removeClass('fa-eye-slash').addClass('fa-eye');
-			} else {
-				input.attr('type', 'password');
-				icon.removeClass('fa-eye').addClass('fa-eye-slash');
-			}
-		});
-	});
-		$(function() {
-			//Initialize Select2 Elements
-			$('.select2').select2()
-
-			//Initialize Select2 Elements
-			$('.select2bs4').select2({
-				theme : 'bootstrap4'
-			})
-			
-		});
-		
-		
-		 $('.summernote').summernote({
-             height: 300,
-             toolbar: [
-                 ['style', ['style']],
-                 ['font', ['bold', 'underline', 'clear']],
-                 ['fontname', ['fontname']],
-                 ['color', ['color']],
-                 ['para', ['ul', 'ol', 'paragraph']],
-                 ['table', ['table']],
-                 ['insert', ['link', 'picture', 'video']],
-                 ['view', ['fullscreen', 'codeview', 'help']]
-             ]
-         });
-	</script>
 
 	<script th:inline="javascript">
 	 var vm_creationresult = [[${result}]];  // The fallback value 'defaultValue' is used if Thymeleaf doesn't render it correctly.
@@ -3494,34 +3809,7 @@ td {
 			})
 		}
 	 
-/* 	if([[${result}]] == ''){
-		
-	}
-	else if([[${result}]] == 'success'){
-		Swal.fire({
-			position: "top",
-			icon: "success",
-			title: 'VM created successfully',
-			showConfirmButton: true
-		})
-	}
-		else if{
-		Swal.fire({
-			position: "top",
-			icon: "warning",
-			title: [[${result}]] ,
-			showConfirmButton: true
-		})
-	} */
-	//else if([[${result}]] == 'fail'){
-	//else if([[${result}]] == 'fail'){
-	
-	
-</script>
 
-
-	<script>
-// Show filename in custom file input
 
 document.getElementById('uploadedImage').addEventListener('change', function(e) {
     if (this.files && this.files[0]) {

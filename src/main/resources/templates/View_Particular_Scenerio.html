@@ -238,6 +238,60 @@ body {
 .hidden {
 	display: none;
 }
+
+/* CSS for page loader */
+/* ---- Page loader overlay ---- */
+.loader-overlay {
+	position: fixed;
+	inset: 0; /* top:0 right:0 bottom:0 left:0 */
+	display: grid;
+	place-items: center; /* perfect centering */
+	background: rgba(0, 0, 0, 0.4);
+	backdrop-filter: blur(2px);
+	/* subtle polish (ignored if unsupported) */
+	z-index: 9999;
+}
+
+/* ---- Spinner ---- */
+.spinner {
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+	border: 6px solid #e6e6e6; /* track */
+	border-top-color: #2563eb; /* indicator */
+	animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {to { transform:rotate(360deg);
+	
+}
+
+}
+
+/* Optional loading text */
+.loader-text {
+	margin-top: 14px;
+	color: #ffffff;
+	font: 500 14px/1.2 system-ui, -apple-system, Segoe UI, Roboto,
+		sans-serif;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+	letter-spacing: .2px;
+}
+
+/* Respect users who prefer reduced motion */
+@media ( prefers-reduced-motion : reduce) {
+	.spinner {
+		animation: none;
+		border-top-color: #2563eb;
+	}
+}
+
+/* Demo content area */
+.page-content {
+	min-height: 100vh;
+	display: grid;
+	place-items: center;
+}
 </style>
 
 <body class="hold-transition sidebar-mini layout-fixed dark-mode">
@@ -301,16 +355,57 @@ body {
 			</div>
 		</div>
 
+		<!-- Page Loader -->
+		<div id="pageLoader" class="loader-overlay" role="status"
+			aria-live="polite" style="display: none" aria-label="Page loading">
+			<div>
+				<div class="spinner" aria-hidden="true"></div>
+				<div class="loader-text">Loading…</div>
+			</div>
+		</div>
+		<!-- End Page Loader -->
+
+		<!-- no of instance -->
+		<div class="modal fade text-center" id="noOfInstance">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Lab creation</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="action" class="float-left">No of Instances</label> <input
+								type="text" required id="instances" name="instances"
+								class="form-control" placeholder="Enter No of Instances">
+						</div>
+						<input type="hidden" id="cloudInstanceId">
+						<div class="form-group">
+							<button class="btn btn-success"
+								th:onclick="createDockerContainer()">Submit</button>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End no of instance -->
+
 		<div th:replace="fragments/footer :: footer"></div>
 	</div>
 
 	<div th:replace="template :: jsscript"></div>
+	<script th:src="@{/custom_js/viewParticularScenario.js}"></script>
+
 
 	<script>
 // Global variables
 let jsonData;
 let scenarioId;
 let editingCommentId = null;
+let instanceId;
 
 document.addEventListener("DOMContentLoaded", function () {
     let rawData = '[[${listObj}]]'.replace(/&quot;/g, '"');
@@ -326,6 +421,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const item = jsonData[0];
     scenarioId = item.Id; // Store scenario ID for later use
+    instanceId = item.LabId;
     const container = document.getElementById("scenarioContainer");
 
     const fragment = document.createDocumentFragment();
@@ -358,9 +454,11 @@ document.addEventListener("DOMContentLoaded", function () {
                                     <option value="delete">Delete</option>
                                 </select>
                             </div>
-                            <a href="/guac/View_Vm_Listing?Id=${item.Id}" class="start-btn btn btn-primary" style="font-weight: 500;">
-                                <i class="fas fa-play"></i> Start
-                            </a>
+                            <button type="button" class="start-btn create-btn"
+								data-toggle="modal" data-target="#noOfInstance"
+								th:data-request-id="${item.LabId}">
+								<i class="fas fa-play"></i> Create Lab
+							</button>
                         </div>
                     </div>
                     <div class="card-tags mt-3 d-flex flex-wrap gap-2">
@@ -617,6 +715,25 @@ function deleteScenerio(id) {
             window.location.href = '/guac/deletsceneriolist/' + id;
         }
     });
+}
+
+function createDockerContainer() {
+	$("#pageLoader").show();
+	$.ajax({
+		type: "POST",
+		url : '/cloud_instance/docker',
+		data : {
+			"instanceID" : instanceId,
+			"noOfInstances" : $('#instances').val(),
+			"scenarioId" : scenarioId
+			
+		},
+		success : function(result) {
+			$("#pageLoader").hide();
+			window.location = "/guac/View_Vm_Listing?Id="+scenarioId;
+			//alert(result);
+		}
+	});
 }
 </script>
 </body>

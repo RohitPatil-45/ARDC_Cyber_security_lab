@@ -18,12 +18,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
+import javax.persistence.Transient;
 
 import org.apache.logging.log4j.util.StringBuilders;
 import org.json.JSONArray;
@@ -69,6 +71,7 @@ import in.canaris.cloud.entity.Discount;
 import in.canaris.cloud.entity.Group;
 import in.canaris.cloud.entity.KVMDriveDetails;
 import in.canaris.cloud.entity.Location;
+import in.canaris.cloud.entity.PortDetails;
 import in.canaris.cloud.entity.Price;
 import in.canaris.cloud.entity.RequestApproval;
 import in.canaris.cloud.entity.SecurityGroup;
@@ -77,6 +80,11 @@ import in.canaris.cloud.entity.Switch;
 import in.canaris.cloud.entity.VMCreationBean;
 import in.canaris.cloud.entity.VPC;
 import in.canaris.cloud.entity.billing;
+import in.canaris.cloud.openstack.entity.ChartBoatInstructionTemplate;
+import in.canaris.cloud.openstack.entity.CloudInstanceForm;
+import in.canaris.cloud.openstack.entity.InstructionDto;
+import in.canaris.cloud.openstack.entity.UserLab;
+import in.canaris.cloud.openstack.entity.UserWiseChatBoatInstructionTemplate;
 import in.canaris.cloud.repository.AddPhysicalServerRepository;
 import in.canaris.cloud.repository.AdditionalStorageRepository;
 import in.canaris.cloud.repository.AppUserRepository;
@@ -96,13 +104,18 @@ import in.canaris.cloud.repository.GroupRepository;
 import in.canaris.cloud.repository.KVMDriveDetailsRepository;
 import in.canaris.cloud.repository.LocationRepository;
 import in.canaris.cloud.repository.NodeUtilizationRepository;
+import in.canaris.cloud.repository.PortDetailsRepository;
 import in.canaris.cloud.repository.PriceRepository;
 import in.canaris.cloud.repository.RequestApprovalRepository;
 import in.canaris.cloud.repository.SubProductRepository;
 import in.canaris.cloud.repository.SwitchRepository;
+import in.canaris.cloud.repository.UserLabRepository;
 import in.canaris.cloud.repository.UserRepository;
 import in.canaris.cloud.repository.VMLocationPathRepository;
 import in.canaris.cloud.repository.VPCRepository;
+import in.canaris.cloud.repository.UserWiseChatBoatInstructionTemplateRepository;
+import in.canaris.cloud.repository.ChartBoatInstructionTemplateRepository;
+
 import in.canaris.cloud.server.entity.HardwareInventory;
 import in.canaris.cloud.server.entity.HardwareInventoryLinux;
 import in.canaris.cloud.server.entity.NodeAvailability;
@@ -116,6 +129,8 @@ import in.canaris.cloud.server.repository.NodeAvailabilityRepository;
 import in.canaris.cloud.server.repository.NodeMonitoringRepository;
 import in.canaris.cloud.server.repository.NodeStatusHistoryRepository;
 import in.canaris.cloud.server.repository.VMHealthRepository;
+import in.canaris.cloud.service.DockerService;
+import in.canaris.cloud.service.GuacamoleService;
 import in.canaris.cloud.utils.CMPUtil;
 import in.canaris.cloud.utils.CommandResult;
 import in.canaris.cloud.utils.ExecutePSCommand;
@@ -125,6 +140,7 @@ import in.canaris.cloud.utils.KillExe;
 
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 
 @Controller
@@ -238,8 +254,24 @@ public class CloudInstanceController {
 
 	@Autowired
 	private KVMDriveDetailsRepository kvmDriveDetailsRepository;
-//	@Autowired
-//	private NodeHealthMonitoringRepository NodeHealthMonitoring;
+
+	@Autowired
+	private ChartBoatInstructionTemplateRepository ChartBoatInstructionTemplateRepository;
+
+	@Autowired
+	private UserWiseChatBoatInstructionTemplateRepository instructionTemplateRepository;
+	
+	@Autowired
+	private UserLabRepository userLabRepository;
+	
+	@Autowired
+	private PortDetailsRepository portDetailsRepository;
+
+	@Autowired
+	private DockerService dockerService;
+
+	@Autowired
+	private GuacamoleService guacService;
 
 	final String var_function_name = "cloud_instance"; // small letter
 	final String disp_function_name = "Cloud Instance"; // capital letter
@@ -1647,45 +1679,99 @@ public class CloudInstanceController {
 //		return "redirect:/" + var_function_name + "/new";
 //	}
 
+//	@PostMapping("/save")
+//	public String save(@ModelAttribute CloudInstance obj, @RequestParam(required = false) MultipartFile uploadedImage,
+//			RedirectAttributes redirectAttributes, Principal principal) {
+//		try {
+//
+//			// Handle the uploaded image
+//
+//			System.out.println("Inside_Save_cloud_instance ::");
+//
+//			if (uploadedImage != null && !uploadedImage.isEmpty()) {
+//				obj.setLab_image(uploadedImage.getBytes()); // store file as byte[]
+//				System.out.println("Uploaded labImage size: " + uploadedImage.getSize());
+//			}
+//
+//			// Copy simple fields
+////			list.setInstance_name(obj.getInstance_name());
+////			list.setLab_id(obj.getLab_id());
+////			list.setLab_tag(obj.getLab_tag());
+////			list.setVnc_port(obj.getVnc_port());
+////			list.setWeb_id(obj.getWeb_id());
+////			list.setDescription(obj.getDescription());
+////			list.setVm_instructions(obj.getVm_instructions());
+////			list.setVirtualization_type(obj.getVirtualization_type());
+////			list.setPhysicalServerIP(obj.getPhysicalServerIP());
+////			list.setSwitch_id(obj.getSwitch_id());
+////			list.setGeneration_type(obj.getGeneration_type());
+////			list.setLocation_id(obj.getLocation_id());
+////			list.setVm_location_path(obj.getVm_location_path());
+////			list.setSubproduct_id(obj.getSubproduct_id());
+////			list.setDiscount_id(obj.getDiscount_id());
+////			list.setPrice_id(obj.getPrice_id());
+////			list.setVpc_id(obj.getVpc_id());
+////			list.setSecurity_group_id(obj.getSecurity_group_id());
+////			list.s
+//
+//			ObjectMapper mapper = new ObjectMapper();
+//			String jsonInstructions = mapper.writeValueAsString(obj.getVm_instructions());
+//			
+//			System.out.println("jsonInstructions ::"+jsonInstructions);
+//			obj.setVm_instructions(jsonInstructions); // Save it as a string in DB
+//
+//			repository.save(obj);
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//
+//		return "redirect:/" + var_function_name + "/new";
+//	}
+
 	@PostMapping("/save")
-	public String save(@ModelAttribute CloudInstance obj, @RequestParam(required = false) MultipartFile uploadedImage,
-			RedirectAttributes redirectAttributes, Principal principal) {
+	public String save(@ModelAttribute CloudInstanceForm form, @ModelAttribute CloudInstance obj,
+			@RequestParam(required = false) MultipartFile uploadedImage, RedirectAttributes redirectAttributes,
+			Principal principal) {
+
 		try {
 
-			// Handle the uploaded image
-
-			System.out.println("Inside_Save_cloud_instance ::");
+			if (obj == null) {
+				throw new RuntimeException("CloudInstance object is null. Please ensure form is binding correctly.");
+			}
 
 			if (uploadedImage != null && !uploadedImage.isEmpty()) {
-				obj.setLab_image(uploadedImage.getBytes()); // store file as byte[]
+				obj.setLab_image(uploadedImage.getBytes());
 				System.out.println("Uploaded labImage size: " + uploadedImage.getSize());
 			}
 
-			// Copy simple fields
-//			list.setInstance_name(obj.getInstance_name());
-//			list.setLab_id(obj.getLab_id());
-//			list.setLab_tag(obj.getLab_tag());
-//			list.setVnc_port(obj.getVnc_port());
-//			list.setWeb_id(obj.getWeb_id());
-//			list.setDescription(obj.getDescription());
-//			list.setVm_instructions(obj.getVm_instructions());
-//			list.setVirtualization_type(obj.getVirtualization_type());
-//			list.setPhysicalServerIP(obj.getPhysicalServerIP());
-//			list.setSwitch_id(obj.getSwitch_id());
-//			list.setGeneration_type(obj.getGeneration_type());
-//			list.setLocation_id(obj.getLocation_id());
-//			list.setVm_location_path(obj.getVm_location_path());
-//			list.setSubproduct_id(obj.getSubproduct_id());
-//			list.setDiscount_id(obj.getDiscount_id());
-//			list.setPrice_id(obj.getPrice_id());
-//			list.setVpc_id(obj.getVpc_id());
-//			list.setSecurity_group_id(obj.getSecurity_group_id());
-//			list.s
-
+			// Save CloudInstance
 			repository.save(obj);
+
+			// Save instructions into ChartBoatInstructionTemplate
+			List<InstructionDto> instructions = form.getInstructions();
+			for (InstructionDto dto : instructions) {
+				ChartBoatInstructionTemplate instruction = new ChartBoatInstructionTemplate();
+
+				instruction.setTemplateId(obj.getId());
+				instruction.setTemaplateName(obj.getInstance_name());
+				instruction.setInstructionCommand(dto.getCommandText());
+
+				if (dto.getInstructionText() != null) {
+					instruction.setInstructionDetails(dto.getInstructionText().getBytes());
+				} else {
+					instruction.setInstructionDetails("".getBytes());
+				}
+
+				// Save instruction
+				ChartBoatInstructionTemplateRepository.save(instruction);
+			}
+
+			redirectAttributes.addFlashAttribute("result", "success");
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("result", "Error: " + e.getMessage());
 		}
 
 		return "redirect:/" + var_function_name + "/new";
@@ -3304,98 +3390,100 @@ public class CloudInstanceController {
 
 		return mav;
 	}
-	
+
 	// Docker Container
-		@PostMapping("/docker")
-		public @ResponseBody String docker(@RequestParam("instanceID") int instanceID) {
+	@PostMapping("/docker")
+	public @ResponseBody String docker(@RequestParam("instanceID") int instanceID, @RequestParam("scenarioId") String scenarioId,
+			@RequestParam("noOfInstances") int noOfInstances, Principal principal) {
 
-			String result = null;
+		String result = null;
+		Map<Integer, Integer> portMappings = null;
+		String imageName = "kalilinux-vnc-novnc:latest";
+		String network = "guac-network";
+		Integer newVncPort;
+		Integer newNoVncPort;
+		try {
 
-			try {
+			Optional<CloudInstance> obj = repository.findById(instanceID);
+			CloudInstance instance = obj.get();
 
-				Optional<CloudInstance> obj = repository.findById(instanceID);
-				CloudInstance instance = obj.get();
-				String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+			String username = ((User) ((Authentication) principal).getPrincipal()).getUsername();
+			String templateName = instance.getInstance_name();
+			String password = instance.getInstance_password();
+			String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+			for (int i = 0; i < noOfInstances; i++) {
+				portMappings = new HashMap<>();
+				newVncPort = portDetailsRepository.findMaxVncPorts() + 1;
+				newNoVncPort = portDetailsRepository.findMaxnoVncPort() + 1;
+				portMappings.put(newVncPort, 5901);
+				portMappings.put(newNoVncPort, 8080);
+
+				int maxLabId = userLabRepository.findMaxLabId();
+				maxLabId++;
+
+				String newInstanceName = instance.getInstance_name() + "_" + maxLabId;
+				System.out.println("template name = " + instance.getInstance_name());
+				System.out.println("new instance name = " + instance.getInstance_name() + "_" + maxLabId);
+				System.out.println("No of instances = " + noOfInstances);
 
 				if (os.equalsIgnoreCase("windows")) {
 					result = createWindowsDockerContainer(instance.getInstance_name(), instance.getInstance_password());
 				} else {
-//					result = createLinuxDockerContainer(instance.getInstance_name(), instance.getContainerIp(),
-//							instance.getWeb_id(), instance.getVnc_port(), instance.getNetworkName(), instance.getSubnet(),
-//							instance.getGateway(), instance.getInstance_password());
-				}
+					result = dockerService.runContainer(imageName, newInstanceName, portMappings, network);
+					if (result.equalsIgnoreCase("success")) {
 
-			} catch (Exception e) {
-				result = "fail";
-			}
+						// Create connection in Guacamole
+						String jsonResponse = guacService.createConnection(newInstanceName, "vnc", newInstanceName,
+								5901, "kali", "kalilinux", "", "", "", "", "", "", "", "", "", "", "");
 
-			return "success";
-		}
+						if (guacService.getConnectionIdByName(jsonResponse) != null) {
+							insertIntoPortDetails(newInstanceName, newVncPort, newNoVncPort);
+							insertIntoUserLab(newInstanceName, username, "vnc", templateName,
+									guacService.getConnectionIdByName(jsonResponse), newVncPort, newNoVncPort,
+									"kalilinux", scenarioId);
+						}
 
-		public String createLinuxDockerContainer(String containerName, String containerIp, String webPort, String vnc_port,
-				String networkName, String subnet, String gateway, String password) {
-
-			String scriptPath = "/home/canaris/Desktop/Docker/container.sh"; // update with actual path
-
-			try {
-				ProcessBuilder pb = new ProcessBuilder("bash", scriptPath, containerName, networkName, "kali", password);
-
-				pb.redirectErrorStream(true); // merge stdout & stderr
-				Process process = pb.start();
-
-				try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-					String line;
-					while ((line = reader.readLine()) != null) {
-						System.out.println(line); // Print script logs
 					}
 				}
-
-				int exitCode = process.waitFor();
-				if (exitCode == 0) {
-					return "sucess";
-				} else {
-					return "fail";
-				}
-
-			} catch (Exception e) {
-				e.printStackTrace();
-				return "fail";
 			}
 
+		} catch (Exception e) {
+			result = "fail";
 		}
 
-		public String createWindowsDockerContainer(String containerName, String password) {
+		return "success";
+	}
 
-			String scriptPath = "/home/canaris/Desktop/Docker/Windows-Docker/windows.sh";
+	public void insertIntoUserLab(String newInstanceName, String username, String remoteType, String templateName,
+			String guacamoleId, Integer newVncPort, Integer newNoVncPort, String password, String scenarioId) {
+		UserLab lab = new UserLab();
+		lab.setInstanceName(newInstanceName);
+		lab.setGuacamoleId(Integer.valueOf(guacamoleId));
+		lab.setUsername(username);
+		lab.setPassword(password);
+		lab.setRemoteType(remoteType);
+		lab.setNoVncPort(newNoVncPort);
+		lab.setVncPort(newVncPort);
+		lab.setIpAddress("");
+		lab.setTemplateName(templateName);
+		lab.setScenarioId(Integer.valueOf(scenarioId));
 
+		userLabRepository.save(lab);
 
-			try {
-				ProcessBuilder pb = new ProcessBuilder("bash", scriptPath, containerName, "kalinet101", "win11", containerName, password);
+	}
 
-				pb.redirectErrorStream(true);
-				Process process = pb.start();
+	public void insertIntoPortDetails(String newInstanceName, Integer newVncPort, Integer newNoVncPort) {
+		PortDetails port = new PortDetails();
+		port.setVmName(newInstanceName);
+		port.setNoVncPort(newNoVncPort);
+		port.setVncPort(newVncPort);
+		portDetailsRepository.save(port);
 
-				StringBuilder output = new StringBuilder();
-				try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-					String line;
-					while ((line = reader.readLine()) != null) {
-						output.append(line).append("\n");
-						System.out.println(line); 
-					}
-				}
+	}
 
-				int exitCode = process.waitFor();
-				if (exitCode == 0) {
-					return "success";
-				} else {
-					return "fail";
-				}
+	public String createWindowsDockerContainer(String containerName, String password) {
 
-			} catch (Exception e) {
-				return "fail";
-			}
-
-		}
-
+		return null;
+	}
 
 }

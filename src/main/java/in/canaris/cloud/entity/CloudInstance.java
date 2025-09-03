@@ -22,6 +22,8 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import antlr.collections.List;
+
 @Entity
 @Table(name = "cloud_instance")
 public class CloudInstance implements Serializable {
@@ -124,6 +126,8 @@ public class CloudInstance implements Serializable {
 	
 	@Column
 	private String AssignedLab;
+	
+	
 	
 
 	@Lob

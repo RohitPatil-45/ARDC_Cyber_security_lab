@@ -190,4 +190,57 @@ public class GuacamoleService {
 		String token = getAuthToken();
 		return GUAC_URL + "/#/client/" + connectionId + "?token=" + token;
 	}
+
+	public String getConnectionIdByName(String jsonResponse) throws Exception {
+
+		JSONObject jsonObject = new JSONObject(jsonResponse);
+		String identifier = jsonObject.getString("identifier");
+
+		return identifier; // Not found
+	}
+
+	public String loginAndGetToken() {
+		String loginUrl = GUAC_URL + "/api/tokens";
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		String body = "username=" + USERNAME + "&password=" + PASSWORD;
+		HttpEntity<String> request = new HttpEntity<>(body, headers);
+
+		ResponseEntity<Map> response = rest.postForEntity(loginUrl, request, Map.class);
+
+		if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+			return (String) response.getBody().get("authToken");
+		}
+		throw new RuntimeException("Failed to login to Guacamole and fetch token");
+	}
+
+	// Step 2: Fetch all connections and map name → identifier
+	public String getConnectionId(String connectionName) {
+		String token = loginAndGetToken();
+
+		String url = GUAC_URL + "/api/session/data/mysql/connections?token=" + token;
+		ResponseEntity<Map> response = rest.getForEntity(url, Map.class);
+
+		if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+			Map<String, Map<String, Object>> connections = response.getBody();
+
+			for (Map.Entry<String, Map<String, Object>> entry : connections.entrySet()) {
+				String id = entry.getKey();
+				Map<String, Object> details = entry.getValue();
+				if (connectionName.equals(details.get("name"))) {
+					return id; // return identifier (like "18")
+				}
+			}
+		}
+		throw new RuntimeException("Connection name '" + connectionName + "' not found in Guacamole");
+	}
+
+	// Step 3: Build embed URL from name
+	public String getVncAccessUrlByName(String connectionName) {
+		String id = getConnectionId(connectionName); // fetch identifier
+		String token = loginAndGetToken();
+		return GUAC_URL + "/#/client/mysql/" + id + "?token=" + token;
+	}
 }

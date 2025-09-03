@@ -3,6 +3,7 @@ package in.canaris.cloud.controller;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Principal;
@@ -38,18 +39,24 @@ import in.canaris.cloud.entity.Discount;
 import in.canaris.cloud.entity.PlaylistScenario;
 import in.canaris.cloud.entity.PlaylistScenarioId;
 import in.canaris.cloud.openstack.entity.Add_Scenario;
+import in.canaris.cloud.openstack.entity.ChartBoatInstructionTemplate;
 import in.canaris.cloud.openstack.entity.CommandHistory;
 import in.canaris.cloud.openstack.entity.InstructionCommand;
 import in.canaris.cloud.openstack.entity.Playlist;
 import in.canaris.cloud.openstack.entity.ScenarioComments;
+import in.canaris.cloud.openstack.entity.UserLab;
+import in.canaris.cloud.openstack.entity.UserWiseChatBoatInstructionTemplate;
 import in.canaris.cloud.repository.ScenarioRepository;
 import in.canaris.cloud.repository.UserRepository;
+import in.canaris.cloud.repository.UserWiseChatBoatInstructionTemplateRepository;
+import in.canaris.cloud.repository.ChartBoatInstructionTemplateRepository;
 import in.canaris.cloud.repository.CloudInstanceRepository;
 import in.canaris.cloud.repository.PlaylistRepository;
 import in.canaris.cloud.repository.PlaylistsSenarioRepository;
-import in.canaris.cloud.repository.InstructionCommandRepository;
+//import in.canaris.cloud.repository.InstructionCommandRepository;
 import in.canaris.cloud.repository.CommandHistoryRepository;
 import in.canaris.cloud.repository.ScenarioCommentsRepository;
+import in.canaris.cloud.repository.UserLabRepository;
 
 import in.canaris.cloud.service.GuacamoleService;
 
@@ -78,14 +85,23 @@ public class GuacamoleController {
 	@Autowired
 	private PlaylistsSenarioRepository PlaylistsSenarioRepository;
 
-	@Autowired
-	private InstructionCommandRepository InstructionCommandRepository;
+//	@Autowired
+//	private InstructionCommandRepository InstructionCommandRepository;
 
 	@Autowired
 	private CommandHistoryRepository CommandHistoryRepository;
 
 	@Autowired
 	private ScenarioCommentsRepository ScenarioCommentsRepository;
+
+	@Autowired
+	private UserLabRepository UserLabRepository;
+
+	@Autowired
+	private ChartBoatInstructionTemplateRepository ChartBoatInstructionTemplateRepository;
+
+	@Autowired
+	private UserWiseChatBoatInstructionTemplateRepository instructionTemplateRepository;
 
 	@GetMapping("/")
 	public String home() {
@@ -144,53 +160,81 @@ public class GuacamoleController {
 //		return "View_Vm_Listing";
 //	}
 
+//	@GetMapping("/View_Vm_Listing")
+//	public ModelAndView viewVmListing(@RequestParam("Id") int scenarioId, Model model) {
+//		System.out.println("Requested scenario Id = " + scenarioId);
+//		ModelAndView mav = new ModelAndView("View_Vm_Listing");
+//		// Fetch scenario
+////		Add_Scenario scenario = ScenarioRepository.findById(scenarioId).orElse(null);
+//
+//		List<UserLab> Lab = UserLabRepository.findByscenarioId(scenarioId);
+//		
+//		
+//
+//		model.addAttribute("connections", Lab);
+//
+//		return mav;
+//	}
+
 	@GetMapping("/View_Vm_Listing")
 	public ModelAndView viewVmListing(@RequestParam("Id") int scenarioId, Model model) {
 		System.out.println("Requested scenario Id = " + scenarioId);
 		ModelAndView mav = new ModelAndView("View_Vm_Listing");
-		// Fetch scenario
-		Add_Scenario scenario = ScenarioRepository.findById(scenarioId).orElse(null);
-		if (scenario == null) {
-			System.out.println("No scenario found for ID: " + scenarioId);
-			model.addAttribute("connections", Collections.emptyList());
-			model.addAttribute("instructions", "");
-			return mav;
+
+		List<UserLab> labs = UserLabRepository.findByscenarioId(scenarioId);
+
+		// Add percentage for each lab
+		List<Map<String, Object>> labData = new ArrayList<>();
+		for (UserLab lab : labs) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("lab", lab);
+
+			// Fetch true and false counts from repository
+			Integer falseCountObj = instructionTemplateRepository
+					.getfalseCompletionCountsByTemplateName(lab.getTemplateName());
+			Integer trueCountObj = instructionTemplateRepository
+					.gettrueCompletionCountsByTemplateName(lab.getTemplateName());
+
+			// Handle null values
+			int falseCount = (falseCountObj != null) ? falseCountObj : 0;
+			int trueCount = (trueCountObj != null) ? trueCountObj : 0;
+
+			int total = trueCount + falseCount;
+
+			// Calculate percentage (avoid division by zero)
+			int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
+			map.put("percentage", percentage);
+
+			labData.add(map);
+
+			System.out.println("labData ::" + labData);
 		}
 
-		System.out.println("Found scenario: " + scenario.getScenarioTitle());
-
-		// Extract Lab IDs
-		String labIdsStr = scenario.getLabId(); // e.g., "287,289,290,295"
-		List<Integer> labIds = new ArrayList<>();
-		if (labIdsStr != null && !labIdsStr.isEmpty()) {
-			for (String idStr : labIdsStr.split(",")) {
-				try {
-					labIds.add(Integer.valueOf(idStr.trim()));
-				} catch (NumberFormatException e) {
-					System.err.println("Invalid LabId: " + idStr);
-				}
-			}
-		}
-
-		// Fetch all CloudInstance objects for these lab IDs
-		List<CloudInstance> connections = new ArrayList<>();
-		if (!labIds.isEmpty()) {
-			connections = repository.findAllById(labIds); // Spring Data JPA method
-		}
-
-		// Debug logs
-		connections.forEach(ci -> {
-			System.out.println("CloudInstance: ID=" + ci.getId() + ", IP=" + ci.getInstance_ip());
-		});
-
-		// Pass to view
-		model.addAttribute("connections", connections);
-
-		mav.addObject("pageTitle", "Scenerio Name : " + scenario.getScenarioName());
-
-//		model.addAttribute("instructions", connections.getVm_instructions()); // If scenario has instructions
+		model.addAttribute("labData", labData);
 		return mav;
 	}
+
+//	@GetMapping("/View_Vm_Listing")
+//	public ModelAndView viewVmListing(@RequestParam("Id") int scenarioId, Model model) {
+//		System.out.println("Requested scenario Id = " + scenarioId);
+//		ModelAndView mav = new ModelAndView("View_Vm_Listing");
+//
+//		// Fetch labs for the given scenario
+//		List<UserLab> labs = UserLabRepository.findByscenarioId(scenarioId);
+//
+//		if (labs == null || labs.isEmpty()) {
+//			System.out.println("No labs found for scenario ID: " + scenarioId);
+//			model.addAttribute("connections", Collections.emptyList());
+//		} else {
+//			model.addAttribute("connections", labs);
+//			System.out.println("Found " + labs.size() + " labs for scenario ID: " + scenarioId);
+//		}
+//
+//		// Set page title (you might want to fetch the actual scenario name)
+//		mav.addObject("pageTitle", "VM Connections - Scenario " + scenarioId);
+//
+//		return mav;
+//	}
 
 	@GetMapping("/view/{id}")
 	public String viewConnection(@PathVariable String id, Model model) {
@@ -206,6 +250,21 @@ public class GuacamoleController {
 
 		List<CloudInstance> instances = null;
 		instances = repository.findByGuacamoleId(id);
+
+//		List<UserLab> labDetails = UserLabRepository.findByLabId(UserLabId);
+//
+//		if (!labDetails.isEmpty()) {
+//			// Get the first item from the list.
+//			UserLab userLab = labDetails.get(0);
+//			;
+//			// Get the guacamoleId from the retrieved object.
+//			Integer guacamoleId = userLab.getGuacamoleId();
+//			Integer scenarioId = userLab.getScenarioId();
+//			String templateIdString = userLab.getTemplateName();
+//			String LabName = userLab.getInstanceName();
+
+//		List<UserWiseChatBoatInstructionTemplate> instances = null;
+//		instances = instructionTemplateRepository.findByGuacamoleId(id);
 
 		model.addAttribute("instructionsdata", instances);
 
@@ -241,84 +300,37 @@ public class GuacamoleController {
 //		return response;
 //	}
 
-	private final ConcurrentHashMap<String, String> lastCommandMap = new ConcurrentHashMap<>();
-
-	@PostMapping("/loadInitialInstruction")
-	@ResponseBody
-	public Map<String, Object> loadInitialInstruction(@RequestParam String labId) {
-		Map<String, Object> response = new HashMap<>();
-		try {
-			InstructionCommand instructionCommand = InstructionCommandRepository.findNextUnexecutedByLabId(labId);
-
-			if (instructionCommand != null) {
-				String newCommand = instructionCommand.getCommand();
-
-				// ✅ Compare with the last stored command
-				String lastCommand = lastCommandMap.get(labId + "~" + newCommand);
-
-				if (newCommand != null && newCommand.equals(lastCommand)) {
-//					response.put("success", false);
-//					response.put("error", "Duplicate command. Nothing new to return.");
-//					return response;
-				} else {
-
-					response.put("success", true);
-					response.put("instruction", instructionCommand.getInstruction());
-					response.put("command", newCommand);
-					response.put("isLast", false);
-					lastCommandMap.put(labId + "~" + newCommand, newCommand);
-				}
-
-			} else {
-				response.put("success", false);
-				response.put("error", "No unexecuted instructions found.");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			response.put("success", false);
-			response.put("error", "Failed to load instruction.");
-		}
-
-		return response;
-	}
-
-//	@PostMapping("/continueActionInstruction")
+//	@PostMapping("/loadInitialInstruction")
 //	@ResponseBody
-//	public Map<String, Object> continueActionInstruction(@RequestParam String labId, @RequestParam String labcommand) {
+//	public Map<String, Object> loadInitialInstruction(@RequestParam String labId) {
 //		Map<String, Object> response = new HashMap<>();
 //		try {
 ////			InstructionCommand instructionCommand = InstructionCommandRepository.findNextUnexecutedByLabId(labId);
+//			UserWiseChatBoatInstructionTemplate instructionCommand = instructionTemplateRepository.findNextUnexecutedByLabId(labId);
+////			
+//			if (instructionCommand != null) {
+//				String newCommand = instructionCommand.getInstructionCommand();
 //
-////			if (instructionCommand != null) {
+//				// ✅ Compare with the last stored command
+//				String lastCommand = lastCommandMap.get(labId + "~" + newCommand);
 //
-////				String instructionI = instructionCommand.getInstruction();
-////				String commandI = instructionCommand.getCommand();
+//				if (newCommand != null && newCommand.equals(lastCommand)) {
+////					response.put("success", false);
+////					response.put("error", "Duplicate command. Nothing new to return.");
+////					return response;
+//				} else {
 //
-//			CommandHistory commandH = CommandHistoryRepository.FindLabIDCommand(labId);
+//					response.put("success", true);
+//					response.put("instruction", instructionCommand.getInstructionDetails());
+//					response.put("command", newCommand);
+//					response.put("isLast", false);
+//					lastCommandMap.put(labId + "~" + newCommand, newCommand);
+//				}
 //
-//			if (labcommand.equalsIgnoreCase(commandH.getCommand())) {
-//
-//				response.put("success", true);
-//				response.put("instruction", "Execute This Command First");
-//				response.put("command", labcommand);
-//				response.put("isLast", false);
 //			} else {
-//				// update query
-//				
-//				InstructionCommand instructionCommandUpdate = InstructionCommandRepository.modifyCommandByLabId(labId,labcommand);
-//
-//				InstructionCommand instructionCommand = InstructionCommandRepository.findNextUnexecutedByLabId(labId);
-//
-//				response.put("success", true);
-//				response.put("instruction", instructionCommand.getInstruction());
-//				response.put("command", instructionCommand.getCommand());
-//				response.put("isLast", false); // Set this properly if needed
+//				response.put("success", false);
+//				response.put("error", "No unexecuted instructions found.");
 //			}
-//
-////			} else {
-////				response.put("success", false);
-////				response.put("error", "No unexecuted instructions found.");
-////			}
 //		} catch (Exception e) {
 //			e.printStackTrace();
 //			response.put("success", false);
@@ -328,232 +340,286 @@ public class GuacamoleController {
 //		return response;
 //	}
 
-//	@PostMapping("/continueActionInstruction")
-//	@ResponseBody
-//	public Map<String, Object> continueActionInstruction(@RequestParam String labId, @RequestParam String labcommand) {
-//		Map<String, Object> response = new HashMap<>();
-//		try {
-//			CommandHistory commandH = CommandHistoryRepository.FindLabIDCommand(labId);
-//
-//			if (commandH != null && labcommand.equalsIgnoreCase(commandH.getCommand())) {
-//				System.out.println("labcommand :" + labcommand);
-//				System.out.println("commandH :" + commandH.getCommand());
-//				System.out.println("Inside data is present in commandHistory");
-//				int updatedRows = InstructionCommandRepository.modifyCommandByLabId(labId, labcommand);
-//
-//				if (updatedRows > 0) {
-//					InstructionCommand instructionCommand = InstructionCommandRepository
-//							.findNextUnexecutedByLabId(labId);
-//
-//					if (instructionCommand != null) {
-//						response.put("success", true);
-//						response.put("instruction", instructionCommand.getInstruction());
-//						response.put("command", instructionCommand.getCommand());
-//						response.put("isLast", false); // Later: make logic to check last step
-//					} else {
-//						response.put("success", true);
-//						response.put("instruction", "Lab is completed.");
-//						response.put("command", "");
-//						response.put("isLast", true); // no more commands left
-//					}
-//				} else {
-//					response.put("success", false);
-//					response.put("error", "Command update failed.");
-//				}
-//
-////				response.put("success", true);
-////				response.put("instruction", "Execute This Command First");
-////				response.put("command", labcommand);
-////				response.put("isLast", false);
-//			} else {
-//
-//				System.out.println("Inside data is Not in commandHistory Nooottt");
-//
-//				response.put("success", true);
-//				response.put("instruction", "Execute This Command First");
-//				response.put("command", labcommand);
-//				response.put("isLast", false);
-//
-//				// ✅ Update the executed command in DB
-////				int updatedRows = InstructionCommandRepository.modifyCommandByLabId(labId, labcommand);
-////
-////				if (updatedRows > 0) {
-////					InstructionCommand instructionCommand = InstructionCommandRepository
-////							.findNextUnexecutedByLabId(labId);
-////
-////					if (instructionCommand != null) {
-////						response.put("success", true);
-////						response.put("instruction", instructionCommand.getInstruction());
-////						response.put("command", instructionCommand.getCommand());
-////						response.put("isLast", false); // Later: make logic to check last step
-////					} else {
-////						response.put("success", true);
-////						response.put("instruction", "Lab is completed.");
-////						response.put("command", "");
-////						response.put("isLast", true); // no more commands left
-////					}
-////				} else {
-////					response.put("success", false);
-////					response.put("error", "Command update failed.");
-////				}
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			response.put("success", false);
-//			response.put("error", "Failed to process command.");
-//		}
-//
-//		return response;
-//	}
-
-	@PostMapping("/continueActionInstruction")
+	@PostMapping("/ActionloadInitialInstruction")
 	@ResponseBody
-	public Map<String, Object> continueActionInstruction(@RequestParam String labId, @RequestParam String labcommand) {
+	public Map<String, Object> ActionloadInitialInstruction(@RequestParam String labId) {
 		Map<String, Object> response = new HashMap<>();
+
 		try {
-			List<CommandHistory> commandHistoryList = CommandHistoryRepository.findByLabId(labId);
+			// Convert labId to Integer
+			int temp = Integer.parseInt(labId);
 
-			boolean commandMatched = false;
+			List<UserLab> labDetails = UserLabRepository.findByguacamoleId(temp);
 
-			for (CommandHistory ch : commandHistoryList) {
-				if (ch.getCommand().equalsIgnoreCase(labcommand)) {
-					commandMatched = true;
-					break;
-				}
-			}
+			if (!labDetails.isEmpty()) {
+				UserLab userLab = labDetails.get(0);
+				String TemplateName = userLab.getTemplateName();
+//				System.out.println("labName ::" + labName);
+				// Fetch instructions for this lab
+				List<UserWiseChatBoatInstructionTemplate> datalist = instructionTemplateRepository
+						.findBytemaplateName(TemplateName);
 
-			if (commandMatched) {
-				System.out.println("Inside: command matched in history");
-				int updatedRows = InstructionCommandRepository.modifyCommandByLabId(labId, labcommand);
+				if (datalist != null && !datalist.isEmpty()) {
 
-				if (updatedRows > 0) {
-					InstructionCommand instructionCommand = InstructionCommandRepository
-							.findNextUnexecutedByLabId(labId);
-
-					if (instructionCommand != null) {
-						response.put("success", true);
-						response.put("instruction", instructionCommand.getInstruction());
-						response.put("command", instructionCommand.getCommand());
-						response.put("isLast", false);
-					} else {
-						response.put("success", true);
-						response.put("instruction", "Lab is completed.");
-						response.put("command", "");
-						response.put("isLast", true);
+					List<Map<String, String>> instructionList = new ArrayList<>();
+					for (UserWiseChatBoatInstructionTemplate inst : datalist) {
+						Map<String, String> map = new HashMap<>();
+						map.put("command", inst.getInstructionCommand());
+						map.put("instructionDetails", new String(inst.getInstructionDetails(), StandardCharsets.UTF_8));
+						instructionList.add(map);
 					}
+
+					response.put("success", true);
+					response.put("instructions", instructionList);
 				} else {
 					response.put("success", false);
-					response.put("error", "Command update failed.");
+					response.put("error", "No instructions found for this lab.");
 				}
 			} else {
-				System.out.println("Command not found in history");
-				response.put("success", true);
-				response.put("instruction", "Execute This Command First");
-				response.put("command", labcommand);
-				response.put("isLast", false);
+				response.put("success", false);
+				response.put("error", "Lab not found.");
 			}
-
+//			System.out.println("response ::" + response);
 		} catch (Exception e) {
 			e.printStackTrace();
 			response.put("success", false);
-			response.put("error", "Failed to process command.");
+			response.put("error", "Failed to load instructions.");
 		}
 
 		return response;
 	}
 
-//	@PostMapping("/guac/continueInstruction")
-//	@ResponseBody
-//	public InstructionResponse continueInstruction(@RequestParam String labId) {
-//	    InstructionResponse response = new InstructionResponse();
-//	    try {
-//	        // Dummy dynamic response (replace with real state logic)
-//	        Random rand = new Random();
-//	        int step = rand.nextInt(5);
-//
-//	        response.setSuccess(true);
-//	        response.setInstruction("Step " + (step + 1) + ": Do something...");
-//	        response.setCommand("Command: echo Step" + (step + 1));
-//	        response.setLast(step >= 3); // Stop after 4 steps
-//	    } catch (Exception e) {
-//	        response.setSuccess(false);
-//	        response.setError("Failed to continue.");
-//	    }
-//	    return response;
-//	}
+	private final ConcurrentHashMap<String, String> lastCommandMap = new ConcurrentHashMap<>();
 
-//	@PostMapping("/playlistsave")
-//	public ModelAndView savePlaylistData(@RequestParam String playlist_title, @RequestParam String playlist_name,
-//			@RequestParam String description, @RequestParam(required = false) MultipartFile cover_image,
-//			@RequestParam String tag_input, Principal principal) {
-//
-//		ModelAndView mav = new ModelAndView("Add_Playlist");
-//
-//		try {
-//
-//			User loginedUser = (User) ((Authentication) principal).getPrincipal();
-//			String username = loginedUser.getUsername();
-//			// Log all parameters
-//			System.out.println("playlist_title: " + playlist_title);
-//			System.out.println("playlist_name: " + playlist_name);
-//			System.out.println("description: " + description);
-//
-//			System.out.println("tag_suggestions: " + tag_input);
-//
-//			System.out.println(
-//					"cover_image: " + (cover_image != null ? cover_image.getOriginalFilename() : "No file uploaded"));
-//
-////	        // Create new scenario object
-//			Playlist list = new Playlist();
-//			list.setPlaylistName(playlist_name);
-//			list.setPlaylistTitle(playlist_title);
-//			list.setDescription(description);
-//			list.setTag(tag_input);
-//			list.setCreatedBy(username);
-//
-//			// Handle the uploaded image file
-//			if (cover_image != null && !cover_image.isEmpty()) {
-//				// Validate file type
-//				String contentType = cover_image.getContentType();
-//				if (contentType != null && contentType.startsWith("image/")) {
-//					// Store image bytes in database
-//					list.setCoverImage(cover_image.getBytes());
-//					System.out.println("Uploaded image saved to database");
-//				} else {
-//					// Invalid file type
-//					mav.addObject("message", "Invalid file type. Please upload an image file.");
-//					mav.addObject("status", "error");
-//					return mav;
-//				}
-//			} else {
-//				// No image uploaded - try to set a default image
-//				String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
-//				try {
-//					byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
-//					list.setCoverImage(defaultImageBytes);
-//					System.out.println("Default image loaded and saved to database");
-//				} catch (IOException e) {
-//					System.err.println("Error loading default image: " + e.getMessage());
-//					// Create a minimal placeholder image instead of null
-//					list.setCoverImage(createPlaceholderImage());
-//					System.out.println("Placeholder image created and saved to database");
-//				}
-//			}
-//
-//			// Save to database
-//			PlaylistRepository.save(list);
-//
-//			mav.addObject("message", "Scenario saved successfully!");
-//			mav.addObject("status", "success");
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			mav.addObject("message", "Error while saving scenario: " + e.getMessage());
-//			mav.addObject("status", "error");
-//		}
-//
-//		return mav;
-//	}
+	@PostMapping("/chatloadInitialInstruction")
+	@ResponseBody
+	public Map<String, Object> chatloadInitialInstruction(@RequestParam String labId) {
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			System.out.println("chatlabId ::" + labId);
+
+			int temp = Integer.parseInt(labId);
+
+			List<UserLab> labDetails = UserLabRepository.findByguacamoleId(temp);
+
+			if (!labDetails.isEmpty()) {
+				UserLab userLab = labDetails.get(0);
+				String templateName = userLab.getTemplateName();
+				System.out.println("chatTemplateName_on ::" + templateName);
+
+				// Fetch next instruction
+				UserWiseChatBoatInstructionTemplate instructionCommand = instructionTemplateRepository
+						.findNextUnexecutedByLabId(templateName);
+
+				if (instructionCommand != null) {
+					System.out.println("chatTemplateName_if ::" + templateName);
+					String newCommand = instructionCommand.getInstructionCommand();
+					System.out.println("newCommand ::" + newCommand);
+
+//					String lastCommand = lastCommandMap.get(labId + "~last");
+//					System.out.println("lastCommand ::" + lastCommand);
+					System.out.println("getInstructionDetails ::" + instructionCommand.getInstructionDetails());
+
+					byte[] htmlBytes = instructionCommand.getInstructionDetails();
+					String decodedHtml = new String(htmlBytes, StandardCharsets.UTF_8);
+					System.out.println("decodedHtml ::" + decodedHtml);
+
+//					if (newCommand != null && newCommand.equals(lastCommand)) {
+					// If duplicate, return but mark it as duplicate
+					response.put("success", false);
+					response.put("error", "Duplicate command skipped.");
+//					} else {
+					// Normal flow
+					response.put("success", true);
+					response.put("instructionText", decodedHtml); // ✅ decoded HTML
+					response.put("command", newCommand);
+					response.put("isLast", false); // you can adjust logic here
+
+					// Save last executed command
+					lastCommandMap.put(labId + "~last", newCommand);
+//					}
+
+				} else {
+					response.put("success", false);
+					response.put("error", "No unexecuted instructions found.");
+				}
+
+			} else {
+				response.put("success", false);
+				response.put("error", "Lab not found.");
+			}
+
+			System.out.println("chatLoadresponse :::" + response);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("success", false);
+			response.put("error", "Failed to load instruction.");
+		}
+
+		return response;
+	}
+
+	@PostMapping("/continueActionInstruction")
+	@ResponseBody
+	public Map<String, Object> continueActionInstruction(@RequestParam String labId, @RequestParam String labcommand) {
+
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			int temp = Integer.parseInt(labId);
+
+			List<UserLab> labDetails = UserLabRepository.findByguacamoleId(temp);
+
+			if (!labDetails.isEmpty()) {
+				UserLab userLab = labDetails.get(0);
+				String templateName = userLab.getTemplateName();
+				System.out.println("TemplateName ::" + templateName);
+
+				// 1. Check if command exists in history
+				List<CommandHistory> commandHistoryList = CommandHistoryRepository.findByContainerName(templateName,
+						labcommand);
+
+				boolean commandMatched = false;
+				for (CommandHistory ch : commandHistoryList) {
+					if (ch.getCommand().equalsIgnoreCase(labcommand)) {
+						commandMatched = true;
+						break;
+					}
+				}
+
+				if (commandMatched) {
+					// Case 1: Command found in history
+					System.out.println("Inside: command matched in history");
+
+					int updatedRows = instructionTemplateRepository.modifyCommandByLabId(templateName, labcommand);
+
+					if (updatedRows > 0) {
+						// Fetch next instruction
+						UserWiseChatBoatInstructionTemplate instructionCommand = instructionTemplateRepository
+								.findNextUnexecutedByLabId(templateName);
+						System.out.println("Lab Updatedd.");
+						if (instructionCommand != null) {
+							byte[] htmlBytes = instructionCommand.getInstructionDetails();
+							String decodedHtml = new String(htmlBytes, StandardCharsets.UTF_8);
+
+							response.put("success", true);
+							response.put("instruction", decodedHtml);
+							response.put("command", instructionCommand.getInstructionCommand());
+							response.put("isLast", false);
+							System.out.println("Lab Next Command.");
+						} else {
+							// No more instructions → Lab completed
+							System.out.println("Lab not completed.");
+							response.put("success", true);
+							response.put("instruction", "Lab is completed.");
+							response.put("command", "");
+							response.put("isLast", true);
+						}
+					} else {
+						System.out.println("Execute this command first.");
+						response.put("success", true);
+						response.put("instruction", "Execute this command first.");
+						response.put("command", labcommand);
+						response.put("isLast", false);
+					}
+
+				} else {
+					response.put("success", true);
+					response.put("instruction", "Execute this command first.");
+					response.put("command", labcommand);
+					response.put("isLast", false);
+				}
+
+			} else {
+				System.out.println("Lab not found.");
+				response.put("success", false);
+				response.put("error", "Lab not found.");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Failed to load process Lab not found.");
+			response.put("success", false);
+			response.put("error", "Failed to process command.");
+		}
+		System.out.println("response Lab " + response);
+		return response;
+	}
+
+	@PostMapping("/InstructionCompleted")
+	@ResponseBody
+	public String instructionCompleted(@RequestParam("LabId") String labId, Principal principal) {
+		String result = "fail";
+		try {
+			System.out.println("labId : : " + labId);
+
+			int temp = Integer.parseInt(labId);
+
+			Authentication auth = (Authentication) principal;
+			String username = auth.getName();
+
+			// Update lab status
+
+			List<UserLab> labDetails = UserLabRepository.findByguacamoleId(temp);
+
+			if (!labDetails.isEmpty()) {
+				UserLab userLab = labDetails.get(0);
+				Long Id = userLab.getLabId();
+
+				int updatedRows = UserLabRepository.updateStatusById(Id);
+
+				if (updatedRows > 0) {
+					result = "success";
+				} else {
+					result = "fail";
+				}
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result = "Error";
+
+		}
+
+		return result;
+	}
+
+	@PostMapping("/getConnectionDeatils")
+	@ResponseBody
+	public Map<String, Object> getConnectionDeatils(@RequestParam("LabId") String LabId, Principal principal) {
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			User loginedUser = (User) ((Authentication) principal).getPrincipal();
+			String username = loginedUser.getUsername();
+
+			// Fetch lab details
+			int temp = Integer.parseInt(LabId);
+
+			List<UserLab> labDetails = UserLabRepository.findByguacamoleId(temp);
+
+			if (!labDetails.isEmpty()) {
+				UserLab userLab = labDetails.get(0);
+
+				response.put("success", true);
+				response.put("username", username);
+				response.put("labName", userLab.getTemplateName());
+				response.put("ipAddress", userLab.getIpAddress());
+			} else {
+				response.put("success", false);
+				response.put("error", "No lab details found for UserLabId " + LabId);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("success", false);
+			response.put("error", "Exception occurred: " + e.getMessage());
+		}
+
+		return response;
+	}
 
 	@GetMapping("/Add_Playlist")
 	public ModelAndView showAddPlaylistForm() {
@@ -1238,6 +1304,7 @@ public class GuacamoleController {
 
 			scenarioObj.setLabId(String.join(",", labIds));
 			scenarioObj.setLabs(String.join(",", labNames));
+
 			scenarioObj.setComments("");
 
 			if (isNew) {
@@ -1472,6 +1539,7 @@ public class GuacamoleController {
 		String result = "fail";
 		try {
 			// Get the logged-in user
+
 			User loginedUser = (User) ((Authentication) principal).getPrincipal();
 			String username = loginedUser.getUsername();
 
@@ -1535,26 +1603,103 @@ public class GuacamoleController {
 
 		return result;
 	}
-	
-	
+
 	@PostMapping("/deleteComment")
 	@ResponseBody
 	public String deleteComment(@RequestParam("commentId") Long commentId) {
-	    String result = "fail";
-	    try {
-	        int deletedRows = ScenarioCommentsRepository.deleteByIdCustom(commentId);
+		String result = "fail";
+		try {
+			int deletedRows = ScenarioCommentsRepository.deleteByIdCustom(commentId);
 
-	        if (deletedRows > 0) {
-	            result = "success";
-	        }
+			if (deletedRows > 0) {
+				result = "success";
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        System.out.println("Error deleting comment: " + e.getMessage());
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Error deleting comment: " + e.getMessage());
+		}
 
-	    return result;
+		return result;
 	}
 
+	@PostMapping("/startConnectionLab")
+	@ResponseBody
+	public String startConnectionLab(@RequestParam("UserLabId") Long UserLabId, Principal principal) {
+		String result = "fail";
+		try {
+
+			User loginedUser = (User) ((Authentication) principal).getPrincipal();
+			String username = loginedUser.getUsername();
+			// Find the lab details. Assuming there's only one entry per labId.
+
+			List<UserLab> labDetails = UserLabRepository.findByLabId(UserLabId);
+
+			if (!labDetails.isEmpty()) {
+				// Get the first item from the list.
+				UserLab userLab = labDetails.get(0);
+				;
+				// Get the guacamoleId from the retrieved object.
+				Integer guacamoleId = userLab.getGuacamoleId();
+				Integer scenarioId = userLab.getScenarioId();
+				String templateIdString = userLab.getTemplateName();
+				String LabName = userLab.getInstanceName();
+
+				List<UserWiseChatBoatInstructionTemplate> datalist = instructionTemplateRepository
+						.findBytemaplateName(LabName);
+
+				if (!datalist.isEmpty()) {
+
+					int tempId = Integer.parseInt(templateIdString);
+
+					List<ChartBoatInstructionTemplate> templates = ChartBoatInstructionTemplateRepository
+							.findBytemplateId(tempId);
+
+					if (!templates.isEmpty()) {
+
+						for (ChartBoatInstructionTemplate template : templates) {
+
+							UserWiseChatBoatInstructionTemplate userWiseTemplate = new UserWiseChatBoatInstructionTemplate();
+
+							userWiseTemplate.setTemplateId(template.getTemplateId());
+							userWiseTemplate.setTemaplateName(template.getTemaplateName());
+							userWiseTemplate.setInstructionCommand(template.getInstructionCommand());
+							userWiseTemplate.setInstructionDetails(template.getInstructionDetails());
+
+							userWiseTemplate.setLabId(template.getTemplateId());
+							userWiseTemplate.setLabName(template.getTemaplateName());
+
+							userWiseTemplate.setUsername(username);
+							userWiseTemplate.setIsCommandExecuted("false");
+							userWiseTemplate.setCommandExecutedCheckTime(new Timestamp(System.currentTimeMillis()));
+
+							instructionTemplateRepository.save(userWiseTemplate);
+
+							System.out
+									.println("Inserted instruction template for user: " + template.getTemaplateName());
+						}
+					} else {
+						System.out.println("No chart boat instruction templates found for template ID: " + tempId);
+					}
+					result = String.valueOf(guacamoleId);
+
+				} else {
+					System.out.println("Skip Entry TO insert into UserinstruionTemplate: ");
+
+					result = String.valueOf(guacamoleId);
+				}
+			}
+
+		} catch (NumberFormatException e) {
+			System.err.println("Error parsing template ID: " + e.getMessage());
+			return "fail";
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("Error starting connection: " + e.getMessage());
+			return "fail";
+		}
+
+		return result;
+	}
 
 }

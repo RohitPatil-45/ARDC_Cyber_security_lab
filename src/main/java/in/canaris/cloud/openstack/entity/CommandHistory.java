@@ -31,8 +31,7 @@ public class CommandHistory {
 	@Column(name = "EventTimestamp")
 	private Timestamp EventTimestamp;
 	
-	@Column(name = "ContainerId", nullable = false, length = 255)
-	private String ContainerId;
+
 
 
 	public int getId() {
@@ -80,14 +79,6 @@ public class CommandHistory {
 	}
 
 
-	public String getContainerId() {
-		return ContainerId;
-	}
-
-
-	public void setContainerId(String containerId) {
-		ContainerId = containerId;
-	}
 	
 	
 

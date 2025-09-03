@@ -132,7 +132,7 @@ h1, h3 {
 	color: #a0a0a0;
 }
 
-.breadcrumb-item + .breadcrumb-item::before {
+.breadcrumb-item+.breadcrumb-item::before {
 	color: #555;
 }
 
@@ -245,37 +245,40 @@ h1, h3 {
 											<tr>
 												<th>ID</th>
 												<th>Lab Name</th>
-												<th>Instance IP</th>
-												<th>Physical Server IP</th>
-												<th>Location Path</th>
-												<th>Tag</th>
+												<th>IP Address</th>
+												<th>UserName</th>
+												<th>Status</th>
+												<th>Completion %</th>
 												<th>Actions</th>
 											</tr>
 										</thead>
 										<tbody>
-											<th:block
-												th:if="${connections != null and !connections.empty}">
-												<tr th:each="conn : ${connections}">
-													<td th:text="${conn.id}"></td>
-													<td th:text="${conn.instance_name}"></td>
-													<td><span class="badge badge-info"
-														th:text="${conn.instance_ip}"></span></td>
-													<td th:text="${conn.physicalServerIP}"></td>
-													<td th:text="${conn.vm_location_path}"></td>
-													<td th:text="${conn.lab_tag}"></td>
-													<td><a
-														th:href="@{|/guac/viewPlaylistConnection/${conn.guacamoleId}|}"
-														class="btn btn-sm btn-success"> <i class="fas fa-play"></i>
-															Start
-													</a></td>
+											<th:block th:if="${labData != null and !labData.empty}">
+												<tr th:each="data : ${labData}">
+													<td th:text="${data['lab'].labId}"></td>
+													<td th:text="${data['lab'].instanceName}"></td>
+													<td th:text="${data['lab'].ipAddress}"></td>
+													<td th:text="${data['lab'].username}"></td>
+													<td th:text="${data['lab'].Status}"></td>
+													<td th:text="${data['percentage'] + '%'}"></td>
+													<td>
+														<button class="btn btn-sm btn-success"
+															th:onclick="'startConnection(' + ${data['lab'].labId} + ')'">
+															<i class="fas fa-play"></i> Start
+														</button>
+													</td>
 												</tr>
 											</th:block>
-											<tr th:if="${connections == null or connections.empty}">
+
+											<tr th:if="${labData == null or labData.empty}">
 												<td colspan="7" class="text-muted text-center">No
 													connection found.</td>
 											</tr>
 										</tbody>
 									</table>
+
+
+
 								</div>
 							</div>
 						</div>
@@ -290,8 +293,31 @@ h1, h3 {
 
 	<div th:replace="template :: jsscript"></div>
 
-	
-	
+	<script>
+		function startConnection(id) {
+
+			// 			alert("idd :" + id);
+
+			$.ajax({
+				type : "POST",
+				url : '/guac/startConnectionLab',
+				data : {
+					"UserLabId" : id
+
+				},
+				success : function(result) {
+					// 					$("#pageLoader").hide();
+					window.location = "/guac/viewPlaylistConnection/" + result;
+					//alert(result);
+				}
+			});
+
+			// 			window.location.href = '/guac/viewPlaylistConnection/'
+			// 					+ guacamoleId;
+
+		}
+	</script>
+
 </body>
 
 </html>
