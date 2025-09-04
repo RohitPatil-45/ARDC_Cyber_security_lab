@@ -299,18 +299,18 @@
 						<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_USER')"
 							class="nav-item"><a href="/cloud_instance_user/vm_user"
 							class="nav-link"> <i class="far fa-circle nav-icon"></i>
-								<p>Create Lab</p>
+								<p>Create Lab Template</p>
 						</a></li>
 
 						<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
 							class="nav-item"><a href="/cloud_instance/view"
 							class="nav-link"> <i class="far fa-circle nav-icon"></i>
-								<p>View Lab</p>
+								<p>View Lab Template</p>
 						</a></li>
 						<li sec:authorize="hasRole('ROLE_USER')" class="nav-item"><a
 							href="/cloud_instance/view" class="nav-link"> <i
 								class="far fa-circle nav-icon"></i>
-								<p>View Lab</p>
+								<p>View Lab Template</p>
 						</a></li>
 
 						<li class="nav-item"><a href="/guac/Scenario_Details"
@@ -328,6 +328,11 @@
 						<li class="nav-item"><a href="/guac/View_Scenario"
 							class="nav-link"> <i class="far fa-circle nav-icon"></i>
 								<p>View Scenario</p>
+						</a></li>
+
+						<li class="nav-item"><a href="/guac/My_Scenario"
+							class="nav-link"> <i class="far fa-circle nav-icon"></i>
+								<p>My Scenario</p>
 						</a></li>
 
 						<li class="nav-item"><a href="/guac/" class="nav-link"> <i

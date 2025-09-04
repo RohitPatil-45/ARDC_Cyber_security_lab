@@ -70,4 +70,23 @@ public class DockerService {
 	public void removeContainer(String containerId) {
 		dockerClient.removeContainerCmd(containerId).withForce(true).exec();
 	}
+
+	public void stopContainerByName(String containerName) {
+		try {
+			String containerId = dockerClient.inspectContainerCmd(containerName).exec().getId();
+			dockerClient.stopContainerCmd(containerId).exec();
+		} catch (Exception e) {
+			System.err.println("Failed to stop container '" + containerName + "': " + e.getMessage());
+		}
+	}
+
+	public void removeContainerByName(String containerName) {
+		try {
+			String containerId = dockerClient.inspectContainerCmd(containerName).exec().getId();
+			dockerClient.removeContainerCmd(containerId).withForce(true).exec();
+		} catch (Exception e) {
+			System.err.println("Failed to remove container '" + containerName + "': " + e.getMessage());
+		}
+	}
+
 }

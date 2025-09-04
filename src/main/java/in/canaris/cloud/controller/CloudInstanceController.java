@@ -84,6 +84,7 @@ import in.canaris.cloud.openstack.entity.ChartBoatInstructionTemplate;
 import in.canaris.cloud.openstack.entity.CloudInstanceForm;
 import in.canaris.cloud.openstack.entity.InstructionDto;
 import in.canaris.cloud.openstack.entity.UserLab;
+import in.canaris.cloud.openstack.entity.UserScenario;
 import in.canaris.cloud.openstack.entity.UserWiseChatBoatInstructionTemplate;
 import in.canaris.cloud.repository.AddPhysicalServerRepository;
 import in.canaris.cloud.repository.AdditionalStorageRepository;
@@ -115,6 +116,7 @@ import in.canaris.cloud.repository.VMLocationPathRepository;
 import in.canaris.cloud.repository.VPCRepository;
 import in.canaris.cloud.repository.UserWiseChatBoatInstructionTemplateRepository;
 import in.canaris.cloud.repository.ChartBoatInstructionTemplateRepository;
+import in.canaris.cloud.repository.UserScenerioRepository;
 
 import in.canaris.cloud.server.entity.HardwareInventory;
 import in.canaris.cloud.server.entity.HardwareInventoryLinux;
@@ -260,15 +262,18 @@ public class CloudInstanceController {
 
 	@Autowired
 	private UserWiseChatBoatInstructionTemplateRepository instructionTemplateRepository;
-	
+
 	@Autowired
 	private UserLabRepository userLabRepository;
-	
+
 	@Autowired
 	private PortDetailsRepository portDetailsRepository;
 
 	@Autowired
 	private DockerService dockerService;
+
+	@Autowired
+	private UserScenerioRepository UserScenerioRepository;
 
 	@Autowired
 	private GuacamoleService guacService;
@@ -3393,9 +3398,14 @@ public class CloudInstanceController {
 
 	// Docker Container
 	@PostMapping("/docker")
-	public @ResponseBody String docker(@RequestParam("instanceID") int instanceID, @RequestParam("scenarioId") String scenarioId,
-			@RequestParam("noOfInstances") int noOfInstances, Principal principal) {
-
+	public @ResponseBody String docker(@RequestParam("instanceID") int instanceID,
+			@RequestParam("scenarioId") String scenarioId, @RequestParam("noOfInstances") int noOfInstances,
+			@RequestParam("scenarioName") String scenarioName, Principal principal) {
+		System.out.println("Inside_Docker_Method :::: ");
+		System.out.println("instanceID :::: " + instanceID);
+		System.out.println("scenarioId :::: " + scenarioId);
+		System.out.println("scenarioName :::: " + scenarioName);
+		System.out.println("noOfInstances :::: " + noOfInstances);
 		String result = null;
 		Map<Integer, Integer> portMappings = null;
 		String imageName = "kalilinux-vnc-novnc:latest";
@@ -3418,10 +3428,14 @@ public class CloudInstanceController {
 				portMappings.put(newVncPort, 5901);
 				portMappings.put(newNoVncPort, 8080);
 
-				int maxLabId = userLabRepository.findMaxLabId();
+				Integer maxLabId1 = userLabRepository.findMaxLabId();
+
+				int maxLabId = (maxLabId1 != null) ? maxLabId1 : 0;
+
 				maxLabId++;
 
 				String newInstanceName = instance.getInstance_name() + "_" + maxLabId;
+
 				System.out.println("template name = " + instance.getInstance_name());
 				System.out.println("new instance name = " + instance.getInstance_name() + "_" + maxLabId);
 				System.out.println("No of instances = " + noOfInstances);
@@ -3441,13 +3455,18 @@ public class CloudInstanceController {
 							insertIntoUserLab(newInstanceName, username, "vnc", templateName,
 									guacService.getConnectionIdByName(jsonResponse), newVncPort, newNoVncPort,
 									"kalilinux", scenarioId);
+
+							insertUserWiseChatBoatInstruction(instanceID, templateName, newInstanceName, username);
 						}
 
 					}
 				}
 			}
 
+			insertUserScenerio(scenarioId, scenarioName, username);
+
 		} catch (Exception e) {
+			e.printStackTrace();
 			result = "fail";
 		}
 
@@ -3465,6 +3484,7 @@ public class CloudInstanceController {
 		lab.setNoVncPort(newNoVncPort);
 		lab.setVncPort(newVncPort);
 		lab.setIpAddress("");
+		lab.setStatus("Pending");
 		lab.setTemplateName(templateName);
 		lab.setScenarioId(Integer.valueOf(scenarioId));
 
@@ -3484,6 +3504,56 @@ public class CloudInstanceController {
 	public String createWindowsDockerContainer(String containerName, String password) {
 
 		return null;
+	}
+
+	public void insertUserScenerio(String scenarioId, String scenarioName, String username) {
+		UserScenario us = new UserScenario();
+		us.setScenarioId(scenarioId);
+		us.setScenarioName(scenarioName);
+		us.setStatus("Start");
+		us.setUsername(username);
+		UserScenerioRepository.save(us);
+
+	}
+
+	public void insertUserWiseChatBoatInstruction(int templateId, String templateName, String LabName,
+			String username) {
+
+		try {
+
+			List<ChartBoatInstructionTemplate> templates = ChartBoatInstructionTemplateRepository
+					.findBytemplateId(templateId);
+			Integer labid = userLabRepository.findMaxLabId();
+
+			if (!templates.isEmpty()) {
+
+				for (ChartBoatInstructionTemplate template : templates) {
+
+					UserWiseChatBoatInstructionTemplate userWiseTemplate = new UserWiseChatBoatInstructionTemplate();
+
+					userWiseTemplate.setTemplateId(template.getTemplateId());
+					userWiseTemplate.setTemaplateName(template.getTemaplateName());
+					userWiseTemplate.setInstructionCommand(template.getInstructionCommand());
+					userWiseTemplate.setInstructionDetails(template.getInstructionDetails());
+
+					userWiseTemplate.setLabId(labid);
+					userWiseTemplate.setLabName(LabName);
+
+					userWiseTemplate.setUsername(username);
+					userWiseTemplate.setIsCommandExecuted("false");
+					userWiseTemplate.setCommandExecutedCheckTime(new Timestamp(System.currentTimeMillis()));
+
+					instructionTemplateRepository.save(userWiseTemplate);
+				}
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Expltion_insert_chartnbordOnstruion" + e);
+			// TODO: handle exception
+		}
+
 	}
 
 }

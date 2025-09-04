@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
@@ -45,9 +47,11 @@ import in.canaris.cloud.openstack.entity.InstructionCommand;
 import in.canaris.cloud.openstack.entity.Playlist;
 import in.canaris.cloud.openstack.entity.ScenarioComments;
 import in.canaris.cloud.openstack.entity.UserLab;
+import in.canaris.cloud.openstack.entity.UserScenario;
 import in.canaris.cloud.openstack.entity.UserWiseChatBoatInstructionTemplate;
 import in.canaris.cloud.repository.ScenarioRepository;
 import in.canaris.cloud.repository.UserRepository;
+import in.canaris.cloud.repository.UserScenerioRepository;
 import in.canaris.cloud.repository.UserWiseChatBoatInstructionTemplateRepository;
 import in.canaris.cloud.repository.ChartBoatInstructionTemplateRepository;
 import in.canaris.cloud.repository.CloudInstanceRepository;
@@ -57,7 +61,7 @@ import in.canaris.cloud.repository.PlaylistsSenarioRepository;
 import in.canaris.cloud.repository.CommandHistoryRepository;
 import in.canaris.cloud.repository.ScenarioCommentsRepository;
 import in.canaris.cloud.repository.UserLabRepository;
-
+import in.canaris.cloud.service.DockerService;
 import in.canaris.cloud.service.GuacamoleService;
 
 @Controller
@@ -102,6 +106,12 @@ public class GuacamoleController {
 
 	@Autowired
 	private UserWiseChatBoatInstructionTemplateRepository instructionTemplateRepository;
+
+	@Autowired
+	private UserScenerioRepository UserScenerioRepository;
+
+	@Autowired
+	private DockerService dockerService;
 
 	@GetMapping("/")
 	public String home() {
@@ -190,10 +200,12 @@ public class GuacamoleController {
 			map.put("lab", lab);
 
 			// Fetch true and false counts from repository
-			Integer falseCountObj = instructionTemplateRepository
-					.getfalseCompletionCountsByTemplateName(lab.getTemplateName());
-			Integer trueCountObj = instructionTemplateRepository
-					.gettrueCompletionCountsByTemplateName(lab.getTemplateName());
+
+			Long labIdLong = lab.getLabId();
+			int labId = labIdLong.intValue();
+
+			Integer falseCountObj = instructionTemplateRepository.getfalseCompletionCountsByTemplateName(labId);
+			Integer trueCountObj = instructionTemplateRepository.gettrueCompletionCountsByTemplateName(labId);
 
 			// Handle null values
 			int falseCount = (falseCountObj != null) ? falseCountObj : 0;
@@ -353,11 +365,15 @@ public class GuacamoleController {
 
 			if (!labDetails.isEmpty()) {
 				UserLab userLab = labDetails.get(0);
-				String TemplateName = userLab.getTemplateName();
+//				String TemplateName = userLab.getTemplateName();
+//				Long laabId = userLab.getLabId();
+				Long labIdLong = userLab.getLabId();
+				int laabId = labIdLong.intValue();
+
+				String LabName = userLab.getInstanceName();
 //				System.out.println("labName ::" + labName);
 				// Fetch instructions for this lab
-				List<UserWiseChatBoatInstructionTemplate> datalist = instructionTemplateRepository
-						.findBytemaplateName(TemplateName);
+				List<UserWiseChatBoatInstructionTemplate> datalist = instructionTemplateRepository.findBylabId(laabId);
 
 				if (datalist != null && !datalist.isEmpty()) {
 
@@ -405,15 +421,19 @@ public class GuacamoleController {
 
 			if (!labDetails.isEmpty()) {
 				UserLab userLab = labDetails.get(0);
-				String templateName = userLab.getTemplateName();
-				System.out.println("chatTemplateName_on ::" + templateName);
+//				String templateName = userLab.getTemplateName();
+//				Long laabId = userLab.getLabId();
+				String LabName = userLab.getInstanceName();
 
+				Long labIdLong = userLab.getLabId();
+				int laabId = labIdLong.intValue();
+				System.out.println("laabId ::" + laabId);
 				// Fetch next instruction
 				UserWiseChatBoatInstructionTemplate instructionCommand = instructionTemplateRepository
-						.findNextUnexecutedByLabId(templateName);
+						.findNextUnexecutedByLabId(laabId);
 
 				if (instructionCommand != null) {
-					System.out.println("chatTemplateName_if ::" + templateName);
+					System.out.println("LabName_if ::" + LabName);
 					String newCommand = instructionCommand.getInstructionCommand();
 					System.out.println("newCommand ::" + newCommand);
 
@@ -468,17 +488,20 @@ public class GuacamoleController {
 		Map<String, Object> response = new HashMap<>();
 
 		try {
-			int temp = Integer.parseInt(labId);
+			int gucamleid = Integer.parseInt(labId);
 
-			List<UserLab> labDetails = UserLabRepository.findByguacamoleId(temp);
+			List<UserLab> labDetails = UserLabRepository.findByguacamoleId(gucamleid);
 
 			if (!labDetails.isEmpty()) {
 				UserLab userLab = labDetails.get(0);
-				String templateName = userLab.getTemplateName();
-				System.out.println("TemplateName ::" + templateName);
+//				Long laabId = userLab.getLabId();
+				String LabName = userLab.getInstanceName();
 
-				// 1. Check if command exists in history
-				List<CommandHistory> commandHistoryList = CommandHistoryRepository.findByContainerName(templateName,
+				Long labIdLong = userLab.getLabId();
+				int laabId = labIdLong.intValue();
+				System.out.println("LabId ::" + laabId);
+
+				List<CommandHistory> commandHistoryList = CommandHistoryRepository.findByContainerName(LabName,
 						labcommand);
 
 				boolean commandMatched = false;
@@ -493,12 +516,12 @@ public class GuacamoleController {
 					// Case 1: Command found in history
 					System.out.println("Inside: command matched in history");
 
-					int updatedRows = instructionTemplateRepository.modifyCommandByLabId(templateName, labcommand);
+					int updatedRows = instructionTemplateRepository.modifyCommandByLabId(laabId, labcommand);
 
 					if (updatedRows > 0) {
-						// Fetch next instruction
+
 						UserWiseChatBoatInstructionTemplate instructionCommand = instructionTemplateRepository
-								.findNextUnexecutedByLabId(templateName);
+								.findNextUnexecutedByLabId(laabId);
 						System.out.println("Lab Updatedd.");
 						if (instructionCommand != null) {
 							byte[] htmlBytes = instructionCommand.getInstructionDetails();
@@ -662,6 +685,7 @@ public class GuacamoleController {
 				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
 				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
 				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
+				String NumberofInstance = temp.getNumberofInstance() != null ? temp.getNumberofInstance() : "";
 //				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
 				String Cover_Image = "";
 				int SrNo = temp.getId();
@@ -676,14 +700,14 @@ public class GuacamoleController {
 				obj.put("Mode", Mode);
 				obj.put("Difficulty_Level", Difficulty_Level);
 				obj.put("Duration", Duration);
-//				obj.put("Labs", Labs);
+				obj.put("NumberofInstance", NumberofInstance);
 				obj.put("Cover_Image", Cover_Image);
 				obj.put("Id", SrNo);
 
 				Finalarray.put(obj);
 			}
 
-			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
+			System.out.println("Fetched Datawqwqw: " + dataList.toString()); // Print to console
 			int srno = 0;
 			for (Playlist temp : dataList) {
 				JSONObject obj = new JSONObject();
@@ -1012,7 +1036,7 @@ public class GuacamoleController {
 
 	@GetMapping("/Playlistimage/{id}")
 	public void getPlaylistImage(@PathVariable int id, HttpServletResponse response) throws IOException {
-		System.out.println("inside_render_image_getPlaylistImage ::");
+//		System.out.println("inside_render_image_getPlaylistImage ::");
 		Optional<Playlist> scenario = PlaylistRepository.findById(id);
 		if (scenario.isPresent() && scenario.get().getCoverImage() != null) {
 			byte[] imageBytes = scenario.get().getCoverImage();
@@ -1027,7 +1051,7 @@ public class GuacamoleController {
 
 	@GetMapping("/Scenarioimage/{id}")
 	public void getScenarioImage(@PathVariable int id, HttpServletResponse response) throws IOException {
-		System.out.println("inside_render_image_getScenarioImage ::");
+//		System.out.println("inside_render_image_getScenarioImage ::");
 		Optional<Add_Scenario> scenario = ScenarioRepository.findById(id);
 		if (scenario.isPresent() && scenario.get().getCoverImage() != null) {
 			byte[] imageBytes = scenario.get().getCoverImage();
@@ -1067,6 +1091,7 @@ public class GuacamoleController {
 				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
 				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
 				String LabId = temp.getLabId() != null ? temp.getLabId() : "";
+				String NumberofInstance = temp.getNumberofInstance() != null ? temp.getNumberofInstance() : "";
 //				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
 				String Cover_Image = "";
 				int SrNo = temp.getId();
@@ -1085,6 +1110,7 @@ public class GuacamoleController {
 				obj.put("Cover_Image", Cover_Image);
 				obj.put("Id", SrNo);
 				obj.put("LabId", LabId);
+				obj.put("NumberofInstance", NumberofInstance);
 
 				Finalarray.put(obj);
 			}
@@ -1475,6 +1501,111 @@ public class GuacamoleController {
 		return mav;
 	}
 
+	@GetMapping("/My_Scenario")
+	public ModelAndView getMy_View_Scenario(Principal principal) {
+		ModelAndView mav = new ModelAndView("My_View_Scenario");
+		JSONArray Finalarray = new JSONArray();
+		List<Add_Scenario> dataList;
+		try {
+			// start
+
+			Authentication authentication = (Authentication) principal;
+			User loginedUser = (User) authentication.getPrincipal();
+
+			String userName = loginedUser.getUsername();
+			String groupName = "";
+			StringBuilder vmNamesBuilder = new StringBuilder();
+
+			List<AppUser> userList = userRepository.findByuserName(userName);
+
+			boolean isSuperAdmin = authentication.getAuthorities().stream()
+					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+
+			boolean isAdmin = authentication.getAuthorities().stream()
+					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+
+			if (isSuperAdmin) {
+				dataList = ScenarioRepository.findByUserScenario();
+			} else {
+
+				for (AppUser appUser : userList) {
+					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
+				}
+
+				List<String> groups = new ArrayList<>();
+				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
+				while (groupTokenizer.hasMoreTokens()) {
+					groups.add(groupTokenizer.nextToken());
+				}
+
+				// Get VM names by group
+				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
+				for (Object[] vmEntry : vmList) {
+					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
+				}
+
+				// Split VM names string into a list
+				List<String> vmGroups = new ArrayList<>();
+				String vmNames = vmNamesBuilder.toString();
+				if (!vmNames.isEmpty()) {
+					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
+					while (vmTokenizer.hasMoreTokens()) {
+						vmGroups.add(vmTokenizer.nextToken());
+					}
+				}
+//				dataList = ScenarioRepository.getView_Scenario(vmGroups);
+				dataList = ScenarioRepository.findByUserScenario();
+			}
+
+//			 dataList = kVMDriveDetailsRepository.findBykVMDetails();
+			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
+			int srno = 0;
+			for (Add_Scenario temp : dataList) {
+				JSONObject obj = new JSONObject();
+
+				String Scenario_Name = temp.getScenarioName() != null ? temp.getScenarioName() : "";
+				String Scenario_Title = temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "";
+				String Description = temp.getDescription() != null ? temp.getDescription() : "";
+				String Category = temp.getCategory() != null ? temp.getCategory() : "";
+				String Scenario_Type = temp.getScenarioType() != null ? temp.getScenarioType() : "";
+				String Mode = temp.getMode() != null ? temp.getMode() : "";
+				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
+				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
+				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
+//				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
+				String Cover_Image = "";
+				int SrNo = temp.getId();
+
+//				srno++;
+
+				obj.put("Scenario_Name", Scenario_Name);
+				obj.put("Scenario_Title", Scenario_Title);
+//				obj.put("Description", Description);
+				obj.put("Category", Category);
+				obj.put("Scenario_Type", Scenario_Type);
+				obj.put("Mode", Mode);
+				obj.put("Difficulty_Level", Difficulty_Level);
+				obj.put("Duration", Duration);
+//				obj.put("Labs", Labs);
+				obj.put("Cover_Image", Cover_Image);
+				obj.put("Id", SrNo);
+
+				Finalarray.put(obj);
+			}
+
+//			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
+
+			mav.addObject("listObj", Finalarray.toString());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			mav.addObject("listObj", null);
+			mav.addObject("error", e.getMessage());
+			System.out.println("Error fetching data: " + e.getMessage());
+		}
+		return mav;
+	}
+
 	@PostMapping("/addplaylist_Scenario")
 	@ResponseBody
 	public String addScenarioToPlaylist(@RequestParam("playlistId") int playlistId,
@@ -1623,83 +1754,99 @@ public class GuacamoleController {
 		return result;
 	}
 
-	@PostMapping("/startConnectionLab")
+	@PostMapping("/showLabButtonOn_Check")
 	@ResponseBody
-	public String startConnectionLab(@RequestParam("UserLabId") Long UserLabId, Principal principal) {
-		String result = "fail";
+	public String showLabButtonOn_Check(@RequestParam("scenarioId") String scenarioId,
+			@RequestParam("scenarioName") String scenarioName, Principal principal) {
 		try {
+//			System.out.println("Checking scenarioId: " + scenarioId);
 
-			User loginedUser = (User) ((Authentication) principal).getPrincipal();
-			String username = loginedUser.getUsername();
-			// Find the lab details. Assuming there's only one entry per labId.
+			Optional<UserScenario> scenarioOpt = UserScenerioRepository.findByScenarioId(scenarioId);
 
-			List<UserLab> labDetails = UserLabRepository.findByLabId(UserLabId);
-
-			if (!labDetails.isEmpty()) {
-				// Get the first item from the list.
-				UserLab userLab = labDetails.get(0);
-				;
-				// Get the guacamoleId from the retrieved object.
-				Integer guacamoleId = userLab.getGuacamoleId();
-				Integer scenarioId = userLab.getScenarioId();
-				String templateIdString = userLab.getTemplateName();
-				String LabName = userLab.getInstanceName();
-
-				List<UserWiseChatBoatInstructionTemplate> datalist = instructionTemplateRepository
-						.findBytemaplateName(LabName);
-
-				if (!datalist.isEmpty()) {
-
-					int tempId = Integer.parseInt(templateIdString);
-
-					List<ChartBoatInstructionTemplate> templates = ChartBoatInstructionTemplateRepository
-							.findBytemplateId(tempId);
-
-					if (!templates.isEmpty()) {
-
-						for (ChartBoatInstructionTemplate template : templates) {
-
-							UserWiseChatBoatInstructionTemplate userWiseTemplate = new UserWiseChatBoatInstructionTemplate();
-
-							userWiseTemplate.setTemplateId(template.getTemplateId());
-							userWiseTemplate.setTemaplateName(template.getTemaplateName());
-							userWiseTemplate.setInstructionCommand(template.getInstructionCommand());
-							userWiseTemplate.setInstructionDetails(template.getInstructionDetails());
-
-							userWiseTemplate.setLabId(template.getTemplateId());
-							userWiseTemplate.setLabName(template.getTemaplateName());
-
-							userWiseTemplate.setUsername(username);
-							userWiseTemplate.setIsCommandExecuted("false");
-							userWiseTemplate.setCommandExecutedCheckTime(new Timestamp(System.currentTimeMillis()));
-
-							instructionTemplateRepository.save(userWiseTemplate);
-
-							System.out
-									.println("Inserted instruction template for user: " + template.getTemaplateName());
-						}
-					} else {
-						System.out.println("No chart boat instruction templates found for template ID: " + tempId);
-					}
-					result = String.valueOf(guacamoleId);
-
-				} else {
-					System.out.println("Skip Entry TO insert into UserinstruionTemplate: ");
-
-					result = String.valueOf(guacamoleId);
-				}
+			if (scenarioOpt.isPresent()) {
+//				System.out.println("Scenario found.");
+				return "available";
+			} else {
+//				System.out.println("Scenario NOT found.");
+				return "notavailable";
 			}
 
-		} catch (NumberFormatException e) {
-			System.err.println("Error parsing template ID: " + e.getMessage());
-			return "fail";
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.err.println("Error starting connection: " + e.getMessage());
 			return "fail";
 		}
+	}
 
-		return result;
+	@PostMapping("/stop_lab")
+	@ResponseBody
+	public String stop_lab(@RequestParam("containerName") String containerName, Principal principal) {
+		try {
+			System.out.println("Inside_stop_lab containerName: " + containerName);
+			dockerService.stopContainerByName(containerName);
+			System.out.println("Container stopped successfully: " + containerName);
+			return "success";
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Exception Inside_stop_lab : " + e);
+			return "fail";
+		}
+	}
+
+	@PostMapping("/remove_lab")
+	@ResponseBody
+	public String remove_lab(@RequestParam("containerName") String containerName, Principal principal) {
+		try {
+			System.out.println("Inside_remove_lab containerName: " + containerName);
+			dockerService.removeContainerByName(containerName);
+			System.out.println("Container removed successfully: " + containerName);
+
+			CommandHistoryRepository.deleteByContainerName(containerName);
+			instructionTemplateRepository.deleteByLabName(containerName);
+			UserLabRepository.deleteByInstanceName(containerName);
+
+			return "success";
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Exception Inside_remove_lab : " + e);
+			return "fail";
+		}
+	}
+
+	@PostMapping("/getPercenetageParticularScenerio")
+	@ResponseBody
+	public String getPercentageParticularScenario(@RequestParam("templateId") String templateId, Principal principal) {
+		try {
+			System.out.println("Inside getPercentageParticularScenario: " + templateId);
+
+			// Convert String to int
+			int templateIdInt = Integer.parseInt(templateId);
+
+			Integer falseCountObj = instructionTemplateRepository.getFalseCompletionCountsByTemplateId(templateIdInt);
+			Integer trueCountObj = instructionTemplateRepository.getTrueCompletionCountsByTemplateId(templateIdInt);
+
+			int falseCount = (falseCountObj != null) ? falseCountObj : 0;
+			int trueCount = (trueCountObj != null) ? trueCountObj : 0;
+
+			System.out.println("True count: " + trueCount + ", False count: " + falseCount);
+
+			int total = trueCount + falseCount;
+
+			if (total == 0) {
+				return "0";
+			}
+
+			int percentage = (trueCount * 100) / total;
+			System.out.println("Percentage: " + percentage + "%");
+
+			return String.valueOf(percentage);
+
+		} catch (NumberFormatException e) {
+			System.err.println("Invalid templateId format: " + templateId);
+			return "Invalid templateId";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
+		}
 	}
 
 }

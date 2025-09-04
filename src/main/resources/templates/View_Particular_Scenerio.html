@@ -262,7 +262,8 @@ body {
 	animation: spin 0.9s linear infinite;
 }
 
-@keyframes spin {to { transform:rotate(360deg);
+@
+keyframes spin {to { transform:rotate(360deg);
 	
 }
 
@@ -365,39 +366,12 @@ body {
 		</div>
 		<!-- End Page Loader -->
 
-		<!-- no of instance -->
-		<div class="modal fade text-center" id="noOfInstance">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Lab creation</h5>
-						<button type="button" class="close" data-dismiss="modal">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<div class="form-group">
-							<label for="action" class="float-left">No of Instances</label> <input
-								type="text" required id="instances" name="instances"
-								class="form-control" placeholder="Enter No of Instances">
-						</div>
-						<input type="hidden" id="cloudInstanceId">
-						<div class="form-group">
-							<button class="btn btn-success"
-								th:onclick="createDockerContainer()">Submit</button>
-						</div>
 
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- End no of instance -->
 
 		<div th:replace="fragments/footer :: footer"></div>
 	</div>
 
 	<div th:replace="template :: jsscript"></div>
-	<script th:src="@{/custom_js/viewParticularScenario.js}"></script>
 
 
 	<script>
@@ -406,10 +380,13 @@ let jsonData;
 let scenarioId;
 let editingCommentId = null;
 let instanceId;
+let noofinstance;
+let scenarioName;
 
 document.addEventListener("DOMContentLoaded", function () {
     let rawData = '[[${listObj}]]'.replace(/&quot;/g, '"');
 
+   
     try {
         jsonData = JSON.parse(rawData);
     } catch (e) {
@@ -420,10 +397,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!jsonData || !jsonData.length) return;
 
     const item = jsonData[0];
-    scenarioId = item.Id; // Store scenario ID for later use
+    scenarioId = item.Id; 
     instanceId = item.LabId;
+    noofinstance=item.NumberofInstance;
+    scenarioName = item.Scenario_Name;
     const container = document.getElementById("scenarioContainer");
-
+    showLabButtonOn_Check();
+    getPercenetageParticularScenerio();
     const fragment = document.createDocumentFragment();
 
     // Card HTML
@@ -439,11 +419,13 @@ document.addEventListener("DOMContentLoaded", function () {
                             ${item.Scenario_Title}
                         </h3>
                     </div>
+                   
                     <div class="d-flex justify-content-between align-items-center flex-wrap mb-3" style="gap: 10px;">
                         <h5 class="card-subtitle mb-0" style="font-weight: 500; color: #555;">
                             ${item.Scenario_Name || 'N/A'}
                         </h5>
                         <div class="d-flex align-items-center" style="gap: 10px;">
+                        <div id="Complete_Per"></div>
                             <div class="form-group mb-0">
                                 <select required id="Actions_${item.Id}" name="Actions"
                                         class="form-control btn btn-outline-primary"
@@ -454,11 +436,22 @@ document.addEventListener("DOMContentLoaded", function () {
                                     <option value="delete">Delete</option>
                                 </select>
                             </div>
-                            <button type="button" class="start-btn create-btn"
-								data-toggle="modal" data-target="#noOfInstance"
-								th:data-request-id="${item.LabId}">
-								<i class="fas fa-play"></i> Create Lab
-							</button>
+                            
+                            <div id="viewLab_btn" >
+                            <a  href="/guac/View_Vm_Listing?Id=${item.Id}" class="btn btn-sm btn-success start-btn create-btn">
+                            <i class="fas fa-play"></i> View Lab </a>
+                            </div>
+                          
+							<div id="createLab_btn" style="display:none">
+								<button   type="button" class="start-btn create-btn" onclick="createDockerContainer()">
+									<i class="fas fa-play"></i> Create Lab
+								</button>
+							</div>
+							
+                        
+                            
+                            
+                            
                         </div>
                     </div>
                     <div class="card-tags mt-3 d-flex flex-wrap gap-2">
@@ -718,14 +711,16 @@ function deleteScenerio(id) {
 }
 
 function createDockerContainer() {
+// 	alert("dockerr")
 	$("#pageLoader").show();
 	$.ajax({
 		type: "POST",
 		url : '/cloud_instance/docker',
 		data : {
 			"instanceID" : instanceId,
-			"noOfInstances" : $('#instances').val(),
-			"scenarioId" : scenarioId
+			"noOfInstances" : noofinstance,
+			"scenarioId" : scenarioId,
+			"scenarioName" : scenarioName
 			
 		},
 		success : function(result) {
@@ -735,6 +730,66 @@ function createDockerContainer() {
 		}
 	});
 }
+
+function showLabButtonOn_Check() {
+// 	alert("hwolabbb"+scenarioId)
+    $.ajax({
+        type: "POST",
+        url: '/guac/showLabButtonOn_Check',
+        data: {
+            "scenarioId": scenarioId,
+            "scenarioName": scenarioName
+        },
+        success: function(result) {
+            // Trim the result in case there are extra spaces
+            result = result.trim();
+// alert("result :"+result)
+            if (result === "available") {
+                // Show View Lab, hide Create Lab
+                $('#viewLab_btn').show();
+                $('#createLab_btn').hide();
+            } else if (result === "notavailable") {
+                // Show Create Lab, hide View Lab
+                $('#createLab_btn').show();
+                $('#viewLab_btn').hide();
+            } else {
+                console.error("Unexpected result from server:", result);
+            }
+        },
+        error: function(err) {
+            console.error("AJAX error:", err);
+        }
+    });
+}
+
+
+function getPercenetageParticularScenerio() {
+// 	alert("templateId "+instanceId)
+    $.ajax({
+        type: "POST",
+        url: '/guac/getPercenetageParticularScenerio',
+        data: {
+            "templateId": instanceId
+        },
+        success: function(result) {
+            result = result.trim();
+
+            if (!isNaN(result)) {
+                document.getElementById("Complete_Per").innerText = result + "%";
+            } else {
+                document.getElementById("Complete_Per").innerText = "N/A";
+            }
+        },
+        error: function(err) {
+            console.error("AJAX error:", err);
+            document.getElementById("Complete_Per").innerText = "Error";
+        }
+    });
+}
+
+
+
+
 </script>
 </body>
 </html>

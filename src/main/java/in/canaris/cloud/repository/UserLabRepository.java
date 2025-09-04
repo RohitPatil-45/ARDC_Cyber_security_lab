@@ -16,7 +16,7 @@ public interface UserLabRepository extends JpaRepository<UserLab, Integer> {
 	List<UserLab> findByscenarioId(int scenarioId);
 
 	@Query("SELECT MAX(u.labId) FROM UserLab u")
-	int findMaxLabId();
+	Integer findMaxLabId();
 
 	List<UserLab> findByLabId(Long userLabId);
 
@@ -26,15 +26,15 @@ public interface UserLabRepository extends JpaRepository<UserLab, Integer> {
 //	@Modifying
 //	@Query("UPDATE UserLab u SET u.Status = 'Completed' WHERE u.labId = :labId")
 //	int updateStatusById(@Param("labId") Long labId);
-	
-	
+
 	@Modifying
 	@Transactional
 	@Query(value = "UPDATE user_lab SET status = 'Completed' WHERE lab_id = :labId", nativeQuery = true)
 	int updateStatusById(@Param("labId") Long labId);
 
-	
-
-
+	@Modifying
+	@Transactional
+	@Query("DELETE FROM UserLab u WHERE u.instanceName = :instanceName")
+	void deleteByInstanceName(String instanceName);
 
 }

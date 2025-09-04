@@ -250,6 +250,8 @@ h1, h3 {
 												<th>Status</th>
 												<th>Completion %</th>
 												<th>Actions</th>
+												<th>Stop Lab</th>
+												<th>Remove Lab</th>
 											</tr>
 										</thead>
 										<tbody>
@@ -261,24 +263,44 @@ h1, h3 {
 													<td th:text="${data['lab'].username}"></td>
 													<td th:text="${data['lab'].Status}"></td>
 													<td th:text="${data['percentage'] + '%'}"></td>
-													
-													<!-- 													<td><a -->
-													<!-- 														th:href="@{|/guac/viewPlaylistConnection/${conn.guacamoleId}|}" -->
-													<!-- 														class="btn btn-sm btn-success"> <i class="fas fa-play"></i> -->
-													<!-- 															Console -->
-													<!-- 													</a></td> -->
-													
+
+													<td><a
+														th:href="@{|/guac/viewPlaylistConnection/${data['lab'].guacamoleId}|}"
+														class="btn btn-sm btn-success"> <i class="fas fa-play"></i>
+															Console
+													</a></td>
+
+
 													<td>
-														<button class="btn btn-sm btn-success"
-															th:onclick="'startConnection(' + ${data['lab'].labId} + ')'">
-															<i class="fas fa-play"></i> Start
+														<button type="button"
+															class="btn btn-sm btn-warning stop-lab-btn"
+															th:data-container-name="${data['lab'].instanceName}">
+															<i class="fas fa-stop"></i> Stop Lab
 														</button>
 													</td>
+													<td>
+														<button type="button"
+															class="btn btn-sm btn-danger remove-lab-btn"
+															th:data-container-name="${data['lab'].instanceName}">
+															<i class="fas fa-trash"></i> Remove Lab
+														</button>
+													</td>
+
+
+
+
+
+													<!-- 													<td> -->
+													<!-- 														<button class="btn btn-sm btn-success" -->
+													<!-- 															th:onclick="'startConnection(' + ${data['lab'].labId} + ')'"> -->
+													<!-- 															<i class="fas fa-play"></i> Start -->
+													<!-- 														</button> -->
+													<!-- 													</td> -->
 												</tr>
 											</th:block>
 
 											<tr th:if="${labData == null or labData.empty}">
-												<td colspan="7" class="text-muted text-center">No
+												<td colspan="9" class="text-muted text-center">No
 													connection found.</td>
 											</tr>
 										</tbody>
@@ -303,7 +325,6 @@ h1, h3 {
 	<script>
 		function startConnection(id) {
 
-			// 			alert("idd :" + id);
 
 			$.ajax({
 				type : "POST",
@@ -323,7 +344,114 @@ h1, h3 {
 			// 					+ guacamoleId;
 
 		}
+
+		
 	</script>
+
+	<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Stop Lab functionality
+    document.querySelectorAll('.stop-lab-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const containerName = this.getAttribute('data-container-name');
+            stopLab(containerName);
+        });
+    });
+
+    // Remove Lab functionality
+    document.querySelectorAll('.remove-lab-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const containerName = this.getAttribute('data-container-name');
+            removeLab(containerName);
+        });
+    });
+
+    function stopLab(containerName) {
+        $.ajax({
+            type: "POST",
+            url: '/guac/stop_lab',
+            data: {
+                "containerName": containerName
+            },
+            success: function(result) {
+                if (result === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Stopped!',
+                        text: 'Lab stopped successfully.',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Failed to stop the lab!'
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Failed to stop the lab!'
+                });
+            }
+        });
+    }
+
+    function removeLab(containerName) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, remove it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "POST",
+                    url: '/guac/remove_lab',
+                    data: {
+                        "containerName": containerName
+                    },
+                    success: function(result) {
+                        if (result === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Removed!',
+                                text: 'Lab removed successfully.',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Failed to remove the lab!'
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Failed to remove the lab!'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+
+});
+</script>
+
+
 
 </body>
 
