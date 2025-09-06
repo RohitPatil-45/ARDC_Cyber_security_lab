@@ -46,5 +46,13 @@ public interface UserWiseChatBoatInstructionTemplateRepository
 	@Query(value = "SELECT COUNT(*) FROM userwise_chatboat_instruction_template "
 			+ "WHERE isCommandExecuted='true' AND template_id = :templateId", nativeQuery = true)
 	Integer getTrueCompletionCountsByTemplateId(@Param("templateId") int templateId);
+	
+	
+	@Modifying
+	@Transactional
+	@Query(value = "UPDATE userwise_chatboat_instruction_template SET isCommandExecuted = 'false' WHERE lab_name = :containerName", nativeQuery = true)
+	void UpdateresetByLabName(@Param("containerName") String containerName);
+
+	
 
 }

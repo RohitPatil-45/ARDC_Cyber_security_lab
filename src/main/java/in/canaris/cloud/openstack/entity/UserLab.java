@@ -10,45 +10,47 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "user_lab")
 public class UserLab {
-	
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "lab_id", nullable = false, updatable = false)
-    private Long labId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "lab_id", nullable = false, updatable = false)
+	private Long labId;
 
-    @Column(name = "template_name", nullable = false, length = 255)
-    private String templateName;
+	@Column(name = "template_name", nullable = false, length = 255)
+	private String templateName;
 
-    @Column(name = "instance_name", nullable = false, length = 255)
-    private String instanceName;
+	@Column(name = "instance_name", nullable = false, length = 255)
+	private String instanceName;
 
-    @Column(name = "remote_type", nullable = false, length = 255)
-    private String remoteType;
+	@Column(name = "remote_type", nullable = false, length = 255)
+	private String remoteType;
 
-    @Column(name = "vnc_port", nullable = false)
-    private Integer vncPort;
+	@Column(name = "vnc_port", nullable = false)
+	private Integer vncPort;
 
-    @Column(name = "no_vnc_port", nullable = false)
-    private Integer noVncPort;
+	@Column(name = "no_vnc_port", nullable = false)
+	private Integer noVncPort;
 
-    @Column(name = "guacamole_id", nullable = false)
-    private Integer guacamoleId;
+	@Column(name = "guacamole_id", nullable = false)
+	private Integer guacamoleId;
 
-    @Column(name = "username", nullable = false, length = 255)
-    private String username;
+	@Column(name = "username", nullable = false, length = 255)
+	private String username;
 
-    @Column(name = "password", length = 50)
-    private String password;
+	@Column(name = "password", length = 50)
+	private String password;
 
-    @Column(name = "scenario_id")
-    private Integer scenarioId;
+	@Column(name = "scenario_id")
+	private Integer scenarioId;
 
-    @Column(name = "ip_address", length = 50)
-    private String ipAddress;
-    
-    @Column(name = "status", length = 50)
-    private String Status;
+	@Column(name = "ip_address", length = 50)
+	private String ipAddress;
+
+	@Column(name = "status", length = 50)
+	private String Status;
+
+	@Column(name = "vmstate", length = 50)
+	private String VmState;
 
 	public Long getLabId() {
 		return labId;
@@ -146,14 +148,22 @@ public class UserLab {
 		Status = status;
 	}
 
+	public String getVmState() {
+		return VmState;
+	}
+
+	public void setVmState(String vmState) {
+		VmState = vmState;
+	}
+
 	@Override
 	public String toString() {
 		return "UserLab [labId=" + labId + ", templateName=" + templateName + ", instanceName=" + instanceName
 				+ ", remoteType=" + remoteType + ", vncPort=" + vncPort + ", noVncPort=" + noVncPort + ", guacamoleId="
 				+ guacamoleId + ", username=" + username + ", password=" + password + ", scenarioId=" + scenarioId
-				+ ", ipAddress=" + ipAddress + ", Status=" + Status + "]";
+				+ ", ipAddress=" + ipAddress + ", Status=" + Status + ", VmState=" + VmState + "]";
 	}
+
 	
-	
-    
+
 }

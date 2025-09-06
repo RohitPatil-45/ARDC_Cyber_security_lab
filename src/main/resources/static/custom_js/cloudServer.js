@@ -185,3 +185,41 @@ $("#addCustomerNameToVM").click(function() {
 		
 	});
 })
+
+
+function importSourceImage(templateId)
+{
+	$("#pageLoader").show();
+	$.ajax({
+		type: "POST",
+		url : '/cloud_instance/sourceImage',
+		data : {
+			"templateId" :templateId
+		},
+		success : function(result) {
+			$("#pageLoader").hide();
+			if(result == "success"){
+				Swal.fire({
+					position: "top",
+					icon: "success",
+					title: 'Source Image created successfully',
+					showConfirmButton: true,
+					timer: 3000,
+				}).then(() => {
+					window.location = "/cloud_instance/view";
+				})
+			}
+			else{
+				Swal.fire({
+					position: 'top',
+					icon: 'warning',
+					title: 'Failed to load Source image',
+					showConfirmButton: false,
+					timer: 3000
+				}).then(() => {
+					window.location = "/cloud_instance/view";
+				})
+			}
+		}
+	});
+}

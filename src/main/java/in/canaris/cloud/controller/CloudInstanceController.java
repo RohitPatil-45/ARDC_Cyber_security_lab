@@ -3,6 +3,7 @@ package in.canaris.cloud.controller;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -3484,7 +3485,7 @@ public class CloudInstanceController {
 		lab.setNoVncPort(newNoVncPort);
 		lab.setVncPort(newVncPort);
 		lab.setIpAddress("");
-		lab.setStatus("Pending");
+		lab.setStatus("InProgress");
 		lab.setTemplateName(templateName);
 		lab.setScenarioId(Integer.valueOf(scenarioId));
 
@@ -3554,6 +3555,31 @@ public class CloudInstanceController {
 			// TODO: handle exception
 		}
 
+	}
+	
+	@PostMapping("/sourceImage")
+	public  @ResponseBody String sourceImage(@RequestParam("templateId") int templateId) {
+		try {
+			String filePath = "C:\\SourceImage\\kalilinux-vnc-novnc:latest.tar";
+			File file = new File(filePath);
+			String imageName = file.getName().replaceFirst("[.][^.]+$", "");
+			if (dockerService.loadImageFromTar(filePath, imageName).equalsIgnoreCase("success")) {
+				try {
+					repository.updateSourceImage(templateId);
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.print("Exception DB update source image :" + e.getMessage());
+				}
+				return "success";
+			} else {
+				return "fail";
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
+		}
+		
 	}
 
 }

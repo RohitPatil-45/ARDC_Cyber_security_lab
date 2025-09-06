@@ -146,45 +146,14 @@ public class GuacamoleController {
 		return "list";
 	}
 
-//	@GetMapping("/View_Vm_Listing")
-//	public String View_Vm_ListingConnections(@RequestParam("Id") int id, Model model) {
-//		System.out.println("Requested Id = " + id);
-//
-//		CloudInstance instance = repository.findById(id).orElse(null);
-//		System.out.println("vvvvFound instance: " + instance);
-//		if (instance != null) {
-//			System.out.println("getVm_instructions: " + instance.getVm_instructions());
-//			System.out.println("IP: " + instance.getInstance_ip());
-//		} else {
-//			System.out.println("No instance found for ID: " + id);
-//		}
-//
-//		List<CloudInstance> connections = new ArrayList<>();
-//		if (instance != null) {
-//			connections.add(instance);
-//		}
-//
-//		System.out.println("connectionsFound instance: " + connections);
-//		model.addAttribute("connections", connections);
-//		model.addAttribute("instructions", instance.getVm_instructions());
-//		return "View_Vm_Listing";
-//	}
+//	
 
-//	@GetMapping("/View_Vm_Listing")
-//	public ModelAndView viewVmListing(@RequestParam("Id") int scenarioId, Model model) {
-//		System.out.println("Requested scenario Id = " + scenarioId);
-//		ModelAndView mav = new ModelAndView("View_Vm_Listing");
-//		// Fetch scenario
-////		Add_Scenario scenario = ScenarioRepository.findById(scenarioId).orElse(null);
-//
-//		List<UserLab> Lab = UserLabRepository.findByscenarioId(scenarioId);
-//		
-//		
-//
-//		model.addAttribute("connections", Lab);
-//
-//		return mav;
-//	}
+	@GetMapping("/Add_Docker")
+	public String addDockerConnections(Model model) {
+		List<String> ipAddresses = UserLabRepository.getPhysicalServerIPs();
+		model.addAttribute("ipaddress", ipAddresses);
+		return "Add_Docker";
+	}
 
 	@GetMapping("/View_Vm_Listing")
 	public ModelAndView viewVmListing(@RequestParam("Id") int scenarioId, Model model) {
@@ -225,28 +194,6 @@ public class GuacamoleController {
 		model.addAttribute("labData", labData);
 		return mav;
 	}
-
-//	@GetMapping("/View_Vm_Listing")
-//	public ModelAndView viewVmListing(@RequestParam("Id") int scenarioId, Model model) {
-//		System.out.println("Requested scenario Id = " + scenarioId);
-//		ModelAndView mav = new ModelAndView("View_Vm_Listing");
-//
-//		// Fetch labs for the given scenario
-//		List<UserLab> labs = UserLabRepository.findByscenarioId(scenarioId);
-//
-//		if (labs == null || labs.isEmpty()) {
-//			System.out.println("No labs found for scenario ID: " + scenarioId);
-//			model.addAttribute("connections", Collections.emptyList());
-//		} else {
-//			model.addAttribute("connections", labs);
-//			System.out.println("Found " + labs.size() + " labs for scenario ID: " + scenarioId);
-//		}
-//
-//		// Set page title (you might want to fetch the actual scenario name)
-//		mav.addObject("pageTitle", "VM Connections - Scenario " + scenarioId);
-//
-//		return mav;
-//	}
 
 	@GetMapping("/view/{id}")
 	public String viewConnection(@PathVariable String id, Model model) {
@@ -1776,13 +1723,34 @@ public class GuacamoleController {
 			return "fail";
 		}
 	}
+	
+	
+	
+	@PostMapping("/start_lab")
+	@ResponseBody
+	public String start_lab(@RequestParam("containerName") String containerName, Principal principal) {
+		try {
+			System.out.println("Inside_start_lab containerName: " + containerName);
+			dockerService.startContainerByName(containerName);
+			String Status = "running";
+			UserLabRepository.updateStatusByLabName(containerName,Status);
+			System.out.println("Container start successfully: " + containerName);
+			return "success";
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Exception Inside_start_lab : " + e);
+			return "fail";
+		}
+	}
 
 	@PostMapping("/stop_lab")
 	@ResponseBody
 	public String stop_lab(@RequestParam("containerName") String containerName, Principal principal) {
 		try {
 			System.out.println("Inside_stop_lab containerName: " + containerName);
+			String Status = "stop";
 			dockerService.stopContainerByName(containerName);
+			UserLabRepository.updateStatusByLabName(containerName,Status);
 			System.out.println("Container stopped successfully: " + containerName);
 			return "success";
 		} catch (Exception e) {
@@ -1808,6 +1776,28 @@ public class GuacamoleController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("Exception Inside_remove_lab : " + e);
+			return "fail";
+		}
+	}
+	
+	
+	
+	@PostMapping("/reset_lab")
+	@ResponseBody
+	public String reset_lab(@RequestParam("containerName") String containerName, Principal principal) {
+		try {
+			System.out.println("Inside_reset_lab containerName: " + containerName);
+//			dockerService.removeContainerByName(containerName);
+			System.out.println("Container reset_lab successfully: " + containerName);
+
+			CommandHistoryRepository.deleteByContainerName(containerName);
+			instructionTemplateRepository.UpdateresetByLabName(containerName);
+			UserLabRepository.UpdateresetByLabName(containerName);
+
+			return "success";
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Exception Inside_reset_lab : " + e);
 			return "fail";
 		}
 	}
@@ -1848,5 +1838,15 @@ public class GuacamoleController {
 			return "fail";
 		}
 	}
+
+
+
+	@PostMapping("/savediscoverdokcerIpaddress")
+	public String savediscoverdokcerIpaddress(@RequestParam("selectedIp") String selectedIp, Model model) {
+		 List<String> networks = dockerService.listDockerNetworks();
+	    model.addAttribute("networks", networks);
+	    return "redirect:/guac/Add_Docker";  
+	}
+
 
 }

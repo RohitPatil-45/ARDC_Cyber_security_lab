@@ -10,7 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "CommandHistory")
+@Table(name = "commandhistory")
 public class CommandHistory {
 	
 	
@@ -21,14 +21,14 @@ public class CommandHistory {
 	@Column(name = "Id", updatable = false, nullable = false)
 	private int Id;
 
-	@Column(name = "ContainerName", nullable = false, length = 255)
+	@Column(name = "containername", nullable = false, length = 255)
 	private String ContainerName;
 	
-	@Column(name = "Command", nullable = false, length = 255)
+	@Column(name = "command", nullable = false, length = 255)
 	private String Command;
 	
 	
-	@Column(name = "EventTimestamp")
+	@Column(name = "eventtimestamp")
 	private Timestamp EventTimestamp;
 	
 

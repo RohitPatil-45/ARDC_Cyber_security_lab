@@ -8,140 +8,242 @@
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link
-	href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto+Mono:wght@400;700&display=swap"
+	href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap"
 	rel="stylesheet">
 
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<!-- Bootstrap CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+
+<!-- Chart.js for percentage graphs -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 <style>
-/* Professional Cyberpunk Theme with Blue Accents */
+:root {
+	--primary-blue: #2b7fff;
+	--blue-dark: #1a5dd0;
+	--blue-light: #3d8aff;
+	--bg-dark: #1e293b;
+	--bg-card: #1a1a1a;
+	--bg-card-header: #151515;
+	--text-primary: #e0e0e0;
+	--text-secondary: #a0a0a0;
+	--border-color: #2a2a2a;
+	--success: #00c853;
+	--warning: #ffab00;
+	--danger: #ff1744;
+	--cyber-glow: 0 0 10px rgba(43, 127, 255, 0.7);
+}
+
+* {
+	box-sizing: border-box;
+}
+
 body {
-	background-color: #1e293b;
-	color: #e0e0e0;
+	background-color: var(--bg-dark);
+	color: var(--text-primary);
 	font-family: 'Poppins', sans-serif;
+	line-height: 1.6;
 	margin: 0;
+	padding: 0;
 }
 
 .content-wrapper {
-	padding: 1rem;
+	padding: 1.5rem;
 }
 
-h1, h3 {
-	color: #2b7fff;
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+	color: var(--primary-blue);
 	font-weight: 600;
-	text-shadow: 0 0 5px rgba(43, 127, 255, 0.3);
+	margin-top: 0;
 }
 
+h1 {
+	font-size: 2rem;
+	text-shadow: var(--cyber-glow);
+	margin-bottom: 1.5rem;
+}
+
+h3 {
+	font-size: 1.5rem;
+	margin-bottom: 1rem;
+}
+
+/* Card Styles */
 .card {
-	background-color: #1a1a1a;
-	border: 1px solid #2a2a2a;
-	border-radius: 4px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+	background-color: var(--bg-card);
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+	margin-bottom: 1.5rem;
+	overflow: hidden;
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card-header {
-	border-bottom: 1px solid #2a2a2a;
-	background: linear-gradient(to right, #151515, #1e1e1e);
+	border-bottom: 1px solid var(--border-color);
+	background: linear-gradient(135deg, var(--bg-card-header) 0%, #1e1e1e
+		100%);
+	padding: 1rem 1.5rem;
 }
 
 .card-title {
 	font-weight: 600;
-	font-size: 1.2rem;
-	color: #2b7fff;
+	font-size: 1.25rem;
+	color: var(--primary-blue);
+	margin: 0;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.card-body {
+	padding: 1.5rem;
+}
+
+/* Table Styles */
+.table-responsive {
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.table {
+	margin-bottom: 0;
+	color: var(--text-primary);
 }
 
 .table th {
 	background: linear-gradient(to bottom, #1a2b47, #152540);
-	color: #2b7fff;
-	border-bottom: 1px solid #2a2a2a;
+	color: var(--primary-blue);
+	border-bottom: 2px solid var(--border-color);
 	font-weight: 600;
-	padding: 12px 15px;
+	padding: 1rem;
+	text-transform: uppercase;
+	font-size: 0.85rem;
+	letter-spacing: 0.5px;
 }
 
 .table td {
 	vertical-align: middle;
-	border-color: #2a2a2a;
-	padding: 12px 15px;
-	background-color: #1a1a1a;
-	color: #d0d0d0;
+	border-color: var(--border-color);
+	padding: 1rem;
+	background-color: var(--bg-card);
+	color: var(--text-primary);
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
-	background-color: #1e1e1e;
+	background-color: rgba(30, 30, 30, 0.5);
 }
 
 .table-hover tbody tr:hover {
-	background-color: #252525;
+	background-color: rgba(43, 127, 255, 0.1);
 }
 
+/* Button Styles */
 .btn-cyber {
-	background: linear-gradient(to bottom, #2b7fff, #1a5dd0);
+	background: linear-gradient(to bottom, var(--primary-blue),
+		var(--blue-dark));
 	color: #fff;
 	border: none;
 	font-weight: 600;
-	border-radius: 3px;
-	padding: 8px 16px;
-	transition: all 0.2s ease;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	border-radius: 4px;
+	padding: 0.5rem 1.25rem;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
 }
 
 .btn-cyber:hover {
-	background: linear-gradient(to bottom, #3d8aff, #2470e0);
+	background: linear-gradient(to bottom, var(--blue-light),
+		var(--primary-blue));
 	color: #fff;
-	transform: translateY(-1px);
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .btn-success {
-	background: linear-gradient(to bottom, #2b7fff, #1a5dd0);
+	background: linear-gradient(to bottom, var(--primary-blue),
+		var(--blue-dark));
 	border: none;
-	border-radius: 3px;
-	padding: 6px 12px;
+	border-radius: 4px;
+	padding: 0.375rem 0.75rem;
 	font-size: 0.875rem;
-	transition: all 0.2s ease;
+	transition: all 0.3s ease;
 }
 
 .btn-success:hover {
-	background: linear-gradient(to bottom, #3d8aff, #2470e0);
+	background: linear-gradient(to bottom, var(--blue-light),
+		var(--primary-blue));
 	transform: translateY(-1px);
 }
 
-.badge-info {
-	background-color: #2b7fff;
-	color: #fff;
+/* Badge Styles */
+.badge {
 	font-weight: 600;
-	padding: 5px 10px;
-	border-radius: 12px;
+	padding: 0.5rem 0.75rem;
+	border-radius: 50px;
+	font-size: 0.75rem;
 }
 
+.badge-info {
+	background-color: var(--primary-blue);
+	color: #fff;
+}
+
+.badge-success {
+	background-color: var(--success);
+}
+
+.badge-warning {
+	background-color: var(--warning);
+}
+
+.badge-danger {
+	background-color: var(--danger);
+}
+
+/* Breadcrumb */
 .breadcrumb {
 	background-color: transparent;
 	padding: 0;
-	margin-bottom: 1rem;
+	margin-bottom: 1.5rem;
 }
 
 .breadcrumb-item a {
-	color: #2b7fff;
+	color: var(--primary-blue);
 	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+	color: var(--blue-light);
+	text-shadow: 0 0 5px rgba(43, 127, 255, 0.5);
 }
 
 .breadcrumb-item.active {
-	color: #a0a0a0;
+	color: var(--text-secondary);
 }
 
 .breadcrumb-item+.breadcrumb-item::before {
-	color: #555;
+	color: var(--text-secondary);
 }
 
+/* Text Section */
 .text-section {
 	margin-bottom: 2rem;
-	padding: 20px;
-	background-color: #1a1a1a;
-	border-radius: 4px;
-	border-left: 4px solid #2b7fff;
+	padding: 1.5rem;
+	background-color: var(--bg-card);
+	border-radius: 8px;
+	border-left: 4px solid var(--primary-blue);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .text-section h1 {
@@ -152,41 +254,228 @@ h1, h3 {
 .text-section p {
 	line-height: 1.6;
 	margin-bottom: 0.5rem;
-	color: #d0d0d0;
+	color: var(--text-primary);
 }
 
-/* Table responsiveness */
-.table-responsive {
-	overflow-x: auto;
-	border-radius: 4px;
+/* Progress Bar & Graph Styles */
+.progress-container {
+	width: 100%;
+	height: 20px;
+	background-color: #2a2a2a;
+	border-radius: 10px;
+	overflow: hidden;
+	margin: 0.5rem 0;
 }
 
-/* Content header improvements */
-.content-header {
-	margin-bottom: 1.5rem;
+.progress-bar {
+	height: 100%;
+	background: linear-gradient(90deg, var(--primary-blue),
+		var(--blue-light));
+	border-radius: 10px;
+	transition: width 0.5s ease;
+	position: relative;
+	box-shadow: 0 0 10px rgba(43, 127, 255, 0.5);
 }
 
-/* Card body padding */
-.card-body {
-	padding: 1.5rem;
+.progress-text {
+	position: absolute;
+	right: 10px;
+	top: 0;
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: white;
+	text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
 }
 
-/* SweetAlert customization */
+.mini-chart-container {
+	width: 100%;
+	height: 30px;
+	margin: 0.5rem 0;
+}
+
+/* Custom SweetAlert2 Styles */
 .swal2-popup {
-	background-color: #1a1a1a !important;
-	color: #e0e0e0 !important;
-	border: 1px solid #2a2a2a;
+	background: var(--bg-card) !important;
+	color: var(--text-primary) !important;
+	border: 1px solid var(--border-color) !important;
+	border-radius: 8px !important;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7) !important;
 }
 
 .swal2-title {
-	color: #2b7fff !important;
+	color: var(--primary-blue) !important;
+	font-size: 1.5rem !important;
+	font-weight: 600 !important;
+	text-shadow: var(--cyber-glow) !important;
+}
+
+.swal2-html-container {
+	color: var(--text-primary) !important;
 }
 
 .swal2-confirm {
-	background: linear-gradient(to bottom, #2b7fff, #1a5dd0) !important;
+	background: linear-gradient(to bottom, var(--primary-blue),
+		var(--blue-dark)) !important;
+	border: none !important;
+	border-radius: 4px !important;
+	padding: 0.5rem 1.5rem !important;
+	font-weight: 600 !important;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* Remove loader styles */
+.swal2-cancel {
+	background: transparent !important;
+	border: 1px solid var(--border-color) !important;
+	color: var(--text-primary) !important;
+	border-radius: 4px !important;
+	padding: 0.5rem 1.5rem !important;
+	font-weight: 600 !important;
+}
+
+.swal2-confirm:focus, .swal2-cancel:focus {
+	box-shadow: 0 0 0 3px rgba(43, 127, 255, 0.3) !important;
+}
+
+/* Dropdown Styles */
+.dropdown-menu {
+	background-color: var(--bg-card);
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+	padding: 0.5rem;
+}
+
+.dropdown-item {
+	color: var(--text-primary);
+	padding: 0.5rem 1rem;
+	border-radius: 4px;
+	transition: all 0.3s ease;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.dropdown-item:hover {
+	background-color: var(--primary-blue);
+	color: #fff;
+}
+
+/* Status Indicators */
+.status-indicator {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	margin-right: 0.5rem;
+}
+
+.status-active {
+	background-color: var(--success);
+	box-shadow: 0 0 8px var(--success);
+}
+
+.status-inactive {
+	background-color: var(--danger);
+	box-shadow: 0 0 8px var(--danger);
+}
+
+.status-pending {
+	background-color: var(--warning);
+	box-shadow: 0 0 8px var(--warning);
+}
+
+/* Grid Layout Improvements */
+.row {
+	margin-left: -0.5rem;
+	margin-right: -0.5rem;
+}
+
+.col-md-12 {
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+}
+
+/* Graph container for percentage visualization */
+.graph-container {
+	width: 100%;
+	height: 30px;
+	background-color: #2a2a2a;
+	border-radius: 4px;
+	overflow: hidden;
+	position: relative;
+}
+
+.graph-fill {
+	height: 100%;
+	background: linear-gradient(90deg, var(--primary-blue),
+		var(--blue-light));
+	border-radius: 4px;
+	transition: width 1s ease-in-out;
+	box-shadow: 0 0 10px rgba(43, 127, 255, 0.5);
+}
+
+.graph-text {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: white;
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Console link styling */
+.console-link {
+	color: var(--primary-blue);
+	text-decoration: none;
+	transition: all 0.3s ease;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.console-link:hover {
+	color: var(--blue-light);
+	text-shadow: 0 0 5px rgba(43, 127, 255, 0.5);
+}
+
+/* Action buttons container */
+.action-buttons {
+	display: flex;
+	gap: 0.5rem;
+}
+
+/* Lab stats section */
+.lab-stats {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.stat-card {
+	background-color: var(--bg-card);
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	padding: 1rem;
+	text-align: center;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.stat-value {
+	font-size: 2rem;
+	font-weight: 700;
+	color: var(--primary-blue);
+	margin: 0.5rem 0;
+}
+
+.stat-label {
+	color: var(--text-secondary);
+	font-size: 0.9rem;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
 </style>
 <body class="hold-transition sidebar-mini layout-fixed dark-mode">
 	<div class="wrapper">
@@ -214,11 +503,17 @@ h1, h3 {
 				</div>
 			</section>
 
+			<!-- Lab Statistics Overview -->
+
+
 			<!-- Lab Access Instructions -->
-			<div class="row" style="margin-left: 1rem;">
+			<div class="row">
 				<div class="col-md-12">
 					<div class="text-section">
-						<h1>LAB ACCESS GUIDELINES</h1>
+						<h1>
+							<i class="fas fa-info-circle"></i> LAB ACCESS GUIDELINES
+						</h1>
+						<div class="cyber-line"></div>
 						<p>To support the completion of this scenario, you have access
 							to a C2 Server running Kali Linux for receiving reverse
 							connections.</p>
@@ -233,10 +528,10 @@ h1, h3 {
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-md-12">
-							<div class="card">
+							<div class="card cyber-glow">
 								<div class="card-header">
 									<h3 class="card-title">
-										<i class="fas fa-network-wired"></i> Overview
+										<i class="fas fa-network-wired"></i> Lab Overview
 									</h3>
 								</div>
 								<div class="card-body table-responsive" id="table-container">
@@ -249,9 +544,10 @@ h1, h3 {
 												<th>UserName</th>
 												<th>Status</th>
 												<th>Completion %</th>
-												<th>Actions</th>
-												<th>Stop Lab</th>
-												<th>Remove Lab</th>
+												<th>Visualization</th>
+												<th>State</th>
+												<th>Console</th>
+												<th>Action</th>
 											</tr>
 										</thead>
 										<tbody>
@@ -261,53 +557,81 @@ h1, h3 {
 													<td th:text="${data['lab'].instanceName}"></td>
 													<td th:text="${data['lab'].ipAddress}"></td>
 													<td th:text="${data['lab'].username}"></td>
-													<td th:text="${data['lab'].Status}"></td>
-													<td th:text="${data['percentage'] + '%'}"></td>
+													<td><span th:if="${data['lab'].Status == 'Completed'}"
+														class="badge badge-success"> <i
+															class="fas fa-circle status-indicator status-active"></i>
+															Completed
+													</span> <span th:unless="${data['lab'].Status == 'Completed'}"
+														class="badge badge-warning"> <i
+															class="fas fa-circle status-indicator status-pending"></i>
+															In Progress
+													</span></td>
 
-													<td><a
+													<td th:text="${data['percentage'] + '%'}"></td>
+													<td>
+														<div class="graph-container">
+															<div class="graph-fill"
+																th:style="'width: ' + ${data['percentage']} + '%;'"></div>
+															<div class="graph-text"
+																th:text="${data['percentage']} + '%'"></div>
+														</div>
+													</td>
+
+													<td th:text="${data['lab'].VmState}"></td>
+
+													<td><a class="btn btn-sm btn-primary console-link"
 														th:href="@{|/guac/viewPlaylistConnection/${data['lab'].guacamoleId}|}"
-														class="btn btn-sm btn-success"> <i class="fas fa-play"></i>
-															Console
+														title="Access Virtual Machine Console"> <i
+															class="fas fa-desktop"></i> View Console
 													</a></td>
 
-
 													<td>
-														<button type="button"
-															class="btn btn-sm btn-warning stop-lab-btn"
-															th:data-container-name="${data['lab'].instanceName}">
-															<i class="fas fa-stop"></i> Stop Lab
-														</button>
+														<div class="action-buttons">
+															<button class="btn btn-sm btn-cyber dropdown-toggle"
+																type="button" id="dropdownMenuButton"
+																data-bs-toggle="dropdown" aria-expanded="false">
+																<i class="fas fa-cog"></i> Actions
+															</button>
+															<ul class="dropdown-menu"
+																aria-labelledby="dropdownMenuButton">
+																<!-- Show Start or Stop Lab based on VmState -->
+																<li th:if="${data['lab'].VmState == 'stop'}"><a
+																	class="dropdown-item start-lab-btn" href="#"
+																	th:data-container-name="${data['lab'].instanceName}">
+																		<i class="fas fa-play"></i> Start Lab
+																</a></li>
+																<li th:if="${data['lab'].VmState == 'running'}"><a
+																	class="dropdown-item stop-lab-btn" href="#"
+																	th:data-container-name="${data['lab'].instanceName}">
+																		<i class="fas fa-stop"></i> Stop Lab
+																</a></li>
+
+																<!-- Remove Lab - Always show -->
+																<li><a class="dropdown-item remove-lab-btn"
+																	href="#"
+																	th:data-container-name="${data['lab'].instanceName}">
+																		<i class="fas fa-trash"></i> Remove Lab
+																</a></li>
+
+																<!-- Reset Lab - Always show -->
+																<li><a class="dropdown-item reset-lab-btn" href="#"
+																	th:data-container-name="${data['lab'].instanceName}">
+																		<i class="fas fa-redo"></i> Reset Lab
+																</a></li>
+															</ul>
+
+														</div>
 													</td>
-													<td>
-														<button type="button"
-															class="btn btn-sm btn-danger remove-lab-btn"
-															th:data-container-name="${data['lab'].instanceName}">
-															<i class="fas fa-trash"></i> Remove Lab
-														</button>
-													</td>
-
-
-
-
-
-													<!-- 													<td> -->
-													<!-- 														<button class="btn btn-sm btn-success" -->
-													<!-- 															th:onclick="'startConnection(' + ${data['lab'].labId} + ')'"> -->
-													<!-- 															<i class="fas fa-play"></i> Start -->
-													<!-- 														</button> -->
-													<!-- 													</td> -->
 												</tr>
 											</th:block>
 
 											<tr th:if="${labData == null or labData.empty}">
-												<td colspan="9" class="text-muted text-center">No
-													connection found.</td>
+												<td colspan="10" class="text-muted text-center"><i
+													class="fas fa-inbox fa-2x mb-2"></i><br> No active
+													labs found.</td>
 											</tr>
 										</tbody>
 									</table>
-
-
-
 								</div>
 							</div>
 						</div>
@@ -322,93 +646,175 @@ h1, h3 {
 
 	<div th:replace="template :: jsscript"></div>
 
+	<!-- Bootstrap JS for dropdowns -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 	<script>
 		function startConnection(id) {
-
-
 			$.ajax({
 				type : "POST",
 				url : '/guac/startConnectionLab',
 				data : {
 					"UserLabId" : id
-
 				},
 				success : function(result) {
-					// 					$("#pageLoader").hide();
 					window.location = "/guac/viewPlaylistConnection/" + result;
-					//alert(result);
 				}
 			});
-
-			// 			window.location.href = '/guac/viewPlaylistConnection/'
-			// 					+ guacamoleId;
-
 		}
-
-		
 	</script>
 
 	<script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Custom SweetAlert2 styling
+    const swalWithCyberTheme = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-cyber',
+            cancelButton: 'btn btn-secondary'
+        },
+        buttonsStyling: false
+    });
+    
     // Stop Lab functionality
     document.querySelectorAll('.stop-lab-btn').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
             const containerName = this.getAttribute('data-container-name');
             stopLab(containerName);
         });
     });
 
+    // Start Lab functionality
+    document.querySelectorAll('.start-lab-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const containerName = this.getAttribute('data-container-name');
+            startLab(containerName);
+        });
+    });
+
     // Remove Lab functionality
     document.querySelectorAll('.remove-lab-btn').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
             const containerName = this.getAttribute('data-container-name');
             removeLab(containerName);
         });
     });
 
+    // Reset Lab functionality
+    document.querySelectorAll('.reset-lab-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const containerName = this.getAttribute('data-container-name');
+            resetLab(containerName);
+        });
+    });
+    
+    
+    function startLab(containerName) {
+        swalWithCyberTheme.fire({
+            title: 'Start Lab?',
+            html: `Are you sure you want to start <b>${containerName}</b>?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '<i class="fas fa-play"></i> Start Lab',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "POST",
+                    url: '/guac/start_lab', // Make sure your backend supports this
+                    data: {
+                        "containerName": containerName
+                    },
+                    success: function(result) {
+                        if (result === 'success') {
+                            swalWithCyberTheme.fire({
+                                icon: 'success',
+                                title: 'Started!',
+                                html: `Lab <b>${containerName}</b> has been started successfully.`,
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            swalWithCyberTheme.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Failed to start the lab!'
+                            });
+                        }
+                    },
+                    error: function() {
+                        swalWithCyberTheme.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Failed to start the lab!'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+
     function stopLab(containerName) {
-        $.ajax({
-            type: "POST",
-            url: '/guac/stop_lab',
-            data: {
-                "containerName": containerName
-            },
-            success: function(result) {
-                if (result === 'success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Stopped!',
-                        text: 'Lab stopped successfully.',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Failed to stop the lab!'
-                    });
-                }
-            },
-            error: function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Failed to stop the lab!'
+        swalWithCyberTheme.fire({
+            title: 'Stop Lab?',
+            html: `Are you sure you want to stop <b>${containerName}</b>?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '<i class="fas fa-stop"></i> Stop Lab',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "POST",
+                    url: '/guac/stop_lab',
+                    data: {
+                        "containerName": containerName
+                    },
+                    success: function(result) {
+                        if (result === 'success') {
+                            swalWithCyberTheme.fire({
+                                icon: 'success',
+                                title: 'Stopped!',
+                                html: `Lab <b>${containerName}</b> has been stopped successfully.`,
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            swalWithCyberTheme.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Failed to stop the lab!'
+                            });
+                        }
+                    },
+                    error: function() {
+                        swalWithCyberTheme.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Failed to stop the lab!'
+                        });
+                    }
                 });
             }
         });
     }
 
     function removeLab(containerName) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
+        swalWithCyberTheme.fire({
+            title: 'Remove Lab?',
+            html: `Are you sure you want to remove <b>${containerName}</b>?<br><span class="text-danger">This action cannot be undone!</span>`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Yes, remove it!',
-            cancelButtonText: 'Cancel'
+            confirmButtonText: '<i class="fas fa-trash"></i> Yes, remove it!',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
@@ -419,16 +825,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     success: function(result) {
                         if (result === 'success') {
-                            Swal.fire({
+                            swalWithCyberTheme.fire({
                                 icon: 'success',
                                 title: 'Removed!',
-                                text: 'Lab removed successfully.',
+                                html: `Lab <b>${containerName}</b> has been removed successfully.`,
                                 confirmButtonText: 'OK'
                             }).then(() => {
                                 location.reload();
                             });
                         } else {
-                            Swal.fire({
+                            swalWithCyberTheme.fire({
                                 icon: 'error',
                                 title: 'Oops...',
                                 text: 'Failed to remove the lab!'
@@ -436,7 +842,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     },
                     error: function() {
-                        Swal.fire({
+                        swalWithCyberTheme.fire({
                             icon: 'error',
                             title: 'Oops...',
                             text: 'Failed to remove the lab!'
@@ -447,11 +853,78 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function resetLab(containerName) {
+        swalWithCyberTheme.fire({
+            title: 'Reset Lab?',
+            html: `This will reset <b>${containerName}</b> to its initial state.<br><span class="text-warning">All progress will be lost!</span>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '<i class="fas fa-redo"></i> Yes, reset it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "POST",
+                    url: '/guac/reset_lab',
+                    data: {
+                        "containerName": containerName
+                    },
+                    success: function(result) {
+                        if (result === 'success') {
+                            swalWithCyberTheme.fire({
+                                icon: 'success',
+                                title: 'Reset!',
+                                html: `Lab <b>${containerName}</b> has been reset successfully.`,
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            swalWithCyberTheme.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Failed to reset the lab!'
+                            });
+                        }
+                    },
+                    error: function() {
+                        swalWithCyberTheme.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Failed to reset the lab!'
+                        });
+                    }
+                });
+            }
+        });
+    }
 
+    // Animate progress bars on scroll into view
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const progressBar = entry.target.querySelector('.graph-fill');
+                const width = progressBar.style.width;
+                progressBar.style.width = '0';
+                setTimeout(() => {
+                    progressBar.style.width = width;
+                }, 100);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.graph-container').forEach(container => {
+        observer.observe(container);
+    });
 });
 </script>
-
-
 
 </body>
 

@@ -5,6 +5,7 @@ import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.Network;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
@@ -12,8 +13,13 @@ import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
 import com.github.dockerjava.transport.DockerHttpClient;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class DockerService {
@@ -70,6 +76,18 @@ public class DockerService {
 	public void removeContainer(String containerId) {
 		dockerClient.removeContainerCmd(containerId).withForce(true).exec();
 	}
+	
+	public void startContainerByName(String containerName) {
+	    try {
+	        String containerId = dockerClient.inspectContainerCmd(containerName).exec().getId();
+	        dockerClient.startContainerCmd(containerId).exec();
+	        System.out.println("Container '" + containerName + "' started successfully.");
+	    } catch (Exception e) {
+	        System.err.println("Failed to start container '" + containerName + "': " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	}
+
 
 	public void stopContainerByName(String containerName) {
 		try {
@@ -87,6 +105,48 @@ public class DockerService {
 		} catch (Exception e) {
 			System.err.println("Failed to remove container '" + containerName + "': " + e.getMessage());
 		}
+	}
+	
+	
+	public List<String> listDockerNetworks() {
+	    try {
+	        List<Network> networks = dockerClient.listNetworksCmd().exec();
+	        return networks.stream()
+	                .map(network -> String.format("%s (%s, %s)", network.getName(), network.getDriver(), network.getScope()))
+	                .collect(Collectors.toList());
+	    } catch (Exception e) {
+	        System.err.println("Error listing Docker networks: " + e.getMessage());
+	        e.printStackTrace();
+	        return List.of(); // Return empty list on error
+	    }
+	}
+	
+	public String loadImageFromTar(String filePath, String expectedImageName) {
+	    try {
+	        File imageFile = new File(filePath);
+	        if (!imageFile.exists()) {
+	            return "fail: Image file not found at " + filePath;
+	        }
+
+	        // Load the image into Docker
+	        try (InputStream inputStream = new FileInputStream(imageFile)) {
+	            dockerClient.loadImageCmd(inputStream).exec();
+	        }
+
+	        
+	        boolean imageExists = dockerClient.listImagesCmd()
+	                .withImageNameFilter(expectedImageName) 
+	                .exec()
+	                .size() > 0;
+
+	        return imageExists
+	                ? "success"
+	                : "fail";
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return "fail";
+	    }
 	}
 
 }

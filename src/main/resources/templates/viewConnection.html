@@ -737,6 +737,18 @@ body {
 	        }
 	    });
 	}
+	
+	const iframe = document.getElementById("rdp-frame");
+
+	  // Always return focus to iframe after any outside click
+	  window.addEventListener("click", () => {
+	    setTimeout(() => {
+	      iframe.focus();
+	    }, 50); // small delay so click event finishes first
+	  });
+
+	  // Ensure iframe can actually be focused
+	  iframe.setAttribute("tabindex", "0");	
 
 	</script>
 </body>

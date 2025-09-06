@@ -243,4 +243,5 @@ public class GuacamoleService {
 		String token = loginAndGetToken();
 		return GUAC_URL + "/#/client/mysql/" + id + "?token=" + token;
 	}
+
 }

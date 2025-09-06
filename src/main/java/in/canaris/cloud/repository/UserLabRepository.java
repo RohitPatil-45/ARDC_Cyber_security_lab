@@ -36,5 +36,24 @@ public interface UserLabRepository extends JpaRepository<UserLab, Integer> {
 	@Transactional
 	@Query("DELETE FROM UserLab u WHERE u.instanceName = :instanceName")
 	void deleteByInstanceName(String instanceName);
+	
+    @Query(value = "SELECT server_ip FROM add_physical_server where virtualization_type='Docker'", nativeQuery = true)
+    List<String> getPhysicalServerIPs();
+
+    
+	@Modifying
+	@Transactional
+	@Query(value = "UPDATE user_lab SET vmstate = :status WHERE instance_name = :containerName", nativeQuery = true)
+	void updateStatusByLabName(@Param("containerName") String containerName,@Param("status") String status);
+
+	
+	@Modifying
+	@Transactional
+	@Query(value = "UPDATE user_lab SET status = 'InProgress' WHERE instance_name = :containerName", nativeQuery = true)
+	void UpdateresetByLabName(@Param("containerName") String containerName);
+
+
+	
+ 
 
 }
