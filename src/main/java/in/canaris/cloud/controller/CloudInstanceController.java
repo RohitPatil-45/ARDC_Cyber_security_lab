@@ -3565,7 +3565,7 @@ public class CloudInstanceController {
 			String imageName = file.getName().replaceFirst("[.][^.]+$", "");
 			if (dockerService.loadImageFromTar(filePath, imageName).equalsIgnoreCase("success")) {
 				try {
-					repository.updateSourceImage(templateId);
+				//	repository.updateSourceImage(templateId);
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.print("Exception DB update source image :" + e.getMessage());

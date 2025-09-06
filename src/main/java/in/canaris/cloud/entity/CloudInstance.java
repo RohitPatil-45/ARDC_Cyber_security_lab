@@ -127,9 +127,6 @@ public class CloudInstance implements Serializable {
 	@Column
 	private String AssignedLab;
 	
-	
-	@Column(name = "source_vm")
-	private String sourceVm;
 
 	@Lob
 	@Column(name = "description", nullable = true)
@@ -615,13 +612,5 @@ public class CloudInstance implements Serializable {
 		this.guacamoleId = guacamoleId;
 	}
 
-	public String getSourceVm() {
-		return sourceVm;
-	}
-
-	public void setSourceVm(String sourceVm) {
-		this.sourceVm = sourceVm;
-	}
-	
 
 }

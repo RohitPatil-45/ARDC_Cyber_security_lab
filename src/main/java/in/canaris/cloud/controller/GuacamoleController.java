@@ -1843,7 +1843,11 @@ public class GuacamoleController {
 
 	@PostMapping("/savediscoverdokcerIpaddress")
 	public String savediscoverdokcerIpaddress(@RequestParam("selectedIp") String selectedIp, Model model) {
+		
+		System.out.println("savediscoverdokcerIpaddress selectedIp ::"+selectedIp);
 		 List<String> networks = dockerService.listDockerNetworks();
+		 
+		 System.out.println("savediscoverdokcerIpaddress selectedIp ::"+networks);
 	    model.addAttribute("networks", networks);
 	    return "redirect:/guac/Add_Docker";  
 	}

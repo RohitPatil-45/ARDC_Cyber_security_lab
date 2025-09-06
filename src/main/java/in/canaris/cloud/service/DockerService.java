@@ -109,15 +109,19 @@ public class DockerService {
 	
 	
 	public List<String> listDockerNetworks() {
+		System.out.println("insdiee _listDockerNetworks");
 	    try {
 	        List<Network> networks = dockerClient.listNetworksCmd().exec();
+	        System.out.println("insdiee _listDockerNetworks :: "+networks);
 	        return networks.stream()
 	                .map(network -> String.format("%s (%s, %s)", network.getName(), network.getDriver(), network.getScope()))
 	                .collect(Collectors.toList());
+	        
+	    	
 	    } catch (Exception e) {
 	        System.err.println("Error listing Docker networks: " + e.getMessage());
 	        e.printStackTrace();
-	        return List.of(); // Return empty list on error
+	        return List.of(); 
 	    }
 	}
 	

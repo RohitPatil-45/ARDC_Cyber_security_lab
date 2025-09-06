@@ -38,6 +38,9 @@ public class SubProduct implements Serializable {
 	@Column
 	private String variant;
 	
+	@Column(name = "is_source_created")
+	private String isSourceCreated;
+	
 	@Column(name="os_name")
 	private String osName;
 
@@ -106,5 +109,16 @@ public class SubProduct implements Serializable {
 	public void setOsName(String osName) {
 		this.osName = osName;
 	}
+
+
+	public String getIsSourceCreated() {
+		return isSourceCreated;
+	}
+
+
+	public void setIsSourceCreated(String isSourceCreated) {
+		this.isSourceCreated = isSourceCreated;
+	}
+	
 	
 }

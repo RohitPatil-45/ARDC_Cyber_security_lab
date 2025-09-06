@@ -156,11 +156,6 @@ public interface CloudInstanceRepository extends JpaRepository<CloudInstance, In
 
 	List<CloudInstance> findByGuacamoleId(String guacamoleId);
 	
-	@Modifying
-	@Transactional
-	@Query("UPDATE CloudInstance c SET c.sourceVm = 'created' WHERE c.id = :templateId")
-	int updateSourceImage(int templateId);
-
 
 	
 }
