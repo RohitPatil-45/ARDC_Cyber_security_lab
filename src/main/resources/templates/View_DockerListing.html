@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Cloud Portal - Docker Networks</title>
+    <head th:include="templateListing :: headFragment"></head>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div th:replace="fragments/header :: header"></div>
+        <div th:replace="fragments/sidebar :: aside"></div>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Docker Network Listing</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item active">Docker Networks</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card card-secondary">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-10">
+                                            <h3 class="card-title" style="padding-top: 10px">Docker Network Details</h3>
+                                        </div>
+                                        <div class="col-md-2"></div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <table id="dockerNetworksTable" class="table table-bordered table-striped">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Network ID</th>
+                                                <th>Name</th>
+                                                <th>Driver</th>
+                                                <th>Scope</th>
+                                                <th>Gateway</th>
+                                                <th>Start IP</th>
+                                                <th>End IP</th>
+                                                <th>Physical Server</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="data : ${listObj}">
+                                                <td th:text="${data.networkId}">-</td>
+                                                <td th:text="${data.name}">-</td>
+                                                <td th:text="${data.driver}">-</td>
+                                                <td th:text="${data.scope}">-</td>
+                                                <td th:text="${data.gateway}">-</td>
+                                                <td th:text="${data.startIp}">-</td>
+                                                <td th:text="${data.endIp}">-</td>
+                                                <td th:text="${data.physicalServer}">-</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
+
+    <div th:replace="templateListing :: jsscript"></div>
+
+</body>
+<script th:inline="javascript">
+    $(function() {
+        $("#dockerNetworksTable").DataTable({
+            "responsive": false,
+            "lengthChange": false,
+            "autoWidth": false,
+            "buttons": ["csv", "excel", "print", "colvis"]
+        }).buttons().container().appendTo('#dockerNetworksTable_wrapper .col-md-6:eq(0)');
+    });
+</script>
+</html>

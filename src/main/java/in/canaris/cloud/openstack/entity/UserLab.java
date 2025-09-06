@@ -51,6 +51,9 @@ public class UserLab {
 
 	@Column(name = "vmstate", length = 50)
 	private String VmState;
+	
+	@Column(name = "instance_user")
+	private String instanceUser;
 
 	public Long getLabId() {
 		return labId;
@@ -154,6 +157,15 @@ public class UserLab {
 
 	public void setVmState(String vmState) {
 		VmState = vmState;
+	}
+	
+	
+	public String getInstanceUser() {
+		return instanceUser;
+	}
+
+	public void setInstanceUser(String instanceUser) {
+		this.instanceUser = instanceUser;
 	}
 
 	@Override

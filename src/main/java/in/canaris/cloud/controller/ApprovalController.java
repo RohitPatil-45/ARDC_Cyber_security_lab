@@ -58,6 +58,7 @@ import in.canaris.cloud.repository.CloudInstanceLogRepository;
 import in.canaris.cloud.repository.CloudInstanceNodeHealthMonitoringRepository;
 import in.canaris.cloud.repository.CloudInstanceRepository;
 import in.canaris.cloud.repository.DiscountRepository;
+import in.canaris.cloud.repository.DiscoverDockerNetworkRepository;
 import in.canaris.cloud.repository.FirewallRepository;
 import in.canaris.cloud.repository.KVMDriveDetailsRepository;
 import in.canaris.cloud.repository.LocationRepository;
@@ -122,6 +123,9 @@ public class ApprovalController {
 
 	@Autowired
 	private CloudInstanceNodeHealthMonitoringRepository CloudInstanceNodeHealthMonitoringRep;
+	
+	@Autowired
+	private DiscoverDockerNetworkRepository DiscoverDockerNetworkRepository;
 
 	@GetMapping("/allRequests")
 	public ModelAndView allRequests(Principal principal) {
@@ -1465,6 +1469,24 @@ public class ApprovalController {
 		}
 		return json;
 	}
+	
+	
+	// get server ip by virtualization type
+	@GetMapping("/getDockerNetworks")
+	public @ResponseBody String getDockerNetworks() {
+		System.out.println("getIpByVirtualizationType  controller calledd:");
+		String json = null;
+		try {
+			List<Object[]> list = DiscoverDockerNetworkRepository.getDockerNetworks();
+			System.out.println("list size:" + list.size());
+			json = new ObjectMapper().writeValueAsString(list);
+		} catch (Exception e) {
+			System.out.println("exception :" + e);
+		}
+		return json;
+	}
+	
+	
 
 	// VM Deletion request
 	@GetMapping("/approveVMDeletion")

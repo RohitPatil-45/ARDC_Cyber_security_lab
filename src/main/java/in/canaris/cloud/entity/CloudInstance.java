@@ -127,6 +127,15 @@ public class CloudInstance implements Serializable {
 	@Column
 	private String AssignedLab;
 	
+	
+	@Column(name = "source_vm")
+	private String sourceVm;
+	
+	@Column(name = "docker_network_id")
+	private String docker_network_id;
+	
+	@Column(name = "docker_network_name ")
+	private String docker_network_name ;
 
 	@Lob
 	@Column(name = "description", nullable = true)
@@ -612,5 +621,29 @@ public class CloudInstance implements Serializable {
 		this.guacamoleId = guacamoleId;
 	}
 
+	public String getSourceVm() {
+		return sourceVm;
+	}
+
+	public void setSourceVm(String sourceVm) {
+		this.sourceVm = sourceVm;
+	}
+
+	public String getDocker_network_id() {
+		return docker_network_id;
+	}
+
+	public void setDocker_network_id(String docker_network_id) {
+		this.docker_network_id = docker_network_id;
+	}
+
+	public String getDocker_network_name() {
+		return docker_network_name;
+	}
+
+	public void setDocker_network_name(String docker_network_name) {
+		this.docker_network_name = docker_network_name;
+	}
+	
 
 }

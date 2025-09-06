@@ -181,9 +181,25 @@ keyframes glowing { 0% {
 
 
 
+
+
+
+
+
+
+
+
 %
 {
 background-color
+
+
+
+
+
+
+
+
 
 
 
@@ -373,7 +389,23 @@ background-color
 
 
 
+
+
+
+
+
+
+
+
 #49e819
+
+
+
+
+
+
+
+
 
 
 
@@ -564,6 +596,14 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
 :
 
 
@@ -659,6 +699,14 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
 0
 
 
@@ -754,7 +802,23 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
 0
+
+
+
+
+
+
+
+
 
 
 
@@ -944,6 +1008,14 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
 px
 
 
@@ -1039,7 +1111,23 @@ px
 
 
 
+
+
+
+
+
+
+
+
 #49e819
+
+
+
+
+
+
+
+
 
 
 
@@ -1231,9 +1319,25 @@ px
 
 
 
+
+
+
+
+
+
+
+
 %
 {
 background-color
+
+
+
+
+
+
+
+
 
 
 
@@ -1423,7 +1527,23 @@ background-color
 
 
 
+
+
+
+
+
+
+
+
 #2ba805
+
+
+
+
+
+
+
+
 
 
 
@@ -1614,6 +1734,14 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
 :
 
 
@@ -1709,6 +1837,14 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
 0
 
 
@@ -1804,7 +1940,23 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
 0
+
+
+
+
+
+
+
+
 
 
 
@@ -1994,6 +2146,14 @@ box-shadow
 
 
 
+
+
+
+
+
+
+
+
 px
 
 
@@ -2089,7 +2249,23 @@ px
 
 
 
+
+
+
+
+
+
+
+
 #2ba805
+
+
+
+
+
+
+
+
 
 
 
@@ -2888,6 +3064,39 @@ td {
 					</div>
 				</section>
 				<!-- End Switch -->
+
+
+
+				<section class="content" id="DockerNetworkSection"
+					style="display: none;">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start; flex-direction: column; display: flex;">
+											<span style="font-weight: bold;">Docker Network</span> <span
+												style="font-size: 1rem; color: #b5b5c3;">Select
+												Docker Network</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<select id="docker_network_id"
+												th:field="*{docker_network_id}" name="docker_network_id"
+												class="form-control" required>
+												<option value="" disabled selected>SELECT</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+
 
 				<!-- Generation Type -->
 				<section class="content">

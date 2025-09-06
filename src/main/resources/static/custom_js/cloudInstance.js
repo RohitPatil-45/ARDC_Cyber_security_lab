@@ -296,36 +296,108 @@ function getSwitchByIP(serverIP) {
 //}
 
 
+//function getIpByVirtualizationType(serverIP) {
+//	var s = "<option value='NONE'>SELECT</option>";
+//	console.log("serverIPType : " + serverIP);
+//
+//	if (serverIP === "Docker") {
+//		$("#SwitchSeaction").hide();
+//		$("#switch_id").val("NONE"); // Set to default
+//		$("#switch_id").prop("required", false); // Not required
+//	} else {
+//		$("#SwitchSeaction").show();
+//		$("#switch_id").prop("required", true); // Required when visible
+//	}
+//
+//	// Optional: fetch and populate another dropdown
+//	$.ajax({
+//		url: '/approval/getIpByVirtualizationType',
+//		data: {
+//			"serverIP": serverIP
+//		},
+//		success: function(result) {
+//			let parsed = JSON.parse(result);
+//			console.log(parsed);
+//			for (var i = 0; i < parsed.length; i++) {
+//				s += '<option value="' + parsed[i][0] + '">' + parsed[i][0] + '</option>';
+//			}
+//			$('#physicalServerIP').html(s);
+//		}
+//	});
+//
+//	$('#physicalServerIP').html(s); // Optional fallback
+//}
+
+
 function getIpByVirtualizationType(serverIP) {
-	var s = "<option value='NONE'>SELECT</option>";
+	var physicalServerOptions = "<option value='NONE'>SELECT</option>";
+	var dockerNetworkOptions = "<option value='NONE'>SELECT</option>";
 	console.log("serverIPType : " + serverIP);
 
-	if (serverIP === "Docker") {
-		$("#SwitchSeaction").hide();
-		$("#switch_id").val("NONE"); // Set to default
-		$("#switch_id").prop("required", false); // Not required
-	} else {
-		$("#SwitchSeaction").show();
-		$("#switch_id").prop("required", true); // Required when visible
-	}
-
-	// Optional: fetch and populate another dropdown
+	// Fetch and populate physical server IPs (always needed)
 	$.ajax({
 		url: '/approval/getIpByVirtualizationType',
-		data: {
-			"serverIP": serverIP
-		},
+		data: { "serverIP": serverIP },
 		success: function(result) {
 			let parsed = JSON.parse(result);
-			console.log(parsed);
+			console.log("Physical IPs:", parsed);
 			for (var i = 0; i < parsed.length; i++) {
-				s += '<option value="' + parsed[i][0] + '">' + parsed[i][0] + '</option>';
+				physicalServerOptions += '<option value="' + parsed[i][0] + '">' + parsed[i][0] + '</option>';
 			}
-			$('#physicalServerIP').html(s);
+			$('#physicalServerIP').html(physicalServerOptions);
 		}
 	});
 
-	$('#physicalServerIP').html(s); // Optional fallback
+	if (serverIP === "Docker") {
+		// Show Docker, Hide Switch
+//		$("#SwitchSeaction").hide();
+//		$("#DockerNetworkSection").show();
+//		$("#switch_id").val("NONE").prop("required", false);
+//
+//		// Fetch Docker network data
+//		$.ajax({
+//			url: '/approval/getDockerNetworks',
+//			type: 'GET',
+//			success: function(dockerresult) {
+//				let parsedDocker = JSON.parse(dockerresult);
+//				console.log("Docker Networks:", parsedDocker);
+//				for (var i = 0; i < parsedDocker.length; i++) {
+//					dockerNetworkOptions += '<option value="' + parsedDocker[i][0] + '">' + parsedDocker[i][1] + '</option>';
+//				}
+//				$('#docker_network_id').html(dockerNetworkOptions);
+//			},
+//			error: function(err) {
+//				console.error("Failed to load Docker networks", err);
+//			}
+//		});
+		
+		
+		$("#SwitchSeaction").hide();
+		       $("#DockerNetworkSection").show();
+		       $("#switch_id").val("NONE").prop("required", false);
+
+		       $.ajax({
+		           url: '/approval/getDockerNetworks',
+		           type: 'GET',
+		           success: function(dockerresult) {
+		               let parsedDocker = JSON.parse(dockerresult);
+		               parsedDocker.forEach(function(network) {
+		                   dockerNetworkOptions += '<option value="' + network[0] + '~' + network[1] + '">' + network[1] + '</option>';
+		               });
+		               $('#docker_network_id').html(dockerNetworkOptions);
+		           },
+		           error: function(err) {
+		               console.error("Failed to load Docker networks", err);
+		           }
+		       });
+
+	} else {
+		// Show Switch, Hide Docker
+		$("#SwitchSeaction").show();
+		$("#DockerNetworkSection").hide();
+		$("#switch_id").prop("required", true);
+		$("#docker_network_id").html("<option value='NONE'>SELECT</option>"); // Reset Docker dropdown
+	}
 }
 
 

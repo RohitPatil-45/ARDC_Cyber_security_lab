@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ import in.canaris.cloud.entity.PlaylistScenarioId;
 import in.canaris.cloud.openstack.entity.Add_Scenario;
 import in.canaris.cloud.openstack.entity.ChartBoatInstructionTemplate;
 import in.canaris.cloud.openstack.entity.CommandHistory;
+import in.canaris.cloud.openstack.entity.Discover_Docker_Network;
 import in.canaris.cloud.openstack.entity.InstructionCommand;
 import in.canaris.cloud.openstack.entity.Playlist;
 import in.canaris.cloud.openstack.entity.ScenarioComments;
@@ -57,7 +59,7 @@ import in.canaris.cloud.repository.ChartBoatInstructionTemplateRepository;
 import in.canaris.cloud.repository.CloudInstanceRepository;
 import in.canaris.cloud.repository.PlaylistRepository;
 import in.canaris.cloud.repository.PlaylistsSenarioRepository;
-//import in.canaris.cloud.repository.InstructionCommandRepository;
+import in.canaris.cloud.repository.DiscoverDockerNetworkRepository;
 import in.canaris.cloud.repository.CommandHistoryRepository;
 import in.canaris.cloud.repository.ScenarioCommentsRepository;
 import in.canaris.cloud.repository.UserLabRepository;
@@ -111,6 +113,9 @@ public class GuacamoleController {
 	private UserScenerioRepository UserScenerioRepository;
 
 	@Autowired
+	private DiscoverDockerNetworkRepository DiscoverDockerNetworkRepository;
+
+	@Autowired
 	private DockerService dockerService;
 
 	@GetMapping("/")
@@ -153,6 +158,13 @@ public class GuacamoleController {
 		List<String> ipAddresses = UserLabRepository.getPhysicalServerIPs();
 		model.addAttribute("ipaddress", ipAddresses);
 		return "Add_Docker";
+	}
+
+	@GetMapping("/View_DockerListing")
+	public String viewDockerListing(Model model) {
+		List<Discover_Docker_Network> dockerNetworks = DiscoverDockerNetworkRepository.findAll(); // service method
+		model.addAttribute("listObj", dockerNetworks);
+		return "View_DockerListing"; // Thymeleaf page name
 	}
 
 	@GetMapping("/View_Vm_Listing")
@@ -586,6 +598,174 @@ public class GuacamoleController {
 			e.printStackTrace();
 			response.put("success", false);
 			response.put("error", "Exception occurred: " + e.getMessage());
+		}
+
+		return response;
+	}
+
+//	@PostMapping("/checkLabCompletionStatus")
+//	@ResponseBody
+//	public Map<String, Object> checkLabCompletionStatus(@RequestParam("labId") String labId, Principal principal) {
+//	    Map<String, Object> response = new HashMap<>();
+//	    
+//	    try {
+//	        int guacamoleId = Integer.parseInt(labId);
+//	        
+//	        // Get the lab details
+//	        List<UserLab> labDetails = UserLabRepository.findByguacamoleId(guacamoleId);
+//	        
+//	        if (labDetails.isEmpty()) {
+//	            response.put("completed", false);
+//	            response.put("error", "Lab not found");
+//	            return response;
+//	        }
+//	        
+//	        UserLab userLab = labDetails.get(0);
+//	        String labName = userLab.getInstanceName();
+//	        Long labIdLong = userLab.getLabId();
+//	        int internalLabId = labIdLong.intValue();
+//	        
+//	        // Check if all instructions are completed for this lab
+//	        List<UserWiseChatBoatInstructionTemplate> allInstructions = 
+//	            instructionTemplateRepository.findBylabId(internalLabId);
+//	        
+//	        List<UserWiseChatBoatInstructionTemplate> unexecutedInstructions = 
+//	            instructionTemplateRepository.findUnexecutedByLabId(internalLabId);
+//	        
+//	        // If there are no unexecuted instructions, the lab is completed
+//	        boolean isCompleted = unexecutedInstructions.isEmpty() && !allInstructions.isEmpty();
+//	        
+//	        response.put("completed", isCompleted);
+//	        
+//	        if (isCompleted) {
+//	            // Get completion time if available
+//	            // You might need to add this to your UserLab entity or create a separate table
+////	            response.put("completionDate", userLab.getCompletionDate() != null ? 
+////	                userLab.getCompletionDate().toString() : new Date().toString());
+//	        }
+//	        
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	        response.put("completed", false);
+//	        response.put("error", "Error checking lab status");
+//	    }
+//	    
+//	    return response;
+//	}
+//	
+//	@PostMapping("/getCompletedLabChatData")
+//	@ResponseBody
+//	public Map<String, Object> getCompletedLabChatData(@RequestParam("labId") String labId, Principal principal) {
+//	    Map<String, Object> response = new HashMap<>();
+//	    
+//	    try {
+//	        int guacamoleId = Integer.parseInt(labId);
+//	        
+//	        // Get the lab details
+//	        List<UserLab> labDetails = UserLabRepository.findByguacamoleId(guacamoleId);
+//	        
+//	        if (labDetails.isEmpty()) {
+//	            response.put("success", false);
+//	            response.put("error", "Lab not found");
+//	            return response;
+//	        }
+//	        
+//	        UserLab userLab = labDetails.get(0);
+//	        String labName = userLab.getInstanceName();
+//	        Long labIdLong = userLab.getLabId();
+//	        int internalLabId = labIdLong.intValue();
+//	        
+//	        // Get all executed commands for this lab
+//	        List<CommandHistory> commandHistory = CommandHistoryRepository.findByContainerName(labName);
+//	        
+//	        // Format chat data
+//	        List<Map<String, Object>> chatData = new ArrayList<>();
+//	        for (CommandHistory command : commandHistory) {
+//	            Map<String, Object> chatItem = new HashMap<>();
+//	            chatItem.put("message", "Command: " + command.getCommand());
+//	            chatItem.put("timestamp", command.getEventTimestamp());
+//	            chatData.add(chatItem);
+//	        }
+//	        
+//	        // Get all instructions to include in chat
+//	        List<UserWiseChatBoatInstructionTemplate> allInstructions = 
+//	            instructionTemplateRepository.findBylabId(internalLabId);
+//	        
+//	        for (UserWiseChatBoatInstructionTemplate instruction : allInstructions) {
+//	            Map<String, Object> chatItem = new HashMap<>();
+//	            byte[] htmlBytes = instruction.getInstructionDetails();
+//	            String decodedHtml = new String(htmlBytes, StandardCharsets.UTF_8);
+//	            chatItem.put("message", "Instruction: " + decodedHtml);
+//	            chatItem.put("timestamp", new Date()); // Use appropriate timestamp if available
+//	            chatData.add(chatItem);
+//	        }
+//	        
+//	        // Sort by timestamp if available
+//	        chatData.sort((a, b) -> {
+//	            Date dateA = (Date) a.get("timestamp");
+//	            Date dateB = (Date) b.get("timestamp");
+//	            return dateA != null && dateB != null ? dateA.compareTo(dateB) : 0;
+//	        });
+//	        
+//	        response.put("success", true);
+//	        response.put("chatData", chatData);
+////	        response.put("completionDate", userLab.getCompletionDate() != null ? 
+////	            userLab.getCompletionDate() : new Date());
+//	        
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	        response.put("success", false);
+//	        response.put("error", "Error loading completed lab data");
+//	    }
+//	    
+//	    return response;
+//	}
+
+	@PostMapping("/getCompletedLabInstructions")
+	@ResponseBody
+	public Map<String, Object> getCompletedLabInstructions(@RequestParam("labId") String labId, Principal principal) {
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			int guacamoleId = Integer.parseInt(labId);
+
+			// Get the lab details
+			List<UserLab> labDetails = UserLabRepository.findByguacamoleId(guacamoleId);
+
+			if (labDetails.isEmpty()) {
+				response.put("success", false);
+				response.put("error", "Lab not found");
+				return response;
+			}
+
+			UserLab userLab = labDetails.get(0);
+			Long labIdLong = userLab.getLabId();
+			int internalLabId = labIdLong.intValue();
+
+			// Get all instructions for this lab
+			List<UserWiseChatBoatInstructionTemplate> allInstructions = instructionTemplateRepository
+					.findBylabId(internalLabId);
+
+			List<Map<String, Object>> instructions = new ArrayList<>();
+			for (UserWiseChatBoatInstructionTemplate instruction : allInstructions) {
+				Map<String, Object> instructionData = new HashMap<>();
+				byte[] htmlBytes = instruction.getInstructionDetails();
+				String decodedHtml = new String(htmlBytes, StandardCharsets.UTF_8);
+
+				instructionData.put("instructionDetails", decodedHtml);
+				instructionData.put("command", instruction.getInstructionCommand());
+				instructionData.put("isExecuted", instruction.getIsCommandExecuted());
+
+				instructions.add(instructionData);
+			}
+
+			response.put("success", true);
+			response.put("instructions", instructions);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("success", false);
+			response.put("error", "Error loading completed instructions");
 		}
 
 		return response;
@@ -1037,8 +1217,6 @@ public class GuacamoleController {
 				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
 				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
 				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
-				String LabId = temp.getLabId() != null ? temp.getLabId() : "";
-				String NumberofInstance = temp.getNumberofInstance() != null ? temp.getNumberofInstance() : "";
 //				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
 				String Cover_Image = "";
 				int SrNo = temp.getId();
@@ -1056,8 +1234,6 @@ public class GuacamoleController {
 				obj.put("Labs", Labs);
 				obj.put("Cover_Image", Cover_Image);
 				obj.put("Id", SrNo);
-				obj.put("LabId", LabId);
-				obj.put("NumberofInstance", NumberofInstance);
 
 				Finalarray.put(obj);
 			}
@@ -1275,7 +1451,7 @@ public class GuacamoleController {
 				}
 			}
 
-			scenarioObj.setLabId(String.join(",", labIds));
+//			scenarioObj.setLabId(String.join(",", labIds));
 			scenarioObj.setLabs(String.join(",", labNames));
 
 			scenarioObj.setComments("");
@@ -1706,7 +1882,7 @@ public class GuacamoleController {
 	public String showLabButtonOn_Check(@RequestParam("scenarioId") String scenarioId,
 			@RequestParam("scenarioName") String scenarioName, Principal principal) {
 		try {
-//			System.out.println("Checking scenarioId: " + scenarioId);
+//			System.out.println("Checking scenarioId: " + scenarioId); usernmae
 
 			Optional<UserScenario> scenarioOpt = UserScenerioRepository.findByScenarioId(scenarioId);
 
@@ -1723,9 +1899,7 @@ public class GuacamoleController {
 			return "fail";
 		}
 	}
-	
-	
-	
+
 	@PostMapping("/start_lab")
 	@ResponseBody
 	public String start_lab(@RequestParam("containerName") String containerName, Principal principal) {
@@ -1733,7 +1907,7 @@ public class GuacamoleController {
 			System.out.println("Inside_start_lab containerName: " + containerName);
 			dockerService.startContainerByName(containerName);
 			String Status = "running";
-			UserLabRepository.updateStatusByLabName(containerName,Status);
+			UserLabRepository.updateStatusByLabName(containerName, Status);
 			System.out.println("Container start successfully: " + containerName);
 			return "success";
 		} catch (Exception e) {
@@ -1750,7 +1924,7 @@ public class GuacamoleController {
 			System.out.println("Inside_stop_lab containerName: " + containerName);
 			String Status = "stop";
 			dockerService.stopContainerByName(containerName);
-			UserLabRepository.updateStatusByLabName(containerName,Status);
+			UserLabRepository.updateStatusByLabName(containerName, Status);
 			System.out.println("Container stopped successfully: " + containerName);
 			return "success";
 		} catch (Exception e) {
@@ -1779,9 +1953,7 @@ public class GuacamoleController {
 			return "fail";
 		}
 	}
-	
-	
-	
+
 	@PostMapping("/reset_lab")
 	@ResponseBody
 	public String reset_lab(@RequestParam("containerName") String containerName, Principal principal) {
@@ -1804,15 +1976,14 @@ public class GuacamoleController {
 
 	@PostMapping("/getPercenetageParticularScenerio")
 	@ResponseBody
-	public String getPercentageParticularScenario(@RequestParam("templateId") String templateId, Principal principal) {
+	public String getPercentageParticularScenario(Principal principal) {
 		try {
-			System.out.println("Inside getPercentageParticularScenario: " + templateId);
 
-			// Convert String to int
-			int templateIdInt = Integer.parseInt(templateId);
+			Authentication auth = (Authentication) principal;
+			String username = auth.getName();
 
-			Integer falseCountObj = instructionTemplateRepository.getFalseCompletionCountsByTemplateId(templateIdInt);
-			Integer trueCountObj = instructionTemplateRepository.getTrueCompletionCountsByTemplateId(templateIdInt);
+			Integer falseCountObj = instructionTemplateRepository.getFalseCompletionCountsByTemplateId(username);
+			Integer trueCountObj = instructionTemplateRepository.getTrueCompletionCountsByTemplateId(username);
 
 			int falseCount = (falseCountObj != null) ? falseCountObj : 0;
 			int trueCount = (trueCountObj != null) ? trueCountObj : 0;
@@ -1830,27 +2001,26 @@ public class GuacamoleController {
 
 			return String.valueOf(percentage);
 
-		} catch (NumberFormatException e) {
-			System.err.println("Invalid templateId format: " + templateId);
-			return "Invalid templateId";
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "fail";
 		}
 	}
 
-
-
 	@PostMapping("/savediscoverdokcerIpaddress")
-	public String savediscoverdokcerIpaddress(@RequestParam("selectedIp") String selectedIp, Model model) {
-		
-		System.out.println("savediscoverdokcerIpaddress selectedIp ::"+selectedIp);
-		 List<String> networks = dockerService.listDockerNetworks();
-		 
-		 System.out.println("savediscoverdokcerIpaddress selectedIp ::"+networks);
-	    model.addAttribute("networks", networks);
-	    return "redirect:/guac/Add_Docker";  
-	}
+	public String savediscoverdokcerIpaddress(@RequestParam("selectedIp") String selectedIp,
+			RedirectAttributes redirectAttributes) {
 
+		System.out.println("Selected IP: " + selectedIp);
+
+		// Discover and save Docker networks to DB
+		dockerService.discoverAndSaveDockerNetworks(selectedIp);
+
+		// Optional: fetch again to display in UI
+		List<String> networks = dockerService.listDockerNetworks();
+		redirectAttributes.addFlashAttribute("networks", networks);
+
+		return "redirect:/guac/Add_Docker";
+	}
 
 }

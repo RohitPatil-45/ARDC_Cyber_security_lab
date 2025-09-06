@@ -69,8 +69,8 @@ public class Add_Scenario {
 	@Column(name = "Labs", nullable = false, length = 255)
 	private String Labs;
 
-	@Column(name = "LabId", nullable = false, length = 255)
-	private String LabId;
+//	@Column(name = "LabId", nullable = false, length = 255)
+//	private String LabId;
 
 	@Column(name = "Comments", nullable = false, length = 255)
 	private String Comments;
@@ -186,13 +186,13 @@ public class Add_Scenario {
 		return serialVersionUID;
 	}
 
-	public String getLabId() {
-		return LabId;
-	}
-
-	public void setLabId(String labId) {
-		LabId = labId;
-	}
+//	public String getLabId() {
+//		return LabId;
+//	}
+//
+//	public void setLabId(String labId) {
+//		LabId = labId;
+//	}
 
 	public Set<Playlist> getPlaylists() {
 		return playlists;

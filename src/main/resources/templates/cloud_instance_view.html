@@ -225,6 +225,10 @@ keyframes pulse { 0% {
 }
 
 100
+
+
+
+
 %
 {
 opacity
@@ -234,7 +238,13 @@ opacity
 
 
 
+
+
+
+
 :
+
+
 
 
 
@@ -243,7 +253,13 @@ opacity
 
 
 
+
+
 0
+
+
+
+
 ;
 transform
 
@@ -252,7 +268,13 @@ transform
 
 
 
+
+
+
+
 :
+
+
 
 
 
@@ -261,7 +283,11 @@ transform
 
 
 
+
+
 scale
+
+
 
 
 
@@ -269,8 +295,18 @@ scale
 
 
 
+
+
 (
+
+
+
+
 1
+
+
+
+
 .1
 
 
@@ -278,7 +314,15 @@ scale
 
 
 
+
+
+
+
 )
+
+
+
+
 ;
 }
 }
@@ -300,8 +344,8 @@ td {
 	color: #fff;
 }
 
-* CSS for page loader */
-/* ---- Page loader overlay ---- */
+* CSS for page loader * /
+	/* ---- Page loader overlay ---- */  
 .loader-overlay {
 	position: fixed;
 	inset: 0; /* top:0 right:0 bottom:0 left:0 */
@@ -521,10 +565,10 @@ keyframes spin {to { transform:rotate(360deg);
 											<th class="text-center"></th>
 											<th class="text-center">Virtualization Type</th>
 											<th class="text-center">Group</th>
-											<th class="text-center">Instance IP</th>
+											<!-- 											<th class="text-center">Instance IP</th> -->
 											<th class="text-center">Cloud Instances</th>
-											<th class="text-center">Instance ID</th>
-											<th class="text-center">VM Status</th>
+											<th class="text-center">Lab Template ID</th>
+											<!-- 											<th class="text-center">VM Status</th> -->
 											<th class="text-center">Created on</th>
 											<th class="text-center">Location</th>
 											<th class="text-center">Source Image</th>
@@ -544,33 +588,33 @@ keyframes spin {to { transform:rotate(360deg);
 												th:if="${obj.instance_ip != null}"
 												style="background-color: #f1faff; cursor: pointer">[[${obj.instance_ip}]]</span>
 												<span th:if="${obj.instance_ip == null}">-</span></td>
-											<td>
-												<div class="row">
-													<div class="col-md-2"></div>
+											<!-- 											<td> -->
+											<!-- 												<div class="row"> -->
+											<!-- 													<div class="col-md-2"></div> -->
 
-													<div class="col-md-10">
-														<h3 class="card-title"
-															style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<!-- 													<div class="col-md-10"> -->
+											<!-- 														<h3 class="card-title" -->
+											<!-- 															style="align-items: flex-start !important; flex-direction: column !important; display: flex;"> -->
 
-															<span class="card-title" th:value="${obj.id}"
-																th:onclick="'viewCloudServerDetails(' + ${obj.id} + ')'"
-																style="font-weight: bold; cursor: pointer;">
-																[[${obj.instance_name}]]</span> <span class="card-title"
-																style="font-size: 1rem !important; color: #b5b5c3 !important"></span>
-															<span th:text="${obj.cpuAssigned+ ' CPU' }"> </span> / <span
-																th:text="${obj.memoryAssigned+ ' RAM' }"> </span>
-														</h3>
-													</div>
+											<!-- 															<span class="card-title" th:value="${obj.id}" -->
+											<!-- 																th:onclick="'viewCloudServerDetails(' + ${obj.id} + ')'" -->
+											<!-- 																style="font-weight: bold; cursor: pointer;"> -->
+											<!-- 																[[${obj.instance_name}]]</span> <span class="card-title" -->
+											<!-- 																style="font-size: 1rem !important; color: #b5b5c3 !important"></span> -->
+											<!-- 															<span th:text="${obj.cpuAssigned+ ' CPU' }"> </span> / <span -->
+											<!-- 																th:text="${obj.memoryAssigned+ ' RAM' }"> </span> -->
+											<!-- 														</h3> -->
+											<!-- 													</div> -->
 
-												</div>
-											</td>
+											<!-- 												</div> -->
+											<!-- 											</td> -->
 											<td>[[${obj.Id}]]</td>
-											<td th:text="${obj.vm_state}"></td>
+											<!-- 											<td th:text="${obj.vm_state}"></td> -->
 											<td>[[${obj.created_on}]]</td>
 
 											<td>[[${obj.location_id.getLocation_name}]]</td>
 											<td><a class="start-btn"
-												th:if="${obj.getSubproduct_id().getProduct_id().getProduct_name() != 'Windows' && obj.sourceVm != 'created'}"
+												th:if="${obj.getSubproduct_id().getIsSourceCreated() != 'created'}"
 												th:onclick="'importSourceImage(' + ${obj.id} + ')'"> <i
 													class="fas fa-play"></i>Source Image
 											</a></td>
@@ -624,16 +668,16 @@ keyframes spin {to { transform:rotate(360deg);
 			</div>
 		</div>
 	</div>
-	
+
 	<!-- Page Loader -->
-		<div id="pageLoader" class="loader-overlay" role="status"
-			aria-live="polite" style="display: none" aria-label="Page loading">
-			<div>
-				<div class="spinner" aria-hidden="true"></div>
-				<div class="loader-text">Loading…</div>
-			</div>
+	<div id="pageLoader" class="loader-overlay" role="status"
+		aria-live="polite" style="display: none" aria-label="Page loading">
+		<div>
+			<div class="spinner" aria-hidden="true"></div>
+			<div class="loader-text">Loading…</div>
 		</div>
-		<!-- End Page Loader -->
+	</div>
+	<!-- End Page Loader -->
 
 	<!-- Footer -->
 	<div th:replace="fragments/footer :: footer"></div>

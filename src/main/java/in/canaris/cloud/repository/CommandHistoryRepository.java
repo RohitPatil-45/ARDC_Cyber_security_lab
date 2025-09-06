@@ -23,6 +23,9 @@ public interface CommandHistoryRepository extends JpaRepository<CommandHistory, 
     @Query("DELETE FROM CommandHistory c WHERE c.ContainerName = :containerName")
     void deleteByContainerName(String containerName);
 
+	@Query("SELECT ch FROM CommandHistory ch WHERE ch.ContainerName = :lab_name")
+	List<CommandHistory> findByContainerName(@Param("lab_name") String lab_name);
+
 
 //	 @Query("SELECT ch FROM CommandHistory ch WHERE ch.ContainerName = :labId AND ch.Command = :command")
 //	    Optional<CommandHistory> findByLabIdAndCommand(@Param("labId") String labId, @Param("command") String command);

@@ -84,9 +84,11 @@ import in.canaris.cloud.entity.billing;
 import in.canaris.cloud.openstack.entity.ChartBoatInstructionTemplate;
 import in.canaris.cloud.openstack.entity.CloudInstanceForm;
 import in.canaris.cloud.openstack.entity.InstructionDto;
+import in.canaris.cloud.openstack.entity.ScenarioLabTemplate;
 import in.canaris.cloud.openstack.entity.UserLab;
 import in.canaris.cloud.openstack.entity.UserScenario;
 import in.canaris.cloud.openstack.entity.UserWiseChatBoatInstructionTemplate;
+import in.canaris.cloud.openstack.repository.ScenarioLabTemplateRepository;
 import in.canaris.cloud.repository.AddPhysicalServerRepository;
 import in.canaris.cloud.repository.AdditionalStorageRepository;
 import in.canaris.cloud.repository.AppUserRepository;
@@ -275,6 +277,9 @@ public class CloudInstanceController {
 
 	@Autowired
 	private UserScenerioRepository UserScenerioRepository;
+	
+	@Autowired
+	private ScenarioLabTemplateRepository scenarioLabTemplateRepository;
 
 	@Autowired
 	private GuacamoleService guacService;
@@ -1735,41 +1740,83 @@ public class CloudInstanceController {
 //		return "redirect:/" + var_function_name + "/new";
 //	}
 
+//	@PostMapping("/save")
+//	public String save(@ModelAttribute CloudInstanceForm form, @ModelAttribute CloudInstance obj,
+//			@RequestParam(required = false) MultipartFile uploadedImage, RedirectAttributes redirectAttributes,
+//			Principal principal) {
+//
+//		try {
+//
+//			if (obj == null) {
+//				throw new RuntimeException("CloudInstance object is null. Please ensure form is binding correctly.");
+//			}
+//
+//			if (uploadedImage != null && !uploadedImage.isEmpty()) {
+//				obj.setLab_image(uploadedImage.getBytes());
+//				System.out.println("Uploaded labImage size: " + uploadedImage.getSize());
+//			}
+//
+//			// Save CloudInstance
+//			repository.save(obj);
+//
+//			// Save instructions into ChartBoatInstructionTemplate
+//			List<InstructionDto> instructions = form.getInstructions();
+//			for (InstructionDto dto : instructions) {
+//				ChartBoatInstructionTemplate instruction = new ChartBoatInstructionTemplate();
+//
+//				instruction.setTemplateId(obj.getId());
+//				instruction.setTemaplateName(obj.getInstance_name());
+//				instruction.setInstructionCommand(dto.getCommandText());
+//
+//				if (dto.getInstructionText() != null) {
+//					instruction.setInstructionDetails(dto.getInstructionText().getBytes());
+//				} else {
+//					instruction.setInstructionDetails("".getBytes());
+//				}
+//
+//				// Save instruction
+//				ChartBoatInstructionTemplateRepository.save(instruction);
+//			}
+//
+//			redirectAttributes.addFlashAttribute("result", "success");
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			redirectAttributes.addFlashAttribute("result", "Error: " + e.getMessage());
+//		}
+//
+//		return "redirect:/" + var_function_name + "/new";
+//	}
+
 	@PostMapping("/save")
 	public String save(@ModelAttribute CloudInstanceForm form, @ModelAttribute CloudInstance obj,
 			@RequestParam(required = false) MultipartFile uploadedImage, RedirectAttributes redirectAttributes,
 			Principal principal) {
 
 		try {
-
-			if (obj == null) {
-				throw new RuntimeException("CloudInstance object is null. Please ensure form is binding correctly.");
-			}
-
 			if (uploadedImage != null && !uploadedImage.isEmpty()) {
 				obj.setLab_image(uploadedImage.getBytes());
-				System.out.println("Uploaded labImage size: " + uploadedImage.getSize());
 			}
 
-			// Save CloudInstance
+			// Split docker_network_id into ID and Name
+			if (obj.getDocker_network_id() != null && obj.getDocker_network_id().contains("~")) {
+				String[] parts = obj.getDocker_network_id().split("~", 2);
+				obj.setDocker_network_id(parts[0]);
+				obj.setDocker_network_name(parts[1]);
+			}
+
 			repository.save(obj);
 
-			// Save instructions into ChartBoatInstructionTemplate
+			// Save ChartBoat instructions if any
 			List<InstructionDto> instructions = form.getInstructions();
 			for (InstructionDto dto : instructions) {
 				ChartBoatInstructionTemplate instruction = new ChartBoatInstructionTemplate();
-
 				instruction.setTemplateId(obj.getId());
 				instruction.setTemaplateName(obj.getInstance_name());
 				instruction.setInstructionCommand(dto.getCommandText());
+				instruction.setInstructionDetails(
+						dto.getInstructionText() != null ? dto.getInstructionText().getBytes() : "".getBytes());
 
-				if (dto.getInstructionText() != null) {
-					instruction.setInstructionDetails(dto.getInstructionText().getBytes());
-				} else {
-					instruction.setInstructionDetails("".getBytes());
-				}
-
-				// Save instruction
 				ChartBoatInstructionTemplateRepository.save(instruction);
 			}
 
@@ -3399,30 +3446,37 @@ public class CloudInstanceController {
 
 	// Docker Container
 	@PostMapping("/docker")
-	public @ResponseBody String docker(@RequestParam("instanceID") int instanceID,
-			@RequestParam("scenarioId") String scenarioId, @RequestParam("noOfInstances") int noOfInstances,
+	public @ResponseBody String docker(@RequestParam("scenarioId") String scenarioId, @RequestParam("noOfInstances") int noOfInstances,
 			@RequestParam("scenarioName") String scenarioName, Principal principal) {
 		System.out.println("Inside_Docker_Method :::: ");
-		System.out.println("instanceID :::: " + instanceID);
 		System.out.println("scenarioId :::: " + scenarioId);
 		System.out.println("scenarioName :::: " + scenarioName);
 		System.out.println("noOfInstances :::: " + noOfInstances);
 		String result = null;
 		Map<Integer, Integer> portMappings = null;
-		String imageName = "kalilinux-vnc-novnc:latest";
+		
 		String network = "guac-network";
 		Integer newVncPort;
 		Integer newNoVncPort;
+		
+		String username = ((User) ((Authentication) principal).getPrincipal()).getUsername();
+		
 		try {
 
-			Optional<CloudInstance> obj = repository.findById(instanceID);
-			CloudInstance instance = obj.get();
-
-			String username = ((User) ((Authentication) principal).getPrincipal()).getUsername();
-			String templateName = instance.getInstance_name();
-			String password = instance.getInstance_password();
-			String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
-			for (int i = 0; i < noOfInstances; i++) {
+			List<ScenarioLabTemplate> templates = scenarioLabTemplateRepository.findByScenarioId(Integer.valueOf(scenarioId));
+			
+			for (ScenarioLabTemplate temp : templates) {
+				
+				Optional<CloudInstance> obj = repository.findById(temp.getTemplateId());
+				CloudInstance instance = obj.get();
+				
+				String templateName = instance.getInstance_name();
+				String password = instance.getInstance_password();
+				String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+				String filePath = instance.getSubproduct_id().getIso_file_path();
+				File file = new File(filePath);
+				String imageName = file.getName().replaceFirst("[.][^.]+$", "");
+		
 				portMappings = new HashMap<>();
 				newVncPort = portDetailsRepository.findMaxVncPorts() + 1;
 				newNoVncPort = portDetailsRepository.findMaxnoVncPort() + 1;
@@ -3436,10 +3490,6 @@ public class CloudInstanceController {
 				maxLabId++;
 
 				String newInstanceName = instance.getInstance_name() + "_" + maxLabId;
-
-				System.out.println("template name = " + instance.getInstance_name());
-				System.out.println("new instance name = " + instance.getInstance_name() + "_" + maxLabId);
-				System.out.println("No of instances = " + noOfInstances);
 
 				if (os.equalsIgnoreCase("windows")) {
 					result = createWindowsDockerContainer(instance.getInstance_name(), instance.getInstance_password());
@@ -3457,7 +3507,7 @@ public class CloudInstanceController {
 									guacService.getConnectionIdByName(jsonResponse), newVncPort, newNoVncPort,
 									"kalilinux", scenarioId);
 
-							insertUserWiseChatBoatInstruction(instanceID, templateName, newInstanceName, username);
+							insertUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName, username);
 						}
 
 					}
@@ -3556,16 +3606,18 @@ public class CloudInstanceController {
 		}
 
 	}
-	
+
 	@PostMapping("/sourceImage")
 	public  @ResponseBody String sourceImage(@RequestParam("templateId") int templateId) {
 		try {
-			String filePath = "C:\\SourceImage\\kalilinux-vnc-novnc:latest.tar";
+			
+			CloudInstance obj = repository.findById(templateId).get();
+			String filePath = obj.getSubproduct_id().getIso_file_path();
 			File file = new File(filePath);
 			String imageName = file.getName().replaceFirst("[.][^.]+$", "");
 			if (dockerService.loadImageFromTar(filePath, imageName).equalsIgnoreCase("success")) {
 				try {
-				//	repository.updateSourceImage(templateId);
+					subProductRepository.updateSourceImage(obj.getSubproduct_id().getId());
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.print("Exception DB update source image :" + e.getMessage());

@@ -40,12 +40,12 @@ public interface UserWiseChatBoatInstructionTemplateRepository
 	void deleteByLabName(String labName);
 
 	@Query(value = "SELECT COUNT(*) FROM userwise_chatboat_instruction_template "
-			+ "WHERE isCommandExecuted='false' AND template_id = :templateId", nativeQuery = true)
-	Integer getFalseCompletionCountsByTemplateId(@Param("templateId") int templateId);
+			+ "WHERE isCommandExecuted='false' AND username = :username", nativeQuery = true)
+	Integer getFalseCompletionCountsByTemplateId(@Param("username") String username);
 
 	@Query(value = "SELECT COUNT(*) FROM userwise_chatboat_instruction_template "
-			+ "WHERE isCommandExecuted='true' AND template_id = :templateId", nativeQuery = true)
-	Integer getTrueCompletionCountsByTemplateId(@Param("templateId") int templateId);
+			+ "WHERE isCommandExecuted='true' AND username = :username", nativeQuery = true)
+	Integer getTrueCompletionCountsByTemplateId(@Param("username") String username);
 	
 	
 	@Modifying

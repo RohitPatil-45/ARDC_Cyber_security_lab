@@ -379,7 +379,6 @@ keyframes spin {to { transform:rotate(360deg);
 let jsonData;
 let scenarioId;
 let editingCommentId = null;
-let instanceId;
 let noofinstance;
 let scenarioName;
 
@@ -398,7 +397,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const item = jsonData[0];
     scenarioId = item.Id; 
-    instanceId = item.LabId;
     noofinstance=item.NumberofInstance;
     scenarioName = item.Scenario_Name;
     const container = document.getElementById("scenarioContainer");
@@ -717,7 +715,6 @@ function createDockerContainer() {
 		type: "POST",
 		url : '/cloud_instance/docker',
 		data : {
-			"instanceID" : instanceId,
 			"noOfInstances" : noofinstance,
 			"scenarioId" : scenarioId,
 			"scenarioName" : scenarioName
@@ -765,13 +762,9 @@ function showLabButtonOn_Check() {
 
 
 function getPercenetageParticularScenerio() {
-// 	alert("templateId "+instanceId)
     $.ajax({
         type: "POST",
         url: '/guac/getPercenetageParticularScenerio',
-        data: {
-            "templateId": instanceId
-        },
         success: function(result) {
             result = result.trim();
 

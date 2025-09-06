@@ -2730,67 +2730,7 @@ public class ReportController {
 		}
 	}
 
-	@GetMapping("/View_Particular_Scenerio")
-	public ModelAndView getView_Particular_Scenerio(@RequestParam String Id) {
-
-		ModelAndView mav = new ModelAndView("View_Particular_Scenerio");
-		JSONArray Finalarray = new JSONArray();
-		List<Add_Scenario> dataList;
-		try {
-
-			int SRNO = Integer.parseInt(Id);
-
-			dataList = ScenarioRepository.getView_Particular_Scenerio(SRNO);
-
-			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
-			int srno = 0;
-			for (Add_Scenario temp : dataList) {
-				JSONObject obj = new JSONObject();
-
-				String Scenario_Name = temp.getScenarioName() != null ? temp.getScenarioName() : "";
-				String Scenario_Title = temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "";
-				String Description = temp.getDescription() != null ? temp.getDescription() : "";
-				String Category = temp.getCategory() != null ? temp.getCategory() : "";
-				String Scenario_Type = temp.getScenarioType() != null ? temp.getScenarioType() : "";
-				String Mode = temp.getMode() != null ? temp.getMode() : "";
-				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
-				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
-				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
-				String LabId = temp.getLabId() != null ? temp.getLabId() : "";
-//				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
-				String Cover_Image = "";
-				int SrNo = temp.getId();
-
-//				srno++;
-
-				obj.put("Scenario_Name", Scenario_Name);
-				obj.put("Scenario_Title", Scenario_Title);
-				obj.put("Description", Description);
-				obj.put("Category", Category);
-				obj.put("Scenario_Type", Scenario_Type);
-				obj.put("Mode", Mode);
-				obj.put("Difficulty_Level", Difficulty_Level);
-				obj.put("Duration", Duration);
-				obj.put("Labs", Labs);
-				obj.put("Cover_Image", Cover_Image);
-				obj.put("Id", SrNo);
-				obj.put("LabId", LabId);
-
-				Finalarray.put(obj);
-			}
-
-			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
-
-			mav.addObject("listObj", Finalarray.toString());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			mav.addObject("listObj", null);
-			mav.addObject("error", e.getMessage());
-			System.out.println("Error fetching data: " + e.getMessage());
-		}
-		return mav;
-	}
+	
 
 	@GetMapping("/View_Vm_Listing")
 	public ModelAndView getView_Vm_Listing(@RequestParam String Id) {
