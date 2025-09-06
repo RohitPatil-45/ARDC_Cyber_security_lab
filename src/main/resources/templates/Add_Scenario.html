@@ -230,6 +230,40 @@ label {
 	background-color: #007bff;
 	color: #fff;
 }
+
+/* Custom styles for instance-based selection */
+.selection-limit {
+	font-size: 0.875rem;
+	margin-top: 5px;
+	color: #6c757d;
+}
+
+.selection-limit.error {
+	color: #dc3545;
+	font-weight: 500;
+}
+
+.instance-warning {
+	display: none;
+	color: #856404;
+	background-color: #fff3cd;
+	border: 1px solid #ffeeba;
+	border-radius: 4px;
+	padding: 10px;
+	margin-top: 10px;
+	font-size: 0.9rem;
+}
+
+.select2-container--disabled {
+	background-color: #e9ecef;
+	opacity: 0.8;
+	cursor: not-allowed;
+}
+
+.select2-container--disabled .select2-selection {
+	background-color: #e9ecef;
+	cursor: not-allowed;
+}
 </style>
 </head>
 
@@ -246,7 +280,6 @@ label {
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<!-- 							<h1>Create New Scenario</h1> -->
 							<h1>[[${pageTitle}]]</h1>
 						</div>
 						<div class="col-sm-6">
@@ -254,7 +287,6 @@ label {
 								<li class="breadcrumb-item"><a href="#"><i
 										class="fas fa-home"></i> Home</a></li>
 								<li class="breadcrumb-item"><a href="#">Scenarios</a></li>
-
 							</ol>
 						</div>
 					</div>
@@ -282,7 +314,8 @@ label {
 
 								<form th:action="@{/guac/saveScenarioData}"
 									th:object="${scenario}" method="post"
-									enctype="multipart/form-data">
+									enctype="multipart/form-data"
+									onsubmit="return validateScenarioForm()">
 									<input type="hidden" th:field="*{Id}" />
 									<div class="card-body">
 										<div class="form-section">
@@ -424,213 +457,278 @@ label {
 												</div>
 												<div class="col-md-6">
 													<div class="form-group">
+														<label for="NoOfInstance">Number of Instance <span
+															class="text-danger">*</span></label> <input type="number" min="1"
+															max="2000" th:field="*{NumberofInstance}"
+															id="NumberofInstance" name="NumberofInstance"
+															class="form-control"
+															placeholder="Enter number of instances..." required>
+														<div class="instance-warning" id="instanceWarning">
+															<i class="fas fa-exclamation-triangle mr-2"></i>Please
+															set the number of instances before selecting lab
+															templates.
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="row mt-4">
+												<div class="col-md-12">
+													<div class="form-group">
 														<label for="Labs" class="form-label fw-bold">Select
 															Lab Template <span class="text-danger">*</span>
-														</label> <select id="Labs" name="Labs" class="form-control "
-															th:field="*{Labs}">
-															<option value="">--Please Select--</option>
+														</label> <select id="Labs" name="Labs" class="form-control"
+															th:field="*{Labs}" multiple="multiple" disabled>
 															<option th:each="scenario : ${instanceNameList}"
 																th:value="${scenario.id + '~' + scenario.instance_name}"
 																th:text="${scenario.instance_name}"></option>
 														</select>
-													</div>
-
-												</div>
-											</div>
-
-
-											<div class="row">
-												<div class="col-md-6">
-													<!-- 											<div class="form-group"> -->
-													<!-- 												<label for="Tag" class="required-field">Tags</label> <input -->
-													<!-- 													type="text" required id="Tag" th:field="*{Tag}" name="Tag" -->
-													<!-- 													class="form-control" placeholder="Type to add tags"> -->
-													<!-- 											</div> -->
-												</div>
-												<div class="col-md-6">
-													<div class="form-group">
-														<label for="NoOfInstance">Number of Instance</label>
-														<!-- 														<div id="commentForm" class="form-control "> -->
-														<!-- 															<input id="NoofInstanceText" class="comment-textarea" -->
-														<!-- 																style="width: 101%;" placeholder="Enter here..."></textarea> -->
-
-														<input type="number" min="1" max="2000"
-															th:field="*{NumberofInstance}" id="NumberofInstance"
-															name="NumberofInstance" class="form-control"
-															placeholder="Enter here...">
-
+														<div class="selection-limit" id="selectionLimit">
+															You can select up to <span id="maxSelections">0</span>
+															lab templates
+														</div>
 													</div>
 												</div>
 											</div>
-
 										</div>
-
 									</div>
-							</div>
 
-							<div class="card-footer text-right">
-								<button type="reset" class="btn btn-outline-secondary mr-2">
-									<i class="fas fa-undo mr-1"></i> Reset
-								</button>
-								<button type="submit" id="saveScenarioBtn"
-									class="btn btn-primary">
-									<i class="fas fa-save mr-1"></i> Save Scenario <span
-										id="scenarioSpinner"
-										class="spinner-border spinner-border-sm ml-2 d-none"></span>
-								</button>
+									<div class="card-footer text-right">
+										<button type="reset" class="btn btn-outline-secondary mr-2">
+											<i class="fas fa-undo mr-1"></i> Reset
+										</button>
+										<button type="submit" id="saveScenarioBtn"
+											class="btn btn-primary">
+											<i class="fas fa-save mr-1"></i> Save Scenario <span
+												id="scenarioSpinner"
+												class="spinner-border spinner-border-sm ml-2 d-none"></span>
+										</button>
+									</div>
+								</form>
 							</div>
-							</form>
 						</div>
 					</div>
 				</div>
+			</section>
 		</div>
-		</section>
-	</div>
 
-	<div th:replace="fragments/footer :: footer"></div>
+		<div th:replace="fragments/footer :: footer"></div>
 	</div>
 
 	<div th:replace="template :: jsscript"></div>
 
 	<!-- jQuery (needed for Bootstrap and multiselect) -->
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 	<!-- Bootstrap JS -->
 	<script
 		src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-
 	<script
 		src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
 	<!-- Summernote JS -->
 	<script
 		src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
-
 	<script
 		src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 	<script type="text/javascript">
-$(document).ready(function() {
-    // Initialize custom file input
-    bsCustomFileInput.init();
+		$(document).ready(function() {
+			// Initialize custom file input
+			bsCustomFileInput.init();
 
-    // Initialize Summernote
-    $('.summernote').summernote({
-        height: 200,
-        toolbar: [
-            ['style', ['style']],
-            ['font', ['bold', 'italic', 'underline', 'clear']],
-            ['fontname', ['fontname']],
-            ['color', ['color']],
-            ['para', ['ul', 'ol', 'paragraph']],
-            ['height', ['height']],
-            ['table', ['table']],
-            ['insert', ['link', 'picture', 'video']],
-            ['view', ['fullscreen', 'codeview', 'help']]
-        ],
-        styleTags: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-        fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana', 'Roboto'],
-        fontNamesIgnoreCheck: ['Roboto']
-    });
+			// Initialize Summernote
+			$('.summernote').summernote({
+				height: 200,
+				toolbar: [
+					['style', ['style']],
+					['font', ['bold', 'italic', 'underline', 'clear']],
+					['fontname', ['fontname']],
+					['color', ['color']],
+					['para', ['ul', 'ol', 'paragraph']],
+					['height', ['height']],
+					['table', ['table']],
+					['insert', ['link', 'picture', 'video']],
+					['view', ['fullscreen', 'codeview', 'help']]
+				],
+				styleTags: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+				fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana', 'Roboto'],
+				fontNamesIgnoreCheck: ['Roboto']
+			});
 
-    // Initialize Select2
-//     $('#Labs').select2({
-//         placeholder: "-- Choose Labs --",
-//         allowClear: true,
-//         width: '100%'
-//     });
+			// Initialize Select2 for multi-select
+			$('#Labs').select2({
+				placeholder: "Select lab templates (max: 0)",
+				allowClear: true,
+				width: '100%',
+				closeOnSelect: false
+			});
 
-    // Inline validation on input change
-  const requiredFields = [
-  'ScenarioTitle', 'ScenarioName', 'Category', 'ScenarioType', 
-  'Mode', 'DifficultyLevel', 'Duration'
-];
+			// Handle instance number change
+			$('#NumberofInstance').on('input', function() {
+				const instanceCount = parseInt($(this).val()) || 0;
+				
+				if (instanceCount > 0) {
+					$('#Labs').prop('disabled', false);
+					$('#instanceWarning').hide();
+					$('#maxSelections').text(instanceCount);
+					$('#selectionLimit').removeClass('error');
+					
+					// Update placeholder text
+					$('#Labs').data('select2').$container.find('.select2-selection__placeholder').text(`Select lab templates (max: ${instanceCount})`);
+					
+					// If current selections exceed the new limit, remove the extra ones
+					const selectedOptions = $('#Labs').val() || [];
+					if (selectedOptions.length > instanceCount) {
+						// Remove excess selections
+						$('#Labs').val(selectedOptions.slice(0, instanceCount)).trigger('change');
+						$('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>Selection limit exceeded! Only ${instanceCount} lab templates allowed.`);
+					} else if (selectedOptions.length > 0) {
+						$('#selectionLimit').html(`You have selected ${selectedOptions.length} of ${instanceCount} allowed lab templates`);
+					} else {
+						$('#selectionLimit').html(`You can select up to <span id="maxSelections">${instanceCount}</span> lab templates`);
+					}
+				} else {
+					$('#Labs').prop('disabled', true);
+					$('#Labs').val(null).trigger('change');
+					$('#instanceWarning').show();
+					$('#maxSelections').text('0');
+					$('#selectionLimit').html(`You can select up to <span id="maxSelections">0</span> lab templates`);
+				}
+			});
 
-    requiredFields.forEach(fieldId => {
-        $('#' + fieldId).on('input change', function() {
-            if ($(this).val().trim()) {
-                $(this).removeClass('is-invalid');
-            } else {
-                $(this).addClass('is-invalid');
-            }
-        });
-    });
+			// Handle lab template selection with limit validation
+			$('#Labs').on('select2:selecting', function(e) {
+				const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
+				const currentSelections = $('#Labs').select2('data').length;
+				
+				if (instanceCount > 0 && currentSelections >= instanceCount) {
+					e.preventDefault();
+					$('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>You can only select up to ${instanceCount} lab templates.`);
+					
+					// Show warning for 2 seconds
+					setTimeout(function() {
+						$('#selectionLimit').removeClass('error');
+						$('#selectionLimit').html(`You have selected ${currentSelections} of ${instanceCount} allowed lab templates`);
+					}, 2000);
+				}
+			});
 
-    // Summernote inline validation
-    $('#description').on('summernote.change', function() {
-        const content = $(this).summernote('code').replace(/<[^>]*>/g, '').trim();
-        if (content) {
-            $(this).closest('.form-group').find('.note-editor').removeClass('is-invalid');
-        } else {
-            $(this).closest('.form-group').find('.note-editor').addClass('is-invalid');
-        }
-    });
+			// Update selection count when changing labs
+			$('#Labs').on('change', function() {
+				const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
+				const currentSelections = $('#Labs').select2('data').length;
+				
+				if (instanceCount > 0) {
+					if (currentSelections > instanceCount) {
+						// This shouldn't happen with the prevention above, but just in case
+						const selectedOptions = $('#Labs').val() || [];
+						$('#Labs').val(selectedOptions.slice(0, instanceCount)).trigger('change');
+					} else if (currentSelections > 0) {
+						$('#selectionLimit').html(`You have selected ${currentSelections} of ${instanceCount} allowed lab templates`);
+					} else {
+						$('#selectionLimit').html(`You can select up to <span id="maxSelections">${instanceCount}</span> lab templates`);
+					}
+				}
+			});
 
-    // Labs select inline validation
-//     $('#Labs').on('change', function() {
-//         if ($(this).val() && $(this).val().length > 0) {
-//             $(this).closest('.form-group').find('.select2-selection').removeClass('is-invalid');
-//         } else {
-//             $(this).closest('.form-group').find('.select2-selection').addClass('is-invalid');
-//         }
-//     });
-});
+			// Inline validation on input change
+			const requiredFields = [
+				'ScenarioTitle', 'ScenarioName', 'Category', 'ScenarioType', 
+				'Mode', 'DifficultyLevel', 'Duration', 'NumberofInstance'
+			];
 
-function validateScenarioForm() {
-    let isValid = true;
+			requiredFields.forEach(fieldId => {
+				$('#' + fieldId).on('input change', function() {
+					if ($(this).val().trim()) {
+						$(this).removeClass('is-invalid');
+					} else {
+						$(this).addClass('is-invalid');
+					}
+				});
+			});
 
-    // Validate required fields
-    const requiredFields = [
-        'Scenario_title', 'Scenario_name', 'Category', 'type', 
-        'mode', 'Difficulty', 'Duration'
-    ];
+			// Summernote inline validation
+			$('#Description').on('summernote.change', function() {
+				const content = $(this).summernote('code').replace(/<[^>]*>/g, '').trim();
+				if (content) {
+					$(this).closest('.form-group').find('.note-editor').removeClass('is-invalid');
+				} else {
+					$(this).closest('.form-group').find('.note-editor').addClass('is-invalid');
+				}
+			});
+		});
 
-    requiredFields.forEach(fieldId => {
-        const field = $('#' + fieldId);
-        if (!field.val().trim()) {
-            field.addClass('is-invalid');
-            isValid = false;
-        } else {
-            field.removeClass('is-invalid');
-        }
-    });
+		function validateScenarioForm() {
+			let isValid = true;
 
-    // Validate Summernote
-    const summernoteContent = $('#description').summernote('code').replace(/<[^>]*>/g, '').trim();
-    if (!summernoteContent) {
-        $('#description').closest('.form-group').find('.note-editor').addClass('is-invalid');
-        isValid = false;
-    } else {
-        $('#description').closest('.form-group').find('.note-editor').removeClass('is-invalid');
-    }
+			// Validate required fields
+			const requiredFields = [
+				'ScenarioTitle', 'ScenarioName', 'Category', 'ScenarioType', 
+				'Mode', 'DifficultyLevel', 'Duration', 'NumberofInstance'
+			];
 
-    // Validate Labs selection
-    const selectedLabs = $('#Labs').val();
-    if (!selectedLabs || selectedLabs.length === 0) {
-        $('#Labs').closest('.form-group').find('.select2-selection').addClass('is-invalid');
-        isValid = false;
-    } else {
-        $('#Labs').closest('.form-group').find('.select2-selection').removeClass('is-invalid');
-    }
+			requiredFields.forEach(fieldId => {
+				const field = $('#' + fieldId);
+				if (!field.val().trim()) {
+					field.addClass('is-invalid');
+					isValid = false;
+				} else {
+					field.removeClass('is-invalid');
+				}
+			});
 
-    if (!isValid) {
-        // Scroll to first invalid field
-        $('html, body').animate({
-            scrollTop: $('.is-invalid:first').offset().top - 100
-        }, 500);
-        return false;
-    }
+			// Validate Labs selection
+			const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
+			const selectedLabs = $('#Labs').val();
+			
+			if (!selectedLabs || selectedLabs.length === 0) {
+				$('#Labs').closest('.form-group').find('.select2-selection').addClass('is-invalid');
+				isValid = false;
+			} else if (selectedLabs.length > instanceCount) {
+				$('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>You can only select up to ${instanceCount} lab templates.`);
+				isValid = false;
+			} else {
+				$('#Labs').closest('.form-group').find('.select2-selection').removeClass('is-invalid');
+			}
 
-    // Show loading spinner
-    $('#scenarioSpinner').removeClass('d-none');
-    $('#saveScenarioBtn').prop('disabled', true);
+			// Validate Summernote
+			const summernoteContent = $('#Description').summernote('code').replace(/<[^>]*>/g, '').trim();
+			if (!summernoteContent) {
+				$('#Description').closest('.form-group').find('.note-editor').addClass('is-invalid');
+				isValid = false;
+			} else {
+				$('#Description').closest('.form-group').find('.note-editor').removeClass('is-invalid');
+			}
 
-    return true;
-}
+			if (!isValid) {
+				// Scroll to first invalid field
+				$('html, body').animate({
+					scrollTop: $('.is-invalid:first').offset().top - 100
+				}, 500);
+				return false;
+			}
+
+			// Show loading spinner
+			$('#scenarioSpinner').removeClass('d-none');
+			$('#saveScenarioBtn').prop('disabled', true);
+
+			return true;
+		}
+		
+		
+		
+	</script>
+
+	<script th:if="${scenarioSaved}">
+	Swal.fire({
+		title: 'Scenario Saved!',
+		text: 'The scenario has been saved successfully.',
+		icon: 'success',
+		confirmButtonText: 'OK',
+		confirmButtonColor: '#3498db'
+	});
 </script>
-
-
-
 
 </body>
 </html>

@@ -48,6 +48,7 @@ import in.canaris.cloud.openstack.entity.Discover_Docker_Network;
 import in.canaris.cloud.openstack.entity.InstructionCommand;
 import in.canaris.cloud.openstack.entity.Playlist;
 import in.canaris.cloud.openstack.entity.ScenarioComments;
+import in.canaris.cloud.openstack.entity.ScenarioLabTemplate;
 import in.canaris.cloud.openstack.entity.UserLab;
 import in.canaris.cloud.openstack.entity.UserScenario;
 import in.canaris.cloud.openstack.entity.UserWiseChatBoatInstructionTemplate;
@@ -62,6 +63,7 @@ import in.canaris.cloud.repository.PlaylistsSenarioRepository;
 import in.canaris.cloud.repository.DiscoverDockerNetworkRepository;
 import in.canaris.cloud.repository.CommandHistoryRepository;
 import in.canaris.cloud.repository.ScenarioCommentsRepository;
+import in.canaris.cloud.openstack.repository.ScenarioLabTemplateRepository;
 import in.canaris.cloud.repository.UserLabRepository;
 import in.canaris.cloud.service.DockerService;
 import in.canaris.cloud.service.GuacamoleService;
@@ -117,6 +119,9 @@ public class GuacamoleController {
 
 	@Autowired
 	private DockerService dockerService;
+	
+	@Autowired
+	private ScenarioLabTemplateRepository ScenarioLabTemplateRepository;
 
 	@GetMapping("/")
 	public String home() {
@@ -1417,107 +1422,213 @@ public class GuacamoleController {
 		return "redirect:/guac/View_Scenario";
 	}
 
+//	@PostMapping("/saveScenarioData")
+//	public String saveScenarioData(@ModelAttribute("scenario") Add_Scenario scenarioObj,
+//			RedirectAttributes redirectAttributes, @RequestParam(required = false) MultipartFile cover_image,
+//			Principal principal) {
+//
+//		try {
+//			boolean isNew = (scenarioObj.getId() == 0);
+//
+//			if (principal != null) {
+//				// scenarioObj.setCreatedBy(principal.getName());
+//			}
+//
+//			String labsArray1 = scenarioObj.getLabs(); // e.g., "101~Lab A,102~Lab B"
+//
+//			// Step 1: Split by comma to get each lab entry
+//			String[] labsArray = labsArray1.split(",");
+//
+//			// Step 2: Process Labs
+//			List<String> labIds = new ArrayList<>();
+//			List<String> labNames = new ArrayList<>();
+//
+//			for (String lab : labsArray) {
+//				String[] parts = lab.split("~");
+//				if (parts.length == 2) {
+//					labIds.add(parts[0].trim());
+//					labNames.add(parts[1].trim());
+//					try {
+//						repository.updateInstanceNameAssigned(Integer.parseInt(parts[0].trim()));
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//			
+//			// here want to scenarioId,scenario_name,template_id,template_name
+//			ScenarioLabTemplateRepository.save()
+//
+////			scenarioObj.setLabId(String.join(",", labIds));
+//			scenarioObj.setLabs(String.join(",", labNames));
+//
+//			scenarioObj.setComments("");
+//
+//			if (isNew) {
+//				// Handle image for new scenario
+//				if (cover_image != null && !cover_image.isEmpty()) {
+//					String contentType = cover_image.getContentType();
+//					if (contentType != null && contentType.startsWith("image/")) {
+//						scenarioObj.setCoverImage(cover_image.getBytes());
+//					} else {
+//						redirectAttributes.addFlashAttribute("message",
+//								"Invalid file type. Please upload an image file.");
+//						redirectAttributes.addFlashAttribute("status", "error");
+//					}
+//				} else {
+//					
+//					String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
+//					try {
+//						byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
+//						scenarioObj.setCoverImage(defaultImageBytes);
+//					} catch (IOException e) {
+//						scenarioObj.setCoverImage(createPlaceholderImage());
+//					}
+//				}
+//
+//			} else {
+//				// Editing existing scenario
+//				Optional<Add_Scenario> existing = ScenarioRepository.findById(scenarioObj.getId());
+//				if (existing.isPresent()) {
+//					Add_Scenario existingScenario = existing.get();
+//
+//					if (cover_image == null || cover_image.isEmpty()) {
+//						scenarioObj.setCoverImage(existingScenario.getCoverImage());
+//					} else {
+//						String contentType = cover_image.getContentType();
+//						if (contentType != null && contentType.startsWith("image/")) {
+//							scenarioObj.setCoverImage(cover_image.getBytes());
+//						} else {
+//							redirectAttributes.addFlashAttribute("message",
+//									"Invalid file type. Please upload an image file.");
+//							redirectAttributes.addFlashAttribute("status", "error");
+//						}
+//					}
+//				}
+//			}
+//
+//			// Save scenario
+//			Add_Scenario savedScenario = ScenarioRepository.save(scenarioObj);
+//			redirectAttributes.addFlashAttribute("message", "Scenario saved successfully!");
+//			redirectAttributes.addFlashAttribute("status", "success");
+//
+//			// Redirect after save
+//			if (isNew) {
+//				return "redirect:/guac/Scenario_Details";
+//			} else {
+//				return "redirect:/guac/View_Particular_Scenerio?Id=" + savedScenario.getId();
+//			}
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			redirectAttributes.addFlashAttribute("message", "Error while saving scenario: " + e.getMessage());
+//			redirectAttributes.addFlashAttribute("status", "error");
+//			return "redirect:/guac/Scenario_Details";
+//		}
+//	}
+	
 	@PostMapping("/saveScenarioData")
 	public String saveScenarioData(@ModelAttribute("scenario") Add_Scenario scenarioObj,
-			RedirectAttributes redirectAttributes, @RequestParam(required = false) MultipartFile cover_image,
-			Principal principal) {
+	                               RedirectAttributes redirectAttributes,
+	                               @RequestParam(required = false) MultipartFile cover_image,
+	                               Principal principal) {
 
-		try {
-			boolean isNew = (scenarioObj.getId() == 0);
+	    try {
+	        boolean isNew = (scenarioObj.getId() == 0);
 
-			if (principal != null) {
-				// scenarioObj.setCreatedBy(principal.getName());
-			}
+	        // Set creator if needed
+	        if (principal != null) {
+	            // scenarioObj.setCreatedBy(principal.getName());
+	        }
 
-			String labsArray1 = scenarioObj.getLabs(); // e.g., "101~Lab A,102~Lab B"
+	        // Step 1: Parse Labs - format: "101~Lab A,102~Lab B"
+	        String labsString = scenarioObj.getLabs();
+	        String[] labsArray = labsString.split(",");
+	        List<String> labIds = new ArrayList<>();
+	        List<String> labNames = new ArrayList<>();
 
-			// Step 1: Split by comma to get each lab entry
-			String[] labsArray = labsArray1.split(",");
+	        for (String lab : labsArray) {
+	            String[] parts = lab.split("~");
+	            if (parts.length == 2) {
+	                String labId = parts[0].trim();
+	                String labName = parts[1].trim();
 
-			// Step 2: Process Labs
-			List<String> labIds = new ArrayList<>();
-			List<String> labNames = new ArrayList<>();
+	                labIds.add(labId);
+	                labNames.add(labName);
 
-			for (String lab : labsArray) {
-				String[] parts = lab.split("~");
-				if (parts.length == 2) {
-					labIds.add(parts[0].trim());
-					labNames.add(parts[1].trim());
-					try {
-						repository.updateInstanceNameAssigned(Integer.parseInt(parts[0].trim()));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
+	                try {
+	                    repository.updateInstanceNameAssigned(Integer.parseInt(labId));
+	                } catch (Exception e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	        }
 
-//			scenarioObj.setLabId(String.join(",", labIds));
-			scenarioObj.setLabs(String.join(",", labNames));
+	        // For saving readable lab names in scenarioObj
+	        scenarioObj.setLabs(String.join(",", labNames));
+	        scenarioObj.setComments("");
 
-			scenarioObj.setComments("");
+	        // Handle cover image
+	        if (cover_image != null && !cover_image.isEmpty()) {
+	            String contentType = cover_image.getContentType();
+	            if (contentType != null && contentType.startsWith("image/")) {
+	                scenarioObj.setCoverImage(cover_image.getBytes());
+	            } else {
+	                redirectAttributes.addFlashAttribute("message", "Invalid file type. Please upload an image file.");
+	                redirectAttributes.addFlashAttribute("status", "error");
+	            }
+	        } else if (isNew) {
+	            // Use default image for new scenario
+	            String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
+	            try {
+	                byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
+	                scenarioObj.setCoverImage(defaultImageBytes);
+	            } catch (IOException e) {
+	                scenarioObj.setCoverImage(createPlaceholderImage());
+	            }
+	        } else {
+	            // Use existing image for edit
+	            Optional<Add_Scenario> existing = ScenarioRepository.findById(scenarioObj.getId());
+	            existing.ifPresent(existingScenario -> {
+	                scenarioObj.setCoverImage(existingScenario.getCoverImage());
+	            });
+	        }
 
-			if (isNew) {
-				// Handle image for new scenario
-				if (cover_image != null && !cover_image.isEmpty()) {
-					String contentType = cover_image.getContentType();
-					if (contentType != null && contentType.startsWith("image/")) {
-						scenarioObj.setCoverImage(cover_image.getBytes());
-					} else {
-						redirectAttributes.addFlashAttribute("message",
-								"Invalid file type. Please upload an image file.");
-						redirectAttributes.addFlashAttribute("status", "error");
-					}
-				} else {
-					// Load default image
-					String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
-					try {
-						byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
-						scenarioObj.setCoverImage(defaultImageBytes);
-					} catch (IOException e) {
-						scenarioObj.setCoverImage(createPlaceholderImage());
-					}
-				}
+	        // Save scenario and get saved entity with ID
+	        Add_Scenario savedScenario = ScenarioRepository.save(scenarioObj);
 
-			} else {
-				// Editing existing scenario
-				Optional<Add_Scenario> existing = ScenarioRepository.findById(scenarioObj.getId());
-				if (existing.isPresent()) {
-					Add_Scenario existingScenario = existing.get();
+	        // Save lab templates into ScenarioLabTemplate table
+	        for (String lab : labsArray) {
+	            String[] parts = lab.split("~");
+	            if (parts.length == 2) {
+	                ScenarioLabTemplate labTemplate = new ScenarioLabTemplate();
+	                labTemplate.setScenarioId(savedScenario.getId());
+	                labTemplate.setScenarioName(savedScenario.getScenarioName());
+	                labTemplate.setTemplateId(Integer.parseInt(parts[0].trim()));
+	                labTemplate.setTemplateName(parts[1].trim());
 
-					if (cover_image == null || cover_image.isEmpty()) {
-						scenarioObj.setCoverImage(existingScenario.getCoverImage());
-					} else {
-						String contentType = cover_image.getContentType();
-						if (contentType != null && contentType.startsWith("image/")) {
-							scenarioObj.setCoverImage(cover_image.getBytes());
-						} else {
-							redirectAttributes.addFlashAttribute("message",
-									"Invalid file type. Please upload an image file.");
-							redirectAttributes.addFlashAttribute("status", "error");
-						}
-					}
-				}
-			}
+	                ScenarioLabTemplateRepository.save(labTemplate);
+	            }
+	        }
 
-			// Save scenario
-			Add_Scenario savedScenario = ScenarioRepository.save(scenarioObj);
-			redirectAttributes.addFlashAttribute("message", "Scenario saved successfully!");
-			redirectAttributes.addFlashAttribute("status", "success");
+	        redirectAttributes.addFlashAttribute("message", "Scenario saved successfully!");
+	        redirectAttributes.addFlashAttribute("status", "success");
 
-			// Redirect after save
-			if (isNew) {
-				return "redirect:/guac/Scenario_Details";
-			} else {
-				return "redirect:/guac/View_Particular_Scenerio?Id=" + savedScenario.getId();
-			}
+	        // Redirect based on whether it's new or edit
+	        if (isNew) {
+	            return "redirect:/guac/Scenario_Details";
+	        } else {
+	            return "redirect:/guac/View_Particular_Scenerio?Id=" + savedScenario.getId();
+	        }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			redirectAttributes.addFlashAttribute("message", "Error while saving scenario: " + e.getMessage());
-			redirectAttributes.addFlashAttribute("status", "error");
-			return "redirect:/guac/Scenario_Details";
-		}
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("message", "Error while saving scenario: " + e.getMessage());
+	        redirectAttributes.addFlashAttribute("status", "error");
+	        return "redirect:/guac/Scenario_Details";
+	    }
 	}
+
 
 	@GetMapping("/View_Scenario")
 	public ModelAndView getView_Scenario(Principal principal) {

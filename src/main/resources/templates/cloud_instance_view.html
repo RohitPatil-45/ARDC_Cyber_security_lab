@@ -229,9 +229,13 @@ keyframes pulse { 0% {
 
 
 
+
+
 %
 {
 opacity
+
+
 
 
 
@@ -249,13 +253,17 @@ opacity
 
 
 
+
 					
 
 
 
 
 
+
 0
+
+
 
 
 
@@ -272,7 +280,10 @@ transform
 
 
 
+
+
 :
+
 
 
 
@@ -285,7 +296,9 @@ transform
 
 
 
+
 scale
+
 
 
 
@@ -297,12 +310,17 @@ scale
 
 
 
+
 (
 
 
 
 
+
+
 1
+
+
 
 
 
@@ -318,7 +336,11 @@ scale
 
 
 
+
+
 )
+
+
 
 
 
@@ -345,7 +367,7 @@ td {
 }
 
 * CSS for page loader * /
-	/* ---- Page loader overlay ---- */  
+	/* ---- Page loader overlay ---- */   
 .loader-overlay {
 	position: fixed;
 	inset: 0; /* top:0 right:0 bottom:0 left:0 */
@@ -568,7 +590,7 @@ keyframes spin {to { transform:rotate(360deg);
 											<!-- 											<th class="text-center">Instance IP</th> -->
 											<th class="text-center">Cloud Instances</th>
 											<th class="text-center">Lab Template ID</th>
-											<!-- 											<th class="text-center">VM Status</th> -->
+											<th class="text-center">Sub Product Create</th>
 											<th class="text-center">Created on</th>
 											<th class="text-center">Location</th>
 											<th class="text-center">Source Image</th>
@@ -610,6 +632,8 @@ keyframes spin {to { transform:rotate(360deg);
 											<!-- 											</td> -->
 											<td>[[${obj.Id}]]</td>
 											<!-- 											<td th:text="${obj.vm_state}"></td> -->
+
+											<td>[[${obj.getSubproduct_id().getIsSourceCreated()}]] </a></td>
 											<td>[[${obj.created_on}]]</td>
 
 											<td>[[${obj.location_id.getLocation_name}]]</td>
