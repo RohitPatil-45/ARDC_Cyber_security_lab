@@ -17,9 +17,12 @@ import in.canaris.cloud.openstack.entity.Discover_Docker_Network;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -141,7 +144,7 @@ public class DockerService {
 	    } catch (Exception e) {
 	        System.err.println("Error listing Docker networks: " + e.getMessage());
 	        e.printStackTrace();
-	        return List.of(); 
+	        return null;
 	    }
 	}
 	
@@ -188,30 +191,80 @@ public class DockerService {
 	
 	public String loadImageFromTar(String filePath, String expectedImageName) {
 	    try {
+	        System.out.println("inside load image ");
 	        File imageFile = new File(filePath);
 	        if (!imageFile.exists()) {
 	            return "fail: Image file not found at " + filePath;
 	        }
 
-	        // Load the image into Docker
-	        try (InputStream inputStream = new FileInputStream(imageFile)) {
-	            dockerClient.loadImageCmd(inputStream).exec();
+	        // Detect OS
+	        String os = System.getProperty("os.name").toLowerCase();
+	        boolean isWindows = os.contains("win");
+
+	        // Build docker load command
+	        String dockerLoadCmd = String.format("docker load -i \"%s\"", filePath);
+
+	        ProcessBuilder processBuilder;
+	        if (isWindows) {
+	            processBuilder = new ProcessBuilder("cmd.exe", "/c", dockerLoadCmd);
+	        } else {
+	            processBuilder = new ProcessBuilder("/bin/sh", "-c", dockerLoadCmd);
 	        }
 
-	        
-	        boolean imageExists = dockerClient.listImagesCmd()
-	                .withImageNameFilter(expectedImageName) 
-	                .exec()
-	                .size() > 0;
+	        processBuilder.redirectErrorStream(true);
+	        Process process = processBuilder.start();
 
-	        return imageExists
-	                ? "success"
-	                : "fail";
+	        // Stream output live
+	        Thread outputThread = new Thread(() -> {
+	            try (BufferedReader reader = new BufferedReader(
+	                    new InputStreamReader(process.getInputStream()))) {
+	                String line;
+	                while ((line = reader.readLine()) != null) {
+	                    System.out.println("[docker load] " + line); // live log
+	                }
+	            } catch (IOException e) {
+	                e.printStackTrace();
+	            }
+	        });
+	        outputThread.start();
+
+	        int exitCode = process.waitFor();
+	        outputThread.join(); // wait until all logs are printed
+
+	        if (exitCode != 0) {
+	            return "fail: Docker load command failed (exit " + exitCode + ")";
+	        }
+
+	        // Verify if image exists
+	        String checkCmd = String.format("docker images -q %s", expectedImageName);
+	        ProcessBuilder checkBuilder;
+	        if (isWindows) {
+	            checkBuilder = new ProcessBuilder("cmd.exe", "/c", checkCmd);
+	        } else {
+	            checkBuilder = new ProcessBuilder("/bin/sh", "-c", checkCmd);
+	        }
+
+	        checkBuilder.redirectErrorStream(true);
+	        Process checkProcess = checkBuilder.start();
+
+	        String imageId = null;
+	        try (BufferedReader checkReader = new BufferedReader(
+	                new InputStreamReader(checkProcess.getInputStream()))) {
+	            imageId = checkReader.readLine();
+	        }
+
+	        int checkExit = checkProcess.waitFor();
+	        if (checkExit == 0 && imageId != null && !imageId.isEmpty()) {
+	            return "success";
+	        } else {
+	            return "fail";
+	        }
 
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        return "fail";
 	    }
 	}
+
 
 }

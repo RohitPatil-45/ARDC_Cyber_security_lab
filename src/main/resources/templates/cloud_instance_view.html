@@ -225,12 +225,6 @@ keyframes pulse { 0% {
 }
 
 100
-
-
-
-
-
-
 %
 {
 opacity
@@ -246,7 +240,10 @@ opacity
 
 
 
+
+
 :
+
 
 
 
@@ -261,13 +258,8 @@ opacity
 
 
 
+
 0
-
-
-
-
-
-
 ;
 transform
 
@@ -282,7 +274,10 @@ transform
 
 
 
+
+
 :
+
 
 
 
@@ -297,7 +292,9 @@ transform
 
 
 
+
 scale
+
 
 
 
@@ -311,20 +308,9 @@ scale
 
 
 
+
 (
-
-
-
-
-
-
 1
-
-
-
-
-
-
 .1
 
 
@@ -338,13 +324,9 @@ scale
 
 
 
+
+
 )
-
-
-
-
-
-
 ;
 }
 }
@@ -366,8 +348,10 @@ td {
 	color: #fff;
 }
 
-* CSS for page loader * /
-	/* ---- Page loader overlay ---- */   
+
+
+/* CSS for page loader */
+/* ---- Page loader overlay ---- */
 .loader-overlay {
 	position: fixed;
 	inset: 0; /* top:0 right:0 bottom:0 left:0 */
@@ -420,6 +404,7 @@ keyframes spin {to { transform:rotate(360deg);
 	display: grid;
 	place-items: center;
 }
+
 </style>
 </head>
 
@@ -432,6 +417,16 @@ keyframes spin {to { transform:rotate(360deg);
 		<!-- Sidebar -->
 		<div th:replace="fragments/sidebar :: aside"></div>
 		<!-- Close Sidebar -->
+
+		<!-- Page Loader -->
+		<div id="pageLoader" class="loader-overlay" role="status"
+			aria-live="polite" style="display: none" aria-label="Page loading">
+			<div>
+				<div class="spinner" aria-hidden="true"></div>
+				<div class="loader-text">Loading…</div>
+			</div>
+		</div>
+		<!-- End Page Loader -->
 
 		<div class="content-wrapper">
 
@@ -587,7 +582,7 @@ keyframes spin {to { transform:rotate(360deg);
 											<th class="text-center"></th>
 											<th class="text-center">Virtualization Type</th>
 											<th class="text-center">Group</th>
-											<!-- 											<th class="text-center">Instance IP</th> -->
+											<th class="text-center">Template</th>
 											<th class="text-center">Cloud Instances</th>
 											<th class="text-center">Lab Template ID</th>
 											<th class="text-center">Sub Product Create</th>
@@ -606,6 +601,7 @@ keyframes spin {to { transform:rotate(360deg);
 											</td>
 
 											<td>[[${obj.groupName}]]</td>
+											<td>[[${obj.instance_name}]]</td>
 											<td><span class="glow-span"
 												th:if="${obj.instance_ip != null}"
 												style="background-color: #f1faff; cursor: pointer">[[${obj.instance_ip}]]</span>
@@ -693,15 +689,7 @@ keyframes spin {to { transform:rotate(360deg);
 		</div>
 	</div>
 
-	<!-- Page Loader -->
-	<div id="pageLoader" class="loader-overlay" role="status"
-		aria-live="polite" style="display: none" aria-label="Page loading">
-		<div>
-			<div class="spinner" aria-hidden="true"></div>
-			<div class="loader-text">Loading…</div>
-		</div>
-	</div>
-	<!-- End Page Loader -->
+
 
 	<!-- Footer -->
 	<div th:replace="fragments/footer :: footer"></div>

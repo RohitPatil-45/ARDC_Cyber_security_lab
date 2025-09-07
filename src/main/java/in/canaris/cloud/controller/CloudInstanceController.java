@@ -3446,16 +3446,13 @@ public class CloudInstanceController {
 
 	// Docker Container
 	@PostMapping("/docker")
-	public @ResponseBody String docker(@RequestParam("scenarioId") String scenarioId, @RequestParam("noOfInstances") int noOfInstances,
-			@RequestParam("scenarioName") String scenarioName, Principal principal) {
+	public @ResponseBody String docker(@RequestParam("scenarioId") String scenarioId, Principal principal) {
 		System.out.println("Inside_Docker_Method :::: ");
 		System.out.println("scenarioId :::: " + scenarioId);
-		System.out.println("scenarioName :::: " + scenarioName);
-		System.out.println("noOfInstances :::: " + noOfInstances);
 		String result = null;
 		Map<Integer, Integer> portMappings = null;
 		
-		String network = "guac-network";
+		String network = null;
 		Integer newVncPort;
 		Integer newNoVncPort;
 		
@@ -3476,12 +3473,14 @@ public class CloudInstanceController {
 				String filePath = instance.getSubproduct_id().getIso_file_path();
 				File file = new File(filePath);
 				String imageName = file.getName().replaceFirst("[.][^.]+$", "");
-		
+				
 				portMappings = new HashMap<>();
 				newVncPort = portDetailsRepository.findMaxVncPorts() + 1;
 				newNoVncPort = portDetailsRepository.findMaxnoVncPort() + 1;
 				portMappings.put(newVncPort, 5901);
 				portMappings.put(newNoVncPort, 8080);
+				
+				network = instance.getDocker_network_name();
 
 				Integer maxLabId1 = userLabRepository.findMaxLabId();
 
@@ -3508,13 +3507,14 @@ public class CloudInstanceController {
 									"kalilinux", scenarioId);
 
 							insertUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName, username);
+							insertUserScenerio(scenarioId, temp.getScenarioName(), username);
 						}
 
 					}
 				}
 			}
 
-			insertUserScenerio(scenarioId, scenarioName, username);
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();

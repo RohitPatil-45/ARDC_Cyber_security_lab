@@ -48,7 +48,7 @@ public class AdditionalStorage implements Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "instance_id", nullable = false)
-	@OnDelete(action = OnDeleteAction.CASCADE)
+	@OnDelete(action = OnDeleteAction.NO_ACTION)
 	@JsonIgnore
 	private CloudInstance instance_id;
 

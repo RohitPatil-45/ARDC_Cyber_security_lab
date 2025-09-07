@@ -715,10 +715,7 @@ function createDockerContainer() {
 		type: "POST",
 		url : '/cloud_instance/docker',
 		data : {
-			"noOfInstances" : noofinstance,
 			"scenarioId" : scenarioId,
-			"scenarioName" : scenarioName
-			
 		},
 		success : function(result) {
 			
