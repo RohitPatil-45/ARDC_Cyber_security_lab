@@ -1,8 +1,10 @@
 package in.canaris.cloud.controller;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -22,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 
+import org.glassfish.jersey.internal.inject.ParamConverters.TypeValueOf;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import in.canaris.cloud.entity.AppUser;
 import in.canaris.cloud.entity.CloudInstance;
@@ -119,7 +125,7 @@ public class GuacamoleController {
 
 	@Autowired
 	private DockerService dockerService;
-	
+
 	@Autowired
 	private ScenarioLabTemplateRepository ScenarioLabTemplateRepository;
 
@@ -163,6 +169,115 @@ public class GuacamoleController {
 		List<String> ipAddresses = UserLabRepository.getPhysicalServerIPs();
 		model.addAttribute("ipaddress", ipAddresses);
 		return "Add_Docker";
+	}
+
+//	@GetMapping("/Create_docker_network")
+//	public String Create_docker_network(Model model) {
+//		List<String> ipAddresses = UserLabRepository.getPhysicalServerIPs();
+//		model.addAttribute("ipaddress", ipAddresses);
+//		return "Create_docker_network";
+//	}
+
+	@GetMapping("/Create_docker_network")
+	public ModelAndView Create_docker_network(RedirectAttributes redirectAttributes) {
+		ModelAndView mav = new ModelAndView("Create_docker_network");
+		List<Discover_Docker_Network> instances = null;
+		instances = DiscoverDockerNetworkRepository.findByDriver();
+		mav.addObject("pageTitle", "Create New Docker Network");
+		mav.addObject("instanceNameList", instances);
+		mav.addObject("dockerNetwork", new Discover_Docker_Network());
+
+		return mav;
+	}
+
+//	@PostMapping("/saveDockerNetwork")
+//	public String saveDockerNetwork(@ModelAttribute("dockerNetwork") Discover_Docker_Network dockerNetwork,
+//			RedirectAttributes redirectAttributes) {
+//
+//		DiscoverDockerNetworkRepository.save(dockerNetwork);
+//
+//		// Optionally, add a flash message
+//		redirectAttributes.addFlashAttribute("successMessage", "Docker Network created successfully!");
+//
+//		// Redirect to a confirmation page or back to the form
+//		return "redirect:/Create_docker_network";
+//	}
+
+	@PostMapping("/saveDockerNetwork")
+	public String saveDockerNetwork(@ModelAttribute("dockerNetwork") Discover_Docker_Network dockerNetwork,
+			RedirectAttributes redirectAttributes) {
+
+		try {
+			// STEP 1: Build Docker command
+			String networkName = dockerNetwork.getName();
+			String driver = dockerNetwork.getDriver();
+			String subnet = "192.168.100.0/24"; // Example static subnet — you can also make it a form field
+			String gateway = dockerNetwork.getGateway();
+			String ipRange = dockerNetwork.getStartIp() + "/28"; // Or use a separate field if needed
+			String auxAddress = "excluded1=" + dockerNetwork.getEndIp();
+
+			List<String> command = List.of("docker", "network", "create", "--driver", driver, "--subnet", subnet,
+					"--gateway", gateway, "--ip-range", ipRange, "--aux-address=" + auxAddress, networkName);
+
+			// STEP 2: Execute the create command
+			ProcessBuilder pbCreate = new ProcessBuilder(command);
+			Process processCreate = pbCreate.start();
+			int exitCodeCreate = processCreate.waitFor();
+
+			if (exitCodeCreate != 0) {
+				redirectAttributes.addFlashAttribute("errorMessage", "Docker network creation failed.");
+				return "redirect:/guac/Create_docker_network";
+			}
+
+			// STEP 3: Get the network ID from stdout
+			String networkId;
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(processCreate.getInputStream()))) {
+				networkId = reader.readLine();
+			}
+
+			// STEP 4: Inspect the network
+			ProcessBuilder pbInspect = new ProcessBuilder("docker", "network", "inspect", networkId);
+			Process processInspect = pbInspect.start();
+			int exitCodeInspect = processInspect.waitFor();
+
+			if (exitCodeInspect != 0) {
+				redirectAttributes.addFlashAttribute("errorMessage", "Docker network inspect failed.");
+				return "redirect:/guac/Create_docker_network";
+			}
+
+			// STEP 5: Parse inspect output
+			StringBuilder inspectOutput = new StringBuilder();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(processInspect.getInputStream()))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					inspectOutput.append(line);
+				}
+			}
+
+			// Parse JSON
+			ObjectMapper objectMapper = new ObjectMapper();
+			JsonNode root = objectMapper.readTree(inspectOutput.toString());
+			JsonNode networkInfo = root.get(0);
+
+			String scope = networkInfo.get("Scope").asText();
+			String id = networkInfo.get("Id").asText();
+
+			// STEP 6: Set fields in entity and save
+			dockerNetwork.setScope(scope);
+			dockerNetwork.setNetworkId(id); // Assuming this field is `networkId` in entity
+
+			DiscoverDockerNetworkRepository.save(dockerNetwork);
+
+			redirectAttributes.addFlashAttribute("successMessage", "Docker Network created successfully!");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("errorMessage", "Unexpected error occurred: " + e.getMessage());
+		}
+
+//	    return "redirect:/guac/Create_docker_network";
+
+		return "redirect:/guac/Create_docker_network";
 	}
 
 	@GetMapping("/View_DockerListing")
@@ -1256,127 +1371,15 @@ public class GuacamoleController {
 		return mav;
 	}
 
-//	@GetMapping("/Scenario_Details")
-//	public ModelAndView Scenario_Details(Principal principal) {
-//		Authentication authentication = (Authentication) principal;
-//		User loginedUser = (User) ((Authentication) principal).getPrincipal();
-//		List<CloudInstance> instances = null;
-//		String userName = loginedUser.getUsername();
-//		String groupName = "";
-//		List<AppUser> user1 = userRepository.findByuserName(loginedUser.getUsername());
-//		boolean isSuperAdmin = authentication.getAuthorities().stream()
-//				.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
-//
-//		boolean isAdmin = authentication.getAuthorities().stream()
-//				.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-//		ModelAndView mav = new ModelAndView("Add_Scenario");
-//		mav.addObject("pageTitle", "Report");
-//		mav.addObject("scenario", new Add_Scenario()); // Add this line
-//
-//		if (isSuperAdmin) {
-//			instances = repository.getInstanceNameNotAssigned();
-//			mav.addObject("instanceNameList", instances);
-//		} else {
-//			for (AppUser appUser : user1) {
-//				groupName = appUser.getGroupName();
-//			}
-//			List<String> groups = new ArrayList<>();
-//			StringTokenizer token = new StringTokenizer(groupName, ",");
-//			while (token.hasMoreTokens()) {
-//				groups.add(token.nextToken());
-//			}
-//
-//			instances = repository.getInstanceNameNotAssigned();
-//			mav.addObject("instanceNameList", instances);
-//		}
-//
-//		return mav;
-//	}
-
-//	@PostMapping("/saveScenarioData")
-//	public String saveScenarioData(@ModelAttribute("scenario") Add_Scenario scenarioObj,
-//			RedirectAttributes redirectAttributes, @RequestParam(required = false) MultipartFile cover_image,
-//			@RequestParam("Labs") String[] labsArray, // Changed parameter name
-//			Principal principal) {
-//
-//		ModelAndView mav = new ModelAndView("redirect:/Scenario_Details");
-//
-//		try {
-//			// Set created by if needed
-//			if (principal != null) {
-//				// If you have a createdBy field in your entity
-//				// scenarioObj.setCreatedBy(principal.getName());
-//			}
-//
-//			// Process multiple selected labs
-//			List<String> labIds = new ArrayList<>();
-//			List<String> labNames = new ArrayList<>();
-//
-//			for (String lab : labsArray) {
-//				String[] parts = lab.split("~");
-//				if (parts.length == 2) {
-//					labIds.add(parts[0]);
-//					labNames.add(parts[1]);
-//					System.out.println("Selected lab: ID=" + parts[0] + ", Name=" + parts[1]);
-//
-//					// Update instance assigned count for each lab
-//					try {
-//						repository.updateInstanceNameAssigned(Integer.valueOf(parts[0]));
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//
-//			// Save all labs as comma-separated values
-//			scenarioObj.setLabs(String.join(",", labNames));
-//			scenarioObj.setLabId(String.join(",", labIds));
-//			scenarioObj.setComments("");
-//
-//			// Handle image
-//			if (cover_image != null && !cover_image.isEmpty()) {
-//				String contentType = cover_image.getContentType();
-//				if (contentType != null && contentType.startsWith("image/")) {
-//					scenarioObj.setCoverImage(cover_image.getBytes());
-//				} else {
-//					redirectAttributes.addFlashAttribute("message", "Invalid file type. Please upload an image file.");
-//					redirectAttributes.addFlashAttribute("status", "error");
-////					return mav;
-//				}
-//			} else {
-//				// Load default image
-//				String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
-//				try {
-//					byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
-//					scenarioObj.setCoverImage(defaultImageBytes);
-//				} catch (IOException e) {
-//					scenarioObj.setCoverImage(createPlaceholderImage());
-//				}
-//			}
-//
-//			// Save scenario
-//			ScenarioRepository.save(scenarioObj);
-//
-//			redirectAttributes.addFlashAttribute("message", "Scenario saved successfully!");
-//			redirectAttributes.addFlashAttribute("status", "success");
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			redirectAttributes.addFlashAttribute("message", "Error while saving scenario: " + e.getMessage());
-//			redirectAttributes.addFlashAttribute("status", "error");
-//		}
-//
-//		return "redirect:/guac/Scenario_Details";
-//	}
-
 	@GetMapping("/Scenario_Details")
-	public ModelAndView showScenario_Details() {
+	public ModelAndView showScenario_Details(RedirectAttributes redirectAttributes) {
 		ModelAndView mav = new ModelAndView("Add_Scenario");
 		List<CloudInstance> instances = null;
 		instances = repository.getInstanceNameNotAssigned();
 		mav.addObject("pageTitle", "Create New Scenario");
 		mav.addObject("instanceNameList", instances);
 		mav.addObject("scenario", new Add_Scenario());
+
 		return mav;
 	}
 
@@ -1422,213 +1425,108 @@ public class GuacamoleController {
 		return "redirect:/guac/View_Scenario";
 	}
 
-//	@PostMapping("/saveScenarioData")
-//	public String saveScenarioData(@ModelAttribute("scenario") Add_Scenario scenarioObj,
-//			RedirectAttributes redirectAttributes, @RequestParam(required = false) MultipartFile cover_image,
-//			Principal principal) {
-//
-//		try {
-//			boolean isNew = (scenarioObj.getId() == 0);
-//
-//			if (principal != null) {
-//				// scenarioObj.setCreatedBy(principal.getName());
-//			}
-//
-//			String labsArray1 = scenarioObj.getLabs(); // e.g., "101~Lab A,102~Lab B"
-//
-//			// Step 1: Split by comma to get each lab entry
-//			String[] labsArray = labsArray1.split(",");
-//
-//			// Step 2: Process Labs
-//			List<String> labIds = new ArrayList<>();
-//			List<String> labNames = new ArrayList<>();
-//
-//			for (String lab : labsArray) {
-//				String[] parts = lab.split("~");
-//				if (parts.length == 2) {
-//					labIds.add(parts[0].trim());
-//					labNames.add(parts[1].trim());
-//					try {
-//						repository.updateInstanceNameAssigned(Integer.parseInt(parts[0].trim()));
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//			
-//			// here want to scenarioId,scenario_name,template_id,template_name
-//			ScenarioLabTemplateRepository.save()
-//
-////			scenarioObj.setLabId(String.join(",", labIds));
-//			scenarioObj.setLabs(String.join(",", labNames));
-//
-//			scenarioObj.setComments("");
-//
-//			if (isNew) {
-//				// Handle image for new scenario
-//				if (cover_image != null && !cover_image.isEmpty()) {
-//					String contentType = cover_image.getContentType();
-//					if (contentType != null && contentType.startsWith("image/")) {
-//						scenarioObj.setCoverImage(cover_image.getBytes());
-//					} else {
-//						redirectAttributes.addFlashAttribute("message",
-//								"Invalid file type. Please upload an image file.");
-//						redirectAttributes.addFlashAttribute("status", "error");
-//					}
-//				} else {
-//					
-//					String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
-//					try {
-//						byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
-//						scenarioObj.setCoverImage(defaultImageBytes);
-//					} catch (IOException e) {
-//						scenarioObj.setCoverImage(createPlaceholderImage());
-//					}
-//				}
-//
-//			} else {
-//				// Editing existing scenario
-//				Optional<Add_Scenario> existing = ScenarioRepository.findById(scenarioObj.getId());
-//				if (existing.isPresent()) {
-//					Add_Scenario existingScenario = existing.get();
-//
-//					if (cover_image == null || cover_image.isEmpty()) {
-//						scenarioObj.setCoverImage(existingScenario.getCoverImage());
-//					} else {
-//						String contentType = cover_image.getContentType();
-//						if (contentType != null && contentType.startsWith("image/")) {
-//							scenarioObj.setCoverImage(cover_image.getBytes());
-//						} else {
-//							redirectAttributes.addFlashAttribute("message",
-//									"Invalid file type. Please upload an image file.");
-//							redirectAttributes.addFlashAttribute("status", "error");
-//						}
-//					}
-//				}
-//			}
-//
-//			// Save scenario
-//			Add_Scenario savedScenario = ScenarioRepository.save(scenarioObj);
-//			redirectAttributes.addFlashAttribute("message", "Scenario saved successfully!");
-//			redirectAttributes.addFlashAttribute("status", "success");
-//
-//			// Redirect after save
-//			if (isNew) {
-//				return "redirect:/guac/Scenario_Details";
-//			} else {
-//				return "redirect:/guac/View_Particular_Scenerio?Id=" + savedScenario.getId();
-//			}
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			redirectAttributes.addFlashAttribute("message", "Error while saving scenario: " + e.getMessage());
-//			redirectAttributes.addFlashAttribute("status", "error");
-//			return "redirect:/guac/Scenario_Details";
-//		}
-//	}
-	
 	@PostMapping("/saveScenarioData")
 	public String saveScenarioData(@ModelAttribute("scenario") Add_Scenario scenarioObj,
-	                               RedirectAttributes redirectAttributes,
-	                               @RequestParam(required = false) MultipartFile cover_image,
-	                               Principal principal) {
+			RedirectAttributes redirectAttributes, @RequestParam(required = false) MultipartFile cover_image,
+			Principal principal) {
 
-	    try {
-	        boolean isNew = (scenarioObj.getId() == 0);
+		try {
+			boolean isNew = (scenarioObj.getId() == 0);
 
-	        // Set creator if needed
-	        if (principal != null) {
-	            // scenarioObj.setCreatedBy(principal.getName());
-	        }
+			// Set creator if needed
+			if (principal != null) {
+				// scenarioObj.setCreatedBy(principal.getName());
+			}
 
-	        // Step 1: Parse Labs - format: "101~Lab A,102~Lab B"
-	        String labsString = scenarioObj.getLabs();
-	        String[] labsArray = labsString.split(",");
-	        List<String> labIds = new ArrayList<>();
-	        List<String> labNames = new ArrayList<>();
+			// Step 1: Parse Labs - format: "101~Lab A,102~Lab B"
+			String labsString = scenarioObj.getLabs();
+			String[] labsArray = labsString.split(",");
+			List<String> labIds = new ArrayList<>();
+			List<String> labNames = new ArrayList<>();
 
-	        for (String lab : labsArray) {
-	            String[] parts = lab.split("~");
-	            if (parts.length == 2) {
-	                String labId = parts[0].trim();
-	                String labName = parts[1].trim();
+			for (String lab : labsArray) {
+				String[] parts = lab.split("~");
+				if (parts.length == 2) {
+					String labId = parts[0].trim();
+					String labName = parts[1].trim();
 
-	                labIds.add(labId);
-	                labNames.add(labName);
+					labIds.add(labId);
+					labNames.add(labName);
 
-	                try {
-	                    repository.updateInstanceNameAssigned(Integer.parseInt(labId));
-	                } catch (Exception e) {
-	                    e.printStackTrace();
-	                }
-	            }
-	        }
+					try {
+						repository.updateInstanceNameAssigned(Integer.parseInt(labId));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
 
-	        // For saving readable lab names in scenarioObj
-	        scenarioObj.setLabs(String.join(",", labNames));
-	        scenarioObj.setComments("");
+			// For saving readable lab names in scenarioObj
+			scenarioObj.setLabs(String.join(",", labNames));
+			scenarioObj.setComments("");
 
-	        // Handle cover image
-	        if (cover_image != null && !cover_image.isEmpty()) {
-	            String contentType = cover_image.getContentType();
-	            if (contentType != null && contentType.startsWith("image/")) {
-	                scenarioObj.setCoverImage(cover_image.getBytes());
-	            } else {
-	                redirectAttributes.addFlashAttribute("message", "Invalid file type. Please upload an image file.");
-	                redirectAttributes.addFlashAttribute("status", "error");
-	            }
-	        } else if (isNew) {
-	            // Use default image for new scenario
-	            String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
-	            try {
-	                byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
-	                scenarioObj.setCoverImage(defaultImageBytes);
-	            } catch (IOException e) {
-	                scenarioObj.setCoverImage(createPlaceholderImage());
-	            }
-	        } else {
-	            // Use existing image for edit
-	            Optional<Add_Scenario> existing = ScenarioRepository.findById(scenarioObj.getId());
-	            existing.ifPresent(existingScenario -> {
-	                scenarioObj.setCoverImage(existingScenario.getCoverImage());
-	            });
-	        }
+			// Handle cover image
+			if (cover_image != null && !cover_image.isEmpty()) {
+				String contentType = cover_image.getContentType();
+				if (contentType != null && contentType.startsWith("image/")) {
+					scenarioObj.setCoverImage(cover_image.getBytes());
+				} else {
+					redirectAttributes.addFlashAttribute("message", "Invalid file type. Please upload an image file.");
+					redirectAttributes.addFlashAttribute("status", "error");
+				}
+			} else if (isNew) {
+				// Use default image for new scenario
+				String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
+				try {
+					byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
+					scenarioObj.setCoverImage(defaultImageBytes);
+				} catch (IOException e) {
+					scenarioObj.setCoverImage(createPlaceholderImage());
+				}
+			} else {
+				// Use existing image for edit
+				Optional<Add_Scenario> existing = ScenarioRepository.findById(scenarioObj.getId());
+				existing.ifPresent(existingScenario -> {
+					scenarioObj.setCoverImage(existingScenario.getCoverImage());
+				});
+			}
 
-	        // Save scenario and get saved entity with ID
-	        Add_Scenario savedScenario = ScenarioRepository.save(scenarioObj);
+			// Save scenario and get saved entity with ID
+			Add_Scenario savedScenario = ScenarioRepository.save(scenarioObj);
 
-	        // Save lab templates into ScenarioLabTemplate table
-	        for (String lab : labsArray) {
-	            String[] parts = lab.split("~");
-	            if (parts.length == 2) {
-	                ScenarioLabTemplate labTemplate = new ScenarioLabTemplate();
-	                labTemplate.setScenarioId(savedScenario.getId());
-	                labTemplate.setScenarioName(savedScenario.getScenarioName());
-	                labTemplate.setTemplateId(Integer.parseInt(parts[0].trim()));
-	                labTemplate.setTemplateName(parts[1].trim());
+			// Save lab templates into ScenarioLabTemplate table
+			for (String lab : labsArray) {
+				String[] parts = lab.split("~");
+				if (parts.length == 2) {
+					ScenarioLabTemplate labTemplate = new ScenarioLabTemplate();
+					labTemplate.setScenarioId(savedScenario.getId());
+					labTemplate.setScenarioName(savedScenario.getScenarioName());
+					labTemplate.setTemplateId(Integer.parseInt(parts[0].trim()));
+					labTemplate.setTemplateName(parts[1].trim());
 
-	                ScenarioLabTemplateRepository.save(labTemplate);
-	            }
-	        }
+					ScenarioLabTemplateRepository.save(labTemplate);
+				}
+			}
 
-	        redirectAttributes.addFlashAttribute("message", "Scenario saved successfully!");
-	        redirectAttributes.addFlashAttribute("status", "success");
+			redirectAttributes.addFlashAttribute("message", "Scenario saved successfully!");
+			redirectAttributes.addFlashAttribute("status", "success");
 
-	        // Redirect based on whether it's new or edit
-	        if (isNew) {
-	            return "redirect:/guac/Scenario_Details";
-	        } else {
-	            return "redirect:/guac/View_Particular_Scenerio?Id=" + savedScenario.getId();
-	        }
+			redirectAttributes.addFlashAttribute("result", "success");
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        redirectAttributes.addFlashAttribute("message", "Error while saving scenario: " + e.getMessage());
-	        redirectAttributes.addFlashAttribute("status", "error");
-	        return "redirect:/guac/Scenario_Details";
-	    }
+			// Redirect based on whether it's new or edit
+			if (isNew) {
+				return "redirect:/guac/Scenario_Details";
+			} else {
+				return "redirect:/guac/View_Particular_Scenerio?Id=" + savedScenario.getId();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("message", "Error while saving scenario: " + e.getMessage());
+			redirectAttributes.addFlashAttribute("status", "error");
+			return "redirect:/guac/Scenario_Details";
+		}
 	}
-
 
 	@GetMapping("/View_Scenario")
 	public ModelAndView getView_Scenario(Principal principal) {
@@ -2121,17 +2019,111 @@ public class GuacamoleController {
 	@PostMapping("/savediscoverdokcerIpaddress")
 	public String savediscoverdokcerIpaddress(@RequestParam("selectedIp") String selectedIp,
 			RedirectAttributes redirectAttributes) {
+		try {
+			dockerService.discoverAndSaveDockerNetworks(selectedIp);
+			redirectAttributes.addFlashAttribute("result", "success");
 
-		System.out.println("Selected IP: " + selectedIp);
-
-		// Discover and save Docker networks to DB
-		dockerService.discoverAndSaveDockerNetworks(selectedIp);
-
-		// Optional: fetch again to display in UI
-		List<String> networks = dockerService.listDockerNetworks();
-		redirectAttributes.addFlashAttribute("networks", networks);
+		} catch (org.springframework.dao.DataIntegrityViolationException ex) {
+			redirectAttributes.addFlashAttribute("result", "Duplicate network entry. This network already exists.");
+		} catch (Exception ex) {
+			redirectAttributes.addFlashAttribute("result", "An unexpected error occurred: " + ex.getMessage());
+		}
 
 		return "redirect:/guac/Add_Docker";
 	}
+
+	@PostMapping("/checkLabCompletion")
+	@ResponseBody
+	public String checkLabCompletion(@RequestParam("labId") String labId) {
+	    try {
+	        int num = Integer.parseInt(labId);
+
+	        System.out.println("Lab ID: " + num);
+	        List<UserLab> userLabs = UserLabRepository.findByguacamoleId(num);
+	        
+	        if (userLabs != null && !userLabs.isEmpty()) {
+	         
+	            for (UserLab lab : userLabs) {
+	                System.out.println("Lab ID: " + lab.getLabId() + ", Status: " + lab.getStatus());
+	            }
+	            
+	            boolean isCompleted = userLabs.stream()
+	                .anyMatch(lab -> "Completed".equalsIgnoreCase(lab.getStatus()));
+
+	            if (isCompleted) {
+	                return "success";
+	            } else {
+	                return "fail";
+	            }
+	        } else {
+	            System.out.println("No UserLab records found for labId: " + num);
+	            return "fail";
+	        }
+	    } catch (NumberFormatException e) {
+	        System.out.println("Invalid labId format: " + labId);
+	        return "fail";
+	    } catch (Exception ex) {
+	        System.out.println("Error checking lab completion: " + ex.getMessage());
+	        return "fail";
+	    }
+	}
+
+
+
+	
+	
+	@PostMapping("/getCompletedCommands")
+	@ResponseBody
+	public Map<String, Object> getCompletedCommands(@RequestParam String labId) {
+	    Map<String, Object> response = new HashMap<>();
+
+	    try {
+	        int guacamoleId = Integer.parseInt(labId);
+
+	        // Find UserLab by guacamoleId
+	        List<UserLab> labDetails = UserLabRepository.findByguacamoleId(guacamoleId);
+
+	        if (!labDetails.isEmpty()) {
+	            UserLab userLab = labDetails.get(0);
+	            String labName = userLab.getInstanceName();
+
+	            // Find all executed commands for this lab name
+	            List<UserWiseChatBoatInstructionTemplate> executedCommands =
+	                    instructionTemplateRepository.findExecutedByLabName(labName);
+
+	            if (!executedCommands.isEmpty()) {
+	                // Map commands to a list of simplified objects for frontend
+	                List<Map<String, String>> commandsList = new ArrayList<>();
+
+	                for (UserWiseChatBoatInstructionTemplate cmd : executedCommands) {
+	                    Map<String, String> cmdMap = new HashMap<>();
+	                    byte[] instructionBytes = cmd.getInstructionDetails();
+	                    String instruction = new String(instructionBytes, StandardCharsets.UTF_8);
+
+	                    cmdMap.put("instruction", instruction);
+	                    cmdMap.put("command", cmd.getInstructionCommand());
+	                    commandsList.add(cmdMap);
+	                }
+
+	                response.put("success", true);
+	                response.put("completedCommands", commandsList);
+	            } else {
+	                response.put("success", true);
+	                response.put("completedCommands", Collections.emptyList());
+	            }
+	        } else {
+	            response.put("success", false);
+	            response.put("error", "Lab not found.");
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        response.put("success", false);
+	        response.put("error", "Failed to process command.");
+	    }
+
+	    return response;
+	}
+
 
 }

@@ -16,6 +16,13 @@ public interface DiscoverDockerNetworkRepository extends JpaRepository<Discover_
 
 
 
+	@Query(value = "SELECT d FROM Discover_Docker_Network d")
+	List<Discover_Docker_Network> findByDriver();
+
+
+	
+
+	
 
 
 }

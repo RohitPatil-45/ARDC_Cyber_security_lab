@@ -392,6 +392,7 @@ body {
 			ActionforLAbOnload(currentLabId);
 			continueActionforLAbOnload(currentLabId);
 			ConnectionDetails(currentLabId); // Call ConnectionDetails on page load
+			 checkLabCompletionStatus(currentLabId); // Check if lab is already completed
 		}
 		
 		// Set up event handler for continue button
@@ -738,6 +739,132 @@ body {
 	    });
 	}
 	
+	
+// 	function checkLabCompletionStatus(labId) {
+// 	    // Check localStorage for completion status
+// 	    if (localStorage.getItem(`labCompleted_${labId}`) === 'true') {
+// 	        $('#continue-button')
+// 	            .prop('disabled', true)
+// 	            .text("Completed");
+// 	    }
+// 	}
+	
+	function checkLabCompletionStatus(labId) {
+		
+    $.ajax({
+        type: "POST",
+        url: "/guac/checkLabCompletion",
+        data: { labId: labId },
+        success: function(response) {
+        	
+            if (response==="success") {
+                // If lab is already completed, disable the button
+                $('#continue-button')
+                    .prop('disabled', true)
+                    .text("Completed");
+                
+                // Load completed commands history
+                loadCompletedCommandsHistory(labId);
+            }
+        },
+        error: function() {
+            console.error('Failed to check lab completion status');
+            
+            // Fallback to localStorage check
+            if (localStorage.getItem(`labCompleted_${labId}`) === 'true') {
+                $('#continue-button')
+                    .prop('disabled', true)
+                    .text("Completed");
+                
+                // Try to load completed commands
+                loadCompletedCommandsHistory(labId);
+            }
+        }
+    });
+}
+	
+	
+	function loadCompletedCommandsHistory(labId) {
+	    $.ajax({
+	        type: "POST",
+	        url: "/guac/getCompletedCommands",  
+	        data: { labId: labId },
+	        success: function(response) {
+	            if (response && response.completedCommands && response.completedCommands.length > 0) {
+	                $('#chat-messages').empty();
+
+	                response.completedCommands.forEach(cmd => {
+	                    const completedCommandHtml = $(`
+	                        <div class="message incoming">
+	                           
+	                            <div class="message-content">${cmd.instruction || ''}</div>
+	                            <div class="message-content"><strong>${cmd.command || ''}</strong></div>
+	                            <div class="message-time">Completed</div>
+	                        </div>
+	                    `);
+	                    $('#chat-messages').append(completedCommandHtml);
+	                });
+
+	                const completionHtml = $(`
+	                    <div class="message incoming">
+	                       
+	                        <div class="message-content" style="color: #4ade80; font-weight: bold;">
+	                            <i class="fas fa-check-circle"></i> All lab instructions completed!
+	                        </div>
+	                       
+	                    </div>
+	                `);
+	                $('#chat-messages').append(completionHtml);
+
+	                // Auto-scroll to bottom
+	                const chatMessages = $('#chat-messages');
+	                chatMessages.scrollTop(chatMessages.prop("scrollHeight"));
+	            } else {
+	                $('#chat-messages').empty();
+	                $('#chat-messages').append('<div>No completed commands found.</div>');
+	            }
+	        },
+	        error: function() {
+	            console.error('Failed to load completed commands history');
+
+	            // Optional fallback to localStorage (your original logic)
+	            const completedCommandsStr = localStorage.getItem(`completedCommands_${labId}`);
+	            if (completedCommandsStr) {
+	                try {
+	                    const completedCommands = JSON.parse(completedCommandsStr);
+	                    $('#chat-messages').empty();
+	                    completedCommands.forEach(cmd => {
+	                        const completedCommandHtml = $(`
+	                            <div class="message incoming">
+	                                
+	                                <div class="message-content">${cmd.instruction || ''}</div>
+	                                <div class="message-content"><strong>${cmd.command || ''}</strong></div>
+	                                <div class="message-time">Completed</div>
+	                            </div>
+	                        `);
+	                        $('#chat-messages').append(completedCommandHtml);
+	                    });
+	                    // Completion message
+	                    $('#chat-messages').append(`
+	                        <div class="message incoming">
+	                            
+	                            <div class="message-content" style="color: #4ade80; font-weight: bold;">
+	                                <i class="fas fa-check-circle"></i> All lab instructions completed!
+	                            </div>
+	                        </div>
+	                    `);
+
+	                    const chatMessages = $('#chat-messages');
+	                    chatMessages.scrollTop(chatMessages.prop("scrollHeight"));
+	                } catch (e) {
+	                    console.error('Error parsing completed commands from localStorage', e);
+	                }
+	            }
+	        }
+	    });
+	}
+
+
 	
 	const iframe = document.getElementById("rdp-frame");
 

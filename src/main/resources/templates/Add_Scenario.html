@@ -720,15 +720,33 @@ label {
 		
 	</script>
 
-	<script th:if="${scenarioSaved}">
-	Swal.fire({
-		title: 'Scenario Saved!',
-		text: 'The scenario has been saved successfully.',
-		icon: 'success',
-		confirmButtonText: 'OK',
-		confirmButtonColor: '#3498db'
-	});
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var result = [[${result}]];
+
+    if (result === 'success') {
+        Swal.fire({
+            title: 'Scenario Saved!',
+            text: 'The scenario has been saved successfully.',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#3498db'
+        });
+    } else if (result && result !== '') {
+        Swal.fire({
+            title: 'Error',
+            text: result,
+            icon: 'error',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#e74c3c'
+        });
+    }
+    /*]]>*/
 </script>
+
+
+
+
 
 </body>
 </html>

@@ -313,7 +313,7 @@
 								<p>View Lab Template</p>
 						</a></li>
 
-						<li  class="nav-item"><a href="/guac/Scenario_Details"
+						<li class="nav-item"><a href="/guac/Scenario_Details"
 							class="nav-link"> <i class="far fa-circle nav-icon"></i>
 								<p>Create Scenario</p>
 						</a></li>
@@ -337,8 +337,15 @@
 
 						<li class="nav-item"><a href="/guac/Add_Docker"
 							class="nav-link"> <i class="far fa-circle nav-icon"></i>
-								<p>Docker Network</p>
+								<p>Discover Docker</p>
 						</a></li>
+
+						<li class="nav-item"><a href="/guac/Create_docker_network"
+							class="nav-link"> <i class="far fa-circle nav-icon"></i>
+								<p>Create Docker Network</p>
+						</a></li>
+
+
 
 						<li class="nav-item"><a href="/guac/View_DockerListing"
 							class="nav-link"> <i class="far fa-circle nav-icon"></i>
@@ -351,15 +358,15 @@
 						</a></li>
 
 
-						<li class="nav-item"><a href="/report/View_PlaylistAcion"
-							class="nav-link"> <i class="far fa-circle nav-icon"></i>
-								<p>View PlaylistAcion</p>
-						</a></li>
+<!-- 						<li class="nav-item"><a href="/report/View_PlaylistAcion" -->
+<!-- 							class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 								<p>View PlaylistAcion</p> -->
+<!-- 						</a></li> -->
 
-						<li class="nav-item"><a href="/report/View_ScenerioAcion"
-							class="nav-link"> <i class="far fa-circle nav-icon"></i>
-								<p>View ScenerioAcion</p>
-						</a></li>
+<!-- 						<li class="nav-item"><a href="/report/View_ScenerioAcion" -->
+<!-- 							class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 								<p>View ScenerioAcion</p> -->
+<!-- 						</a></li> -->
 
 					</ul></li>
 
@@ -394,27 +401,31 @@
 						<!-- 							class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
 						<!-- 								<p>Create VM with Application</p> -->
 						<!-- 						</a></li> -->
-						
-						<li sec:authorize="hasRole('ROLE_USER')" class="nav-item"><a href="/guac/Add_Playlist"
-							class="nav-link"> <i class="far fa-circle nav-icon"></i>
+
+						<li sec:authorize="hasRole('ROLE_USER')" class="nav-item"><a
+							href="/guac/Add_Playlist" class="nav-link"> <i
+								class="far fa-circle nav-icon"></i>
 								<p>Create Playlist</p>
 						</a></li>
-						<li sec:authorize="hasRole('ROLE_USER')" class="nav-item"><a href="/guac/View_Playlist"
-							class="nav-link"> <i class="far fa-circle nav-icon"></i>
+						<li sec:authorize="hasRole('ROLE_USER')" class="nav-item"><a
+							href="/guac/View_Playlist" class="nav-link"> <i
+								class="far fa-circle nav-icon"></i>
 								<p>View Playlist</p>
 						</a></li>
-						<li sec:authorize="hasRole('ROLE_USER')" class="nav-item"><a href="/guac/View_Scenario"
-							class="nav-link"> <i class="far fa-circle nav-icon"></i>
+						<li sec:authorize="hasRole('ROLE_USER')" class="nav-item"><a
+							href="/guac/View_Scenario" class="nav-link"> <i
+								class="far fa-circle nav-icon"></i>
 								<p>View Scenario</p>
 						</a></li>
 
-						<li sec:authorize="hasRole('ROLE_USER')" class="nav-item"><a href="/guac/My_Scenario"
-							class="nav-link"> <i class="far fa-circle nav-icon"></i>
+						<li sec:authorize="hasRole('ROLE_USER')" class="nav-item"><a
+							href="/guac/My_Scenario" class="nav-link"> <i
+								class="far fa-circle nav-icon"></i>
 								<p>My Scenario</p>
 						</a></li>
-						
-						
-						
+
+
+
 						<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
 							class="nav-item"><a href="/cloud_instance/view"
 							class="nav-link"> <i class="far fa-circle nav-icon"></i>

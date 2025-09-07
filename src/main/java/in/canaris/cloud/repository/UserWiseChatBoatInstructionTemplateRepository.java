@@ -52,6 +52,11 @@ public interface UserWiseChatBoatInstructionTemplateRepository
 	@Transactional
 	@Query(value = "UPDATE userwise_chatboat_instruction_template SET isCommandExecuted = 'false' WHERE lab_name = :containerName", nativeQuery = true)
 	void UpdateresetByLabName(@Param("containerName") String containerName);
+	
+	
+	@Query(value = "SELECT * FROM userwise_chatboat_instruction_template WHERE lab_name = :labName AND isCommandExecuted = 'true' ORDER BY id ASC", nativeQuery = true)
+	List<UserWiseChatBoatInstructionTemplate> findExecutedByLabName(@Param("labName") String labName);
+
 
 	
 

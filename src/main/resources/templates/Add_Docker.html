@@ -201,6 +201,37 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script
 		src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	<script>
+	document.getElementById('discoveryForm').addEventListener('submit', function (e) {
+		const selectedIp = document.getElementById('ipAddress').value;
+		const customIp = document.getElementById('customIp').value.trim();
+
+		if (selectedIp === '') {
+			Swal.fire({
+				icon: 'warning',
+				title: 'Missing IP Address',
+				text: 'Please select an IP address or enter a custom IP.',
+			});
+			e.preventDefault();
+			return;
+		}
+
+		if (selectedIp === 'custom' && customIp === '') {
+			Swal.fire({
+				icon: 'warning',
+				title: 'Missing Custom IP',
+				text: 'Please enter a custom IP address.',
+			});
+			e.preventDefault();
+			return;
+		}
+	});
+</script>
+
+
 	<script>
 		document.getElementById('ipAddress').addEventListener(
 				'change',
@@ -214,6 +245,31 @@
 					}
 				});
 	</script>
+
+
+	<script th:inline="javascript">
+    var vm_creationresult = [[${result}]];
+
+    if (vm_creationresult == null || vm_creationresult === '') {
+        // Do nothing
+    } else if (vm_creationresult === 'success') {
+        Swal.fire({
+            position: "top",
+            icon: "success",
+            title: "Docker networks discovered successfully!",
+            showConfirmButton: true
+        });
+    } else {
+        Swal.fire({
+            position: "top",
+            icon: "warning",
+            title: vm_creationresult,
+            showConfirmButton: true
+        });
+    }
+</script>
+
+
 
 </body>
 </html>
