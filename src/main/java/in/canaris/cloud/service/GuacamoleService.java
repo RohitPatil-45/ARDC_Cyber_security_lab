@@ -1,6 +1,7 @@
 package in.canaris.cloud.service;
 
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -16,9 +17,15 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class GuacamoleService {
 
-	private static final String GUAC_URL = "http://localhost:8075/guacamole";
-	private static final String USERNAME = "guacadmin";
-	private static final String PASSWORD = "guacadmin";
+	@Value("${guacamole_url}")
+	private String GUAC_URL;
+	
+	@Value("${guacamole_username}")
+	private String USERNAME;
+	
+	@Value("${guacamole_password}")
+	private String PASSWORD
+;
 
 	private final RestTemplate rest = new RestTemplate();
 

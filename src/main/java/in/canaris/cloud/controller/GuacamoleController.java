@@ -12,6 +12,7 @@ import java.security.Principal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -232,7 +233,7 @@ public class GuacamoleController {
 			String ipRange = dockerNetwork.getStartIp() + "/28"; // Or use a separate field if needed
 			String auxAddress = "excluded1=" + dockerNetwork.getEndIp();
 
-			List<String> command = List.of("docker", "network", "create", "--driver", driver, "--subnet", subnet,
+			List<String> command = Arrays.asList("docker", "network", "create", "--driver", driver, "--subnet", subnet,
 					"--gateway", gateway, "--ip-range", ipRange, "--aux-address=" + auxAddress, networkName);
 
 			// STEP 2: Execute the create command
