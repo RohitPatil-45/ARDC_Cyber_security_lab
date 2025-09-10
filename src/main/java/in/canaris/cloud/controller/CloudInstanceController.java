@@ -277,7 +277,7 @@ public class CloudInstanceController {
 
 	@Autowired
 	private UserScenerioRepository UserScenerioRepository;
-	
+
 	@Autowired
 	private ScenarioLabTemplateRepository scenarioLabTemplateRepository;
 
@@ -3451,35 +3451,40 @@ public class CloudInstanceController {
 		System.out.println("scenarioId :::: " + scenarioId);
 		String result = null;
 		Map<Integer, Integer> portMappings = null;
-		
+
 		String network = null;
 		Integer newVncPort;
 		Integer newNoVncPort;
-		
+
 		String username = ((User) ((Authentication) principal).getPrincipal()).getUsername();
-		
+
 		try {
 
-			List<ScenarioLabTemplate> templates = scenarioLabTemplateRepository.findByScenarioId(Integer.valueOf(scenarioId));
-			
+			List<ScenarioLabTemplate> templates = scenarioLabTemplateRepository
+					.findByScenarioId(Integer.valueOf(scenarioId));
+
+			System.out.println("rDokcer_templates : " + templates);
 			for (ScenarioLabTemplate temp : templates) {
-				
+
+				System.out.println("Inside_Dokcer_templates : " + templates);
+
 				Optional<CloudInstance> obj = repository.findById(temp.getTemplateId());
 				CloudInstance instance = obj.get();
-				
+
 				String templateName = instance.getInstance_name();
 				String password = instance.getInstance_password();
 				String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
 				String filePath = instance.getSubproduct_id().getIso_file_path();
 				File file = new File(filePath);
 				String imageName = file.getName().replaceFirst("[.][^.]+$", "");
-				
+				System.out.println("imageNameimageName ::::" + imageName);
+
 				portMappings = new HashMap<>();
 				newVncPort = portDetailsRepository.findMaxVncPorts() + 1;
 				newNoVncPort = portDetailsRepository.findMaxnoVncPort() + 1;
 				portMappings.put(newVncPort, 5901);
 				portMappings.put(newNoVncPort, 8080);
-				
+
 				network = instance.getDocker_network_name();
 
 				Integer maxLabId1 = userLabRepository.findMaxLabId();
@@ -3489,13 +3494,13 @@ public class CloudInstanceController {
 				maxLabId++;
 
 				String newInstanceName = instance.getInstance_name() + "_" + maxLabId;
-
+				System.out.println("Inside_Dokcer_newInstanceName : " + newInstanceName);
 				if (os.equalsIgnoreCase("windows")) {
 					result = createWindowsDockerContainer(instance.getInstance_name(), instance.getInstance_password());
 				} else {
 					result = dockerService.runContainer(imageName, newInstanceName, portMappings, network);
 					if (result.equalsIgnoreCase("success")) {
-
+						System.out.println("Inside_Dokcer_method : " + result);
 						// Create connection in Guacamole
 						String jsonResponse = guacService.createConnection(newInstanceName, "vnc", newInstanceName,
 								5901, "kali", "kalilinux", "", "", "", "", "", "", "", "", "", "", "");
@@ -3506,7 +3511,8 @@ public class CloudInstanceController {
 									guacService.getConnectionIdByName(jsonResponse), newVncPort, newNoVncPort,
 									"kalilinux", scenarioId);
 
-							insertUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName, username);
+							insertUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName,
+									username);
 							insertUserScenerio(scenarioId, temp.getScenarioName(), username);
 						}
 
@@ -3514,10 +3520,9 @@ public class CloudInstanceController {
 				}
 			}
 
-			
-
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println("Exception_Dokcer_method : " + e);
 			result = "fail";
 		}
 
@@ -3608,9 +3613,9 @@ public class CloudInstanceController {
 	}
 
 	@PostMapping("/sourceImage")
-	public  @ResponseBody String sourceImage(@RequestParam("templateId") int templateId) {
+	public @ResponseBody String sourceImage(@RequestParam("templateId") int templateId) {
 		try {
-			
+
 			CloudInstance obj = repository.findById(templateId).get();
 			String filePath = obj.getSubproduct_id().getIso_file_path();
 			File file = new File(filePath);
@@ -3631,7 +3636,7 @@ public class CloudInstanceController {
 			e.printStackTrace();
 			return "fail";
 		}
-		
+
 	}
 
 }

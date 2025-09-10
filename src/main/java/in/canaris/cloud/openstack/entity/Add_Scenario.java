@@ -3,6 +3,7 @@ package in.canaris.cloud.openstack.entity;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -50,10 +52,9 @@ public class Add_Scenario {
 
 	@Column(name = "MaxPlayers", nullable = false, length = 255)
 	private String MaxPlayers;
-	
+
 	@Column(name = "number_of_instance", nullable = false, length = 255)
 	private String NumberofInstance;
-	
 
 //	@Column(name = "Cover_Image", nullable = false, length = 255)
 //	private String Cover_Image;
@@ -77,6 +78,17 @@ public class Add_Scenario {
 
 	@ManyToMany(mappedBy = "scenarios")
 	private Set<Playlist> playlists = new HashSet<>();
+
+	@OneToMany(mappedBy = "scenario", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<SubPlaylistScenario> subPlaylists = new HashSet<>();
+
+	public Set<SubPlaylistScenario> getSubPlaylists() {
+		return subPlaylists;
+	}
+
+	public void setSubPlaylists(Set<SubPlaylistScenario> subPlaylists) {
+		this.subPlaylists = subPlaylists;
+	}
 
 	public int getId() {
 		return Id;
@@ -209,7 +221,5 @@ public class Add_Scenario {
 	public void setNumberofInstance(String numberofInstance) {
 		NumberofInstance = numberofInstance;
 	}
-	
-	
 
 }

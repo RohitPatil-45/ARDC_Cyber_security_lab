@@ -293,6 +293,103 @@ keyframes spin {to { transform:rotate(360deg);
 	display: grid;
 	place-items: center;
 }
+
+/* Modal Styles */
+.modal-overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.7);
+	z-index: 10000;
+	justify-content: center;
+	align-items: center;
+}
+
+.modal-content {
+	background-color: #1e1e1e;
+	border-radius: 12px;
+	padding: 24px;
+	width: 90%;
+	max-width: 500px;
+	border: 2px solid #2d4fa6;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+	padding-bottom: 15px;
+	border-bottom: 1px solid #333;
+}
+
+.modal-title {
+	font-family: 'Poppins', sans-serif;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: #3b82f6;
+	margin: 0;
+}
+
+.modal-close {
+	background: none;
+	border: none;
+	color: #aaa;
+	font-size: 1.5rem;
+	cursor: pointer;
+	transition: color 0.2s;
+}
+
+.modal-close:hover {
+	color: #fff;
+}
+
+.modal-body {
+	margin-bottom: 20px;
+}
+
+.modal-select {
+	width: 100%;
+	padding: 10px 12px;
+	background-color: #2a2a2a;
+	border: 1px solid #444;
+	border-radius: 6px;
+	color: #e0e0e0;
+	font-size: 1rem;
+}
+
+.modal-select:focus {
+	outline: none;
+	border-color: #3b82f6;
+}
+
+.modal-footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+}
+
+.modal-btn {
+	padding: 8px 16px;
+	border-radius: 6px;
+	font-weight: 500;
+	cursor: pointer;
+	border: none;
+}
+
+.modal-btn-primary {
+	background-color: #3b82f6;
+	color: white;
+}
+
+.modal-btn-secondary {
+	background-color: #6b7280;
+	color: white;
+}
 </style>
 
 <body class="hold-transition sidebar-mini layout-fixed dark-mode">
@@ -315,9 +412,8 @@ keyframes spin {to { transform:rotate(360deg);
 										class="fas fa-home"></i> Home</a></li>
 								<li class="breadcrumb-item active"><a href="#">Scenario</a></li>
 							</ol>
+							<div></div>
 						</div>
-					</div>
-				</div>
 			</section>
 
 			<section class="content">
@@ -366,7 +462,36 @@ keyframes spin {to { transform:rotate(360deg);
 		</div>
 		<!-- End Page Loader -->
 
+		<!-- Move Scenario Modal -->
+		<div id="moveScenarioModal" class="modal-overlay">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title">Move Scenario</h3>
+					<button class="modal-close" onclick="closeMoveModal()">&times;</button>
+				</div>
+				<div class="modal-body">
+					<!-- 					<p>Select a playlist to move this scenario to:</p> -->
+					<!-- 					<select id="playlistSelect" class="modal-select"> -->
+					<!-- 						<option value="">Loading playlists...</option> -->
+					<!-- 					</select> -->
 
+					<div class="form-group">
+						<label for="scenarioDropdown">Select Playlist</label> <select
+							id="scenarioDropdown" class="form-control custom-select">
+							<option value="">-- Choose a Playlist --</option>
+							<option th:each="playlist : ${PlaylistList}"
+								th:value="${playlist.Id}" th:text="${playlist.playlistName}"></option>
+						</select>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button class="modal-btn modal-btn-secondary"
+						onclick="closeMoveModal()">Cancel</button>
+					<button class="modal-btn modal-btn-primary"
+						onclick="submitMoveScenario()">Move Scenario</button>
+				</div>
+			</div>
+		</div>
 
 		<div th:replace="fragments/footer :: footer"></div>
 	</div>
@@ -381,6 +506,7 @@ let scenarioId;
 let editingCommentId = null;
 let noofinstance;
 let scenarioName;
+let currentScenarioIdForMove = null;
 
 document.addEventListener("DOMContentLoaded", function () {
     let rawData = '[[${listObj}]]'.replace(/&quot;/g, '"');
@@ -445,11 +571,6 @@ document.addEventListener("DOMContentLoaded", function () {
 									<i class="fas fa-play"></i> Create Lab
 								</button>
 							</div>
-							
-                        
-                            
-                            
-                            
                         </div>
                     </div>
                     <div class="card-tags mt-3 d-flex flex-wrap gap-2">
@@ -553,8 +674,6 @@ function submitComment() {
             Swal.fire("Error", "An error occurred while saving the comment.", "error");
         }
     });
-
-
 }
 
 function loadComments() {
@@ -586,7 +705,6 @@ function loadComments() {
         }
     });
 }
-
 
 function createCommentElement(comment) {
     const commentEl = document.createElement("div");
@@ -660,7 +778,6 @@ function deleteComment(commentId) {
     });
 }
 
-
 function handleActionChange(selectElement, SceneriotId) {
     const action = selectElement.value;
 
@@ -668,10 +785,107 @@ function handleActionChange(selectElement, SceneriotId) {
         editScenerio(SceneriotId);
     } else if (action === "delete") {
         deleteScenerio(SceneriotId);
+    } else if (action === "move") {
+        MoveScenerio(SceneriotId);
     }
 
     // Reset dropdown
     selectElement.value = "";
+}
+
+function MoveScenerio(id) {
+    currentScenarioIdForMove = id;
+    showMoveModal();
+}
+
+function showMoveModal() {
+    // Show the modal
+    document.getElementById("moveScenarioModal").style.display = "flex";
+    
+    // Load playlists
+    loadPlaylists();
+}
+
+function closeMoveModal() {
+    document.getElementById("moveScenarioModal").style.display = "none";
+    currentScenarioIdForMove = null;
+}
+
+// function loadPlaylists() {
+//     // Show loading state
+//     const selectElement = document.getElementById("playlistSelect");
+//     selectElement.innerHTML = '<option value="">Loading playlists...</option>';
+    
+//     // AJAX call to fetch playlists
+//     $.ajax({
+//         url: "/guac/getPlaylists", // Update with your actual endpoint
+//         type: "GET",
+//         dataType: "json",
+//         success: function(playlists) {
+//             if (playlists && playlists.length > 0) {
+//                 selectElement.innerHTML = '<option value="">Select a playlist</option>';
+                
+//                 playlists.forEach(playlist => {
+//                     const option = document.createElement("option");
+//                     option.value = playlist.id;
+//                     option.textContent = playlist.name;
+//                     selectElement.appendChild(option);
+//                 });
+//             } else {
+//                 selectElement.innerHTML = '<option value="">No playlists available</option>';
+//             }
+//         },
+//         error: function(xhr, status, error) {
+//             console.error("Error loading playlists:", error);
+//             selectElement.innerHTML = '<option value="">Error loading playlists</option>';
+//         }
+//     });
+// }
+
+function submitMoveScenario() {
+    const playlistSelect = document.getElementById("playlistSelect");
+    const selectedPlaylistId = playlistSelect.value;
+    
+    if (!selectedPlaylistId) {
+        Swal.fire("Error", "Please select a playlist", "error");
+        return;
+    }
+    
+    if (!currentScenarioIdForMove) {
+        Swal.fire("Error", "No scenario selected for moving", "error");
+        return;
+    }
+    
+    // Show loading
+    $("#pageLoader").show();
+    
+    // AJAX call to move scenario
+    $.ajax({
+        url: "/guac/moveScenarioToPlaylist", 
+        type: "POST",
+        data: {
+            scenarioId: currentScenarioIdForMove,
+            playlistId: selectedPlaylistId
+        },
+        success: function(response) {
+            $("#pageLoader").hide();
+            
+            if (response === "success") {
+                Swal.fire("Success", "Scenario moved successfully!", "success").then(() => {
+                    closeMoveModal();
+                    // Optionally reload the page or update UI
+                    window.location.reload();
+                });
+            } else {
+                Swal.fire("Error", response.message || "Failed to move scenario", "error");
+            }
+        },
+        error: function(xhr, status, error) {
+            $("#pageLoader").hide();
+            console.error("Error moving scenario:", error);
+            Swal.fire("Error", "An error occurred while moving the scenario", "error");
+        }
+    });
 }
 
 function editScenerio(id) {
@@ -709,7 +923,6 @@ function deleteScenerio(id) {
 }
 
 function createDockerContainer() {
-// 	alert("dockerr")
 	$("#pageLoader").show();
 	$.ajax({
 		type: "POST",
@@ -718,16 +931,13 @@ function createDockerContainer() {
 			"scenarioId" : scenarioId,
 		},
 		success : function(result) {
-			
 			$("#pageLoader").hide();
 			window.location = "/guac/View_Vm_Listing?Id="+scenarioId;
-			//alert(result);
 		}
 	});
 }
 
 function showLabButtonOn_Check() {
-// 	alert("hwolabbb"+scenarioId)
     $.ajax({
         type: "POST",
         url: '/guac/showLabButtonOn_Check',
@@ -738,7 +948,6 @@ function showLabButtonOn_Check() {
         success: function(result) {
             // Trim the result in case there are extra spaces
             result = result.trim();
-// alert("result :"+result)
             if (result === "available") {
                 // Show View Lab, hide Create Lab
                 $('#viewLab_btn').show();
@@ -756,7 +965,6 @@ function showLabButtonOn_Check() {
         }
     });
 }
-
 
 function getPercenetageParticularScenerio() {
     $.ajax({
@@ -777,10 +985,6 @@ function getPercenetageParticularScenerio() {
         }
     });
 }
-
-
-
-
 </script>
 </body>
 </html>

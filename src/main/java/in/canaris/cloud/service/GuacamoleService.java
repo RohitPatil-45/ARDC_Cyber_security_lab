@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class GuacamoleService {
 
-	private static final String GUAC_URL = "http://localhost:8080/guacamole";
+	private static final String GUAC_URL = "http://localhost:8075/guacamole";
 	private static final String USERNAME = "guacadmin";
 	private static final String PASSWORD = "guacadmin";
 
@@ -164,8 +164,8 @@ public class GuacamoleService {
 
 		// Attributes (mandatory in Guacamole API)
 		JSONObject attributes = new JSONObject();
-		attributes.put("max-connections", "1");
-		attributes.put("max-connections-per-user", "1");
+		attributes.put("max-connections", "2");
+		attributes.put("max-connections-per-user", "2");
 
 		// Main request body
 		JSONObject body = new JSONObject();
