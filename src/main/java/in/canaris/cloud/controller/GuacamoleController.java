@@ -947,41 +947,42 @@ public class GuacamoleController {
 
 	@PostMapping("/save_AddPlaylistInScenarioInSub_Playlist")
 	public String saveItemInPlaylist(@RequestParam("playlistId") int playlistId,
-	        @RequestParam("itemType") String itemType,
-	        @RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds,
-	        @RequestParam(value = "subPlaylistId", required = false) Integer subPlaylistId) {
-	    
-	    // Validate Playlist
-	    Optional<Playlist> playlistOpt = PlaylistRepository.findById(playlistId);
-	    if (!playlistOpt.isPresent()) {
-	        throw new IllegalArgumentException("Invalid Playlist ID: " + playlistId);
-	    }
+			@RequestParam("itemType") String itemType,
+			@RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds,
+			@RequestParam(value = "subPlaylistId", required = false) Integer subPlaylistId) {
 
-	    // Handle different case variations
-	    if ("scenario".equalsIgnoreCase(itemType) || "scenario".equals(itemType)) {
-	        if (scenarioIds != null && !scenarioIds.isEmpty()) {
-	            for (Integer scenarioId : scenarioIds) {
-	                PlaylistItem item = new PlaylistItem();
-	                item.setPlaylistId(playlistId);
-	                item.setItemType(PlaylistItem.ItemType.scenario);
-	                item.setItemId(scenarioId);
-	                PlaylistItemRepository.save(item);
-	            }
-	        }
-	    } else if ("sub_playlist".equalsIgnoreCase(itemType) || "subplaylist".equalsIgnoreCase(itemType)) {
-	        if (subPlaylistId != null) {
-	            PlaylistItem item = new PlaylistItem();
-	            item.setPlaylistId(playlistId);
-	            item.setItemType(PlaylistItem.ItemType.sub_playlist);
-	            item.setItemId(subPlaylistId);
-	            PlaylistItemRepository.save(item);
-	        }
-	    } else {
-	        throw new IllegalArgumentException("Invalid item type: " + itemType);
-	    }
+		// Validate Playlist
+		Optional<Playlist> playlistOpt = PlaylistRepository.findById(playlistId);
+		if (!playlistOpt.isPresent()) {
+			throw new IllegalArgumentException("Invalid Playlist ID: " + playlistId);
+		}
 
-	    return "redirect:/guac/Add_Scenario_and_Sub_Playlist_In_Playlist";
+		// Handle different case variations
+		if ("scenario".equalsIgnoreCase(itemType) || "scenario".equals(itemType)) {
+			if (scenarioIds != null && !scenarioIds.isEmpty()) {
+				for (Integer scenarioId : scenarioIds) {
+					PlaylistItem item = new PlaylistItem();
+					item.setPlaylistId(playlistId);
+					item.setItemType(PlaylistItem.ItemType.scenario);
+					item.setItemId(scenarioId);
+					PlaylistItemRepository.save(item);
+				}
+			}
+		} else if ("sub_playlist".equalsIgnoreCase(itemType) || "subplaylist".equalsIgnoreCase(itemType)) {
+			if (subPlaylistId != null) {
+				PlaylistItem item = new PlaylistItem();
+				item.setPlaylistId(playlistId);
+				item.setItemType(PlaylistItem.ItemType.sub_playlist);
+				item.setItemId(subPlaylistId);
+				PlaylistItemRepository.save(item);
+			}
+		} else {
+			throw new IllegalArgumentException("Invalid item type: " + itemType);
+		}
+
+		return "redirect:/guac/Add_Scenario_and_Sub_Playlist_In_Playlist";
 	}
+
 	@GetMapping("/Add_ScenarioInSub_Playlist")
 	public ModelAndView showAddScenarioInSubPlaylistForm() {
 		ModelAndView mav = new ModelAndView("Add_ScenarioInSub_Playlist");
@@ -1022,89 +1023,209 @@ public class GuacamoleController {
 		return "redirect:/guac/Add_ScenarioInSub_Playlis";
 	}
 
+	@GetMapping("/View_Particular_Playlist")
+	public ModelAndView getView_Particular_Playlist(@RequestParam String Id) {
+
+		ModelAndView mav = new ModelAndView("View_Particular_Playlist");
+		JSONArray Finalarray = new JSONArray();
+		List<Playlist> dataList;
+
+		Optional<Add_Scenario> ScenariodataList;
+
+		try {
+
+			int SRNO = Integer.parseInt(Id);
+
+			dataList = PlaylistRepository.getView_Particular_Scenerio(SRNO);
+
+			List<Add_Scenario> scenarioDataList = PlaylistsSenarioRepository.getScenariosByPlaylist(SRNO);
+
+			for (Add_Scenario temp : scenarioDataList) {
+				System.out.println("Scenario ID: " + temp.getId() + ", Name: " + temp.getScenarioName());
+
+				JSONObject obj = new JSONObject();
+
+				String Scenario_Name = temp.getScenarioName() != null ? temp.getScenarioName() : "";
+				String Scenario_Title = temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "";
+				String Description = temp.getDescription() != null ? temp.getDescription() : "";
+				String Category = temp.getCategory() != null ? temp.getCategory() : "";
+				String Scenario_Type = temp.getScenarioType() != null ? temp.getScenarioType() : "";
+				String Mode = temp.getMode() != null ? temp.getMode() : "";
+				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
+				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
+				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
+				String NumberofInstance = temp.getNumberofInstance() != null ? temp.getNumberofInstance() : "";
+//				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
+				String Cover_Image = "";
+				int SrNo = temp.getId();
+
+//				srno++;
+
+				obj.put("Scenario_Name", Scenario_Name);
+				obj.put("Scenario_Title", Scenario_Title);
+//				obj.put("Description", Description);
+				obj.put("Category", Category);
+				obj.put("Scenario_Type", Scenario_Type);
+				obj.put("Mode", Mode);
+				obj.put("Difficulty_Level", Difficulty_Level);
+				obj.put("Duration", Duration);
+				obj.put("NumberofInstance", NumberofInstance);
+				obj.put("Cover_Image", Cover_Image);
+				obj.put("Id", SrNo);
+
+				Finalarray.put(obj);
+			}
+
+			System.out.println("Fetched Datawqwqw: " + dataList.toString()); // Print to console
+			int srno = 0;
+			for (Playlist temp : dataList) {
+				JSONObject obj = new JSONObject();
+
+				String PlaylistTitle = temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "";
+				String PlaylistName = temp.getPlaylistName() != null ? temp.getPlaylistName() : "";
+				String Description = temp.getDescription() != null ? temp.getDescription() : "";
+				String Tag = temp.getTag() != null ? temp.getTag() : "";
+
+//				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
+				String Cover_Image = "";
+				int SrNo = temp.getId();
+
+//				srno++;
+
+				obj.put("PlaylistTitle", PlaylistTitle);
+				obj.put("PlaylistName", PlaylistName);
+				obj.put("Description", Description);
+				obj.put("Tag", Tag);
+
+				obj.put("Cover_Image", Cover_Image);
+				obj.put("Id", SrNo);
+
+				Finalarray.put(obj);
+			}
+
+//			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
+
+			mav.addObject("listObj", Finalarray.toString());
+			mav.addObject("scenarioList", ScenarioRepository.findAll());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			mav.addObject("listObj", null);
+			mav.addObject("error", e.getMessage());
+			System.out.println("Error fetching data: " + e.getMessage());
+		}
+		return mav;
+	}
+
 //	@GetMapping("/View_Particular_Playlist")
 //	public ModelAndView getView_Particular_Playlist(@RequestParam String Id) {
-//
 //		ModelAndView mav = new ModelAndView("View_Particular_Playlist");
-//		JSONArray Finalarray = new JSONArray();
-//		List<Playlist> dataList;
-//
-//		Optional<Add_Scenario> ScenariodataList;
+//		JSONArray finalArray = new JSONArray();
+//		JSONArray scenarioItems = new JSONArray();
+//		JSONArray subPlaylistItems = new JSONArray();
+//		JSONArray otherItems = new JSONArray();
 //
 //		try {
-//
 //			int SRNO = Integer.parseInt(Id);
 //
-//			dataList = PlaylistRepository.getView_Particular_Scenerio(SRNO);
+//			// Get playlist details
+//			List<Playlist> dataList = PlaylistRepository.getView_Particular_Scenerio(SRNO);
 //
-//			List<Add_Scenario> scenarioDataList = PlaylistsSenarioRepository.getScenariosByPlaylist(SRNO);
+//			// Get all items in this playlist
+//			List<PlaylistItem> playlistItems = PlaylistItemRepository.findByPlaylistId(SRNO);
 //
-//			for (Add_Scenario temp : scenarioDataList) {
-//				System.out.println("Scenario ID: " + temp.getId() + ", Name: " + temp.getScenarioName());
-//
+//			// Process each playlist item
+//			for (PlaylistItem item : playlistItems) {
 //				JSONObject obj = new JSONObject();
+//				obj.put("PlaylistItemId", item.getId());
+//				obj.put("PlaylistId", item.getPlaylistId());
+//				String itemType = item.getItemType() != null ? item.getItemType().toString() : "";
+//				obj.put("ItemType", itemType);
+//				obj.put("ItemId", item.getItemId());
+//				obj.put("Position", item.getPosition() != null ? item.getPosition() : -1);
 //
-//				String Scenario_Name = temp.getScenarioName() != null ? temp.getScenarioName() : "";
-//				String Scenario_Title = temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "";
-//				String Description = temp.getDescription() != null ? temp.getDescription() : "";
-//				String Category = temp.getCategory() != null ? temp.getCategory() : "";
-//				String Scenario_Type = temp.getScenarioType() != null ? temp.getScenarioType() : "";
-//				String Mode = temp.getMode() != null ? temp.getMode() : "";
-//				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
-//				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
-//				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
-//				String NumberofInstance = temp.getNumberofInstance() != null ? temp.getNumberofInstance() : "";
-////				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
-//				String Cover_Image = "";
-//				int SrNo = temp.getId();
+//				if ("scenario".equalsIgnoreCase(itemType)) {
+//					// Get scenario details
+//					List<Add_Scenario> scenarios = PlaylistsSenarioRepository.getScenariosByPlaylist(item.getItemId());
 //
-////				srno++;
+//					for (Add_Scenario scenario : scenarios) {
+//						JSONObject scenarioObj = new JSONObject();
+//						scenarioObj.put("Scenario_Name",
+//								scenario.getScenarioName() != null ? scenario.getScenarioName() : "");
+//						scenarioObj.put("Scenario_Title",
+//								scenario.getScenarioTitle() != null ? scenario.getScenarioTitle() : "");
+//						scenarioObj.put("Category", scenario.getCategory() != null ? scenario.getCategory() : "");
+//						scenarioObj.put("Scenario_Type",
+//								scenario.getScenarioType() != null ? scenario.getScenarioType() : "");
+//						scenarioObj.put("Mode", scenario.getMode() != null ? scenario.getMode() : "");
+//						scenarioObj.put("Difficulty_Level",
+//								scenario.getDifficultyLevel() != null ? scenario.getDifficultyLevel() : "");
+//						scenarioObj.put("Duration", scenario.getDuration() != null ? scenario.getDuration() : "");
+//						scenarioObj.put("NumberofInstance",
+//								scenario.getNumberofInstance() != null ? scenario.getNumberofInstance() : "");
+//						scenarioObj.put("Cover_Image", "");
+//						scenarioObj.put("Id", scenario.getId());
 //
-//				obj.put("Scenario_Name", Scenario_Name);
-//				obj.put("Scenario_Title", Scenario_Title);
-////				obj.put("Description", Description);
-//				obj.put("Category", Category);
-//				obj.put("Scenario_Type", Scenario_Type);
-//				obj.put("Mode", Mode);
-//				obj.put("Difficulty_Level", Difficulty_Level);
-//				obj.put("Duration", Duration);
-//				obj.put("NumberofInstance", NumberofInstance);
-//				obj.put("Cover_Image", Cover_Image);
-//				obj.put("Id", SrNo);
+//						scenarioItems.put(scenarioObj);
+//					}
 //
-//				Finalarray.put(obj);
+//				} else if ("sub_playlist".equalsIgnoreCase(itemType)) {
+//					// Get sub-playlist details
+//					Optional<Playlist> subPlaylistOpt = PlaylistRepository.findById(item.getItemId());
+//					if (subPlaylistOpt.isPresent()) {
+//						Playlist subPlaylist = subPlaylistOpt.get();
+//						obj.put("PlaylistTitle",
+//								subPlaylist.getPlaylistTitle() != null ? subPlaylist.getPlaylistTitle() : "");
+//						obj.put("PlaylistName",
+//								subPlaylist.getPlaylistName() != null ? subPlaylist.getPlaylistName() : "");
+//						obj.put("Description",
+//								subPlaylist.getDescription() != null ? subPlaylist.getDescription() : "");
+//						obj.put("Tag", subPlaylist.getTag() != null ? subPlaylist.getTag() : "");
+//						obj.put("Cover_Image", "");
+//						obj.put("Id", subPlaylist.getId());
+//						subPlaylistItems.put(obj);
+//					}
+//				} else {
+//					// Handle other item types
+//					obj.put("Title", "Unknown Item Type");
+//					obj.put("Description", "This item type is not specifically handled");
+//					otherItems.put(obj);
+//				}
 //			}
 //
-//			System.out.println("Fetched Datawqwqw: " + dataList.toString()); // Print to console
-//			int srno = 0;
+//			// Add playlist details
 //			for (Playlist temp : dataList) {
 //				JSONObject obj = new JSONObject();
-//
-//				String PlaylistTitle = temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "";
-//				String PlaylistName = temp.getPlaylistName() != null ? temp.getPlaylistName() : "";
-//				String Description = temp.getDescription() != null ? temp.getDescription() : "";
-//				String Tag = temp.getTag() != null ? temp.getTag() : "";
-//
-////				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
-//				String Cover_Image = "";
-//				int SrNo = temp.getId();
-//
-////				srno++;
-//
-//				obj.put("PlaylistTitle", PlaylistTitle);
-//				obj.put("PlaylistName", PlaylistName);
-//				obj.put("Description", Description);
-//				obj.put("Tag", Tag);
-//
-//				obj.put("Cover_Image", Cover_Image);
-//				obj.put("Id", SrNo);
-//
-//				Finalarray.put(obj);
+//				obj.put("PlaylistTitle", temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "");
+//				obj.put("PlaylistName", temp.getPlaylistName() != null ? temp.getPlaylistName() : "");
+//				obj.put("Description", temp.getDescription() != null ? temp.getDescription() : "");
+//				obj.put("Tag", temp.getTag() != null ? temp.getTag() : "");
+//				obj.put("Cover_Image", "");
+//				obj.put("Id", temp.getId());
+//				obj.put("Type", "PLAYLIST_DETAILS");
+//				finalArray.put(obj);
 //			}
 //
-////			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
+//			// Add categorized items
+//			JSONObject scenarioCategory = new JSONObject();
+//			scenarioCategory.put("Type", "SCENARIO_ITEMS");
+//			scenarioCategory.put("Items", scenarioItems);
+//			scenarioCategory.put("Count", scenarioItems.length());
+//			finalArray.put(scenarioCategory);
 //
-//			mav.addObject("listObj", Finalarray.toString());
+//			JSONObject subPlaylistCategory = new JSONObject();
+//			subPlaylistCategory.put("Type", "SUBPLAYLIST_ITEMS");
+//			subPlaylistCategory.put("Items", subPlaylistItems);
+//			subPlaylistCategory.put("Count", subPlaylistItems.length());
+//			finalArray.put(subPlaylistCategory);
+//
+//			JSONObject otherCategory = new JSONObject();
+//			otherCategory.put("Type", "OTHER_ITEMS");
+//			otherCategory.put("Items", otherItems);
+//			otherCategory.put("Count", otherItems.length());
+//			finalArray.put(otherCategory);
+//
+//			mav.addObject("listObj", finalArray.toString());
 //			mav.addObject("scenarioList", ScenarioRepository.findAll());
 //
 //		} catch (Exception e) {
@@ -1115,84 +1236,6 @@ public class GuacamoleController {
 //		}
 //		return mav;
 //	}
-	
-	
-	@GetMapping("/View_Particular_Playlist")
-	public ModelAndView getView_Particular_Playlist(@RequestParam String Id) {
-	    ModelAndView mav = new ModelAndView("View_Particular_Playlist");
-	    JSONArray Finalarray = new JSONArray();
-
-	    try {
-	        int SRNO = Integer.parseInt(Id);
-
-	       
-	        List<Playlist> dataList = PlaylistRepository.getView_Particular_Scenerio(SRNO);
-	        List<Add_Scenario> scenarioDataList = PlaylistsSenarioRepository.getScenariosByPlaylist(SRNO);
-
-	       
-	        List<PlaylistItem> playlistItems = PlaylistItemRepository.findByPlaylistId(SRNO);
-
-	        for (PlaylistItem item : playlistItems) {
-	            JSONObject obj = new JSONObject();
-	            obj.put("PlaylistItemId", item.getId());
-	            obj.put("PlaylistId", item.getPlaylistId());
-	            String ItemType =item.getItemType().toString();
-	            obj.put("ItemType", item.getItemType().toString());
-	            obj.put("ItemId", item.getItemId());
-	            obj.put("Position", item.getPosition() != null ? item.getPosition() : -1);
-	            
-	            if(ItemType.equalsIgnoreCase("scenario")) {
-	            	
-	            	
-	            }else if (ItemType.equalsIgnoreCase("sub_playlist")) {
-	            	
-	            }else {
-	            	
-	            }
-
-	            Finalarray.put(obj);
-	        }
-
-	        // Existing logic: add scenario data
-	        for (Add_Scenario temp : scenarioDataList) {
-	            JSONObject obj = new JSONObject();
-	            obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
-	            obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
-	            obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
-	            obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
-	            obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
-	            obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
-	            obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
-	            obj.put("NumberofInstance", temp.getNumberofInstance() != null ? temp.getNumberofInstance() : "");
-	            obj.put("Cover_Image", "");
-	            obj.put("Id", temp.getId());
-	            Finalarray.put(obj);
-	        }
-
-	        // Existing logic: add playlist data
-	        for (Playlist temp : dataList) {
-	            JSONObject obj = new JSONObject();
-	            obj.put("PlaylistTitle", temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "");
-	            obj.put("PlaylistName", temp.getPlaylistName() != null ? temp.getPlaylistName() : "");
-	            obj.put("Description", temp.getDescription() != null ? temp.getDescription() : "");
-	            obj.put("Tag", temp.getTag() != null ? temp.getTag() : "");
-	            obj.put("Cover_Image", "");
-	            obj.put("Id", temp.getId());
-	            Finalarray.put(obj);
-	        }
-
-	        mav.addObject("listObj", Finalarray.toString());
-	        mav.addObject("scenarioList", ScenarioRepository.findAll());
-
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        mav.addObject("listObj", null);
-	        mav.addObject("error", e.getMessage());
-	        System.out.println("Error fetching data: " + e.getMessage());
-	    }
-	    return mav;
-	}
-
 
 	@GetMapping("/editplaylist/{id}")
 	public ModelAndView editplaylist(@PathVariable("id") Integer id) {
