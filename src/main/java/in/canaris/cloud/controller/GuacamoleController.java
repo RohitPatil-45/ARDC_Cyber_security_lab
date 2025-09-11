@@ -81,6 +81,7 @@ import in.canaris.cloud.repository.SubPlaylistRepository;
 import in.canaris.cloud.repository.UserLabRepository;
 import in.canaris.cloud.service.DockerService;
 import in.canaris.cloud.service.GuacamoleService;
+import in.canaris.cloud.utils.GuacIdentifierUtil;
 
 @Controller
 @RequestMapping("/guac")
@@ -353,7 +354,8 @@ public class GuacamoleController {
 
 	@GetMapping("/viewPlaylistConnection/{id}")
 	public String viewPlaylistConnection(@PathVariable String id, Model model) {
-		String url = guacService.getEmbedUrl(id);
+		String identifier = GuacIdentifierUtil.encode(id, "mysql");
+		String url = guacService.getEmbedUrl(identifier);
 		model.addAttribute("embedUrl", url);
 
 		List<CloudInstance> instances = null;
