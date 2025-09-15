@@ -39,16 +39,20 @@ public class SubPlaylist {
 
 	@Column(name = "CreatedBy", nullable = false, length = 255)
 	private String CreatedBy;
-	
+
+	@Lob
+	@Column(name = "coverImage", nullable = true)
+	private byte[] CoverImage;
+
 	@OneToMany(mappedBy = "subPlaylist", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<SubPlaylistScenario> scenarios = new HashSet<>();
 
 	public Set<SubPlaylistScenario> getScenarios() {
-	    return scenarios;
+		return scenarios;
 	}
 
 	public void setScenarios(Set<SubPlaylistScenario> scenarios) {
-	    this.scenarios = scenarios;
+		this.scenarios = scenarios;
 	}
 
 	public int getId() {
@@ -102,8 +106,13 @@ public class SubPlaylist {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	
-	
-	
+
+	public byte[] getCoverImage() {
+		return CoverImage;
+	}
+
+	public void setCoverImage(byte[] coverImage) {
+		CoverImage = coverImage;
+	}
 
 }

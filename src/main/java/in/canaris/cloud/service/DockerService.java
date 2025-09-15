@@ -266,5 +266,81 @@ public class DockerService {
 	    }
 	}
 
+	
+	public String runWindowsContainer(String imageName, String newInstanceName, Map<Integer, Integer> portMappings,
+			String network) {
+		try {
+			Integer rdpPort = null;
+			Integer novncPort = null;
+
+			for (Map.Entry<Integer, Integer> entry : portMappings.entrySet()) {
+				if (entry.getValue() == 3389) {
+					rdpPort = entry.getKey();
+				} else if (entry.getValue() == 8080) {
+					novncPort = entry.getKey();
+				}
+			}
+
+			if (rdpPort == null || novncPort == null) {
+				throw new IllegalArgumentException("RDP (3389) and noVNC (8006) ports must be mapped in portMappings");
+			}
+
+			String scriptPath = "/home/ubuntu/Desktop/ARDC_Lab/windows-docker/win.sh";
+
+			ProcessBuilder pb = new ProcessBuilder("bash", scriptPath, "--lab-name", newInstanceName, "--rdp-port",
+					String.valueOf(rdpPort), "--novnc-port", String.valueOf(novncPort), "--net-name", network);
+
+			pb.redirectErrorStream(true);
+			Process process = pb.start();
+
+			// Read container ID from script output
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String containerId = null;
+			String line;
+			while ((line = reader.readLine()) != null) {
+				System.out.println("output :: "+line.trim());
+				containerId = line.trim(); // last line should be container ID
+			}
+
+			int exitCode = process.waitFor();
+			if (exitCode != 0 || containerId == null || containerId.isEmpty()) {
+				return "fail";
+			}
+
+			//Verify container is running using Docker API
+			InspectContainerResponse inspect = dockerClient.inspectContainerCmd(containerId).exec();
+			if (inspect.getState().getRunning()) {
+				return "success";
+			} else {
+				return "fail";
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
+		}
+	}
+	
+	
+	public String getContainerIpViaCli(String containerName) {
+	    try {
+	        ProcessBuilder pb = new ProcessBuilder(
+	            "docker", "inspect", "-f",
+	            "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}",
+	            containerName
+	        );
+	        pb.redirectErrorStream(true);
+	        Process process = pb.start();
+
+	        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+	        String ip = reader.readLine();
+
+	        process.waitFor();
+	        return ip != null ? ip.trim() : null;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return null;
+	    }
+	}
 
 }

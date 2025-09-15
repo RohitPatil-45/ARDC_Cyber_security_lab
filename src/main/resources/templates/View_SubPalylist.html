@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:include="template :: headFragment(${pageTitle})">
+<title>View Sub Playlist | CMP</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Summernote CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css"
+	rel="stylesheet">
+</head>
+
+<style>
+/* Dark Theme for Body Only */
+body {
+	background-color: #121212;
+	color: #e0e0e0;
+}
+
+/* Content Wrapper */
+.content-wrapper {
+	background-color: #121212;
+}
+
+/* Card Styling */
+.card {
+	background-color: #1e1e1e;
+	border: 1px solid #333;
+	color: #e0e0e0;
+}
+
+.card-header {
+	background-color: #1a1a1a;
+	border-bottom: 1px solid #333;
+	color: #e0e0e0;
+}
+
+/* Content Header */
+.content-header h1 {
+	color: #3b82f6;
+}
+
+.breadcrumb {
+	background-color: transparent;
+}
+
+.breadcrumb-item a {
+	color: #9e9e9e;
+}
+
+.breadcrumb-item.active {
+	color: #c5c5c5;
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+	color: #666;
+}
+
+/* Form Elements */
+.form-control {
+	background-color: #2d2d2d;
+	border: 1px solid #444;
+	color: #e0e0e0;
+}
+
+.form-control:focus {
+	background-color: #2d2d2d;
+	border-color: #3b82f6;
+	color: #e0e0e0;
+	box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+.custom-select {
+	background-color: #2d2d2d;
+	border: 1px solid #444;
+	color: #e0e0e0;
+}
+
+.custom-file-label {
+	background-color: #2d2d2d;
+	border: 1px solid #444;
+	color: #e0e0e0;
+}
+
+.custom-file-label::after {
+	background-color: #333;
+	color: #e0e0e0;
+}
+
+/* Buttons */
+.btn-primary {
+	background-color: #3b82f6;
+	border-color: #3b82f6;
+}
+
+.btn-secondary {
+	background-color: #6c757d;
+	border-color: #6c757d;
+}
+
+.btn-light {
+	background-color: #444;
+	border-color: #555;
+	color: #e0e0e0;
+}
+
+/* Table Styling */
+.table {
+	color: #e0e0e0;
+}
+
+.table th, .table td {
+	border-color: #444;
+}
+
+.table-hover tbody tr:hover {
+	background-color: rgba(255, 255, 255, 0.075);
+	color: #e0e0e0;
+}
+
+/* Main Card */
+.playlist-card {
+	position: relative;
+	background-color: #1a1a1a;
+	border: 2px solid #2d4fa6;
+	border-radius: 12px;
+	overflow: hidden;
+	color: #e0e0e0;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+	transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s
+		ease;
+}
+
+/* Hover effect */
+.playlist-card:hover {
+	transform: scale(1.02);
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.9);
+	border-color: #3b82f6;
+}
+
+/* Image */
+.playlist-card .card-image img {
+	width: 100%;
+	height: 180px;
+	object-fit: cover;
+	display: block;
+	border-bottom: 2px solid #444;
+}
+
+/* Content wrapper */
+.playlist-card .card-content {
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+/* Heading */
+.playlist-card .card-title {
+	font-family: 'Poppins', sans-serif;
+	font-size: 1.2rem;
+	font-weight: 700;
+	line-height: 1.4;
+	color: #3b82f6;
+	margin: 0;
+}
+
+/* Description */
+.playlist-card .card-description {
+	font-family: 'Roboto', sans-serif;
+	font-size: 0.95rem;
+	font-weight: 400;
+	line-height: 1.5;
+	color: #b0b0b0;
+	margin: 0;
+}
+
+/* Tags */
+.playlist-card .card-tags {
+	margin-top: 5px;
+}
+
+.playlist-card .card-tags .tag {
+	display: inline-block;
+	background: #2d2d2d;
+	color: #3b82f6;
+	font-size: 0.75rem;
+	font-weight: 600;
+	padding: 4px 10px;
+	margin-right: 5px;
+	border-radius: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+/* Additional dark theme elements */
+.nav-sidebar .nav-item .nav-treeview {
+	background-color: #1e1e1e;
+}
+
+.nav-sidebar .nav-item .nav-treeview .nav-link {
+	color: #b0b0b0;
+}
+
+/* Footer */
+.main-footer {
+	background-color: #1a1a1a;
+	border-top: 1px solid #333;
+	color: #e0e0e0;
+}
+
+.custom-control {
+	width: 70px;
+	height: 70px;
+	background: rgba(0, 0, 0, 0.6);
+	border-radius: 50%;
+	top: 50%;
+	transform: translateY(-50%);
+	transition: background 0.3s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.custom-control:hover {
+	background: rgba(0, 0, 0, 0.9);
+}
+
+.carousel-control-prev {
+	left: -46px; /* Move more to left */
+}
+
+.carousel-control-next {
+	right: -46px; /* Move more to right */
+}
+
+.carousel-control-prev-icon, .carousel-control-next-icon {
+	background-size: 40px 40px; /* Bigger arrow */
+	width: 40px;
+	height: 40px;
+}
+
+.carousel-control-prev.disabled, .carousel-control-next.disabled {
+	pointer-events: none;
+	opacity: 0.3;
+}
+</style>
+
+<body class="hold-transition sidebar-mini layout-fixed dark-mode">
+
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>
+								<i class="fas fa-list-ol playlist-icon"></i> View Sub Playlist
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#"><i
+										class="fas fa-home"></i> Home</a></li>
+								<li class="breadcrumb-item active"><a href="#">Sub
+										Playlist</a></li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+
+					<!-- Playlist Wrapper Card -->
+					<div class="card mb-4">
+						<div class="card-header">
+							<h3 class="card-title">
+								<i class="fas fa-music text-primary"></i> My Sub Playlist
+							</h3>
+						</div>
+
+						<div class="card-body">
+							<div class="row" id="playlistContainer"></div>
+						</div>
+					</div>
+					<!-- End Playlist Wrapper Card -->
+
+				</div>
+			</section>
+
+		</div>
+
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
+
+
+
+	<script>
+$(function () {
+    let rawData = '[[${listObj}]]';
+    rawData = rawData.replace(/&quot;/g, '"');
+    let jsonData = JSON.parse(rawData);
+
+    const playlistContainer = document.getElementById("playlistContainer");
+    const fragment = document.createDocumentFragment();
+
+    // Loop through playlists and build cards
+    jsonData.forEach((item, index) => {
+        const cardHtml = `
+            <div class="col-md-4 mb-4">
+                <div class="playlist-card" onclick='PlaylistCardClick("${item.Id}")'>
+                    <div class="card-image">
+                        <img src="/guac/SubPlaylistimage/${item.Id}" alt="${item.PlaylistTitle}" loading="lazy">
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">${item.PlaylistName}</h3>
+                      
+                        <div class="card-tags">
+                            <span class="tag">${item.Tag || ''}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Create wrapper and append
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = cardHtml;
+        fragment.appendChild(wrapper.firstElementChild);
+    });
+
+    // Append all cards to container
+    playlistContainer.appendChild(fragment);
+});
+
+function PlaylistCardClick(id) {
+    window.location.href = "/guac/View_Particular_SubPlaylist?Id=" + id;
+}
+</script>
+
+
+</body>
+</html>

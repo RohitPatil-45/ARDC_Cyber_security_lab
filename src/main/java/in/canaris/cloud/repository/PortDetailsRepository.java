@@ -13,5 +13,8 @@ public interface PortDetailsRepository extends JpaRepository<PortDetails, Intege
 	
 	@Query("SELECT MAX(p.noVncPort) FROM PortDetails p")
     Integer findMaxnoVncPort();
+	
+	@Query("SELECT MAX(p.rdpPort) FROM PortDetails p")
+    Integer findMaxRdpPort();
 
 }

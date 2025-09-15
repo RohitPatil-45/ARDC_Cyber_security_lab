@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -1023,93 +1024,94 @@ public class GuacamoleController {
 			SubPlaylistScenarioRepository.save(joinEntity);
 		}
 
-		return "redirect:/guac/Add_ScenarioInSub_Playlis";
+		return "redirect:/guac/Add_ScenarioInSub_Playlist";
 	}
 
 	@GetMapping("/View_Particular_Playlist")
 	public ModelAndView getView_Particular_Playlist(@RequestParam String Id) {
-
 		ModelAndView mav = new ModelAndView("View_Particular_Playlist");
 		JSONArray Finalarray = new JSONArray();
-		List<Playlist> dataList;
-
-		Optional<Add_Scenario> ScenariodataList;
 
 		try {
-
 			int SRNO = Integer.parseInt(Id);
 
-			dataList = PlaylistRepository.getView_Particular_Scenerio(SRNO);
+			// Fetch playlist data
+			List<Playlist> dataList = PlaylistRepository.getView_Particular_Scenerio(SRNO);
 
-			List<Add_Scenario> scenarioDataList = PlaylistsSenarioRepository.getScenariosByPlaylist(SRNO);
+			// Fetch playlist items
+			List<PlaylistItem> playlistItems = PlaylistItemRepository.findByPlaylistId(SRNO);
 
+			// Separate scenario and sub-playlist items
+			List<Integer> scenarioIds = playlistItems.stream()
+					.filter(item -> item.getItemType() == PlaylistItem.ItemType.scenario).map(PlaylistItem::getItemId)
+					.collect(Collectors.toList());
+
+			List<Integer> subPlaylistIds = playlistItems.stream()
+					.filter(item -> item.getItemType() == PlaylistItem.ItemType.sub_playlist)
+					.map(PlaylistItem::getItemId).collect(Collectors.toList());
+
+			// Fetch all scenarios by IDs
+			List<Add_Scenario> scenarioDataList = new ArrayList<>();
+			if (!scenarioIds.isEmpty()) {
+				scenarioDataList = ScenarioRepository.findAllById(scenarioIds);
+			}
+
+			// Fetch all sub-playlists by IDs
+			List<SubPlaylist> subPlaylistDataList = new ArrayList<>();
+			if (!subPlaylistIds.isEmpty()) {
+				subPlaylistDataList = SubPlaylistRepository.findAllById(subPlaylistIds);
+			}
+
+			// Prepare scenario JSON
 			for (Add_Scenario temp : scenarioDataList) {
-				System.out.println("Scenario ID: " + temp.getId() + ", Name: " + temp.getScenarioName());
-
 				JSONObject obj = new JSONObject();
-
-				String Scenario_Name = temp.getScenarioName() != null ? temp.getScenarioName() : "";
-				String Scenario_Title = temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "";
-				String Description = temp.getDescription() != null ? temp.getDescription() : "";
-				String Category = temp.getCategory() != null ? temp.getCategory() : "";
-				String Scenario_Type = temp.getScenarioType() != null ? temp.getScenarioType() : "";
-				String Mode = temp.getMode() != null ? temp.getMode() : "";
-				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
-				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
-				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
-				String NumberofInstance = temp.getNumberofInstance() != null ? temp.getNumberofInstance() : "";
-//				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
-				String Cover_Image = "";
-				int SrNo = temp.getId();
-
-//				srno++;
-
-				obj.put("Scenario_Name", Scenario_Name);
-				obj.put("Scenario_Title", Scenario_Title);
-//				obj.put("Description", Description);
-				obj.put("Category", Category);
-				obj.put("Scenario_Type", Scenario_Type);
-				obj.put("Mode", Mode);
-				obj.put("Difficulty_Level", Difficulty_Level);
-				obj.put("Duration", Duration);
-				obj.put("NumberofInstance", NumberofInstance);
-				obj.put("Cover_Image", Cover_Image);
-				obj.put("Id", SrNo);
-
+				obj.put("item_type", "scenario");
+				obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
+				obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
+				obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
+				obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
+				obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
+				obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
+				obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
+				obj.put("NumberofInstance", temp.getNumberofInstance() != null ? temp.getNumberofInstance() : "");
+				obj.put("Cover_Image", ""); // keeping blank for now
+				obj.put("Id", temp.getId());
 				Finalarray.put(obj);
 			}
 
-			System.out.println("Fetched Datawqwqw: " + dataList.toString()); // Print to console
-			int srno = 0;
+			// Prepare sub-playlist JSON
+			for (SubPlaylist temp : subPlaylistDataList) {
+				JSONObject obj = new JSONObject();
+				obj.put("item_type", "sub_playlist");
+				obj.put("Playlist_Name", temp.getPlaylistName() != null ? temp.getPlaylistName() : "");
+				obj.put("Playlist_Title", temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "");
+				obj.put("Description", temp.getDescription() != null ? temp.getDescription() : "");
+				obj.put("Tag", temp.getTag() != null ? temp.getTag() : "");
+				obj.put("Cover_Image", ""); // keeping blank for now
+				obj.put("Id", temp.getId());
+				Finalarray.put(obj);
+			}
+
+			// Prepare playlist JSON
 			for (Playlist temp : dataList) {
 				JSONObject obj = new JSONObject();
-
-				String PlaylistTitle = temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "";
-				String PlaylistName = temp.getPlaylistName() != null ? temp.getPlaylistName() : "";
-				String Description = temp.getDescription() != null ? temp.getDescription() : "";
-				String Tag = temp.getTag() != null ? temp.getTag() : "";
-
-//				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
-				String Cover_Image = "";
-				int SrNo = temp.getId();
-
-//				srno++;
-
-				obj.put("PlaylistTitle", PlaylistTitle);
-				obj.put("PlaylistName", PlaylistName);
-				obj.put("Description", Description);
-				obj.put("Tag", Tag);
-
-				obj.put("Cover_Image", Cover_Image);
-				obj.put("Id", SrNo);
-
+				obj.put("PlaylistTitle", temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "");
+				obj.put("PlaylistName", temp.getPlaylistName() != null ? temp.getPlaylistName() : "");
+				obj.put("Description", temp.getDescription() != null ? temp.getDescription() : "");
+				obj.put("Tag", temp.getTag() != null ? temp.getTag() : "");
+				obj.put("Cover_Image", ""); // keeping blank for now
+				obj.put("Id", temp.getId());
 				Finalarray.put(obj);
 			}
 
-//			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
-
+			// Add to model
 			mav.addObject("listObj", Finalarray.toString());
-			mav.addObject("scenarioList", ScenarioRepository.findAll());
+
+			List<SubPlaylist> subPlaylists = SubPlaylistRepository.findAll();
+			mav.addObject("subPlaylists", subPlaylists);
+
+			List<Add_Scenario> scenarios = ScenarioRepository.findAll();
+			mav.addObject("scenarioList", scenarios);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1117,128 +1119,42 @@ public class GuacamoleController {
 			mav.addObject("error", e.getMessage());
 			System.out.println("Error fetching data: " + e.getMessage());
 		}
+
 		return mav;
 	}
 
-//	@GetMapping("/View_Particular_Playlist")
-//	public ModelAndView getView_Particular_Playlist(@RequestParam String Id) {
-//		ModelAndView mav = new ModelAndView("View_Particular_Playlist");
-//		JSONArray finalArray = new JSONArray();
-//		JSONArray scenarioItems = new JSONArray();
-//		JSONArray subPlaylistItems = new JSONArray();
-//		JSONArray otherItems = new JSONArray();
-//
-//		try {
-//			int SRNO = Integer.parseInt(Id);
-//
-//			// Get playlist details
-//			List<Playlist> dataList = PlaylistRepository.getView_Particular_Scenerio(SRNO);
-//
-//			// Get all items in this playlist
-//			List<PlaylistItem> playlistItems = PlaylistItemRepository.findByPlaylistId(SRNO);
-//
-//			// Process each playlist item
-//			for (PlaylistItem item : playlistItems) {
-//				JSONObject obj = new JSONObject();
-//				obj.put("PlaylistItemId", item.getId());
-//				obj.put("PlaylistId", item.getPlaylistId());
-//				String itemType = item.getItemType() != null ? item.getItemType().toString() : "";
-//				obj.put("ItemType", itemType);
-//				obj.put("ItemId", item.getItemId());
-//				obj.put("Position", item.getPosition() != null ? item.getPosition() : -1);
-//
-//				if ("scenario".equalsIgnoreCase(itemType)) {
-//					// Get scenario details
-//					List<Add_Scenario> scenarios = PlaylistsSenarioRepository.getScenariosByPlaylist(item.getItemId());
-//
-//					for (Add_Scenario scenario : scenarios) {
-//						JSONObject scenarioObj = new JSONObject();
-//						scenarioObj.put("Scenario_Name",
-//								scenario.getScenarioName() != null ? scenario.getScenarioName() : "");
-//						scenarioObj.put("Scenario_Title",
-//								scenario.getScenarioTitle() != null ? scenario.getScenarioTitle() : "");
-//						scenarioObj.put("Category", scenario.getCategory() != null ? scenario.getCategory() : "");
-//						scenarioObj.put("Scenario_Type",
-//								scenario.getScenarioType() != null ? scenario.getScenarioType() : "");
-//						scenarioObj.put("Mode", scenario.getMode() != null ? scenario.getMode() : "");
-//						scenarioObj.put("Difficulty_Level",
-//								scenario.getDifficultyLevel() != null ? scenario.getDifficultyLevel() : "");
-//						scenarioObj.put("Duration", scenario.getDuration() != null ? scenario.getDuration() : "");
-//						scenarioObj.put("NumberofInstance",
-//								scenario.getNumberofInstance() != null ? scenario.getNumberofInstance() : "");
-//						scenarioObj.put("Cover_Image", "");
-//						scenarioObj.put("Id", scenario.getId());
-//
-//						scenarioItems.put(scenarioObj);
-//					}
-//
-//				} else if ("sub_playlist".equalsIgnoreCase(itemType)) {
-//					// Get sub-playlist details
-//					Optional<Playlist> subPlaylistOpt = PlaylistRepository.findById(item.getItemId());
-//					if (subPlaylistOpt.isPresent()) {
-//						Playlist subPlaylist = subPlaylistOpt.get();
-//						obj.put("PlaylistTitle",
-//								subPlaylist.getPlaylistTitle() != null ? subPlaylist.getPlaylistTitle() : "");
-//						obj.put("PlaylistName",
-//								subPlaylist.getPlaylistName() != null ? subPlaylist.getPlaylistName() : "");
-//						obj.put("Description",
-//								subPlaylist.getDescription() != null ? subPlaylist.getDescription() : "");
-//						obj.put("Tag", subPlaylist.getTag() != null ? subPlaylist.getTag() : "");
-//						obj.put("Cover_Image", "");
-//						obj.put("Id", subPlaylist.getId());
-//						subPlaylistItems.put(obj);
-//					}
-//				} else {
-//					// Handle other item types
-//					obj.put("Title", "Unknown Item Type");
-//					obj.put("Description", "This item type is not specifically handled");
-//					otherItems.put(obj);
-//				}
-//			}
-//
-//			// Add playlist details
-//			for (Playlist temp : dataList) {
-//				JSONObject obj = new JSONObject();
-//				obj.put("PlaylistTitle", temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "");
-//				obj.put("PlaylistName", temp.getPlaylistName() != null ? temp.getPlaylistName() : "");
-//				obj.put("Description", temp.getDescription() != null ? temp.getDescription() : "");
-//				obj.put("Tag", temp.getTag() != null ? temp.getTag() : "");
-//				obj.put("Cover_Image", "");
-//				obj.put("Id", temp.getId());
-//				obj.put("Type", "PLAYLIST_DETAILS");
-//				finalArray.put(obj);
-//			}
-//
-//			// Add categorized items
-//			JSONObject scenarioCategory = new JSONObject();
-//			scenarioCategory.put("Type", "SCENARIO_ITEMS");
-//			scenarioCategory.put("Items", scenarioItems);
-//			scenarioCategory.put("Count", scenarioItems.length());
-//			finalArray.put(scenarioCategory);
-//
-//			JSONObject subPlaylistCategory = new JSONObject();
-//			subPlaylistCategory.put("Type", "SUBPLAYLIST_ITEMS");
-//			subPlaylistCategory.put("Items", subPlaylistItems);
-//			subPlaylistCategory.put("Count", subPlaylistItems.length());
-//			finalArray.put(subPlaylistCategory);
-//
-//			JSONObject otherCategory = new JSONObject();
-//			otherCategory.put("Type", "OTHER_ITEMS");
-//			otherCategory.put("Items", otherItems);
-//			otherCategory.put("Count", otherItems.length());
-//			finalArray.put(otherCategory);
-//
-//			mav.addObject("listObj", finalArray.toString());
-//			mav.addObject("scenarioList", ScenarioRepository.findAll());
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			mav.addObject("listObj", null);
-//			mav.addObject("error", e.getMessage());
-//			System.out.println("Error fetching data: " + e.getMessage());
-//		}
-//		return mav;
-//	}
+	@PostMapping("/addplaylist_SubPlaylist")
+	@ResponseBody
+	public String addSubPlaylistToPlaylist(@RequestParam("playlistId") int playlistId,
+			@RequestParam("subPlaylistId") int subPlaylistId) {
+		try {
+			// check parent playlist exists
+			Playlist playlist = PlaylistRepository.findById(playlistId)
+					.orElseThrow(() -> new RuntimeException("Playlist not found"));
+
+			// check sub playlist exists
+			SubPlaylist sub = SubPlaylistRepository.findById(subPlaylistId)
+					.orElseThrow(() -> new RuntimeException("Sub Playlist not found"));
+
+			// prevent duplicates
+			boolean exists = PlaylistItemRepository.existsByPlaylistIdAndItemIdAndItemType(playlistId, subPlaylistId,
+					PlaylistItem.ItemType.sub_playlist);
+
+			if (!exists) {
+				PlaylistItem item = new PlaylistItem();
+				item.setPlaylistId(playlistId);
+				item.setItemId(subPlaylistId);
+				item.setItemType(PlaylistItem.ItemType.sub_playlist);
+
+				PlaylistItemRepository.save(item);
+			}
+
+			return "success";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "error: " + e.getMessage();
+		}
+	}
 
 	@GetMapping("/editplaylist/{id}")
 	public ModelAndView editplaylist(@PathVariable("id") Integer id) {
@@ -1526,6 +1442,103 @@ public class GuacamoleController {
 		return mav;
 	}
 
+	@GetMapping("/View_SubPalylist")
+	public ModelAndView getView_SubPalylist(Principal principal) {
+		ModelAndView mav = new ModelAndView("View_SubPalylist");
+		JSONArray Finalarray = new JSONArray();
+		List<SubPlaylist> dataList;
+		try {
+			// start
+
+			Authentication authentication = (Authentication) principal;
+			User loginedUser = (User) authentication.getPrincipal();
+
+			String userName = loginedUser.getUsername();
+			String groupName = "";
+			StringBuilder vmNamesBuilder = new StringBuilder();
+
+			List<AppUser> userList = userRepository.findByuserName(userName);
+
+			boolean isSuperAdmin = authentication.getAuthorities().stream()
+					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+
+			boolean isAdmin = authentication.getAuthorities().stream()
+					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+
+			if (isSuperAdmin) {
+				dataList = SubPlaylistRepository.findAll();
+			} else {
+				// Get group names
+				for (AppUser appUser : userList) {
+					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
+				}
+
+				List<String> groups = new ArrayList<>();
+				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
+				while (groupTokenizer.hasMoreTokens()) {
+					groups.add(groupTokenizer.nextToken());
+				}
+
+				// Get VM names by group
+				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
+				for (Object[] vmEntry : vmList) {
+					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
+				}
+
+				// Split VM names string into a list
+				List<String> vmGroups = new ArrayList<>();
+				String vmNames = vmNamesBuilder.toString();
+				if (!vmNames.isEmpty()) {
+					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
+					while (vmTokenizer.hasMoreTokens()) {
+						vmGroups.add(vmTokenizer.nextToken());
+					}
+				}
+//				dataList = ScenarioRepository.getView_Scenario(vmGroups);
+				dataList = SubPlaylistRepository.findAll();
+			}
+
+//			 dataList = kVMDriveDetailsRepository.findBykVMDetails();
+			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
+			int srno = 0;
+			for (SubPlaylist temp : dataList) {
+				JSONObject obj = new JSONObject();
+
+				String PlaylistTitle = temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "";
+				String PlaylistName = temp.getPlaylistName() != null ? temp.getPlaylistName() : "";
+				String Description = temp.getDescription() != null ? temp.getDescription() : "";
+				String Tag = temp.getTag() != null ? temp.getTag() : "";
+
+//				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
+				String Cover_Image = "";
+				int SrNo = temp.getId();
+
+//				srno++;
+
+				obj.put("PlaylistTitle", PlaylistTitle);
+				obj.put("PlaylistName", PlaylistName);
+				obj.put("Description", Description);
+				obj.put("Tag", Tag);
+
+				obj.put("Cover_Image", Cover_Image);
+				obj.put("Id", SrNo);
+
+				Finalarray.put(obj);
+			}
+
+			System.out.println("Finalarray_getView_SubPalylist ::" + Finalarray);
+
+			mav.addObject("listObj", Finalarray.toString());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			mav.addObject("listObj", null);
+			mav.addObject("error", e.getMessage());
+			System.out.println("Error fetching data: " + e.getMessage());
+		}
+		return mav;
+	}
+
 	@GetMapping("/Playlistimage/{id}")
 	public void getPlaylistImage(@PathVariable int id, HttpServletResponse response) throws IOException {
 //		System.out.println("inside_render_image_getPlaylistImage ::");
@@ -1545,6 +1558,21 @@ public class GuacamoleController {
 	public void getScenarioImage(@PathVariable int id, HttpServletResponse response) throws IOException {
 //		System.out.println("inside_render_image_getScenarioImage ::");
 		Optional<Add_Scenario> scenario = ScenarioRepository.findById(id);
+		if (scenario.isPresent() && scenario.get().getCoverImage() != null) {
+			byte[] imageBytes = scenario.get().getCoverImage();
+			response.setContentType("image/jpeg");
+			response.getOutputStream().write(imageBytes);
+			response.getOutputStream().close();
+		} else {
+
+			response.sendRedirect("/images/default-student.jpg");
+		}
+	}
+
+	@GetMapping("/SubPlaylistimage/{id}")
+	public void getSubPlaylistimage(@PathVariable int id, HttpServletResponse response) throws IOException {
+//		System.out.println("inside_render_image_getScenarioImage ::");
+		Optional<SubPlaylist> scenario = SubPlaylistRepository.findById(id);
 		if (scenario.isPresent() && scenario.get().getCoverImage() != null) {
 			byte[] imageBytes = scenario.get().getCoverImage();
 			response.setContentType("image/jpeg");
@@ -1984,61 +2012,106 @@ public class GuacamoleController {
 		return mav;
 	}
 
+//	@PostMapping("/addplaylist_Scenario")
+//	@ResponseBody
+//	public String addScenarioToPlaylist(@RequestParam("playlistId") int playlistId,
+//			@RequestParam("scenarioId") int scenarioId) {
+//		try {
+//			// fetch Playlist and Scenario
+//			Playlist playlist = PlaylistRepository.findById(playlistId)
+//					.orElseThrow(() -> new RuntimeException("Playlist not found"));
+//
+//			Add_Scenario scenario = ScenarioRepository.findById(scenarioId)
+//					.orElseThrow(() -> new RuntimeException("Scenario not found"));
+//
+//			// create composite key
+//			PlaylistScenarioId id = new PlaylistScenarioId(playlistId, scenarioId);
+//
+//			// create entity
+//			PlaylistScenario ps = new PlaylistScenario();
+//			ps.setId(id);
+//			ps.setPlaylist(playlist);
+//			ps.setScenario(scenario);
+//
+//			PlaylistsSenarioRepository.save(ps);
+//
+//			return "success";
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return "error: " + e.getMessage();
+//		}
+//	}
+
 	@PostMapping("/addplaylist_Scenario")
 	@ResponseBody
 	public String addScenarioToPlaylist(@RequestParam("playlistId") int playlistId,
-			@RequestParam("scenarioId") int scenarioId) {
+			@RequestParam("scenarioId") List<Integer> scenarioIds) {
 		try {
-			// fetch Playlist and Scenario
 			Playlist playlist = PlaylistRepository.findById(playlistId)
 					.orElseThrow(() -> new RuntimeException("Playlist not found"));
 
-			Add_Scenario scenario = ScenarioRepository.findById(scenarioId)
-					.orElseThrow(() -> new RuntimeException("Scenario not found"));
+			for (Integer scenarioId : scenarioIds) {
+				Add_Scenario scenario = ScenarioRepository.findById(scenarioId)
+						.orElseThrow(() -> new RuntimeException("Scenario not found: " + scenarioId));
 
-			// create composite key
-			PlaylistScenarioId id = new PlaylistScenarioId(playlistId, scenarioId);
+				// Prevent duplicates
+				boolean exists = PlaylistItemRepository.existsByPlaylistIdAndItemIdAndItemType(playlistId, scenarioId,
+						PlaylistItem.ItemType.scenario);
 
-			// create entity
-			PlaylistScenario ps = new PlaylistScenario();
-			ps.setId(id);
-			ps.setPlaylist(playlist);
-			ps.setScenario(scenario);
-
-			// save
-			PlaylistsSenarioRepository.save(ps);
-
+				if (!exists) {
+					PlaylistItem item = new PlaylistItem();
+					item.setPlaylistId(playlistId);
+					item.setItemId(scenarioId);
+					item.setItemType(PlaylistItem.ItemType.scenario);
+					PlaylistItemRepository.save(item);
+				}
+			}
 			return "success";
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "error: " + e.getMessage();
 		}
 	}
 
-	@GetMapping("/Remove_Particular_ScenerioPlaylist")
+	@GetMapping("/getSubPlaylistScenarios")
 	@ResponseBody
-	public String removeParticularScenarioPlaylist(@RequestParam("playlistId") int playlistId,
-			@RequestParam("scenarioId") int scenarioId) {
-		String result = "fail";
-		try {
-			// Create composite key
-			PlaylistScenarioId id = new PlaylistScenarioId(playlistId, scenarioId);
+	public List<Map<String, Object>> getSubPlaylistScenarios(@RequestParam int subPlaylistId) {
+		List<Map<String, Object>> scenarios = new ArrayList<>();
 
-			// Check if record exists
-			if (PlaylistsSenarioRepository.existsById(id)) {
-				PlaylistsSenarioRepository.deleteById(id);
-				result = "success";
-			} else {
-				result = "not_found";
+		try {
+			SubPlaylist subPlaylist = SubPlaylistRepository.findById(subPlaylistId).orElse(null);
+			if (subPlaylist != null) {
+				for (SubPlaylistScenario sps : subPlaylist.getScenarios()) {
+					Add_Scenario scenario = sps.getScenario();
+					Map<String, Object> scenarioMap = new HashMap<>();
+					scenarioMap.put("id", scenario.getId());
+					scenarioMap.put("title", scenario.getScenarioTitle());
+					scenarioMap.put("type", scenario.getScenarioType());
+					scenarioMap.put("difficulty", scenario.getDifficultyLevel());
+					scenarios.add(scenarioMap);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("Error deleting data: " + e.getMessage());
 		}
-		return result;
+
+		return scenarios;
 	}
 
+	@GetMapping("/removePlaylistItem")
+	@ResponseBody
+	public String removePlaylistItem(@RequestParam int playlistId, @RequestParam String itemType,
+			@RequestParam int itemId) {
+		try {
+			PlaylistItem.ItemType type = PlaylistItem.ItemType.valueOf(itemType);
+			PlaylistItemRepository.deleteByPlaylistIdAndItemTypeAndItemId(playlistId, type, itemId);
+			return "success";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "error";
+		}
+	}
 //	
 
 	@PostMapping("/addComment")
@@ -2368,27 +2441,104 @@ public class GuacamoleController {
 
 //	getPlaylists
 
+//	@PostMapping("/subplaylistsave")
+//	public String subplaylistsaveData(SubPlaylist obj, RedirectAttributes redirectAttributes, Principal principal) {
+//
+//		try {
+//			// Set CreatedBy
+//			if (principal != null) {
+//				obj.setCreatedBy(principal.getName());
+//			}
+//
+//			boolean isNew = (obj.getId() == 0);
+//
+//			// If editing, fetch existing and merge if necessary
+//			if (!isNew) {
+//				Optional<SubPlaylist> existing = SubPlaylistRepository.findById(obj.getId());
+//				if (existing.isPresent()) {
+//					SubPlaylist existingPlaylist = existing.get();
+//					// Optionally merge data (if some fields should not be overwritten)
+//				} else {
+//					redirectAttributes.addFlashAttribute("message", "Playlist not found.");
+//					redirectAttributes.addFlashAttribute("status", "error");
+//					return "redirect:/guac/Add_Sub_Playlist";
+//				}
+//			}
+//
+//			// Save to DB
+//			SubPlaylistRepository.save(obj);
+//
+//			redirectAttributes.addFlashAttribute("message", "The playlist has been saved successfully!");
+//			redirectAttributes.addFlashAttribute("status", "success");
+//
+////	        return "redirect:/guac/View_Particular_Playlist?Id=" + obj.getId();
+//			return "redirect:/guac/Add_Sub_Playlist";
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			redirectAttributes.addFlashAttribute("message", "Error while saving playlist: " + e.getMessage());
+//			redirectAttributes.addFlashAttribute("status", "error");
+//			return "redirect:/guac/Add_Sub_Playlist";
+//		}
+//	}
+
 	@PostMapping("/subplaylistsave")
-	public String subplaylistsaveData(SubPlaylist obj, RedirectAttributes redirectAttributes, Principal principal) {
+	public String subplaylistsaveData(SubPlaylist obj, RedirectAttributes redirectAttributes,
+			@RequestParam(required = false) MultipartFile cover_image, Principal principal) {
 
 		try {
-			// Set CreatedBy
+			// Set createdBy
 			if (principal != null) {
 				obj.setCreatedBy(principal.getName());
 			}
 
 			boolean isNew = (obj.getId() == 0);
 
-			// If editing, fetch existing and merge if necessary
-			if (!isNew) {
+			if (isNew) {
+				// New playlist - handle image
+				if (cover_image != null && !cover_image.isEmpty()) {
+					String contentType = cover_image.getContentType();
+					if (contentType != null && contentType.startsWith("image/")) {
+						obj.setCoverImage(cover_image.getBytes());
+						System.out.println("Uploaded image saved to database");
+					} else {
+						redirectAttributes.addFlashAttribute("message",
+								"Invalid file type. Please upload an image file.");
+						redirectAttributes.addFlashAttribute("status", "error");
+					}
+				} else {
+					// No image uploaded - load default
+					String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
+					try {
+						byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
+						obj.setCoverImage(defaultImageBytes);
+						System.out.println("Default image loaded and saved to database");
+					} catch (IOException e) {
+						System.err.println("Error loading default image: " + e.getMessage());
+						obj.setCoverImage(createPlaceholderImage());
+						System.out.println("Placeholder image created and saved to database");
+					}
+				}
+			} else {
+				// Editing existing playlist
 				Optional<SubPlaylist> existing = SubPlaylistRepository.findById(obj.getId());
 				if (existing.isPresent()) {
 					SubPlaylist existingPlaylist = existing.get();
-					// Optionally merge data (if some fields should not be overwritten)
-				} else {
-					redirectAttributes.addFlashAttribute("message", "Playlist not found.");
-					redirectAttributes.addFlashAttribute("status", "error");
-					return "redirect:/guac/Add_Sub_Playlist";
+
+					// Retain existing image if new one isn't uploaded
+					if (cover_image == null || cover_image.isEmpty()) {
+						obj.setCoverImage(existingPlaylist.getCoverImage());
+					} else {
+						String contentType = cover_image.getContentType();
+						if (contentType != null && contentType.startsWith("image/")) {
+							obj.setCoverImage(cover_image.getBytes());
+							System.out.println("Updated image saved to database");
+						} else {
+							redirectAttributes.addFlashAttribute("message",
+									"Invalid file type. Please upload an image file.");
+							redirectAttributes.addFlashAttribute("status", "error");
+						}
+					}
 				}
 			}
 
@@ -2406,6 +2556,109 @@ public class GuacamoleController {
 			redirectAttributes.addFlashAttribute("message", "Error while saving playlist: " + e.getMessage());
 			redirectAttributes.addFlashAttribute("status", "error");
 			return "redirect:/guac/Add_Sub_Playlist";
+		}
+	}
+
+	@GetMapping("/View_Particular_SubPlaylist")
+	public ModelAndView getView_Particular_SubPlaylist(@RequestParam String Id) {
+		ModelAndView mav = new ModelAndView("View_Particular_SubPlaylist");
+		JSONArray Finalarray = new JSONArray();
+
+		try {
+			int SRNO = Integer.parseInt(Id);
+
+			// ✅ Fetch sub-playlist
+			Optional<SubPlaylist> subPlaylistOpt = SubPlaylistRepository.findById(SRNO);
+
+			if (subPlaylistOpt.isPresent()) {
+				SubPlaylist subPlaylist = subPlaylistOpt.get();
+
+				List<SubPlaylistScenario> scenarioLinks = SubPlaylistScenarioRepository.findBySubPlaylist(subPlaylist);
+
+				for (SubPlaylistScenario link : scenarioLinks) {
+					Add_Scenario temp = link.getScenario();
+
+					JSONObject obj = new JSONObject();
+					obj.put("item_type", "scenario");
+					obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
+					obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
+					obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
+					obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
+					obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
+					obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
+					obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
+					obj.put("NumberofInstance", temp.getNumberofInstance() != null ? temp.getNumberofInstance() : "");
+					obj.put("Cover_Image", ""); // ✅ serve scenario image if needed
+					obj.put("Id", temp.getId());
+					obj.put("subPlaylistId", subPlaylist.getId()); // ✅ Add sub-playlist ID to each scenario
+					Finalarray.put(obj);
+				}
+
+				// ✅ Pass scenario JSON
+				mav.addObject("listObj", Finalarray.toString());
+
+				// ✅ Pass SubPlaylist details separately
+				JSONObject subObj = new JSONObject();
+				subObj.put("Id", subPlaylist.getId());
+				subObj.put("Playlist_Name", subPlaylist.getPlaylistName());
+				subObj.put("Playlist_Title", subPlaylist.getPlaylistTitle());
+				subObj.put("Description", subPlaylist.getDescription());
+				subObj.put("Tag", subPlaylist.getTag());
+				subObj.put("Cover_Image", "");
+				mav.addObject("subPlaylistObj", subObj.toString());
+
+			} else {
+				mav.addObject("listObj", "[]");
+				mav.addObject("subPlaylistObj", "{}");
+				mav.addObject("error", "SubPlaylist not found for ID " + SRNO);
+			}
+
+			List<Add_Scenario> scenarios = ScenarioRepository.findAll();
+			mav.addObject("scenarioList", scenarios);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			mav.addObject("listObj", "[]");
+			mav.addObject("subPlaylistObj", "{}");
+			mav.addObject("error", e.getMessage());
+			System.out.println("Error fetching data: " + e.getMessage());
+		}
+
+		return mav;
+	}
+
+	@PostMapping("/addSubPlaylist_Scenario")
+	public String addSubPlaylist_Scenario(@RequestParam("subPlaylistId") Integer subPlaylistId,
+			@RequestParam("scenarioIds") List<Integer> scenarioIds) {
+
+		// ✅ Fetch existing SubPlaylist
+		SubPlaylist subPlaylist = SubPlaylistRepository.findById(subPlaylistId)
+				.orElseThrow(() -> new RuntimeException("SubPlaylist not found with ID " + subPlaylistId));
+
+		for (Integer scenarioId : scenarioIds) {
+			Add_Scenario scenario = ScenarioRepository.findById(scenarioId)
+					.orElseThrow(() -> new RuntimeException("Scenario not found with ID " + scenarioId));
+
+			SubPlaylistScenario joinEntity = new SubPlaylistScenario();
+			joinEntity.setSubPlaylist(subPlaylist);
+			joinEntity.setScenario(scenario);
+
+			SubPlaylistScenarioRepository.save(joinEntity);
+		}
+
+		return "redirect:/guac/View_Particular_Playlist?Id=" + subPlaylistId;
+	}
+
+	@GetMapping("/removeSubPlaylistItem")
+	@ResponseBody
+	public String removeSubPlaylistItem(@RequestParam("subPlaylistId") Integer subPlaylistId,
+			@RequestParam("itemId") Integer scenarioId) {
+		try {
+			// Call repository method to delete record by both IDs
+			SubPlaylistScenarioRepository.deleteBySubPlaylistIdAndScenarioId(subPlaylistId, scenarioId);
+			return "success";
+		} catch (Exception e) {
+			return "error";
 		}
 	}
 

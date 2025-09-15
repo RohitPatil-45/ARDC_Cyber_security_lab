@@ -21,6 +21,9 @@ public class PortDetails {
 
     @Column(name = "no_vnc_port", nullable = false)
     private Integer noVncPort;
+    
+    @Column(name = "rdp_port", nullable = false)
+    private Integer rdpPort;
 
     @Column(name = "vm_name", nullable = false, length = 50)
     private String vmName;
@@ -47,6 +50,14 @@ public class PortDetails {
 
 	public void setNoVncPort(Integer noVncPort) {
 		this.noVncPort = noVncPort;
+	}
+	
+	public Integer getRdpPort() {
+		return rdpPort;
+	}
+
+	public void setRdpPort(Integer rdpPort) {
+		this.rdpPort = rdpPort;
 	}
 
 	public String getVmName() {

@@ -339,18 +339,19 @@ label {
 									<div class="row">
 										<div class="col-md-6">
 											<div class="form-group">
-												<label for="playlistName" class="required-field">Sub Playlist
-													Name</label> <input type="text" th:field="*{playlistName}" required
-													id="playlistName" name="playlistName" class="form-control"
-													placeholder="Enter playlist name">
+												<label for="playlistName" class="required-field">Sub
+													Playlist Name</label> <input type="text" th:field="*{playlistName}"
+													required id="playlistName" name="playlistName"
+													class="form-control" placeholder="Enter playlist name">
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group">
-												<label for="playlistTitle" class="required-field">Sub Playlist
-													Title</label> <input type="text" th:field="*{playlistTitle}"
-													required id="playlistTitle" name="playlistTitle"
-													class="form-control" placeholder="Enter playlist title">
+												<label for="playlistTitle" class="required-field">Sub
+													Playlist Title</label> <input type="text"
+													th:field="*{playlistTitle}" required id="playlistTitle"
+													name="playlistTitle" class="form-control"
+													placeholder="Enter playlist title">
 											</div>
 										</div>
 									</div>
@@ -370,7 +371,18 @@ label {
 									<!-- Media & Resources -->
 									<div class="row">
 										<div class="col-md-6">
-											
+
+											<div class="form-group">
+												<label for="cover_image"> Cover Image</label>
+												<div class="custom-file">
+													<input type="file" class="custom-file-input"
+														id="cover_image" name="cover_image" accept="image/*">
+													<label class="custom-file-label" for="cover_image">Choose
+														image</label>
+												</div>
+												<small class="form-text text-muted">Recommended
+													size: 1200x630 pixels</small>
+											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group">
@@ -382,7 +394,7 @@ label {
 									</div>
 
 
-									
+
 
 									<!-- Hidden field for CreatedBy if needed -->
 									<input type="hidden" th:field="*{createdBy}" />
