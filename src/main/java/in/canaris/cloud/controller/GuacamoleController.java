@@ -47,8 +47,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import in.canaris.cloud.entity.AppUser;
 import in.canaris.cloud.entity.CloudInstance;
 import in.canaris.cloud.entity.Discount;
+import in.canaris.cloud.entity.Group;
 import in.canaris.cloud.entity.PlaylistScenario;
 import in.canaris.cloud.entity.PlaylistScenarioId;
+import in.canaris.cloud.openstack.entity.UserPlaylistMapping;
 import in.canaris.cloud.openstack.entity.Add_Scenario;
 import in.canaris.cloud.openstack.entity.ChartBoatInstructionTemplate;
 import in.canaris.cloud.openstack.entity.CommandHistory;
@@ -63,6 +65,7 @@ import in.canaris.cloud.openstack.entity.SubPlaylistScenario;
 import in.canaris.cloud.openstack.entity.UserLab;
 import in.canaris.cloud.openstack.entity.UserScenario;
 import in.canaris.cloud.openstack.entity.UserWiseChatBoatInstructionTemplate;
+import in.canaris.cloud.openstack.entity.UserWisePlaylistForm;
 import in.canaris.cloud.repository.ScenarioRepository;
 import in.canaris.cloud.repository.UserRepository;
 import in.canaris.cloud.repository.UserScenerioRepository;
@@ -72,11 +75,14 @@ import in.canaris.cloud.repository.CloudInstanceRepository;
 import in.canaris.cloud.repository.PlaylistRepository;
 import in.canaris.cloud.repository.PlaylistsSenarioRepository;
 import in.canaris.cloud.repository.DiscoverDockerNetworkRepository;
+import in.canaris.cloud.repository.GroupRepository;
 import in.canaris.cloud.repository.CommandHistoryRepository;
 import in.canaris.cloud.repository.ScenarioCommentsRepository;
 import in.canaris.cloud.openstack.repository.ScenarioLabTemplateRepository;
 import in.canaris.cloud.repository.SubPlaylistScenarioRepository;
 import in.canaris.cloud.repository.PlaylistItemRepository;
+import in.canaris.cloud.repository.AppUserRepository;
+import in.canaris.cloud.repository.UserPlaylistMappingRepository;
 
 import in.canaris.cloud.repository.SubPlaylistRepository;
 import in.canaris.cloud.repository.UserLabRepository;
@@ -147,6 +153,15 @@ public class GuacamoleController {
 
 	@Autowired
 	PlaylistItemRepository PlaylistItemRepository;
+
+	@Autowired
+	AppUserRepository AppUserRepository;
+
+	@Autowired
+	UserPlaylistMappingRepository UserPlaylistMappingRepository;
+	
+	@Autowired
+	GroupRepository GroupRepository;
 
 	@GetMapping("/")
 	public String home() {
@@ -1345,100 +1360,153 @@ public class GuacamoleController {
 		}
 	}
 
+//	@GetMapping("/View_Playlist")
+//	public ModelAndView getView_Playlist(Principal principal) {
+//		ModelAndView mav = new ModelAndView("View_Playlist");
+//		JSONArray Finalarray = new JSONArray();
+//		List<Playlist> dataList;
+//		try {
+//			// start
+//
+//			Authentication authentication = (Authentication) principal;
+//			User loginedUser = (User) authentication.getPrincipal();
+//
+//			String userName = loginedUser.getUsername();
+//			String groupName = "";
+//			StringBuilder vmNamesBuilder = new StringBuilder();
+//
+//			List<AppUser> userList = userRepository.findByuserName(userName);
+//
+//			boolean isSuperAdmin = authentication.getAuthorities().stream()
+//					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+//
+//			boolean isAdmin = authentication.getAuthorities().stream()
+//					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+//
+//			if (isSuperAdmin) {
+//				dataList = PlaylistRepository.findAll();
+//			} else {
+//				// Get group names
+//				for (AppUser appUser : userList) {
+//					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
+//				}
+//
+//				List<String> groups = new ArrayList<>();
+//				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
+//				while (groupTokenizer.hasMoreTokens()) {
+//					groups.add(groupTokenizer.nextToken());
+//				}
+//
+//				// Get VM names by group
+//				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
+//				for (Object[] vmEntry : vmList) {
+//					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
+//				}
+//
+//				// Split VM names string into a list
+//				List<String> vmGroups = new ArrayList<>();
+//				String vmNames = vmNamesBuilder.toString();
+//				if (!vmNames.isEmpty()) {
+//					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
+//					while (vmTokenizer.hasMoreTokens()) {
+//						vmGroups.add(vmTokenizer.nextToken());
+//					}
+//				}
+////				dataList = ScenarioRepository.getView_Scenario(vmGroups);
+//				dataList = PlaylistRepository.findAll();
+//			}
+//
+////			 dataList = kVMDriveDetailsRepository.findBykVMDetails();
+//			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
+//			int srno = 0;
+//			for (Playlist temp : dataList) {
+//				JSONObject obj = new JSONObject();
+//
+//				String PlaylistTitle = temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "";
+//				String PlaylistName = temp.getPlaylistName() != null ? temp.getPlaylistName() : "";
+//				String Description = temp.getDescription() != null ? temp.getDescription() : "";
+//				String Tag = temp.getTag() != null ? temp.getTag() : "";
+//
+////				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
+//				String Cover_Image = "";
+//				int SrNo = temp.getId();
+//
+////				srno++;
+//
+//				obj.put("PlaylistTitle", PlaylistTitle);
+//				obj.put("PlaylistName", PlaylistName);
+//				obj.put("Description", Description);
+//				obj.put("Tag", Tag);
+//
+//				obj.put("Cover_Image", Cover_Image);
+//				obj.put("Id", SrNo);
+//
+//				Finalarray.put(obj);
+//			}
+//
+//			System.out.println("Finalarray_getView_Playlist ::" + Finalarray);
+//
+//			mav.addObject("listObj", Finalarray.toString());
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			mav.addObject("listObj", null);
+//			mav.addObject("error", e.getMessage());
+//			System.out.println("Error fetching data: " + e.getMessage());
+//		}
+//		return mav;
+//	}
+
 	@GetMapping("/View_Playlist")
 	public ModelAndView getView_Playlist(Principal principal) {
 		ModelAndView mav = new ModelAndView("View_Playlist");
 		JSONArray Finalarray = new JSONArray();
-		List<Playlist> dataList;
-		try {
-			// start
+		List<Playlist> dataList = new ArrayList<>();
 
+		try {
 			Authentication authentication = (Authentication) principal;
 			User loginedUser = (User) authentication.getPrincipal();
 
 			String userName = loginedUser.getUsername();
-			String groupName = "";
-			StringBuilder vmNamesBuilder = new StringBuilder();
-
-			List<AppUser> userList = userRepository.findByuserName(userName);
 
 			boolean isSuperAdmin = authentication.getAuthorities().stream()
 					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
 
-			boolean isAdmin = authentication.getAuthorities().stream()
-					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-
 			if (isSuperAdmin) {
+				// SuperAdmin → show all playlists
 				dataList = PlaylistRepository.findAll();
 			} else {
-				// Get group names
-				for (AppUser appUser : userList) {
-					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
-				}
+				// Normal User → get only playlists assigned to them
+				List<Integer> playlistIds = UserPlaylistMappingRepository.findPlaylistIdsByUserName(userName);
 
-				List<String> groups = new ArrayList<>();
-				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
-				while (groupTokenizer.hasMoreTokens()) {
-					groups.add(groupTokenizer.nextToken());
+				if (playlistIds != null && !playlistIds.isEmpty()) {
+					dataList = PlaylistRepository.findAllById(playlistIds);
 				}
-
-				// Get VM names by group
-				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
-				for (Object[] vmEntry : vmList) {
-					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
-				}
-
-				// Split VM names string into a list
-				List<String> vmGroups = new ArrayList<>();
-				String vmNames = vmNamesBuilder.toString();
-				if (!vmNames.isEmpty()) {
-					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
-					while (vmTokenizer.hasMoreTokens()) {
-						vmGroups.add(vmTokenizer.nextToken());
-					}
-				}
-//				dataList = ScenarioRepository.getView_Scenario(vmGroups);
-				dataList = PlaylistRepository.findAll();
 			}
 
-//			 dataList = kVMDriveDetailsRepository.findBykVMDetails();
-			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
-			int srno = 0;
+			// Convert to JSON
 			for (Playlist temp : dataList) {
 				JSONObject obj = new JSONObject();
 
-				String PlaylistTitle = temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "";
-				String PlaylistName = temp.getPlaylistName() != null ? temp.getPlaylistName() : "";
-				String Description = temp.getDescription() != null ? temp.getDescription() : "";
-				String Tag = temp.getTag() != null ? temp.getTag() : "";
-
-//				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
-				String Cover_Image = "";
-				int SrNo = temp.getId();
-
-//				srno++;
-
-				obj.put("PlaylistTitle", PlaylistTitle);
-				obj.put("PlaylistName", PlaylistName);
-				obj.put("Description", Description);
-				obj.put("Tag", Tag);
-
-				obj.put("Cover_Image", Cover_Image);
-				obj.put("Id", SrNo);
+				obj.put("PlaylistTitle", temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "");
+				obj.put("PlaylistName", temp.getPlaylistName() != null ? temp.getPlaylistName() : "");
+				obj.put("Description", temp.getDescription() != null ? temp.getDescription() : "");
+				obj.put("Tag", temp.getTag() != null ? temp.getTag() : "");
+				obj.put("Cover_Image", ""); // for now blank
+				obj.put("Id", temp.getId());
 
 				Finalarray.put(obj);
 			}
 
 			System.out.println("Finalarray_getView_Playlist ::" + Finalarray);
-
 			mav.addObject("listObj", Finalarray.toString());
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			mav.addObject("listObj", null);
 			mav.addObject("error", e.getMessage());
-			System.out.println("Error fetching data: " + e.getMessage());
 		}
+
 		return mav;
 	}
 
@@ -2661,5 +2729,109 @@ public class GuacamoleController {
 			return "error";
 		}
 	}
+
+//	@GetMapping("/Add_UserWisePlaylist")
+//	public ModelAndView showAdd_UserWisePlaylistForm() {
+//		ModelAndView mav = new ModelAndView("Add_ScenarioInSub_Playlist");
+//		mav.addObject("pageTitle", "Add Scenario In Sub Playlist");
+//
+//		// All subplaylists
+//		List<SubPlaylist> subPlaylists = SubPlaylistRepository.findAll();
+//		mav.addObject("subPlaylists", subPlaylists);
+//
+//		// All scenarios
+//		List<Add_Scenario> scenarios = ScenarioRepository.findAll();
+//		mav.addObject("scenarios", scenarios);
+//
+//		// New object to bind form data
+//		mav.addObject("subPlaylist", new SubPlaylist());
+//
+//		return mav;
+//	}
+
+	@GetMapping("/Add_UserWisePlaylist")
+	public ModelAndView showAdd_UserWisePlaylistForm() {
+	    ModelAndView mav = new ModelAndView("Add_UserWisePlaylist");
+	    mav.addObject("pageTitle", "Add User Wise Playlist");
+	    
+	    List<Group> groups = GroupRepository.findAll();
+	    mav.addObject("groups", groups); // Changed from "group" to "groups" for clarity
+
+	    // Initially load all users, but we'll implement AJAX filtering
+	    List<AppUser> users = AppUserRepository.findAll();
+	    mav.addObject("users", users);
+
+	    // All playlists
+	    List<Playlist> playlists = PlaylistRepository.findAll();
+	    mav.addObject("playlists", playlists);
+
+	    List<SubPlaylist> subplaylists = SubPlaylistRepository.findAll();
+	    mav.addObject("subplaylists", subplaylists);
+
+	    List<Add_Scenario> scenarios = ScenarioRepository.findAll();
+	    mav.addObject("scenarios", scenarios); // Changed from "Scenario" to "scenarios"
+
+
+
+	    return mav;
+	}
+
+	// Add this endpoint for AJAX user filtering
+	@GetMapping("/getUsersByGroup")
+	@ResponseBody
+	public List<AppUser> getUsersByGroup(@RequestParam String groupName) {
+	    if (groupName == null || groupName.isEmpty()) {
+	        return AppUserRepository.findAll();
+	    } else {
+	        return AppUserRepository.findByGroupName(groupName);
+	    }
+	}
+
+	@PostMapping("/save_UserWisePlaylist")
+	public String saveUserWisePlaylist(@ModelAttribute UserWisePlaylistForm form) {
+
+		try {
+
+			// Get username from AppUser table
+			String userName = AppUserRepository.getUserNameById(form.getUserId());
+
+			// Save or update for each playlist
+			for (Integer playlistId : form.getPlaylistIds()) {
+				UserPlaylistMappingRepository.upsertUserPlaylist(userName, playlistId);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "redirect:/guac/Add_UserWisePlaylist";
+	}
+
+	@GetMapping("/user_playlist_summary")
+	public ModelAndView showUserPlaylistSummary() {
+		ModelAndView mav = new ModelAndView("user_playlist_summary");
+
+		try {
+			// Call the method on the injected repository instance
+			List<Object[]> summary = UserPlaylistMappingRepository.getUserPlaylistSummary();
+			mav.addObject("summary", summary);
+		} catch (Exception e) {
+			mav.addObject("error", "Error fetching summary: " + e.getMessage());
+		}
+
+		return mav;
+	}
+
+//	@GetMapping("/user_playlist_summary")
+//	public String getUserPlaylistSummary(Model model) {
+//		try {
+//			List<Object[]> summary = AddUserWisePlaylistRepository.getUserPlaylistSummary();
+//			model.addAttribute("summary", summary);
+//			return "redirect:/guac/user_playlist_summary";
+//		} catch (Exception e) {
+//			model.addAttribute("error", "Error fetching summary: " + e.getMessage());
+//			return "redirect:/guac/user_playlist_summary";
+//		}
+//	}
 
 }

@@ -388,8 +388,8 @@
 
 				<!-- 					</ul></li> -->
 
-				<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
-					class="nav-item"><a href="#" class="nav-link"> <i
+				<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item">
+					<a href="#" class="nav-link"> <i
 						class="nav-icon fas fa-money-check"></i>
 						<p>
 							ARDC SuperAdmin <i class="right fas fa-angle-left"></i>
@@ -411,11 +411,6 @@
 										<p>Create Template</p>
 								</a>
 								</li>
-								<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_USER')"
-									class="nav-item"><a href="/cloud_instance_user/vm_user"
-									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-										<p>Create Template (User)</p>
-								</a></li>
 								<li class="nav-item"><a href="/cloud_instance/view"
 									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 										<p>View Template</p>
@@ -438,7 +433,6 @@
 									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 										<p>View Scenario</p>
 								</a></li>
-
 							</ul></li>
 
 						<!-- Playlists -->
@@ -457,7 +451,6 @@
 									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 										<p>View Playlist</p>
 								</a></li>
-
 							</ul></li>
 
 						<!-- Sub-Playlists -->
@@ -472,19 +465,15 @@
 									class="nav-link"> <i class="far fa-circle nav-icon"></i>
 										<p>Create Sub Playlist</p>
 								</a></li>
-
 								<li class="nav-item"><a href="/guac/View_SubPalylist"
 									class="nav-link"> <i class="far fa-circle nav-icon"></i>
 										<p>View Sub Playlist</p>
 								</a></li>
-
-
 								<li class="nav-item"><a
 									href="/guac/Add_ScenarioInSub_Playlist" class="nav-link"> <i
 										class="far fa-circle nav-icon"></i>
 										<p>Add Scenario Sub Playlist</p>
 								</a></li>
-
 								<li class="nav-item"><a
 									href="/guac/Add_Scenario_and_Sub_Playlist_In_Playlist"
 									class="nav-link"> <i class="far fa-circle nav-icon"></i>
@@ -492,10 +481,30 @@
 								</a></li>
 							</ul></li>
 
+						<!-- UserWise Playlist -->
+						<li class="nav-item has-treeview"><a href="#"
+							class="nav-link"> <i class="far fa-circle nav-icon"></i>
+								<p>
+									UserWise Playlist <i class="right fas fa-angle-left"></i>
+								</p>
+						</a>
+							<ul class="nav nav-treeview">
+								<li class="nav-item"><a href="/guac/Add_UserWisePlaylist"
+									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+										<p>Add UserWise Playlist</p>
+								</a></li>
+
+								<li class="nav-item"><a href="/guac/user_playlist_summary"
+									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+										<p>User Playlist Summary</p>
+								</a></li>
+
+
+							</ul></li>
 
 
 
-						<!-- My Scenario Inprogess -->
+						<!-- My Scenario In Progress -->
 						<li class="nav-item has-treeview"><a href="#"
 							class="nav-link"> <i class="far fa-circle nav-icon"></i>
 								<p>
@@ -537,7 +546,9 @@
 								<p>Connection</p>
 						</a></li>
 
-					</ul></li>
+					</ul>
+				</li>
+
 
 
 
@@ -551,66 +562,22 @@
 						</p>
 				</a>
 					<ul class="nav nav-treeview">
-						<!-- 						<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a -->
-						<!-- 							href="/cloud_instance/new" class="nav-link"> <i -->
-						<!-- 								class="far fa-circle nav-icon"></i> -->
-						<!-- 								<p>Create VM</p> -->
-						<!-- 						</a></li> -->
-						<!-- 						<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_USER')" -->
-						<!-- 							class="nav-item"><a href="/cloud_instance_user/vm_user" -->
-						<!-- 							class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
-						<!-- 								<p>Create VM</p> -->
-						<!-- 						</a></li> -->
-						<!-- 						<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
-						<!-- 							class="nav-item"><a href="/cloud_instance/vm_database" -->
-						<!-- 							class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
-						<!-- 								<p>Create VM with Database</p> -->
-						<!-- 						</a></li> -->
-						<!-- 						<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
-						<!-- 							class="nav-item"><a href="/cloud_instance/vm_application" -->
-						<!-- 							class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
-						<!-- 								<p>Create VM with Application</p> -->
-						<!-- 						</a></li> -->
 
-						<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a
-							href="/guac/Add_Playlist" class="nav-link"> <i
-								class="far fa-circle nav-icon"></i>
-								<p>Create Playlist</p>
-						</a></li>
-						<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a
-							href="/guac/View_Playlist" class="nav-link"> <i
-								class="far fa-circle nav-icon"></i>
+						<li
+							sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_USER','ROLE_SUPERADMIN')"
+							class="nav-item"><a href="/guac/View_Playlist"
+							class="nav-link"> <i class="far fa-circle nav-icon"></i>
 								<p>View Playlist</p>
 						</a></li>
-						<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a
-							href="/guac/View_Scenario" class="nav-link"> <i
-								class="far fa-circle nav-icon"></i>
-								<p>View Scenario</p>
-						</a></li>
 
-						<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a
-							href="/guac/My_Scenario" class="nav-link"> <i
-								class="far fa-circle nav-icon"></i>
+						<li
+							sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_USER','ROLE_SUPERADMIN')"
+							class="nav-item"><a href="/guac/My_Scenario"
+							class="nav-link"> <i class="far fa-circle nav-icon"></i>
 								<p>My Scenario</p>
 						</a></li>
 
 
-
-						<!-- 						<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
-						<!-- 							class="nav-item"><a href="/cloud_instance/view" -->
-						<!-- 							class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
-						<!-- 								<p>Learn</p> -->
-						<!-- 						</a></li> -->
-						<!-- 						<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
-						<!-- 							class="nav-item"><a href="/cloud_instance/view" -->
-						<!-- 							class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
-						<!-- 								<p>Practice</p> -->
-						<!-- 						</a></li> -->
-						<!-- 						<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
-						<!-- 							class="nav-item"><a href="/cloud_instance/view" -->
-						<!-- 							class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
-						<!-- 								<p>Assessment</p> -->
-						<!-- 						</a></li> -->
 
 					</ul></li>
 
