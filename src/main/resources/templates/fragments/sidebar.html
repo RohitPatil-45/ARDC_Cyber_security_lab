@@ -1,16 +1,26 @@
 <!-- Main Sidebar Container -->
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
 	<!-- Brand Logo -->
-	<a sec:authorize="hasRole('ROLE_SUPERADMIN')" class="brand-link"
-		href="/MainDashboard/Main"> <img
-		src="/webtemplate/dist/img/AdminLTELogo.png" alt="AdminLTE Logo"
-		class="brand-image img-circle elevation-3" style="opacity: .8">
-		<span class="brand-text font-weight-light">ITIGCC</span>
-	</a> <a sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_USER')"
-		class="brand-link" href="/MainDashboard/RoleMain"> <img
-		src="/webtemplate/dist/img/AdminLTELogo.png" alt="AdminLTE Logo"
-		class="brand-image img-circle elevation-3" style="opacity: .8">
-		<span class="brand-text font-weight-light">ITIGCC</span>
+	<!-- 	<a sec:authorize="hasRole('ROLE_SUPERADMIN')" class="brand-link" -->
+	<!-- 		href="/MainDashboard/Main"> <img -->
+	<!-- 		src="/webtemplate/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" -->
+	<!-- 		class="brand-image img-circle elevation-3" style="opacity: .8"> -->
+	<!-- 		<span class="brand-text font-weight-light">ITIGCC</span> -->
+	<!-- 	</a> <a sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_USER')" -->
+	<!-- 		class="brand-link" href="/MainDashboard/RoleMain"> <img -->
+	<!-- 		src="/webtemplate/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" -->
+	<!-- 		class="brand-image img-circle elevation-3" style="opacity: .8"> -->
+	<!-- 		<span class="brand-text font-weight-light">ITIGCC</span> -->
+	<!-- 	</a> -->
+	<div>
+		<a
+			sec:authorize="hasAnyRole('ROLE_SUPERADMIN','ROLE_ADMIN','ROLE_USER')"
+			class="brand-link" href="/MainDashboard/RoleMain"> <img
+			src="/webtemplate/dist/img/Magicbox-logo.png" alt="Magicbox Logo"
+			class="brand-image img-circle elevation-3" style="opacity: .8;width: 100%;height: 70px;margin-left: -3px;">
+	</div>
+
+
 	</a>
 
 	<!-- Sidebar -->
@@ -392,7 +402,7 @@
 					<a href="#" class="nav-link"> <i
 						class="nav-icon fas fa-money-check"></i>
 						<p>
-							ARDC SuperAdmin <i class="right fas fa-angle-left"></i>
+							Magicbox SuperAdmin <i class="right fas fa-angle-left"></i>
 						</p>
 				</a>
 					<ul class="nav nav-treeview">
@@ -485,18 +495,18 @@
 						<li class="nav-item has-treeview"><a href="#"
 							class="nav-link"> <i class="far fa-circle nav-icon"></i>
 								<p>
-									UserWise Playlist <i class="right fas fa-angle-left"></i>
+									UserWise Subscription <i class="right fas fa-angle-left"></i>
 								</p>
 						</a>
 							<ul class="nav nav-treeview">
 								<li class="nav-item"><a href="/guac/Add_UserWisePlaylist"
 									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-										<p>Add UserWise Playlist</p>
+										<p>Add Assign</p>
 								</a></li>
 
 								<li class="nav-item"><a href="/guac/user_playlist_summary"
 									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-										<p>User Playlist Summary</p>
+										<p>User Assign Summary</p>
 								</a></li>
 
 
@@ -558,7 +568,7 @@
 					class="nav-item"><a href="#" class="nav-link"> <i
 						class="nav-icon fas fa-cloud"></i>
 						<p>
-							ARDC User <i class="right fas fa-angle-left"></i>
+							Magicbox User <i class="right fas fa-angle-left"></i>
 						</p>
 				</a>
 					<ul class="nav nav-treeview">
@@ -568,6 +578,16 @@
 							class="nav-item"><a href="/guac/View_Playlist"
 							class="nav-link"> <i class="far fa-circle nav-icon"></i>
 								<p>View Playlist</p>
+						</a></li>
+
+						<li class="nav-item"><a href="/guac/View_SubPalylist"
+							class="nav-link"> <i class="far fa-circle nav-icon"></i>
+								<p>View Sub Playlist</p>
+						</a></li>
+
+						<li class="nav-item"><a href="/guac/View_Scenario"
+							class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+								<p>View Scenario</p>
 						</a></li>
 
 						<li

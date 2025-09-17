@@ -13,4 +13,6 @@ public interface SubPlaylistRepository extends JpaRepository<SubPlaylist, Intege
 	@Query("SELECT d FROM SubPlaylist d WHERE d.Id = :id")
 	List<SubPlaylist> getView_Particular_Subplaylist(@Param("id") Integer SRNO);
 
+	
+
 }

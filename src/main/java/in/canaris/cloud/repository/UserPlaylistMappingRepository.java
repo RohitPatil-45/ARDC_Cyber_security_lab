@@ -1,6 +1,8 @@
 package in.canaris.cloud.repository;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 
@@ -25,5 +27,17 @@ public interface UserPlaylistMappingRepository extends JpaRepository<UserPlaylis
 	@Query(value = "SELECT user_name, COUNT(playlist_id) AS playlist_count " + "FROM user_playlist_maping "
 			+ "GROUP BY user_name", nativeQuery = true)
 	List<Object[]> getUserPlaylistSummary();
+
+
+	  @Query("SELECT u FROM UserPlaylistMapping u WHERE u.UserName = :UserName")
+	List<UserPlaylistMapping> findByUserName(@Param("UserName") String UserName);
+
+
+	  
+		
+
+
+
+//	List<UserPlaylistMapping> findByUserName(String userName);
 
 }

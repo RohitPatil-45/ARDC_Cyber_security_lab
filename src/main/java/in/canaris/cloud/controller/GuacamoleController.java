@@ -63,7 +63,10 @@ import in.canaris.cloud.openstack.entity.ScenarioLabTemplate;
 import in.canaris.cloud.openstack.entity.SubPlaylist;
 import in.canaris.cloud.openstack.entity.SubPlaylistScenario;
 import in.canaris.cloud.openstack.entity.UserLab;
+import in.canaris.cloud.openstack.entity.UserMappingsResponse;
 import in.canaris.cloud.openstack.entity.UserScenario;
+import in.canaris.cloud.openstack.entity.UserScenarioMapping;
+import in.canaris.cloud.openstack.entity.UserSubplaylistMapping;
 import in.canaris.cloud.openstack.entity.UserWiseChatBoatInstructionTemplate;
 import in.canaris.cloud.openstack.entity.UserWisePlaylistForm;
 import in.canaris.cloud.repository.ScenarioRepository;
@@ -83,6 +86,8 @@ import in.canaris.cloud.repository.SubPlaylistScenarioRepository;
 import in.canaris.cloud.repository.PlaylistItemRepository;
 import in.canaris.cloud.repository.AppUserRepository;
 import in.canaris.cloud.repository.UserPlaylistMappingRepository;
+import in.canaris.cloud.repository.UserSubplaylistMappingRepository;
+import in.canaris.cloud.repository.UserScenarioMappingRepository;
 
 import in.canaris.cloud.repository.SubPlaylistRepository;
 import in.canaris.cloud.repository.UserLabRepository;
@@ -159,9 +164,15 @@ public class GuacamoleController {
 
 	@Autowired
 	UserPlaylistMappingRepository UserPlaylistMappingRepository;
-	
+
 	@Autowired
 	GroupRepository GroupRepository;
+
+	@Autowired
+	UserSubplaylistMappingRepository UserSubplaylistMappingRepository;
+
+	@Autowired
+	UserScenarioMappingRepository UserScenarioMappingRepository;
 
 	@GetMapping("/")
 	public String home() {
@@ -1510,102 +1521,154 @@ public class GuacamoleController {
 		return mav;
 	}
 
+//	@GetMapping("/View_SubPalylist")
+//	public ModelAndView getView_SubPalylist(Principal principal) {
+//		ModelAndView mav = new ModelAndView("View_SubPalylist");
+//		JSONArray Finalarray = new JSONArray();
+//		List<SubPlaylist> dataList;
+//		try {
+//			// start
+//
+//			Authentication authentication = (Authentication) principal;
+//			User loginedUser = (User) authentication.getPrincipal();
+//
+//			String userName = loginedUser.getUsername();
+//			String groupName = "";
+//			StringBuilder vmNamesBuilder = new StringBuilder();
+//
+//			List<AppUser> userList = userRepository.findByuserName(userName);
+//
+//			boolean isSuperAdmin = authentication.getAuthorities().stream()
+//					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+//
+//			boolean isAdmin = authentication.getAuthorities().stream()
+//					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+//
+//			if (isSuperAdmin) {
+//				dataList = SubPlaylistRepository.findAll();
+//			} else {
+//				// Get group names
+//				for (AppUser appUser : userList) {
+//					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
+//				}
+//
+//				List<String> groups = new ArrayList<>();
+//				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
+//				while (groupTokenizer.hasMoreTokens()) {
+//					groups.add(groupTokenizer.nextToken());
+//				}
+//
+//				// Get VM names by group
+//				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
+//				for (Object[] vmEntry : vmList) {
+//					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
+//				}
+//
+//				// Split VM names string into a list
+//				List<String> vmGroups = new ArrayList<>();
+//				String vmNames = vmNamesBuilder.toString();
+//				if (!vmNames.isEmpty()) {
+//					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
+//					while (vmTokenizer.hasMoreTokens()) {
+//						vmGroups.add(vmTokenizer.nextToken());
+//					}
+//				}
+////				dataList = ScenarioRepository.getView_Scenario(vmGroups);
+//				dataList = SubPlaylistRepository.findAll();
+//			}
+//
+////			 dataList = kVMDriveDetailsRepository.findBykVMDetails();
+//			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
+//			int srno = 0;
+//			for (SubPlaylist temp : dataList) {
+//				JSONObject obj = new JSONObject();
+//
+//				String PlaylistTitle = temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "";
+//				String PlaylistName = temp.getPlaylistName() != null ? temp.getPlaylistName() : "";
+//				String Description = temp.getDescription() != null ? temp.getDescription() : "";
+//				String Tag = temp.getTag() != null ? temp.getTag() : "";
+//
+////				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
+//				String Cover_Image = "";
+//				int SrNo = temp.getId();
+//
+////				srno++;
+//
+//				obj.put("PlaylistTitle", PlaylistTitle);
+//				obj.put("PlaylistName", PlaylistName);
+//				obj.put("Description", Description);
+//				obj.put("Tag", Tag);
+//
+//				obj.put("Cover_Image", Cover_Image);
+//				obj.put("Id", SrNo);
+//
+//				Finalarray.put(obj);
+//			}
+//
+//			System.out.println("Finalarray_getView_SubPalylist ::" + Finalarray);
+//
+//			mav.addObject("listObj", Finalarray.toString());
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			mav.addObject("listObj", null);
+//			mav.addObject("error", e.getMessage());
+//			System.out.println("Error fetching data: " + e.getMessage());
+//		}
+//		return mav;
+//	}
+	
+	
 	@GetMapping("/View_SubPalylist")
-	public ModelAndView getView_SubPalylist(Principal principal) {
-		ModelAndView mav = new ModelAndView("View_SubPalylist");
-		JSONArray Finalarray = new JSONArray();
-		List<SubPlaylist> dataList;
-		try {
-			// start
+	public ModelAndView getView_SubPlaylist(Principal principal) {
+	    ModelAndView mav = new ModelAndView("View_SubPalylist");
+	    JSONArray Finalarray = new JSONArray();
+	    List<SubPlaylist> dataList = new ArrayList<>();
 
-			Authentication authentication = (Authentication) principal;
-			User loginedUser = (User) authentication.getPrincipal();
+	    try {
+	        Authentication authentication = (Authentication) principal;
+	        User loginedUser = (User) authentication.getPrincipal();
 
-			String userName = loginedUser.getUsername();
-			String groupName = "";
-			StringBuilder vmNamesBuilder = new StringBuilder();
+	        String userName = loginedUser.getUsername();
 
-			List<AppUser> userList = userRepository.findByuserName(userName);
+	        boolean isSuperAdmin = authentication.getAuthorities().stream()
+	                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
 
-			boolean isSuperAdmin = authentication.getAuthorities().stream()
-					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+	        if (isSuperAdmin) {
+	            // SuperAdmin → all subplaylists
+	            dataList = SubPlaylistRepository.findAll();
+	        } else {
+	            // Normal User → only subplaylists assigned to them
+	            List<Integer> subPlaylistIds = UserSubplaylistMappingRepository.findSubPlaylistIdsByUserName(userName);
 
-			boolean isAdmin = authentication.getAuthorities().stream()
-					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+	            if (subPlaylistIds != null && !subPlaylistIds.isEmpty()) {
+	                dataList = SubPlaylistRepository.findAllById(subPlaylistIds);
+	            }
+	        }
 
-			if (isSuperAdmin) {
-				dataList = SubPlaylistRepository.findAll();
-			} else {
-				// Get group names
-				for (AppUser appUser : userList) {
-					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
-				}
+	        // Convert to JSON
+	        for (SubPlaylist temp : dataList) {
+	            JSONObject obj = new JSONObject();
+	            obj.put("PlaylistTitle", temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "");
+	            obj.put("PlaylistName", temp.getPlaylistName() != null ? temp.getPlaylistName() : "");
+	            obj.put("Description", temp.getDescription() != null ? temp.getDescription() : "");
+	            obj.put("Tag", temp.getTag() != null ? temp.getTag() : "");
+	            obj.put("Cover_Image", ""); 
+	            obj.put("Id", temp.getId());
+	            Finalarray.put(obj);
+	        }
 
-				List<String> groups = new ArrayList<>();
-				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
-				while (groupTokenizer.hasMoreTokens()) {
-					groups.add(groupTokenizer.nextToken());
-				}
+	        System.out.println("Finalarray_getView_SubPlaylist ::" + Finalarray);
+	        mav.addObject("listObj", Finalarray.toString());
 
-				// Get VM names by group
-				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
-				for (Object[] vmEntry : vmList) {
-					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
-				}
-
-				// Split VM names string into a list
-				List<String> vmGroups = new ArrayList<>();
-				String vmNames = vmNamesBuilder.toString();
-				if (!vmNames.isEmpty()) {
-					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
-					while (vmTokenizer.hasMoreTokens()) {
-						vmGroups.add(vmTokenizer.nextToken());
-					}
-				}
-//				dataList = ScenarioRepository.getView_Scenario(vmGroups);
-				dataList = SubPlaylistRepository.findAll();
-			}
-
-//			 dataList = kVMDriveDetailsRepository.findBykVMDetails();
-			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
-			int srno = 0;
-			for (SubPlaylist temp : dataList) {
-				JSONObject obj = new JSONObject();
-
-				String PlaylistTitle = temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "";
-				String PlaylistName = temp.getPlaylistName() != null ? temp.getPlaylistName() : "";
-				String Description = temp.getDescription() != null ? temp.getDescription() : "";
-				String Tag = temp.getTag() != null ? temp.getTag() : "";
-
-//				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
-				String Cover_Image = "";
-				int SrNo = temp.getId();
-
-//				srno++;
-
-				obj.put("PlaylistTitle", PlaylistTitle);
-				obj.put("PlaylistName", PlaylistName);
-				obj.put("Description", Description);
-				obj.put("Tag", Tag);
-
-				obj.put("Cover_Image", Cover_Image);
-				obj.put("Id", SrNo);
-
-				Finalarray.put(obj);
-			}
-
-			System.out.println("Finalarray_getView_SubPalylist ::" + Finalarray);
-
-			mav.addObject("listObj", Finalarray.toString());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			mav.addObject("listObj", null);
-			mav.addObject("error", e.getMessage());
-			System.out.println("Error fetching data: " + e.getMessage());
-		}
-		return mav;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        mav.addObject("listObj", null);
+	        mav.addObject("error", e.getMessage());
+	    }
+	    return mav;
 	}
+
 
 	@GetMapping("/Playlistimage/{id}")
 	public void getPlaylistImage(@PathVariable int id, HttpServletResponse response) throws IOException {
@@ -1870,215 +1933,335 @@ public class GuacamoleController {
 		}
 	}
 
+//	@GetMapping("/View_Scenario")
+//	public ModelAndView getView_Scenario(Principal principal) {
+//		ModelAndView mav = new ModelAndView("View_Scenario");
+//		JSONArray Finalarray = new JSONArray();
+//		List<Add_Scenario> dataList;
+//		try {
+//			// start
+//
+//			Authentication authentication = (Authentication) principal;
+//			User loginedUser = (User) authentication.getPrincipal();
+//
+//			String userName = loginedUser.getUsername();
+//			String groupName = "";
+//			StringBuilder vmNamesBuilder = new StringBuilder();
+//
+//			List<AppUser> userList = userRepository.findByuserName(userName);
+//
+//			boolean isSuperAdmin = authentication.getAuthorities().stream()
+//					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+//
+//			boolean isAdmin = authentication.getAuthorities().stream()
+//					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+//
+//			if (isSuperAdmin) {
+//				dataList = ScenarioRepository.findAll();
+//			} else {
+//				// Get group names
+//				for (AppUser appUser : userList) {
+//					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
+//				}
+//
+//				List<String> groups = new ArrayList<>();
+//				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
+//				while (groupTokenizer.hasMoreTokens()) {
+//					groups.add(groupTokenizer.nextToken());
+//				}
+//
+//				// Get VM names by group
+//				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
+//				for (Object[] vmEntry : vmList) {
+//					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
+//				}
+//
+//				// Split VM names string into a list
+//				List<String> vmGroups = new ArrayList<>();
+//				String vmNames = vmNamesBuilder.toString();
+//				if (!vmNames.isEmpty()) {
+//					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
+//					while (vmTokenizer.hasMoreTokens()) {
+//						vmGroups.add(vmTokenizer.nextToken());
+//					}
+//				}
+////				dataList = ScenarioRepository.getView_Scenario(vmGroups);
+//				dataList = ScenarioRepository.findAll();
+//			}
+//
+////			 dataList = kVMDriveDetailsRepository.findBykVMDetails();
+//			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
+//			int srno = 0;
+//			for (Add_Scenario temp : dataList) {
+//				JSONObject obj = new JSONObject();
+//
+//				String Scenario_Name = temp.getScenarioName() != null ? temp.getScenarioName() : "";
+//				String Scenario_Title = temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "";
+//				String Description = temp.getDescription() != null ? temp.getDescription() : "";
+//				String Category = temp.getCategory() != null ? temp.getCategory() : "";
+//				String Scenario_Type = temp.getScenarioType() != null ? temp.getScenarioType() : "";
+//				String Mode = temp.getMode() != null ? temp.getMode() : "";
+//				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
+//				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
+//				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
+////				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
+//				String Cover_Image = "";
+//				int SrNo = temp.getId();
+//
+////				srno++;
+//
+//				obj.put("Scenario_Name", Scenario_Name);
+//				obj.put("Scenario_Title", Scenario_Title);
+////				obj.put("Description", Description);
+//				obj.put("Category", Category);
+//				obj.put("Scenario_Type", Scenario_Type);
+//				obj.put("Mode", Mode);
+//				obj.put("Difficulty_Level", Difficulty_Level);
+//				obj.put("Duration", Duration);
+////				obj.put("Labs", Labs);
+//				obj.put("Cover_Image", Cover_Image);
+//				obj.put("Id", SrNo);
+//
+//				Finalarray.put(obj);
+//			}
+//
+////			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
+//
+//			mav.addObject("listObj", Finalarray.toString());
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			mav.addObject("listObj", null);
+//			mav.addObject("error", e.getMessage());
+//			System.out.println("Error fetching data: " + e.getMessage());
+//		}
+//		return mav;
+//	}
+	
 	@GetMapping("/View_Scenario")
 	public ModelAndView getView_Scenario(Principal principal) {
-		ModelAndView mav = new ModelAndView("View_Scenario");
-		JSONArray Finalarray = new JSONArray();
-		List<Add_Scenario> dataList;
-		try {
-			// start
+	    ModelAndView mav = new ModelAndView("View_Scenario");
+	    JSONArray Finalarray = new JSONArray();
+	    List<Add_Scenario> dataList = new ArrayList<>();
 
-			Authentication authentication = (Authentication) principal;
-			User loginedUser = (User) authentication.getPrincipal();
+	    try {
+	        Authentication authentication = (Authentication) principal;
+	        User loginedUser = (User) authentication.getPrincipal();
 
-			String userName = loginedUser.getUsername();
-			String groupName = "";
-			StringBuilder vmNamesBuilder = new StringBuilder();
+	        String userName = loginedUser.getUsername();
 
-			List<AppUser> userList = userRepository.findByuserName(userName);
+	        boolean isSuperAdmin = authentication.getAuthorities().stream()
+	                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
 
-			boolean isSuperAdmin = authentication.getAuthorities().stream()
-					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+	        if (isSuperAdmin) {
+	            // SuperAdmin → all scenarios
+	            dataList = ScenarioRepository.findAll();
+	        } else {
+	            // Normal User → only mapped scenarios
+	            List<Integer> scenarioIds = UserScenarioMappingRepository.findScenarioIdsByUserName(userName);
 
-			boolean isAdmin = authentication.getAuthorities().stream()
-					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+	            if (scenarioIds != null && !scenarioIds.isEmpty()) {
+	                dataList = ScenarioRepository.findAllById(scenarioIds);
+	            }
+	        }
 
-			if (isSuperAdmin) {
-				dataList = ScenarioRepository.findAll();
-			} else {
-				// Get group names
-				for (AppUser appUser : userList) {
-					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
-				}
+	        // Convert to JSON
+	        for (Add_Scenario temp : dataList) {
+	            JSONObject obj = new JSONObject();
+	            obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
+	            obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
+	            obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
+	            obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
+	            obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
+	            obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
+	            obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
+	            obj.put("Cover_Image", "");
+	            obj.put("Id", temp.getId());
+	            Finalarray.put(obj);
+	        }
 
-				List<String> groups = new ArrayList<>();
-				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
-				while (groupTokenizer.hasMoreTokens()) {
-					groups.add(groupTokenizer.nextToken());
-				}
+	        System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
+	        mav.addObject("listObj", Finalarray.toString());
 
-				// Get VM names by group
-				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
-				for (Object[] vmEntry : vmList) {
-					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
-				}
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        mav.addObject("listObj", null);
+	        mav.addObject("error", e.getMessage());
+	    }
 
-				// Split VM names string into a list
-				List<String> vmGroups = new ArrayList<>();
-				String vmNames = vmNamesBuilder.toString();
-				if (!vmNames.isEmpty()) {
-					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
-					while (vmTokenizer.hasMoreTokens()) {
-						vmGroups.add(vmTokenizer.nextToken());
-					}
-				}
-//				dataList = ScenarioRepository.getView_Scenario(vmGroups);
-				dataList = ScenarioRepository.findAll();
-			}
-
-//			 dataList = kVMDriveDetailsRepository.findBykVMDetails();
-			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
-			int srno = 0;
-			for (Add_Scenario temp : dataList) {
-				JSONObject obj = new JSONObject();
-
-				String Scenario_Name = temp.getScenarioName() != null ? temp.getScenarioName() : "";
-				String Scenario_Title = temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "";
-				String Description = temp.getDescription() != null ? temp.getDescription() : "";
-				String Category = temp.getCategory() != null ? temp.getCategory() : "";
-				String Scenario_Type = temp.getScenarioType() != null ? temp.getScenarioType() : "";
-				String Mode = temp.getMode() != null ? temp.getMode() : "";
-				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
-				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
-				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
-//				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
-				String Cover_Image = "";
-				int SrNo = temp.getId();
-
-//				srno++;
-
-				obj.put("Scenario_Name", Scenario_Name);
-				obj.put("Scenario_Title", Scenario_Title);
-//				obj.put("Description", Description);
-				obj.put("Category", Category);
-				obj.put("Scenario_Type", Scenario_Type);
-				obj.put("Mode", Mode);
-				obj.put("Difficulty_Level", Difficulty_Level);
-				obj.put("Duration", Duration);
-//				obj.put("Labs", Labs);
-				obj.put("Cover_Image", Cover_Image);
-				obj.put("Id", SrNo);
-
-				Finalarray.put(obj);
-			}
-
-//			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
-
-			mav.addObject("listObj", Finalarray.toString());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			mav.addObject("listObj", null);
-			mav.addObject("error", e.getMessage());
-			System.out.println("Error fetching data: " + e.getMessage());
-		}
-		return mav;
+	    return mav;
 	}
 
+
+//	@GetMapping("/My_Scenario")
+//	public ModelAndView getMy_View_Scenario(Principal principal) {
+//		ModelAndView mav = new ModelAndView("My_View_Scenario");
+//		JSONArray Finalarray = new JSONArray();
+//		List<Add_Scenario> dataList;
+//		try {
+//			// start
+//
+//			Authentication authentication = (Authentication) principal;
+//			User loginedUser = (User) authentication.getPrincipal();
+//
+//			String userName = loginedUser.getUsername();
+//			String groupName = "";
+//			StringBuilder vmNamesBuilder = new StringBuilder();
+//
+//			List<AppUser> userList = userRepository.findByuserName(userName);
+//
+//			boolean isSuperAdmin = authentication.getAuthorities().stream()
+//					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+//
+//			boolean isAdmin = authentication.getAuthorities().stream()
+//					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+//
+//			if (isSuperAdmin) {
+//				dataList = ScenarioRepository.findByUserScenario();
+//			} else {
+//
+//				for (AppUser appUser : userList) {
+//					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
+//				}
+//
+//				List<String> groups = new ArrayList<>();
+//				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
+//				while (groupTokenizer.hasMoreTokens()) {
+//					groups.add(groupTokenizer.nextToken());
+//				}
+//
+//				// Get VM names by group
+//				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
+//				for (Object[] vmEntry : vmList) {
+//					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
+//				}
+//
+//				// Split VM names string into a list
+//				List<String> vmGroups = new ArrayList<>();
+//				String vmNames = vmNamesBuilder.toString();
+//				if (!vmNames.isEmpty()) {
+//					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
+//					while (vmTokenizer.hasMoreTokens()) {
+//						vmGroups.add(vmTokenizer.nextToken());
+//					}
+//				}
+////				dataList = ScenarioRepository.getView_Scenario(vmGroups);
+//				dataList = ScenarioRepository.findByUserScenario();
+//			}
+//
+////			 dataList = kVMDriveDetailsRepository.findBykVMDetails();
+//			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
+//			int srno = 0;
+//			for (Add_Scenario temp : dataList) {
+//				JSONObject obj = new JSONObject();
+//
+//				String Scenario_Name = temp.getScenarioName() != null ? temp.getScenarioName() : "";
+//				String Scenario_Title = temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "";
+//				String Description = temp.getDescription() != null ? temp.getDescription() : "";
+//				String Category = temp.getCategory() != null ? temp.getCategory() : "";
+//				String Scenario_Type = temp.getScenarioType() != null ? temp.getScenarioType() : "";
+//				String Mode = temp.getMode() != null ? temp.getMode() : "";
+//				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
+//				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
+//				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
+////				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
+//				String Cover_Image = "";
+//				int SrNo = temp.getId();
+//
+////				srno++;
+//
+//				obj.put("Scenario_Name", Scenario_Name);
+//				obj.put("Scenario_Title", Scenario_Title);
+////				obj.put("Description", Description);
+//				obj.put("Category", Category);
+//				obj.put("Scenario_Type", Scenario_Type);
+//				obj.put("Mode", Mode);
+//				obj.put("Difficulty_Level", Difficulty_Level);
+//				obj.put("Duration", Duration);
+////				obj.put("Labs", Labs);
+//				obj.put("Cover_Image", Cover_Image);
+//				obj.put("Id", SrNo);
+//
+//				Finalarray.put(obj);
+//			}
+//
+////			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
+//
+//			mav.addObject("listObj", Finalarray.toString());
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			mav.addObject("listObj", null);
+//			mav.addObject("error", e.getMessage());
+//			System.out.println("Error fetching data: " + e.getMessage());
+//		}
+//		return mav;
+//	}
+	
+	
 	@GetMapping("/My_Scenario")
 	public ModelAndView getMy_View_Scenario(Principal principal) {
-		ModelAndView mav = new ModelAndView("My_View_Scenario");
-		JSONArray Finalarray = new JSONArray();
-		List<Add_Scenario> dataList;
-		try {
-			// start
+	    ModelAndView mav = new ModelAndView("My_View_Scenario");
+	    JSONArray Finalarray = new JSONArray();
+	    List<Add_Scenario> dataList = new ArrayList<>();
 
-			Authentication authentication = (Authentication) principal;
-			User loginedUser = (User) authentication.getPrincipal();
+	    try {
+	        Authentication authentication = (Authentication) principal;
+	        User loginedUser = (User) authentication.getPrincipal();
 
-			String userName = loginedUser.getUsername();
-			String groupName = "";
-			StringBuilder vmNamesBuilder = new StringBuilder();
+	        String userName = loginedUser.getUsername();
 
-			List<AppUser> userList = userRepository.findByuserName(userName);
+	        boolean isSuperAdmin = authentication.getAuthorities().stream()
+	                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
 
-			boolean isSuperAdmin = authentication.getAuthorities().stream()
-					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+	        if (isSuperAdmin) {
+	            // SuperAdmin → show all "My Scenarios"
+//	            dataList = ScenarioRepository.findByUserScenario();
+	        	
+	        	List<Integer> scenarioIds = UserScenarioMappingRepository.findScenarioIdsByUserName(userName);
 
-			boolean isAdmin = authentication.getAuthorities().stream()
-					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+	            if (scenarioIds != null && !scenarioIds.isEmpty()) {
+	                dataList = ScenarioRepository.findByUserScenarioById(scenarioIds,userName);
+	            }
+	            
+	        } else {
+	            // Normal user → only scenarios assigned to them
+	            List<Integer> scenarioIds = UserScenarioMappingRepository.findScenarioIdsByUserName(userName);
 
-			if (isSuperAdmin) {
-				dataList = ScenarioRepository.findByUserScenario();
-			} else {
+	            if (scenarioIds != null && !scenarioIds.isEmpty()) {
+	                dataList = ScenarioRepository.findByUserScenarioById(scenarioIds,userName);
+	            }
+	        }
 
-				for (AppUser appUser : userList) {
-					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
-				}
+	        // Convert to JSON
+	        for (Add_Scenario temp : dataList) {
+	            JSONObject obj = new JSONObject();
+	            obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
+	            obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
+	            obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
+	            obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
+	            obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
+	            obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
+	            obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
+	            obj.put("Cover_Image", "");
+	            obj.put("Id", temp.getId());
 
-				List<String> groups = new ArrayList<>();
-				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
-				while (groupTokenizer.hasMoreTokens()) {
-					groups.add(groupTokenizer.nextToken());
-				}
+	            Finalarray.put(obj);
+	        }
 
-				// Get VM names by group
-				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
-				for (Object[] vmEntry : vmList) {
-					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
-				}
+	        System.out.println("Finalarray_getMy_View_Scenario ::" + Finalarray);
+	        mav.addObject("listObj", Finalarray.toString());
 
-				// Split VM names string into a list
-				List<String> vmGroups = new ArrayList<>();
-				String vmNames = vmNamesBuilder.toString();
-				if (!vmNames.isEmpty()) {
-					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
-					while (vmTokenizer.hasMoreTokens()) {
-						vmGroups.add(vmTokenizer.nextToken());
-					}
-				}
-//				dataList = ScenarioRepository.getView_Scenario(vmGroups);
-				dataList = ScenarioRepository.findByUserScenario();
-			}
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        mav.addObject("listObj", null);
+	        mav.addObject("error", e.getMessage());
+	        System.out.println("Error fetching data: " + e.getMessage());
+	    }
 
-//			 dataList = kVMDriveDetailsRepository.findBykVMDetails();
-			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
-			int srno = 0;
-			for (Add_Scenario temp : dataList) {
-				JSONObject obj = new JSONObject();
-
-				String Scenario_Name = temp.getScenarioName() != null ? temp.getScenarioName() : "";
-				String Scenario_Title = temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "";
-				String Description = temp.getDescription() != null ? temp.getDescription() : "";
-				String Category = temp.getCategory() != null ? temp.getCategory() : "";
-				String Scenario_Type = temp.getScenarioType() != null ? temp.getScenarioType() : "";
-				String Mode = temp.getMode() != null ? temp.getMode() : "";
-				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
-				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
-				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
-//				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
-				String Cover_Image = "";
-				int SrNo = temp.getId();
-
-//				srno++;
-
-				obj.put("Scenario_Name", Scenario_Name);
-				obj.put("Scenario_Title", Scenario_Title);
-//				obj.put("Description", Description);
-				obj.put("Category", Category);
-				obj.put("Scenario_Type", Scenario_Type);
-				obj.put("Mode", Mode);
-				obj.put("Difficulty_Level", Difficulty_Level);
-				obj.put("Duration", Duration);
-//				obj.put("Labs", Labs);
-				obj.put("Cover_Image", Cover_Image);
-				obj.put("Id", SrNo);
-
-				Finalarray.put(obj);
-			}
-
-//			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
-
-			mav.addObject("listObj", Finalarray.toString());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			mav.addObject("listObj", null);
-			mav.addObject("error", e.getMessage());
-			System.out.println("Error fetching data: " + e.getMessage());
-		}
-		return mav;
+	    return mav;
 	}
+
 
 //	@PostMapping("/addplaylist_Scenario")
 //	@ResponseBody
@@ -2751,57 +2934,118 @@ public class GuacamoleController {
 
 	@GetMapping("/Add_UserWisePlaylist")
 	public ModelAndView showAdd_UserWisePlaylistForm() {
-	    ModelAndView mav = new ModelAndView("Add_UserWisePlaylist");
-	    mav.addObject("pageTitle", "Add User Wise Playlist");
-	    
-	    List<Group> groups = GroupRepository.findAll();
-	    mav.addObject("groups", groups); // Changed from "group" to "groups" for clarity
+		ModelAndView mav = new ModelAndView("Add_UserWisePlaylist");
+		mav.addObject("pageTitle", "Add User Wise Playlist");
 
-	    // Initially load all users, but we'll implement AJAX filtering
-	    List<AppUser> users = AppUserRepository.findAll();
-	    mav.addObject("users", users);
+		List<Group> groups = GroupRepository.findAll();
+		mav.addObject("groups", groups); // Changed from "group" to "groups" for clarity
 
-	    // All playlists
-	    List<Playlist> playlists = PlaylistRepository.findAll();
-	    mav.addObject("playlists", playlists);
+		// Initially load all users, but we'll implement AJAX filtering
+		List<AppUser> users = AppUserRepository.findAll();
+		mav.addObject("users", users);
 
-	    List<SubPlaylist> subplaylists = SubPlaylistRepository.findAll();
-	    mav.addObject("subplaylists", subplaylists);
+		// All playlists
+		List<Playlist> playlists = PlaylistRepository.findAll();
+		mav.addObject("playlists", playlists);
 
-	    List<Add_Scenario> scenarios = ScenarioRepository.findAll();
-	    mav.addObject("scenarios", scenarios); // Changed from "Scenario" to "scenarios"
+		List<SubPlaylist> subplaylists = SubPlaylistRepository.findAll();
+		mav.addObject("subplaylists", subplaylists);
 
+		List<Add_Scenario> scenarios = ScenarioRepository.findAll();
+		mav.addObject("scenarios", scenarios); // Changed from "Scenario" to "scenarios"
 
-
-	    return mav;
+		return mav;
 	}
 
 	// Add this endpoint for AJAX user filtering
 	@GetMapping("/getUsersByGroup")
 	@ResponseBody
-	public List<AppUser> getUsersByGroup(@RequestParam String groupName) {
-	    if (groupName == null || groupName.isEmpty()) {
-	        return AppUserRepository.findAll();
-	    } else {
-	        return AppUserRepository.findByGroupName(groupName);
-	    }
+	public List<AppUser> getUsersByGroup(@RequestParam(required = false) String groupName) {
+		if (groupName == null || groupName.isEmpty() || groupName.equalsIgnoreCase("all")) {
+			return AppUserRepository.findAll(); // return all users
+		} else {
+			return AppUserRepository.findByGroupName(groupName);
+		}
 	}
 
+//	@PostMapping("/save_UserWisePlaylist")
+//	public String saveUserWisePlaylist(@ModelAttribute UserWisePlaylistForm form) {
+//
+//		try {
+//
+//			// Get username from AppUser table
+//			String userName = AppUserRepository.getUserNameById(form.getUserId());
+//
+//			// Save or update for each playlist
+//			for (Integer playlistId : form.getPlaylistIds()) {
+//				UserPlaylistMappingRepository.upsertUserPlaylist(userName, playlistId);
+//			}
+//			
+////			user_subplaylist_mapping
+//			UserSubplaylistMappingRepository.insert
+//			
+////			user_scenario_mapping
+//			
+//			UserScenarioMappingRepository.insert
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//
+//		return "redirect:/guac/Add_UserWisePlaylist";
+//	}
+
 	@PostMapping("/save_UserWisePlaylist")
-	public String saveUserWisePlaylist(@ModelAttribute UserWisePlaylistForm form) {
-
+	public String saveUserWisePlaylist(@RequestParam(required = false) String groupId,
+			@RequestParam("userIds") List<Long> userIds, @RequestParam("playlistIds") List<Integer> playlistIds,
+			@RequestParam("subplaylistIds") List<Integer> subplaylistIds,
+			@RequestParam("scenarioIds") List<Integer> scenarioIds) {
 		try {
+			// Loop over all selected users
+			for (Long userId : userIds) {
+				String userName = AppUserRepository.getUserNameById(userId);
+				System.out.println("Processing userId: " + userId + " -> userName: " + userName);
 
-			// Get username from AppUser table
-			String userName = AppUserRepository.getUserNameById(form.getUserId());
+				if (userName == null) {
+					throw new RuntimeException("No username found for userId=" + userId);
+				}
 
-			// Save or update for each playlist
-			for (Integer playlistId : form.getPlaylistIds()) {
-				UserPlaylistMappingRepository.upsertUserPlaylist(userName, playlistId);
+//
+//				SubPlaylistScenarioRepository.save(joinEntity);
+				// Save playlists
+				for (Integer playlistId : playlistIds) {
+
+					UserPlaylistMapping UserPlaylistEntity = new UserPlaylistMapping();
+					UserPlaylistEntity.setPlaylistId(playlistId);
+					UserPlaylistEntity.setUserName(userName);
+
+					UserPlaylistMappingRepository.save(UserPlaylistEntity);
+				}
+
+				// Save subplaylists
+				for (Integer subplaylistId : subplaylistIds) {
+
+					UserSubplaylistMapping UserSubplaylistEntity = new UserSubplaylistMapping();
+					UserSubplaylistEntity.setSubPlaylistId(subplaylistId);
+					UserSubplaylistEntity.setUserName(userName);
+
+					UserSubplaylistMappingRepository.save(UserSubplaylistEntity);
+				}
+
+				// Save scenarios
+				for (Integer scenarioId : scenarioIds) {
+
+					UserScenarioMapping UserScenarioEntity = new UserScenarioMapping();
+					UserScenarioEntity.setScenarioId(scenarioId);
+					UserScenarioEntity.setUserName(userName);
+
+					UserScenarioMappingRepository.save(UserScenarioEntity);
+				}
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			
 		}
 
 		return "redirect:/guac/Add_UserWisePlaylist";
@@ -2813,25 +3057,80 @@ public class GuacamoleController {
 
 		try {
 			// Call the method on the injected repository instance
-			List<Object[]> summary = UserPlaylistMappingRepository.getUserPlaylistSummary();
-			mav.addObject("summary", summary);
+			mav.addObject("pageTitle", "View User Wise Playlist");
+
+			List<Group> groups = GroupRepository.findAll();
+			mav.addObject("groups", groups); // Changed from "group" to "groups" for clarity
+
+			// Initially load all users, but we'll implement AJAX filtering
+			List<AppUser> users = AppUserRepository.findAll();
+			mav.addObject("users", users);
+
+			// All playlists
+			List<Playlist> playlists = PlaylistRepository.findAll();
+			mav.addObject("playlists", playlists);
+
+			List<SubPlaylist> subplaylists = SubPlaylistRepository.findAll();
+			mav.addObject("subplaylists", subplaylists);
+
+			List<Add_Scenario> scenarios = ScenarioRepository.findAll();
+			mav.addObject("scenarios", scenarios); // Changed from "Scenario" to "scenarios"
+			
 		} catch (Exception e) {
 			mav.addObject("error", "Error fetching summary: " + e.getMessage());
 		}
 
 		return mav;
 	}
+	
+	@GetMapping("/getUserMappings")
+	@ResponseBody
+	public Map<String, Object> getUserMappings(@RequestParam long userId) {
+	    Map<String, Object> response = new HashMap<String, Object>();
+	    try {
+	    	
+	    	
+				String userName = AppUserRepository.getUserNameById(userId);
+				System.out.println("Processing userId: " + userId + " -> userName: " + userName);
 
-//	@GetMapping("/user_playlist_summary")
-//	public String getUserPlaylistSummary(Model model) {
-//		try {
-//			List<Object[]> summary = AddUserWisePlaylistRepository.getUserPlaylistSummary();
-//			model.addAttribute("summary", summary);
-//			return "redirect:/guac/user_playlist_summary";
-//		} catch (Exception e) {
-//			model.addAttribute("error", "Error fetching summary: " + e.getMessage());
-//			return "redirect:/guac/user_playlist_summary";
-//		}
-//	}
+				
+				
+	    	
+	        // Fetch playlist IDs
+	        List<UserPlaylistMapping> playlistMappings = UserPlaylistMappingRepository.findByUserName(userName);
+	        List<Integer> playlistIds = new ArrayList<Integer>();
+	        for (UserPlaylistMapping m : playlistMappings) {
+	            playlistIds.add(m.getPlaylistId());
+	        }
+
+	        // Fetch subplaylist IDs
+	        List<UserSubplaylistMapping> subplaylistMappings = UserSubplaylistMappingRepository.findByUserName(userName);
+	        List<Integer> subplaylistIds = new ArrayList<Integer>();
+	        for (UserSubplaylistMapping m : subplaylistMappings) {
+	            subplaylistIds.add(m.getSubPlaylistId());
+	        }
+
+	        // Fetch scenario IDs
+	        List<UserScenarioMapping> scenarioMappings = UserScenarioMappingRepository.findByUserName(userName);
+	        List<Integer> scenarioIds = new ArrayList<Integer>();
+	        for (UserScenarioMapping m : scenarioMappings) {
+	            scenarioIds.add(m.getScenarioId());
+	        }
+
+	        response.put("playlistIds", playlistIds);
+	        response.put("subplaylistIds", subplaylistIds);
+	        response.put("scenarioIds", scenarioIds);
+	        response.put("status", "success");
+	    } catch (Exception e) {
+	        response.put("status", "error");
+	        response.put("message", e.getMessage());
+	    }
+	    return response;
+	}
+
+
+
+
+
 
 }

@@ -543,8 +543,8 @@ h3 {
 												<th>IP Address</th>
 												<th>UserName</th>
 												<th>Status</th>
-												<th>Completion %</th>
-												<th>Visualization</th>
+												
+												<th>Progress</th>
 												<th>State</th>
 												<th>Console</th>
 												<th>Action</th>
@@ -567,7 +567,7 @@ h3 {
 															In Progress
 													</span></td>
 
-													<td th:text="${data['percentage'] + '%'}"></td>
+													
 													<td>
 														<div class="graph-container">
 															<div class="graph-fill"
@@ -581,9 +581,10 @@ h3 {
 
 													<td><a class="btn btn-sm btn-primary console-link"
 														th:href="@{|/guac/viewPlaylistConnection/${data['lab'].guacamoleId}|}"
-														title="Access Virtual Machine Console"> <i
-															class="fas fa-desktop"></i> View Console
+														title="Access Virtual Machine Console" target="_blank">
+															<i class="fas fa-desktop"></i> View Console
 													</a></td>
+
 
 													<td>
 														<div class="action-buttons">

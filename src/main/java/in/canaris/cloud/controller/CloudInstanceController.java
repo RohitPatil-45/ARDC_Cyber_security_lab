@@ -3456,8 +3456,9 @@ public class CloudInstanceController {
 		Integer newVncPort;
 		Integer newNoVncPort;
 		Integer newRdpPort;
-		
+
 		String containerIP = null;
+		String TemplateName = null;
 
 		String jsonResponse = null;
 
@@ -3482,6 +3483,7 @@ public class CloudInstanceController {
 				String filePath = instance.getSubproduct_id().getIso_file_path();
 				File file = new File(filePath);
 				String imageName = file.getName().replaceFirst("[.][^.]+$", "");
+				TemplateName = temp.getScenarioName();
 
 				System.out.println("imageNameimageName ::::" + imageName);
 
@@ -3514,17 +3516,19 @@ public class CloudInstanceController {
 					result = dockerService.runWindowsContainer(imageName, newInstanceName, portMappings, network);
 					if (result.equalsIgnoreCase("success")) {
 						System.out.println("inside windows docker : " + result);
-						jsonResponse = guacService.createConnection(newInstanceName, "rdp", instance.getPhysicalServerIP(), newRdpPort, "admin",
-								"12345", "", "", "", "", "", "", "", "", "", "", "");
+						jsonResponse = guacService.createConnection(newInstanceName, "rdp",
+								instance.getPhysicalServerIP(), newRdpPort, "admin", "12345", "", "", "", "", "", "",
+								"", "", "", "", "");
 						if (guacService.getConnectionIdByName(jsonResponse) != null) {
 							containerIP = dockerService.getContainerIpViaCli(newInstanceName);
 							insertIntoPortDetailsForWindows(newInstanceName, newRdpPort, newNoVncPort);
 							insertIntoUserLabForWindows(newInstanceName, username, "rdp", templateName,
-									guacService.getConnectionIdByName(jsonResponse), newRdpPort, newNoVncPort, "12345", "admin", containerIP,
-									scenarioId);
+									guacService.getConnectionIdByName(jsonResponse), newRdpPort, newNoVncPort, "12345",
+									"admin", containerIP, scenarioId);
 
-							insertUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName, username);
-							insertUserScenerio(scenarioId, temp.getScenarioName(), username);
+							insertUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName,
+									username);
+
 						}
 
 					}
@@ -3536,37 +3540,40 @@ public class CloudInstanceController {
 					if (result.equalsIgnoreCase("success")) {
 						System.out.println("inside linux docker : " + result);
 						// Create connection in Guacamole
-						jsonResponse = guacService.createConnection(newInstanceName, "vnc", instance.getPhysicalServerIP(), newVncPort,
-								"kali", "kalilinux", "", "", "", "", "", "", "", "", "", "", "");
+						jsonResponse = guacService.createConnection(newInstanceName, "vnc",
+								instance.getPhysicalServerIP(), newVncPort, "kali", "kalilinux", "", "", "", "", "", "",
+								"", "", "", "", "");
 						if (guacService.getConnectionIdByName(jsonResponse) != null) {
 							containerIP = dockerService.getContainerIpViaCli(newInstanceName);
 							insertIntoPortDetails(newInstanceName, newVncPort, newNoVncPort);
 							insertIntoUserLab(newInstanceName, username, "vnc", templateName,
-									guacService.getConnectionIdByName(jsonResponse), newVncPort, newNoVncPort, "kalilinux", containerIP,
-									scenarioId);
+									guacService.getConnectionIdByName(jsonResponse), newVncPort, newNoVncPort,
+									"kalilinux", containerIP, scenarioId);
 
-							insertUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName, username);
-							insertUserScenerio(scenarioId, temp.getScenarioName(), username);
+							insertUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName,
+									username);
+
 						}
-
 
 					}
 				}
 
 			}
 
+			insertUserScenerio(scenarioId, TemplateName, username);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("Exception_Dokcer_method : " + e);
 			result = "fail";
 		}
-		
+
 		return result;
 
 	}
 
 	public void insertIntoUserLab(String newInstanceName, String username, String remoteType, String templateName,
-			String guacamoleId, Integer newVncPort, Integer newNoVncPort, String password, String containerIP, String scenarioId) {
+			String guacamoleId, Integer newVncPort, Integer newNoVncPort, String password, String containerIP,
+			String scenarioId) {
 		UserLab lab = new UserLab();
 		lab.setInstanceName(newInstanceName);
 		lab.setGuacamoleId(Integer.valueOf(guacamoleId));
@@ -3577,6 +3584,7 @@ public class CloudInstanceController {
 		lab.setNoVncPort(newNoVncPort);
 		lab.setVncPort(newVncPort);
 		lab.setIpAddress(containerIP);
+		lab.setVmState("running");
 		lab.setStatus("InProgress");
 		lab.setTemplateName(templateName);
 		lab.setScenarioId(Integer.valueOf(scenarioId));
@@ -3584,9 +3592,10 @@ public class CloudInstanceController {
 		userLabRepository.save(lab);
 
 	}
-	
-	public void insertIntoUserLabForWindows(String newInstanceName, String username, String remoteType, String templateName,
-			String guacamoleId, Integer newRdpPort, Integer newNoVncPort, String password, String instanceuser, String containerIP, String scenarioId) {
+
+	public void insertIntoUserLabForWindows(String newInstanceName, String username, String remoteType,
+			String templateName, String guacamoleId, Integer newRdpPort, Integer newNoVncPort, String password,
+			String instanceuser, String containerIP, String scenarioId) {
 		UserLab lab = new UserLab();
 		lab.setInstanceName(newInstanceName);
 		lab.setGuacamoleId(Integer.valueOf(guacamoleId));
@@ -3613,7 +3622,7 @@ public class CloudInstanceController {
 		portDetailsRepository.save(port);
 
 	}
-	
+
 	public void insertIntoPortDetailsForWindows(String newInstanceName, Integer newRdpPort, Integer newNoVncPort) {
 		PortDetails port = new PortDetails();
 		port.setVmName(newInstanceName);
@@ -3622,7 +3631,6 @@ public class CloudInstanceController {
 		portDetailsRepository.save(port);
 
 	}
-
 
 	public void insertUserScenerio(String scenarioId, String scenarioName, String username) {
 		UserScenario us = new UserScenario();

@@ -22,7 +22,9 @@ public interface AppUserRepository extends JpaRepository<AppUser, Integer> {
 	@Query(value = "SELECT user_name FROM app_user WHERE user_id = :userId", nativeQuery = true)
 	String getUserNameById(@Param("userId") Long userId);
 
-	
 	List<AppUser> findByGroupName(String groupName);
+
+	@Query(value = "SELECT group_name FROM app_user", nativeQuery = true)
+	List<AppUser> findByAllGroupName();
 
 }
