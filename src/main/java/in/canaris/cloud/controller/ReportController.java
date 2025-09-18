@@ -2013,26 +2013,6 @@ public class ReportController {
 					}
 				}
 
-//				if (!Capacity.isEmpty() && Capacity.matches("\\d+")) {
-//					capacityLong = Long.parseLong(Capacity);
-//					capacityGB = capacityLong / 1024 / 1024 / 1024;
-//				}
-//				if (!Used.isEmpty() && Used.matches("\\d+")) {
-//					usedLong = Long.parseLong(Used);
-//					usedGB = usedLong / 1024 / 1024 / 1024;
-//				}
-//				if (!Capacity.isEmpty() && (Capacity.contains("GB"))) {
-//
-//				} else {
-//					capacityLong = Long.parseLong(Capacity);
-//					capacityGB = capacityLong / 1024 / 1024 / 1024;
-//
-//					usedLong = Long.parseLong(Used);
-//					usedGB = usedLong / 1024 / 1024 / 1024;
-//				}
-//
-//				long freeGB = capacityGB - usedGB;
-
 				srno++;
 
 				array.put(srno);

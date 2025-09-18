@@ -2282,14 +2282,13 @@ public class GuacamoleController {
 			User loginedUser = (User) authentication.getPrincipal();
 
 			String userName = loginedUser.getUsername();
-			
+
 			List<UserScenario> scenarioIds = UserScenerioRepository.findByUsername(userName);
-			
+
 			for (UserScenario objs : scenarioIds) {
 				Add_Scenario temp = ScenarioRepository.findById(Integer.parseInt(objs.getScenarioId())).get();
 				JSONObject obj = new JSONObject();
-				
-				
+
 				obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
 				obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
 				obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
@@ -2302,22 +2301,20 @@ public class GuacamoleController {
 
 				Finalarray.put(obj);
 			}
-				
 
 			System.out.println("Finalarray_getMy_View_Scenario ::" + Finalarray);
 			mav.addObject("listObj", Finalarray.toString());
 
-		}catch(
+		} catch (
 
-	Exception e)
-	{
-		e.printStackTrace();
-		mav.addObject("listObj", null);
-		mav.addObject("error", e.getMessage());
-		System.out.println("Error fetching data: " + e.getMessage());
-	}
+		Exception e) {
+			e.printStackTrace();
+			mav.addObject("listObj", null);
+			mav.addObject("error", e.getMessage());
+			System.out.println("Error fetching data: " + e.getMessage());
+		}
 
-	return mav;
+		return mav;
 	}
 
 //	@PostMapping("/addplaylist_Scenario")
@@ -3238,6 +3235,53 @@ public class GuacamoleController {
 			response.put("message", e.getMessage());
 		}
 		return response;
+	}
+
+	@GetMapping("/UserWisePerformance")
+	public ModelAndView getUserWisePerformance(Principal principal) {
+		ModelAndView mav = new ModelAndView("UserWisePerformance");
+		JSONArray Finalarray = new JSONArray();
+
+		try {
+
+			List<AppUser> dataList = AppUserRepository.findAll();
+
+			int srno = 0;
+			for (AppUser temp : dataList) {
+				JSONArray array = new JSONArray();
+
+				String userName = temp.getUserName() != null ? temp.getUserName() : "";
+
+				Integer falseCountObj = instructionTemplateRepository.getFalseCompletionCountsByTemplateId(userName);
+				Integer trueCountObj = instructionTemplateRepository.getTrueCompletionCountsByTemplateId(userName);
+
+				int falseCount = (falseCountObj != null) ? falseCountObj : 0;
+				int trueCount = (trueCountObj != null) ? trueCountObj : 0;
+
+				int total = trueCount + falseCount;
+
+				int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
+
+				srno++;
+
+				array.put(srno);
+				array.put(userName);
+				array.put(percentage + "%");
+
+				Finalarray.put(array);
+			}
+
+			System.out.println("Finalarray_UserWisePerformance ::" + Finalarray);
+
+			mav.addObject("listObj", Finalarray.toString());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			mav.addObject("listObj", null);
+			mav.addObject("error", e.getMessage());
+			System.out.println("Error fetching data: " + e.getMessage());
+		}
+		return mav;
 	}
 
 }
