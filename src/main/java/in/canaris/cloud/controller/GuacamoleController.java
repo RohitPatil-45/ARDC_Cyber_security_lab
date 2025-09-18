@@ -332,12 +332,70 @@ public class GuacamoleController {
 		return "View_DockerListing"; // Thymeleaf page name
 	}
 
+//	@GetMapping("/View_Vm_Listing")
+//	public ModelAndView viewVmListing(@RequestParam("Id") int scenarioId, Model model, Principal principal) {
+//		System.out.println("Requested scenario Id = " + scenarioId);
+//
+//		Authentication auth = (Authentication) principal;
+//		String username = auth.getName();
+//
+//		ModelAndView mav = new ModelAndView("View_Vm_Listing");
+//
+//		List<UserLab> labs = UserLabRepository.findByScenarioIdAndUsername(scenarioId, username);
+//
+//		// Add percentage for each lab
+//		List<Map<String, Object>> labData = new ArrayList<>();
+//		for (UserLab lab : labs) {
+//			Map<String, Object> map = new HashMap<>();
+//			map.put("lab", lab);
+//
+//			// Fetch true and false counts from repository
+//			String insatnceName = lab.getTemplateName();
+//			
+//			
+//			
+//			List<CloudInstance> cloudobj = repository.findByInstanceName(insatnceName);
+//			CloudInstance instance = cloudobj.get();
+//
+//			String templateName = instance.getInstance_name();
+//			String password = instance.getInstance_password();
+//			String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+//			
+//			Long labIdLong = lab.getLabId();
+//			int labId = labIdLong.intValue();
+//
+//			Integer falseCountObj = instructionTemplateRepository.getfalseCompletionCountsByTemplateName(labId);
+//			Integer trueCountObj = instructionTemplateRepository.gettrueCompletionCountsByTemplateName(labId);
+//
+//			// Handle null values
+//			int falseCount = (falseCountObj != null) ? falseCountObj : 0;
+//			int trueCount = (trueCountObj != null) ? trueCountObj : 0;
+//
+//			int total = trueCount + falseCount;
+//
+//			// Calculate percentage (avoid division by zero)
+//			int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
+//			map.put("percentage", percentage);
+//
+//			labData.add(map);
+//
+//			System.out.println("labData ::" + labData);
+//		}
+//
+//		model.addAttribute("labData", labData);
+//		return mav;
+//	}
+
 	@GetMapping("/View_Vm_Listing")
-	public ModelAndView viewVmListing(@RequestParam("Id") int scenarioId, Model model) {
+	public ModelAndView viewVmListing(@RequestParam("Id") int scenarioId, Model model, Principal principal) {
 		System.out.println("Requested scenario Id = " + scenarioId);
+
+		Authentication auth = (Authentication) principal;
+		String username = auth.getName();
+
 		ModelAndView mav = new ModelAndView("View_Vm_Listing");
 
-		List<UserLab> labs = UserLabRepository.findByscenarioId(scenarioId);
+		List<UserLab> labs = UserLabRepository.findByScenarioIdAndUsername(scenarioId, username);
 
 		// Add percentage for each lab
 		List<Map<String, Object>> labData = new ArrayList<>();
@@ -345,8 +403,26 @@ public class GuacamoleController {
 			Map<String, Object> map = new HashMap<>();
 			map.put("lab", lab);
 
-			// Fetch true and false counts from repository
+			// Fetch CloudInstance by instance name
+			String instanceName = lab.getTemplateName();
+			List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
 
+			if (!cloudInstances.isEmpty()) {
+				CloudInstance instance = cloudInstances.get(0); // ✅ first match
+
+				String templateName = instance.getInstance_name();
+				String password = instance.getInstance_password();
+				String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+
+				// You can store them in the map if needed
+//	            map.put("templateName", templateName);
+//	            map.put("password", password);
+				map.put("os", os);
+			} else {
+				System.out.println("No CloudInstance found for name: " + instanceName);
+			}
+
+			// Handle LabId
 			Long labIdLong = lab.getLabId();
 			int labId = labIdLong.intValue();
 
@@ -1617,58 +1693,56 @@ public class GuacamoleController {
 //		}
 //		return mav;
 //	}
-	
-	
+
 	@GetMapping("/View_SubPalylist")
 	public ModelAndView getView_SubPlaylist(Principal principal) {
-	    ModelAndView mav = new ModelAndView("View_SubPalylist");
-	    JSONArray Finalarray = new JSONArray();
-	    List<SubPlaylist> dataList = new ArrayList<>();
+		ModelAndView mav = new ModelAndView("View_SubPalylist");
+		JSONArray Finalarray = new JSONArray();
+		List<SubPlaylist> dataList = new ArrayList<>();
 
-	    try {
-	        Authentication authentication = (Authentication) principal;
-	        User loginedUser = (User) authentication.getPrincipal();
+		try {
+			Authentication authentication = (Authentication) principal;
+			User loginedUser = (User) authentication.getPrincipal();
 
-	        String userName = loginedUser.getUsername();
+			String userName = loginedUser.getUsername();
 
-	        boolean isSuperAdmin = authentication.getAuthorities().stream()
-	                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+			boolean isSuperAdmin = authentication.getAuthorities().stream()
+					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
 
-	        if (isSuperAdmin) {
-	            // SuperAdmin → all subplaylists
-	            dataList = SubPlaylistRepository.findAll();
-	        } else {
-	            // Normal User → only subplaylists assigned to them
-	            List<Integer> subPlaylistIds = UserSubplaylistMappingRepository.findSubPlaylistIdsByUserName(userName);
+			if (isSuperAdmin) {
+				// SuperAdmin → all subplaylists
+				dataList = SubPlaylistRepository.findAll();
+			} else {
+				// Normal User → only subplaylists assigned to them
+				List<Integer> subPlaylistIds = UserSubplaylistMappingRepository.findSubPlaylistIdsByUserName(userName);
 
-	            if (subPlaylistIds != null && !subPlaylistIds.isEmpty()) {
-	                dataList = SubPlaylistRepository.findAllById(subPlaylistIds);
-	            }
-	        }
+				if (subPlaylistIds != null && !subPlaylistIds.isEmpty()) {
+					dataList = SubPlaylistRepository.findAllById(subPlaylistIds);
+				}
+			}
 
-	        // Convert to JSON
-	        for (SubPlaylist temp : dataList) {
-	            JSONObject obj = new JSONObject();
-	            obj.put("PlaylistTitle", temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "");
-	            obj.put("PlaylistName", temp.getPlaylistName() != null ? temp.getPlaylistName() : "");
-	            obj.put("Description", temp.getDescription() != null ? temp.getDescription() : "");
-	            obj.put("Tag", temp.getTag() != null ? temp.getTag() : "");
-	            obj.put("Cover_Image", ""); 
-	            obj.put("Id", temp.getId());
-	            Finalarray.put(obj);
-	        }
+			// Convert to JSON
+			for (SubPlaylist temp : dataList) {
+				JSONObject obj = new JSONObject();
+				obj.put("PlaylistTitle", temp.getPlaylistTitle() != null ? temp.getPlaylistTitle() : "");
+				obj.put("PlaylistName", temp.getPlaylistName() != null ? temp.getPlaylistName() : "");
+				obj.put("Description", temp.getDescription() != null ? temp.getDescription() : "");
+				obj.put("Tag", temp.getTag() != null ? temp.getTag() : "");
+				obj.put("Cover_Image", "");
+				obj.put("Id", temp.getId());
+				Finalarray.put(obj);
+			}
 
-	        System.out.println("Finalarray_getView_SubPlaylist ::" + Finalarray);
-	        mav.addObject("listObj", Finalarray.toString());
+			System.out.println("Finalarray_getView_SubPlaylist ::" + Finalarray);
+			mav.addObject("listObj", Finalarray.toString());
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        mav.addObject("listObj", null);
-	        mav.addObject("error", e.getMessage());
-	    }
-	    return mav;
+		} catch (Exception e) {
+			e.printStackTrace();
+			mav.addObject("listObj", null);
+			mav.addObject("error", e.getMessage());
+		}
+		return mav;
 	}
-
 
 	@GetMapping("/Playlistimage/{id}")
 	public void getPlaylistImage(@PathVariable int id, HttpServletResponse response) throws IOException {
@@ -2037,61 +2111,60 @@ public class GuacamoleController {
 //		}
 //		return mav;
 //	}
-	
+
 	@GetMapping("/View_Scenario")
 	public ModelAndView getView_Scenario(Principal principal) {
-	    ModelAndView mav = new ModelAndView("View_Scenario");
-	    JSONArray Finalarray = new JSONArray();
-	    List<Add_Scenario> dataList = new ArrayList<>();
+		ModelAndView mav = new ModelAndView("View_Scenario");
+		JSONArray Finalarray = new JSONArray();
+		List<Add_Scenario> dataList = new ArrayList<>();
 
-	    try {
-	        Authentication authentication = (Authentication) principal;
-	        User loginedUser = (User) authentication.getPrincipal();
+		try {
+			Authentication authentication = (Authentication) principal;
+			User loginedUser = (User) authentication.getPrincipal();
 
-	        String userName = loginedUser.getUsername();
+			String userName = loginedUser.getUsername();
 
-	        boolean isSuperAdmin = authentication.getAuthorities().stream()
-	                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+			boolean isSuperAdmin = authentication.getAuthorities().stream()
+					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
 
-	        if (isSuperAdmin) {
-	            // SuperAdmin → all scenarios
-	            dataList = ScenarioRepository.findAll();
-	        } else {
-	            // Normal User → only mapped scenarios
-	            List<Integer> scenarioIds = UserScenarioMappingRepository.findScenarioIdsByUserName(userName);
+			if (isSuperAdmin) {
+				// SuperAdmin → all scenarios
+				dataList = ScenarioRepository.findAll();
+			} else {
+				// Normal User → only mapped scenarios
+				List<Integer> scenarioIds = UserScenarioMappingRepository.findScenarioIdsByUserName(userName);
 
-	            if (scenarioIds != null && !scenarioIds.isEmpty()) {
-	                dataList = ScenarioRepository.findAllById(scenarioIds);
-	            }
-	        }
+				if (scenarioIds != null && !scenarioIds.isEmpty()) {
+					dataList = ScenarioRepository.findAllById(scenarioIds);
+				}
+			}
 
-	        // Convert to JSON
-	        for (Add_Scenario temp : dataList) {
-	            JSONObject obj = new JSONObject();
-	            obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
-	            obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
-	            obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
-	            obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
-	            obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
-	            obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
-	            obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
-	            obj.put("Cover_Image", "");
-	            obj.put("Id", temp.getId());
-	            Finalarray.put(obj);
-	        }
+			// Convert to JSON
+			for (Add_Scenario temp : dataList) {
+				JSONObject obj = new JSONObject();
+				obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
+				obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
+				obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
+				obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
+				obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
+				obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
+				obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
+				obj.put("Cover_Image", "");
+				obj.put("Id", temp.getId());
+				Finalarray.put(obj);
+			}
 
-	        System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
-	        mav.addObject("listObj", Finalarray.toString());
+			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
+			mav.addObject("listObj", Finalarray.toString());
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        mav.addObject("listObj", null);
-	        mav.addObject("error", e.getMessage());
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+			mav.addObject("listObj", null);
+			mav.addObject("error", e.getMessage());
+		}
 
-	    return mav;
+		return mav;
 	}
-
 
 //	@GetMapping("/My_Scenario")
 //	public ModelAndView getMy_View_Scenario(Principal principal) {
@@ -2197,71 +2270,55 @@ public class GuacamoleController {
 //		}
 //		return mav;
 //	}
-	
-	
+
 	@GetMapping("/My_Scenario")
 	public ModelAndView getMy_View_Scenario(Principal principal) {
-	    ModelAndView mav = new ModelAndView("My_View_Scenario");
-	    JSONArray Finalarray = new JSONArray();
-	    List<Add_Scenario> dataList = new ArrayList<>();
+		ModelAndView mav = new ModelAndView("My_View_Scenario");
+		JSONArray Finalarray = new JSONArray();
+		List<Add_Scenario> dataList = new ArrayList<>();
 
-	    try {
-	        Authentication authentication = (Authentication) principal;
-	        User loginedUser = (User) authentication.getPrincipal();
+		try {
+			Authentication authentication = (Authentication) principal;
+			User loginedUser = (User) authentication.getPrincipal();
 
-	        String userName = loginedUser.getUsername();
+			String userName = loginedUser.getUsername();
+			
+			List<UserScenario> scenarioIds = UserScenerioRepository.findByUsername(userName);
+			
+			for (UserScenario objs : scenarioIds) {
+				Add_Scenario temp = ScenarioRepository.findById(Integer.parseInt(objs.getScenarioId())).get();
+				JSONObject obj = new JSONObject();
+				
+				
+				obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
+				obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
+				obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
+				obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
+				obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
+				obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
+				obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
+				obj.put("Cover_Image", "");
+				obj.put("Id", temp.getId());
 
-	        boolean isSuperAdmin = authentication.getAuthorities().stream()
-	                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+				Finalarray.put(obj);
+			}
+				
 
-	        if (isSuperAdmin) {
-	            // SuperAdmin → show all "My Scenarios"
-//	            dataList = ScenarioRepository.findByUserScenario();
-	        	
-	        	List<Integer> scenarioIds = UserScenarioMappingRepository.findScenarioIdsByUserName(userName);
+			System.out.println("Finalarray_getMy_View_Scenario ::" + Finalarray);
+			mav.addObject("listObj", Finalarray.toString());
 
-	            if (scenarioIds != null && !scenarioIds.isEmpty()) {
-	                dataList = ScenarioRepository.findByUserScenarioById(scenarioIds,userName);
-	            }
-	            
-	        } else {
-	            // Normal user → only scenarios assigned to them
-	            List<Integer> scenarioIds = UserScenarioMappingRepository.findScenarioIdsByUserName(userName);
+		}catch(
 
-	            if (scenarioIds != null && !scenarioIds.isEmpty()) {
-	                dataList = ScenarioRepository.findByUserScenarioById(scenarioIds,userName);
-	            }
-	        }
-
-	        // Convert to JSON
-	        for (Add_Scenario temp : dataList) {
-	            JSONObject obj = new JSONObject();
-	            obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
-	            obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
-	            obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
-	            obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
-	            obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
-	            obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
-	            obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
-	            obj.put("Cover_Image", "");
-	            obj.put("Id", temp.getId());
-
-	            Finalarray.put(obj);
-	        }
-
-	        System.out.println("Finalarray_getMy_View_Scenario ::" + Finalarray);
-	        mav.addObject("listObj", Finalarray.toString());
-
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        mav.addObject("listObj", null);
-	        mav.addObject("error", e.getMessage());
-	        System.out.println("Error fetching data: " + e.getMessage());
-	    }
-
-	    return mav;
+	Exception e)
+	{
+		e.printStackTrace();
+		mav.addObject("listObj", null);
+		mav.addObject("error", e.getMessage());
+		System.out.println("Error fetching data: " + e.getMessage());
 	}
 
+	return mav;
+	}
 
 //	@PostMapping("/addplaylist_Scenario")
 //	@ResponseBody
@@ -2463,7 +2520,10 @@ public class GuacamoleController {
 		try {
 //			System.out.println("Checking scenarioId: " + scenarioId); usernmae
 
-			Optional<UserScenario> scenarioOpt = UserScenerioRepository.findByScenarioId(scenarioId);
+			User loginedUser = (User) ((Authentication) principal).getPrincipal();
+			String username = loginedUser.getUsername();
+
+			Optional<UserScenario> scenarioOpt = UserScenerioRepository.findByScenarioId(scenarioId, username);
 
 			if (scenarioOpt.isPresent()) {
 //				System.out.println("Scenario found.");
@@ -2513,17 +2573,72 @@ public class GuacamoleController {
 		}
 	}
 
+//	@PostMapping("/remove_lab")
+//	@ResponseBody
+//	public String remove_lab(@RequestParam("containerName") String containerName, Principal principal) {
+//		try {
+//			
+//			 Authentication auth = (Authentication) principal;
+//			    String username = auth.getName();
+//			    
+//			System.out.println("Inside_remove_lab containerName: " + containerName);
+//			dockerService.removeContainerByName(containerName);
+//			System.out.println("Container removed successfully: " + containerName);
+//			
+//			List<UserLab> list = UserLabRepository.findByInstnaceName(containerName);
+//			
+//			String getusername=  list.getusername;
+//			String scenarioId = list.scenarioId;
+//
+//			CommandHistoryRepository.deleteByContainerName(containerName);
+//			instructionTemplateRepository.deleteByLabName(containerName);
+//			UserLabRepository.deleteByInstanceName(containerName);
+//			
+//			
+//			UserScenerioRepository.deleteByScenarioIdandUsername(getusername,scenarioId);
+//
+//			return "success";
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			System.out.println("Exception Inside_remove_lab : " + e);
+//			return "fail";
+//		}
+//	}
+
 	@PostMapping("/remove_lab")
 	@ResponseBody
 	public String remove_lab(@RequestParam("containerName") String containerName, Principal principal) {
 		try {
+			Authentication auth = (Authentication) principal;
+			String username = auth.getName();
+
 			System.out.println("Inside_remove_lab containerName: " + containerName);
+
+			// remove container from docker
 			dockerService.removeContainerByName(containerName);
 			System.out.println("Container removed successfully: " + containerName);
 
-			CommandHistoryRepository.deleteByContainerName(containerName);
-			instructionTemplateRepository.deleteByLabName(containerName);
-			UserLabRepository.deleteByInstanceName(containerName);
+			// find lab by instance name
+			List<UserLab> labs = UserLabRepository.findByInstnaceName(containerName);
+
+			if (!labs.isEmpty()) {
+				UserLab lab = labs.get(0); // take first record
+				String getUsername = lab.getUsername();
+				Integer scenarioId = lab.getScenarioId();
+
+				String scenarioIdStr = String.valueOf(scenarioId);
+
+				// delete related records
+				CommandHistoryRepository.deleteByContainerName(containerName);
+				instructionTemplateRepository.deleteByLabName(containerName);
+				UserLabRepository.deleteByInstanceName(containerName);
+
+				if (scenarioId != null) {
+					UserScenerioRepository.deleteByScenarioIdAndUsername(getUsername, scenarioIdStr);
+				}
+			} else {
+				System.out.println("No UserLab found for instanceName: " + containerName);
+			}
 
 			return "success";
 		} catch (Exception e) {
@@ -3045,7 +3160,7 @@ public class GuacamoleController {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			
+
 		}
 
 		return "redirect:/guac/Add_UserWisePlaylist";
@@ -3075,62 +3190,54 @@ public class GuacamoleController {
 
 			List<Add_Scenario> scenarios = ScenarioRepository.findAll();
 			mav.addObject("scenarios", scenarios); // Changed from "Scenario" to "scenarios"
-			
+
 		} catch (Exception e) {
 			mav.addObject("error", "Error fetching summary: " + e.getMessage());
 		}
 
 		return mav;
 	}
-	
+
 	@GetMapping("/getUserMappings")
 	@ResponseBody
 	public Map<String, Object> getUserMappings(@RequestParam long userId) {
-	    Map<String, Object> response = new HashMap<String, Object>();
-	    try {
-	    	
-	    	
-				String userName = AppUserRepository.getUserNameById(userId);
-				System.out.println("Processing userId: " + userId + " -> userName: " + userName);
+		Map<String, Object> response = new HashMap<String, Object>();
+		try {
 
-				
-				
-	    	
-	        // Fetch playlist IDs
-	        List<UserPlaylistMapping> playlistMappings = UserPlaylistMappingRepository.findByUserName(userName);
-	        List<Integer> playlistIds = new ArrayList<Integer>();
-	        for (UserPlaylistMapping m : playlistMappings) {
-	            playlistIds.add(m.getPlaylistId());
-	        }
+			String userName = AppUserRepository.getUserNameById(userId);
+			System.out.println("Processing userId: " + userId + " -> userName: " + userName);
 
-	        // Fetch subplaylist IDs
-	        List<UserSubplaylistMapping> subplaylistMappings = UserSubplaylistMappingRepository.findByUserName(userName);
-	        List<Integer> subplaylistIds = new ArrayList<Integer>();
-	        for (UserSubplaylistMapping m : subplaylistMappings) {
-	            subplaylistIds.add(m.getSubPlaylistId());
-	        }
+			// Fetch playlist IDs
+			List<UserPlaylistMapping> playlistMappings = UserPlaylistMappingRepository.findByUserName(userName);
+			List<Integer> playlistIds = new ArrayList<Integer>();
+			for (UserPlaylistMapping m : playlistMappings) {
+				playlistIds.add(m.getPlaylistId());
+			}
 
-	        // Fetch scenario IDs
-	        List<UserScenarioMapping> scenarioMappings = UserScenarioMappingRepository.findByUserName(userName);
-	        List<Integer> scenarioIds = new ArrayList<Integer>();
-	        for (UserScenarioMapping m : scenarioMappings) {
-	            scenarioIds.add(m.getScenarioId());
-	        }
+			// Fetch subplaylist IDs
+			List<UserSubplaylistMapping> subplaylistMappings = UserSubplaylistMappingRepository
+					.findByUserName(userName);
+			List<Integer> subplaylistIds = new ArrayList<Integer>();
+			for (UserSubplaylistMapping m : subplaylistMappings) {
+				subplaylistIds.add(m.getSubPlaylistId());
+			}
 
-	        response.put("playlistIds", playlistIds);
-	        response.put("subplaylistIds", subplaylistIds);
-	        response.put("scenarioIds", scenarioIds);
-	        response.put("status", "success");
-	    } catch (Exception e) {
-	        response.put("status", "error");
-	        response.put("message", e.getMessage());
-	    }
-	    return response;
+			// Fetch scenario IDs
+			List<UserScenarioMapping> scenarioMappings = UserScenarioMappingRepository.findByUserName(userName);
+			List<Integer> scenarioIds = new ArrayList<Integer>();
+			for (UserScenarioMapping m : scenarioMappings) {
+				scenarioIds.add(m.getScenarioId());
+			}
+
+			response.put("playlistIds", playlistIds);
+			response.put("subplaylistIds", subplaylistIds);
+			response.put("scenarioIds", scenarioIds);
+			response.put("status", "success");
+		} catch (Exception e) {
+			response.put("status", "error");
+			response.put("message", e.getMessage());
+		}
+		return response;
 	}
-
-
-
-
-
 
 }

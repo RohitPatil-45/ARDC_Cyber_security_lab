@@ -542,6 +542,8 @@ h3 {
 												<th>Lab Name</th>
 												<th>IP Address</th>
 												<th>UserName</th>
+												<th>Password</th>
+												<th>OS</th>
 												<th>Status</th>
 												
 												<th>Progress</th>
@@ -556,7 +558,9 @@ h3 {
 													<td th:text="${data['lab'].labId}"></td>
 													<td th:text="${data['lab'].instanceName}"></td>
 													<td th:text="${data['lab'].ipAddress}"></td>
-													<td th:text="${data['lab'].username}"></td>
+													<td th:text="${data['lab'].instanceUser}"></td>
+													<td th:text="${data['lab'].password}"></td>
+													<td th:text="${data['os']}"></td>
 													<td><span th:if="${data['lab'].Status == 'Completed'}"
 														class="badge badge-success"> <i
 															class="fas fa-circle status-indicator status-active"></i>

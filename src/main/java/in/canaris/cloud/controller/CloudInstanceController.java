@@ -3517,13 +3517,13 @@ public class CloudInstanceController {
 					if (result.equalsIgnoreCase("success")) {
 						System.out.println("inside windows docker : " + result);
 						jsonResponse = guacService.createConnection(newInstanceName, "rdp",
-								instance.getPhysicalServerIP(), newRdpPort, "admin", "12345", "", "", "", "", "", "",
+								instance.getPhysicalServerIP(), newRdpPort, "admin", "Admin@123!", "", "true", "", "", "", "",
 								"", "", "", "", "");
 						if (guacService.getConnectionIdByName(jsonResponse) != null) {
 							containerIP = dockerService.getContainerIpViaCli(newInstanceName);
 							insertIntoPortDetailsForWindows(newInstanceName, newRdpPort, newNoVncPort);
 							insertIntoUserLabForWindows(newInstanceName, username, "rdp", templateName,
-									guacService.getConnectionIdByName(jsonResponse), newRdpPort, newNoVncPort, "12345",
+									guacService.getConnectionIdByName(jsonResponse), newRdpPort, newNoVncPort, "Admin@123!",
 									"admin", containerIP, scenarioId);
 
 							insertUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName,
@@ -3606,6 +3606,7 @@ public class CloudInstanceController {
 		lab.setNoVncPort(newNoVncPort);
 		lab.setVncPort(newRdpPort);
 		lab.setIpAddress(containerIP);
+		lab.setVmState("running");
 		lab.setStatus("InProgress");
 		lab.setTemplateName(templateName);
 		lab.setScenarioId(Integer.valueOf(scenarioId));

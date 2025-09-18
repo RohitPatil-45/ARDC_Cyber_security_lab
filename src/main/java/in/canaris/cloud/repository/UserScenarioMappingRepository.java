@@ -18,7 +18,7 @@ public interface UserScenarioMappingRepository extends JpaRepository<UserScenari
 	@Query(value = "SELECT scenarioid FROM user_scenario_mapping WHERE user_name = :userName", nativeQuery = true)
 	List<Integer> findScenarioIdsByUserName(@Param("userName") String userName);
 
-	@Query("SELECT u FROM UserScenarioMapping u WHERE u.UserName = :userName")
+	@Query(value = "SELECT * FROM user_scenario_mapping WHERE user_name = :userName", nativeQuery = true)
 	List<UserScenarioMapping> findByUserName(@Param("userName") String userName);
 
 //	List<UserScenarioMapping> findByUserName(String userName);

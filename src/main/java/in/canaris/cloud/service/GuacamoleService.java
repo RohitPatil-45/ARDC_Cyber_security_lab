@@ -131,7 +131,7 @@ public class GuacamoleService {
 		case "rdp":
 			if (domain != null)
 				params.put("domain", domain);
-			params.put("security", "nla");
+			params.put("security", "any");
 			if (ignoreCert != null && ignoreCert.equals("true")) {
 				params.put("ignore-cert", "true");
 			}

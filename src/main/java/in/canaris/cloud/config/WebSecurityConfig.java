@@ -115,7 +115,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				} else if (roles.contains("ROLE_ADMIN")) {
 					landingpageURl = "/cloud_instance/view";
 				} else if (roles.contains("ROLE_USER")) {
-					landingpageURl = "/cloud_instance/view";
+					landingpageURl = "/guac/View_Playlist";
 				}
 
 				getRedirectStrategy().sendRedirect(request, response, landingpageURl);

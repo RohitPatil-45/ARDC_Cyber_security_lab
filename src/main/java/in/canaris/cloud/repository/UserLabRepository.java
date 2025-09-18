@@ -13,7 +13,9 @@ import in.canaris.cloud.openstack.entity.UserLab;
 
 public interface UserLabRepository extends JpaRepository<UserLab, Integer> {
 
-	List<UserLab> findByscenarioId(int scenarioId);
+	@Query("SELECT u FROM UserLab u WHERE u.scenarioId = :scenarioId AND u.username = :username")
+	List<UserLab> findByScenarioIdAndUsername(@Param("scenarioId") Integer scenarioId,
+			@Param("username") String username);
 
 	@Query("SELECT MAX(u.labId) FROM UserLab u")
 	Integer findMaxLabId();
@@ -36,24 +38,21 @@ public interface UserLabRepository extends JpaRepository<UserLab, Integer> {
 	@Transactional
 	@Query("DELETE FROM UserLab u WHERE u.instanceName = :instanceName")
 	void deleteByInstanceName(String instanceName);
-	
-    @Query(value = "SELECT server_ip FROM add_physical_server where virtualization_type='Docker'", nativeQuery = true)
-    List<String> getPhysicalServerIPs();
 
-    
+	@Query(value = "SELECT server_ip FROM add_physical_server where virtualization_type='Docker'", nativeQuery = true)
+	List<String> getPhysicalServerIPs();
+
 	@Modifying
 	@Transactional
 	@Query(value = "UPDATE user_lab SET vmstate = :status WHERE instance_name = :containerName", nativeQuery = true)
-	void updateStatusByLabName(@Param("containerName") String containerName,@Param("status") String status);
+	void updateStatusByLabName(@Param("containerName") String containerName, @Param("status") String status);
 
-	
 	@Modifying
 	@Transactional
 	@Query(value = "UPDATE user_lab SET status = 'InProgress' WHERE instance_name = :containerName", nativeQuery = true)
 	void UpdateresetByLabName(@Param("containerName") String containerName);
 
-
-	
- 
+	@Query("Select u FROM UserLab u WHERE u.instanceName = :containerName")
+	List<UserLab> findByInstnaceName(@Param("containerName") String containerName);
 
 }
