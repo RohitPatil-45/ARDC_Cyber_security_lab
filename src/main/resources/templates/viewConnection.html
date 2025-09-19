@@ -3,6 +3,7 @@
 
 <head>
 <title>View RDP Connections | CMP</title>
+<link rel="icon" type="image/png" href="/webtemplate/dist/img/magicboxEye3.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -107,9 +108,6 @@ body {
 	margin-left: auto;
 }
 
-.message-content {
-	margin-bottom: 5px;
-}
 
 .message-time {
 	font-size: 0.75rem;
@@ -190,7 +188,7 @@ body {
 .message-content {
 	margin-bottom: 5px;
 	line-height: 1.5;
-	font-size: 14px;
+	font-size: 17px;
 }
 
 .message-content img {
@@ -262,6 +260,294 @@ body {
 #chat-messages::-webkit-scrollbar-thumb:hover {
 	background: #718096;
 }
+
+/* New styles for collapsible sidebar */
+.connection-container {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	position: relative;
+}
+
+.main-content {
+	display: flex;
+	flex: 1;
+	overflow: hidden;
+}
+
+.rdp-frame-container {
+	flex: 1;
+	position: relative;
+	transition: all 0.3s ease;
+}
+
+.rdp-frame-container.expanded {
+	margin-right: 0;
+}
+
+.sidebar {
+	width: 400px;
+	background-color: #1a202c;
+	border-left: 1px solid #2d3748;
+	display: flex;
+	flex-direction: column;
+	transition: transform 0.3s ease;
+	z-index: 100;
+}
+
+.sidebar.collapsed {
+	transform: translateX(100%);
+}
+
+.sidebar-toggler {
+	position: absolute;
+	top: 50%;
+	right: 400px;
+	transform: translateY(-50%);
+	background-color: #2d3748;
+	color: white;
+	border: none;
+	border-radius: 5px 0 0 5px;
+	padding: 10px 5px;
+	cursor: pointer;
+	z-index: 101;
+	transition: right 0.3s ease;
+}
+
+.sidebar.collapsed ~ .sidebar-toggler {
+	right: 0;
+}
+
+.sidebar-tabs {
+	display: flex;
+	border-bottom: 1px solid #2d3748;
+}
+
+.sidebar-tab {
+	flex: 1;
+	background: none;
+	border: none;
+	color: #a0aec0;
+	padding: 12px;
+	cursor: pointer;
+	transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar-tab:hover {
+	background-color: #2d3748;
+	color: white;
+}
+
+.sidebar-tab.active {
+	background-color: #2d3748;
+	color: white;
+	border-bottom: 2px solid #007bff;
+}
+
+/* Enhanced Chat Tab Styling */
+.sidebar-tab[data-tab="chat"] {
+	position: relative;
+}
+
+.sidebar-tab[data-tab="chat"].has-new-messages::after {
+	content: "";
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	width: 8px;
+	height: 8px;
+	background-color: #ff4757;
+	border-radius: 50%;
+}
+
+.sidebar-tab[data-tab="chat"].active.has-new-messages::after {
+	display: none;
+}
+
+.tab-content {
+	flex: 1;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+.tab-pane {
+	display: none;
+	flex-direction: column;
+	height: 100%;
+	overflow: hidden;
+}
+
+.tab-pane.active {
+	display: flex;
+}
+
+.instructions-container, .chat-container, .details-container {
+	flex: 1;
+	overflow: auto;
+	padding: 15px;
+}
+
+.instruction-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 15px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #2d3748;
+}
+
+.toggle-btn {
+	background-color: #2d3748;
+	color: #a0aec0;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 12px;
+}
+
+.toggle-btn.active {
+	background-color: #007bff;
+	color: white;
+}
+
+.instruction-content img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 8px;
+	margin: 10px 0;
+}
+
+.instruction-text {
+	margin-bottom: 15px;
+	line-height: 1.6;
+}
+
+.image-container {
+	text-align: center;
+	margin: 10px 0;
+	background-color: #2d3748;
+	padding: 10px;
+	border-radius: 8px;
+}
+
+.image-caption {
+	font-size: 12px;
+	color: #a0aec0;
+	margin-top: 5px;
+}
+
+/* Enhanced Chat Styles */
+.chat-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 15px;
+	background-color: #2d3748;
+	border-radius: 8px 8px 0 0;
+	margin-bottom: 10px;
+}
+
+.chat-title {
+	font-weight: bold;
+	color: #63b3ed;
+	font-size: 16px;
+}
+
+.chat-status {
+	display: flex;
+	align-items: center;
+	font-size: 12px;
+	color: #a0aec0;
+}
+
+.chat-status-indicator {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background-color: #48bb78;
+	margin-right: 5px;
+}
+
+.system-message {
+	background-color: rgba(255, 215, 0, 0.1);
+	border-left: 3px solid #ffd700;
+	padding: 10px;
+	margin: 10px 0;
+	border-radius: 4px;
+	font-size: 13px;
+	color: #ffd700;
+}
+
+.user-typing {
+	font-style: italic;
+	color: #a0aec0;
+	font-size: 12px;
+	padding: 5px 15px;
+	height: 20px;
+}
+
+.message-highlight {
+	animation: messagePulse 2s ease;
+}
+
+@keyframes messagePulse {
+	0% { background-color: rgba(59, 130, 246, 0.3); }
+	100% { background-color: #2d3748; }
+}
+
+.command-message {
+	border-left: 3px solid #48bb78;
+}
+
+.important-message {
+	border: 1px solid #f56565;
+}
+
+/* Notification badge */
+.notification-badge {
+	position: absolute;
+	top: -5px;
+	right: -5px;
+	background-color: #ff4757;
+	color: white;
+	border-radius: 50%;
+	width: 18px;
+	height: 18px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+/* Chat input area (if needed in future) */
+.chat-input-area {
+	display: flex;
+	padding: 10px;
+	border-top: 1px solid #2d3748;
+	background-color: #1a202c;
+}
+
+.chat-input {
+	flex: 1;
+	background-color: #2d3748;
+	border: none;
+	border-radius: 20px;
+	padding: 10px 15px;
+	color: white;
+}
+
+.chat-send-btn {
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 20px;
+	padding: 10px 15px;
+	margin-left: 10px;
+	cursor: pointer;
+}
 </style>
 
 <link rel="stylesheet" th:href="@{/webtemplate/css/style_connetion.css}">
@@ -298,7 +584,7 @@ body {
 		<!-- Main content area -->
 		<div class="main-content">
 			<!-- RDP Frame -->
-			<div class="rdp-frame-container">
+			<div class="rdp-frame-container" id="rdp-container">
 				<div class="connection-loading" id="loading-indicator">
 					<div class="spinner"></div>
 					<p>Establishing secure connection...</p>
@@ -315,6 +601,7 @@ body {
 
 					<button class="sidebar-tab" data-tab="chat" id="chat-tab-button">
 						<i class="fas fa-comments"></i> Chat Support
+						<span class="notification-badge" id="chat-notification" style="display: none;">3</span>
 					</button>
 
 					<button class="sidebar-tab" data-tab="details">
@@ -326,7 +613,13 @@ body {
 					<!-- Instructions Tab -->
 					<div class="tab-pane active" id="instructions-tab">
 						<div class="instructions-container">
-							<h5 class="mb-3">Lab Instructions</h5>
+							<div class="instruction-toggle">
+								<h5>Lab Instructions</h5>
+								<div>
+									<button class="toggle-btn active" id="show-text-btn">Text</button>
+									<button class="toggle-btn active" id="show-images-btn">Images</button>
+								</div>
+							</div>
 							<div class="instruction-content">
 								<div id="Lab_Instructions">
 									<!-- Instructions will be dynamically loaded here -->
@@ -337,10 +630,22 @@ body {
 
 					<!-- Chat Tab -->
 					<div class="tab-pane" id="chat-tab">
+						<div class="chat-header">
+							<div class="chat-title">Lab Assistant</div>
+							<div class="chat-status">
+								<div class="chat-status-indicator"></div>
+								Online
+							</div>
+						</div>
 						<div class="chat-container">
 							<div id="chat-messages">
+								<div class="system-message">
+									<i class="fas fa-info-circle"></i> Your lab assistant is ready to help. Follow the instructions to complete the lab.
+								</div>
 								<!-- Messages will be dynamically appended here -->
 							</div>
+							
+							<div class="user-typing" id="typing-indicator"></div>
 
 							<!-- Continue button for each Command -->
 							<div class="messageoutgoing">
@@ -352,15 +657,22 @@ body {
 
 					<!-- Details Tab -->
 					<div class="tab-pane" id="details-tab">
-						<h5 class="mb-3" style="color: aliceblue;">Connection Details</h5>
-						<div class="details-grid">
-							<div id="connection_details">
-								<!-- Connection details will be dynamically loaded here -->
+						<div class="details-container">
+							<h5 class="mb-3" style="color: aliceblue;">Connection Details</h5>
+							<div class="details-grid">
+								<div id="connection_details">
+									<!-- Connection details will be dynamically loaded here -->
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
+			
+			<!-- Sidebar toggle button -->
+			<button class="sidebar-toggler" id="sidebar-toggle" style="display: none">
+				<i class="fas fa-chevron-left" id="sidebar-toggle-icon"></i>
+			</button>
 		</div>
 	</div>
 
@@ -378,6 +690,7 @@ body {
 	
 	// Global variable to store current lab ID
 	let currentLabId = getLabIdFromUrl();
+	let newMessagesCount = 0;
 	
 	// Function to handle continue button click
 	function handleContinueClick() {
@@ -386,7 +699,63 @@ body {
 		continueAction(labId, command);
 	}
 	
+	// Function to show typing indicator
+	function showTypingIndicator() {
+		$('#typing-indicator').html('<i class="fas fa-circle-notch fa-spin"></i> Assistant is typing...');
+		setTimeout(() => {
+			$('#typing-indicator').html('');
+		}, 2000);
+	}
+	
+	// Function to highlight new messages
+	function highlightNewMessage() {
+		$('#chat-messages .message').last().addClass('message-highlight');
+	}
+	
+	// Function to update notification badge
+	function updateNotificationBadge() {
+		const chatTab = $('#chat-tab-button');
+		const notificationBadge = $('#chat-notification');
+		
+		if (!$('#chat-tab').hasClass('active')) {
+			newMessagesCount++;
+			notificationBadge.text(newMessagesCount).show();
+			chatTab.addClass('has-new-messages');
+		} else {
+			newMessagesCount = 0;
+			notificationBadge.hide();
+			chatTab.removeClass('has-new-messages');
+		}
+	}
+	
 	$(document).ready(function() {
+		// Toggle sidebar visibility
+		$('#sidebar-toggle').click(function() {
+			const sidebar = $('#instruction-sidebar');
+			sidebar.toggleClass('collapsed');
+			$('#rdp-container').toggleClass('expanded');
+			
+			// Update icon based on state
+			const icon = $('#sidebar-toggle-icon');
+			if (sidebar.hasClass('collapsed')) {
+				icon.removeClass('fa-chevron-left').addClass('fa-chevron-right');
+			} else {
+				icon.removeClass('fa-chevron-right').addClass('fa-chevron-left');
+			}
+		});
+		
+		// Toggle text visibility
+		$('#show-text-btn').click(function() {
+			$(this).toggleClass('active');
+			$('.instruction-text').toggle();
+		});
+		
+		// Toggle image visibility
+		$('#show-images-btn').click(function() {
+			$(this).toggleClass('active');
+			$('.image-container').toggle();
+		});
+		
 		// Load initial instructions on page load
 		if (currentLabId) {
 			ActionforLAbOnload(currentLabId);
@@ -403,9 +772,13 @@ body {
 			if (currentLabId) {
 				continueActionforLAbOnload(currentLabId);
 			}
+			// Reset notification when chat tab is opened
+			newMessagesCount = 0;
+			$('#chat-notification').hide();
+			$(this).removeClass('has-new-messages');
 		});
 		
-		// Toggle sidebar visibility
+		// Toggle sidebar visibility (old button)
 		$('#toggle-sidebar').click(function() {
 			$('#instruction-sidebar').toggle();
 			const isVisible = $('#instruction-sidebar').is(':visible');
@@ -513,15 +886,34 @@ body {
 	                    const command = instr.command || '';
 	                    const details = instr.instructionDetails || '';
 
-	                    // Create a message card
+	                    // Parse the instruction details to separate text and images
+	                    const $content = $('<div>').html(details);
+	                    const textContent = $content.text().trim();
+	                    const images = $content.find('img');
+	                    
+	                    // Create instruction container
 	                    const instructionHtml = $(`
-	                        <div class="message incoming">
-	                            
-	                            <div class="message-content"></div>
+	                        <div class="instruction-item">
+	                            <div class="instruction-text">${textContent}</div>
 	                            <div class="message-command"><strong>${command}</strong></div>
 	                        </div>
 	                    `);
-	                    instructionHtml.find('.message-content').html(details);
+	                    
+	                    // Add images if any
+	                    if (images.length > 0) {
+	                        images.each(function() {
+	                            const src = $(this).attr('src');
+	                            const alt = $(this).attr('alt') || '';
+	                            const imageContainer = $(`
+	                                <div class="image-container">
+	                                    <img src="${src}" alt="${alt}">
+	                                    ${alt ? `<div class="image-caption">${alt}</div>` : ''}
+	                                </div>
+	                            `);
+	                            instructionHtml.append(imageContainer);
+	                        });
+	                    }
+	                    
 	                    $('#Lab_Instructions').append(instructionHtml);
 	                });
 
@@ -550,38 +942,50 @@ body {
 					const newCommand = response.command || '';
 					const isLast = response.isLast || false;
 
-					// Clear previous messages
-					$('#chat-messages').empty();
+					// Clear previous messages except system message
+					$('#chat-messages').children().not('.system-message').remove();
 
-					// Add instruction (HTML including image)
-					const instructionHtml = $('<div class="message incoming"><div class="message-content"></div></div>');
-					instructionHtml.find('.message-content').html(newInstruction);
-					$('#chat-messages').append(instructionHtml);
+					// Show typing indicator before adding new message
+					showTypingIndicator();
+					
+					setTimeout(() => {
+						// Add instruction (HTML including image)
+						const instructionHtml = $('<div class="message incoming"><div class="message-content"></div></div>');
+						instructionHtml.find('.message-content').html(newInstruction);
+						$('#chat-messages').append(instructionHtml);
 
-					// Add command (plain text)
-					if (newCommand.trim() !== '') {
-						const commandHtml = $(`
-							<div class="message incoming">
-								<div class="message-content">${newCommand}</div>
-							</div>
-						`);
-						$('#chat-messages').append(commandHtml);
-					}
+						// Add command (plain text)
+						if (newCommand.trim() !== '') {
+							const commandHtml = $(`
+								<div class="message incoming command-message">
+									<div class="message-content"><strong>${newCommand}</strong></div>
+								</div>
+							`);
+							$('#chat-messages').append(commandHtml);
+						}
 
-					// Update Continue button data attributes
-					$('#continue-button')
-						.data('labid', id)
-						.data('command', newCommand);
+						// Update Continue button data attributes
+						$('#continue-button')
+							.data('labid', id)
+							.data('command', newCommand);
 
-					// Auto-scroll to bottom
-					const chatMessages = $('#chat-messages');
-					chatMessages.scrollTop(chatMessages.prop("scrollHeight"));
+						// Auto-scroll to bottom
+						const chatMessages = $('#chat-messages');
+						chatMessages.scrollTop(chatMessages.prop("scrollHeight"));
+						
+						// Highlight new message
+						highlightNewMessage();
+						
+						// Update notification badge
+						updateNotificationBadge();
 
-					// Disable continue button if it's the last
-					if (isLast) {
-						onLastInstructionCompleted(id);
-						$('#continue-button').prop('disabled', true).text("Completed");
-					}
+						// Disable continue button if it's the last
+						if (isLast) {
+							onLastInstructionCompleted(id);
+							$('#continue-button').prop('disabled', true).text("Completed");
+						}
+					}, 2000);
+
 				} else {
 					console.error('Failed to load instruction:', response.error);
 				}
@@ -597,8 +1001,6 @@ body {
 	}
 	
 	function continueAction(id, command) {
-// 	    console.log("continueAction called with id:", id, "command:", command); // Debug
-
 	    $.ajax({
 	        type: "POST",
 	        url: "/guac/continueActionInstruction",
@@ -607,8 +1009,6 @@ body {
 	            labcommand: command
 	        },
 	        success: function(response) {
-	            console.log("AJAX response:", response); // Debug
-
 	            if (response.success) {
 	                const newInstruction = response.instruction;
 	                const newCommand = response.command;
@@ -619,34 +1019,43 @@ body {
 	                    .data('labid', id)
 	                    .data('command', newCommand);
 
-	                // Instruction HTML
-	                const instructionHtml = `
-	                    <div class="message incoming">
-	                        <div class="message-content">${newInstruction}</div>
-	                    </div>
-	                `;
+	                // Show typing indicator
+	                showTypingIndicator();
+	                
+	                setTimeout(() => {
+		                // Instruction HTML
+		                const instructionHtml = `
+		                    <div class="message incoming">
+		                        <div class="message-content">${newInstruction}</div>
+		                    </div>
+		                `;
 
-	                // Command HTML
-	                const commandHtml = `
-	                    <div class="message incoming">
-	                        <div class="message-content">${newCommand}</div>
-	                    </div>
-	                `;
+		                // Command HTML
+		                const commandHtml = `
+		                    <div class="message incoming command-message">
+		                        <div class="message-content"><strong>${newCommand}</strong></div>
+		                    </div>
+		                `;
 
-	                // Append to chat window
-	                $('#chat-messages').append(instructionHtml).append(commandHtml);
+		                // Append to chat window
+		                $('#chat-messages').append(instructionHtml).append(commandHtml);
 
-	                // Auto scroll to bottom
-	                const chatMessages = $('#chat-messages');
-	                chatMessages.scrollTop(chatMessages[0].scrollHeight);
+		                // Auto scroll to bottom
+		                const chatMessages = $('#chat-messages');
+		                chatMessages.scrollTop(chatMessages[0].scrollHeight);
+		                
+		                // Highlight new message
+		                highlightNewMessage();
+		                
+		                // Update notification badge
+		                updateNotificationBadge();
 
-	                // Call function if it's the last step
-	                if (isLast) {
-	                    console.log("isLast is true, calling onLastInstructionCompleted with id:", id);
-	                    onLastInstructionCompleted(id);
-
-	                    $('#continue-button').prop('disabled', true).text("Completed");
-	                }
+		                // Call function if it's the last step
+		                if (isLast) {
+		                    onLastInstructionCompleted(id);
+		                    $('#continue-button').prop('disabled', true).text("Completed");
+		                }
+	                }, 2000);
 	            } else {
 	                Swal.fire({
 	                    icon: 'error',
@@ -665,17 +1074,27 @@ body {
 	    });
 	}
 
-
 	function onLastInstructionCompleted(labId) {
-// 	    console.log("Inside onLastInstructionCompleted, labId:", labId); // Debug
-// 	    alert("Last instruction completed for lab ID: " + labId);
-
 	    $.ajax({
 	        type: "POST",
 	        url: "/guac/InstructionCompleted",
 	        data: { LabId: labId }, 
 	        success: function(response) {
 	        	if (response==="success") {
+	        	    // Add completion message to chat
+	        	    const completionMessage = `
+	        	        <div class="message incoming important-message">
+	        	            <div class="message-content">
+	        	                <i class="fas fa-check-circle"></i> Congratulations! You've completed all lab instructions.
+	        	            </div>
+	        	        </div>
+	        	    `;
+	        	    $('#chat-messages').append(completionMessage);
+	        	    
+	        	    // Auto scroll to bottom
+	        	    const chatMessages = $('#chat-messages');
+	        	    chatMessages.scrollTop(chatMessages[0].scrollHeight);
+	        	    
 	        	    Swal.fire({
 	        	        icon: 'success',
 	        	        title: 'Completed',
@@ -688,14 +1107,12 @@ body {
 	        	        text: response.error || 'Could not mark instruction completed.'
 	        	    });
 	        	}
-
 	        },
 	        error: function(xhr, status, error) {
 	            console.error("AJAX error:", status, error);
 	        }
 	    });
 	}
-
 
 	function ConnectionDetails(id) {
 	    $.ajax({
@@ -721,8 +1138,6 @@ body {
 	                    </div>
 	                `;
 	                $('#connection_details').html(detailsHtml);
-
-
 	            } else {
 	                console.error('Failed to load connection details:', response.error);
 	                $('#connection_details').html('<div class="text-muted">Error loading connection details</div>');
@@ -739,50 +1154,37 @@ body {
 	    });
 	}
 	
-	
-// 	function checkLabCompletionStatus(labId) {
-// 	    // Check localStorage for completion status
-// 	    if (localStorage.getItem(`labCompleted_${labId}`) === 'true') {
-// 	        $('#continue-button')
-// 	            .prop('disabled', true)
-// 	            .text("Completed");
-// 	    }
-// 	}
-	
 	function checkLabCompletionStatus(labId) {
-		
-    $.ajax({
-        type: "POST",
-        url: "/guac/checkLabCompletion",
-        data: { labId: labId },
-        success: function(response) {
-        	
-            if (response==="success") {
-                // If lab is already completed, disable the button
-                $('#continue-button')
-                    .prop('disabled', true)
-                    .text("Completed");
-                
-                // Load completed commands history
-                loadCompletedCommandsHistory(labId);
-            }
-        },
-        error: function() {
-            console.error('Failed to check lab completion status');
-            
-            // Fallback to localStorage check
-            if (localStorage.getItem(`labCompleted_${labId}`) === 'true') {
-                $('#continue-button')
-                    .prop('disabled', true)
-                    .text("Completed");
-                
-                // Try to load completed commands
-                loadCompletedCommandsHistory(labId);
-            }
-        }
-    });
-}
-	
+	    $.ajax({
+	        type: "POST",
+	        url: "/guac/checkLabCompletion",
+	        data: { labId: labId },
+	        success: function(response) {
+	            if (response==="success") {
+	                // If lab is already completed, disable the button
+	                $('#continue-button')
+	                    .prop('disabled', true)
+	                    .text("Completed");
+	                
+	                // Load completed commands history
+	                loadCompletedCommandsHistory(labId);
+	            }
+	        },
+	        error: function() {
+	            console.error('Failed to check lab completion status');
+	            
+	            // Fallback to localStorage check
+	            if (localStorage.getItem(`labCompleted_${labId}`) === 'true') {
+	                $('#continue-button')
+	                    .prop('disabled', true)
+	                    .text("Completed");
+	                
+	                // Try to load completed commands
+	                loadCompletedCommandsHistory(labId);
+	            }
+	        }
+	    });
+	}
 	
 	function loadCompletedCommandsHistory(labId) {
 	    $.ajax({
@@ -792,11 +1194,17 @@ body {
 	        success: function(response) {
 	            if (response && response.completedCommands && response.completedCommands.length > 0) {
 	                $('#chat-messages').empty();
+	                
+	                // Add system message
+	                $('#chat-messages').append(`
+	                    <div class="system-message">
+	                        <i class="fas fa-info-circle"></i> This lab has been completed. Here's the command history:
+	                    </div>
+	                `);
 
 	                response.completedCommands.forEach(cmd => {
 	                    const completedCommandHtml = $(`
 	                        <div class="message incoming">
-	                           
 	                            <div class="message-content">${cmd.instruction || ''}</div>
 	                            <div class="message-content"><strong>${cmd.command || ''}</strong></div>
 	                            <div class="message-time">Completed</div>
@@ -806,12 +1214,10 @@ body {
 	                });
 
 	                const completionHtml = $(`
-	                    <div class="message incoming">
-	                       
+	                    <div class="message incoming important-message">
 	                        <div class="message-content" style="color: #4ade80; font-weight: bold;">
 	                            <i class="fas fa-check-circle"></i> All lab instructions completed!
 	                        </div>
-	                       
 	                    </div>
 	                `);
 	                $('#chat-messages').append(completionHtml);
@@ -827,7 +1233,7 @@ body {
 	        error: function() {
 	            console.error('Failed to load completed commands history');
 
-	            // Optional fallback to localStorage (your original logic)
+	            // Optional fallback to localStorage
 	            const completedCommandsStr = localStorage.getItem(`completedCommands_${labId}`);
 	            if (completedCommandsStr) {
 	                try {
@@ -836,7 +1242,6 @@ body {
 	                    completedCommands.forEach(cmd => {
 	                        const completedCommandHtml = $(`
 	                            <div class="message incoming">
-	                                
 	                                <div class="message-content">${cmd.instruction || ''}</div>
 	                                <div class="message-content"><strong>${cmd.command || ''}</strong></div>
 	                                <div class="message-time">Completed</div>
@@ -846,8 +1251,7 @@ body {
 	                    });
 	                    // Completion message
 	                    $('#chat-messages').append(`
-	                        <div class="message incoming">
-	                            
+	                        <div class="message incoming important-message">
 	                            <div class="message-content" style="color: #4ade80; font-weight: bold;">
 	                                <i class="fas fa-check-circle"></i> All lab instructions completed!
 	                            </div>
@@ -864,20 +1268,17 @@ body {
 	    });
 	}
 
-
-	
 	const iframe = document.getElementById("rdp-frame");
 
-	  // Always return focus to iframe after any outside click
-	  window.addEventListener("click", () => {
+	// Always return focus to iframe after any outside click
+	window.addEventListener("click", () => {
 	    setTimeout(() => {
 	      iframe.focus();
 	    }, 50); // small delay so click event finishes first
-	  });
+	});
 
-	  // Ensure iframe can actually be focused
-	  iframe.setAttribute("tabindex", "0");	
-
+	// Ensure iframe can actually be focused
+	iframe.setAttribute("tabindex", "0");	
 	</script>
 </body>
 </html>

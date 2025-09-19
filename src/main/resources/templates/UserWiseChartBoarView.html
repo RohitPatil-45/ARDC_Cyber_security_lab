@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Cloud Portal</title>
+<head th:include="templateListing :: headFragment"></head>
+<link rel="icon" type="image/png" href="/webtemplate/dist/img/magicboxEye3.png">
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<!-- Header -->
+		<div th:replace="fragments/header :: header"></div>
+		<!-- Sidebar -->
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+			<!-- Page Header -->
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>User Wise Edit Instruction and Command</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">User Wise Edit
+									Instruction and Command</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Page Content -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<h3 class="card-title" style="padding-top: 10px">User Wise
+										Edit Instruction and Command</h3>
+								</div>
+								<div class="card-body">
+									<table id="userPerformanceTable"
+										class="table table-bordered table-striped">
+										<thead class="thead-light">
+											<tr>
+												<th>Sr No.</th>
+												<th>User Name</th>
+												<th>Template Name</th>
+												<th>Lab Name</th>
+												<th>Action</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="row : ${listObj}">
+												<td th:text="${row.srNo}"></td>
+												<td th:text="${row.userName}"></td>
+												<td th:text="${row.templateName}"></td>
+												<td th:text="${row.labName}"></td>
+												<td th:utext="${row.action}"></td>
+											</tr>
+										</tbody>
+									</table>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- Footer -->
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="instructionModal" tabindex="-1"
+		role="dialog">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Edit Setup Instructions</h5>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body" id="instructionModalBody">
+					
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Scripts -->
+	<div th:replace="templateListing :: jsscript"></div>
+
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script type="text/javascript"
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+
+
+
+
+
+	<script>
+		// OnClick Eye Button
+		function getInstructionOfUser(templateName, userName) {
+			$.ajax({
+				url : '/guac/getInstructionOfUser',
+				type : 'GET',
+				data : {
+					templateName : templateName,
+					userName : userName
+				},
+				success : function(response) {
+					// 					alert("response :" + response)
+					$("#instructionModalBody").html(response);
+					$("#instructionModal").modal("show");
+				},
+				error : function(xhr, status, error) {
+					$("#instructionModalBody").html(
+							"<div class='alert alert-danger'>Error loading instructions: "
+									+ error + "</div>");
+					$("#instructionModal").modal("show");
+				}
+			});
+		}
+
+		function saveInstruction(templateName, userName) {
+		    var instructions = [];
+
+		    // Loop through all instruction groups
+		    $("#instructionModalBody").find(".instruction-group").each(function () {
+		        var id = $(this).data("id"); // take hidden id
+		        var command = $(this).find("textarea.command").val();
+		        var instructionDetails = $(this).find(".instruction-content").html();
+
+		        instructions.push({
+		            id: id,
+		            command: command,
+		            instructionDetails: instructionDetails
+		        });
+		    });
+
+		    $.ajax({
+		        url: '/guac/saveInstructionOfUser',
+		        type: 'POST',
+		        contentType: 'application/json',   // ✅ send JSON
+		        data: JSON.stringify(instructions), // ✅ stringify
+		        success: function (response) {
+		            if (response === "success") {
+		                Swal.fire({
+		                    icon: 'success',
+		                    title: 'Updated Successfully!',
+		                    text: 'Instruction saved successfully!',
+		                    showConfirmButton: false,
+		                    timer: 2000
+		                });
+		                $("#instructionModal").modal("hide");
+		            } else {
+		                Swal.fire({
+		                    icon: 'error',
+		                    title: 'Failed',
+		                    text: response
+		                });
+		            }
+		        },
+		        error: function (xhr, status, error) {
+		            Swal.fire({
+		                icon: 'error',
+		                title: 'Error',
+		                text: "Error while saving: " + error
+		            });
+		        }
+		    });
+		}
+
+	</script>
+</body>
+</html>

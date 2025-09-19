@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import in.canaris.cloud.openstack.entity.ChartBoatInstructionTemplate;
 import in.canaris.cloud.openstack.entity.UserWiseChatBoatInstructionTemplate;
 
 public interface UserWiseChatBoatInstructionTemplateRepository
@@ -54,6 +55,34 @@ public interface UserWiseChatBoatInstructionTemplateRepository
 
 	@Query(value = "SELECT * FROM userwise_chatboat_instruction_template WHERE lab_name = :labName AND isCommandExecuted = 'true' ORDER BY id ASC", nativeQuery = true)
 	List<UserWiseChatBoatInstructionTemplate> findExecutedByLabName(@Param("labName") String labName);
+
+//	@Query(value = "SELECT * " + "FROM userwise_chatboat_instruction_template c "
+//			+ "WHERE c.id = :templateId AND c.username = :username", nativeQuery = true)
+//	List<ChartBoatInstructionTemplate> findByTemplateIdAndUserName(@Param("templateId") int templateId,
+//			@Param("username") String username);
+
+//	@Query(value = "SELECT id, commandExecutedCheckTime, instruction_command, instruction_details "
+//			+ "FROM userwise_chatboat_instruction_template "
+//			+ "WHERE id = :templateId AND username = :userName", nativeQuery = true)
+//	List<Object[]> findByTemplateIdAndUserName(@Param("templateId") int templateId, @Param("userName") String userName);
+
+	@Query(value = "SELECT id, commandExecutedCheckTime, instruction_command, instruction_details "
+			+ "FROM userwise_chatboat_instruction_template "
+			+ "WHERE temaplate_name = :temaplateName AND username = :userName", nativeQuery = true)
+	List<Object[]> findByTemplateNameAndUserName(@Param("temaplateName") String temaplateName,
+			@Param("userName") String userName);
+
+	@Modifying
+	@Transactional
+	@Query(value = "UPDATE userwise_chatboat_instruction_template "
+			+ "SET instruction_command = :command, instruction_details = :instructionDetails "
+			+ "WHERE id = :id", nativeQuery = true)
+	int updateInstructionById(@Param("id") int id, @Param("command") String command,
+			@Param("instructionDetails") byte[] instructionDetails);
+
+	@Query(value = "SELECT DISTINCT lab_name,username, temaplate_name "
+			+ "FROM userwise_chatboat_instruction_template", nativeQuery = true)
+	List<Object[]> findDistinctLabUserTemplate();
 
 //	@Query(value = "SELECT COUNT(*) FROM userwise_chatboat_instruction_template "
 //			+ "WHERE isCommandExecuted='false' and username=:username", nativeQuery = true)
