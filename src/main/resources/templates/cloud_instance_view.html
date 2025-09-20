@@ -6,7 +6,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cloud Portal</title>
-<link rel="icon" type="image/png" href="/webtemplate/dist/img/magicboxEye3.png">
+<link rel="icon" type="image/png"
+	href="/webtemplate/dist/img/magicboxEye3.png">
 <link rel="stylesheet"
 	th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
 <!-- Ionicons -->
@@ -225,6 +226,10 @@ keyframes pulse { 0% {
 }
 
 100
+
+
+
+
 %
 {
 opacity
@@ -242,7 +247,13 @@ opacity
 
 
 
+
+
+
+
 :
+
+
 
 
 
@@ -259,7 +270,13 @@ opacity
 
 
 
+
+
 0
+
+
+
+
 ;
 transform
 
@@ -276,7 +293,13 @@ transform
 
 
 
+
+
+
+
 :
+
+
 
 
 
@@ -293,7 +316,11 @@ transform
 
 
 
+
+
 scale
+
+
 
 
 
@@ -309,8 +336,18 @@ scale
 
 
 
+
+
 (
+
+
+
+
 1
+
+
+
+
 .1
 
 
@@ -326,7 +363,15 @@ scale
 
 
 
+
+
+
+
 )
+
+
+
+
 ;
 }
 }
@@ -347,8 +392,6 @@ td {
 	min-width: 1em;
 	color: #fff;
 }
-
-
 
 /* CSS for page loader */
 /* ---- Page loader overlay ---- */
@@ -404,7 +447,6 @@ keyframes spin {to { transform:rotate(360deg);
 	display: grid;
 	place-items: center;
 }
-
 </style>
 </head>
 
@@ -576,72 +618,90 @@ keyframes spin {to { transform:rotate(360deg);
 							<!-- Customer Modal -->
 
 							<div>
-								<table id="VmTable" class="table table-bordered table-striped">
-									<thead style="background-color: #e2e2e2">
-										<tr>
-											<th class="text-center"></th>
-											<th class="text-center">Virtualization Type</th>
-											<th class="text-center">Group</th>
-											<th class="text-center">Template</th>
-<!-- 											<th class="text-center">Cloud Instances</th> -->
-											<th class="text-center">Lab Template ID</th>
-											<th class="text-center">Sub Product Create</th>
-											<th class="text-center">Created on</th>
-											<th class="text-center">Location</th>
-											<th class="text-center">Source Image</th>
-										</tr>
-									</thead>
-									<tbody>
+								<div class="table-container">
+									<table id="VmTable" class="table table-bordered table-striped">
+										<thead style="background-color: #e2e2e2">
+											<tr>
+												<th class="text-center"><input type="checkbox"
+													id="selectAll"></th>
+												<th class="text-center">Template</th>
+												<th class="text-center">Template Tag</th>
+												<th class="text-center">UserName</th>
+												<th class="text-center">Password</th>
+												<th class="text-center">Protocol</th>
+												<th class="text-center">Security Mode</th>
+												<th class="text-center">Server Certificate</th>
+												<th class="text-center">Description</th>
+												<th class="text-center">Virtualization Type</th>
+												<th class="text-center">Group</th>
+												<th class="text-center">Physical Server IP</th>
+												<th class="text-center">Switch</th>
+												<th class="text-center">Region</th>
+												<th class="text-center">Lab Template ID</th>
+												<th class="text-center">Sub Product Create</th>
+												<th class="text-center">Created on</th>
+												<th class="text-center">Location</th>
+												<th class="text-center">Source Image</th>
 
-										<tr th:each="obj : ${listObj}" class="odd"
-											style="background-color: #fff;">
-											<td>[[${obj.Id}]]</td>
-											<td
-												th:text="${#strings.isEmpty(obj.virtualization_type) ? 'Hyper-V' : obj.virtualization_type}">
-											</td>
+												<!-- Separate action columns -->
+												<th class="text-center">Edit</th>
+												<th class="text-center">View Instruction</th>
+												<th class="text-center">Delete</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="obj : ${listObj}" class="odd"
+												style="background-color: #fff;">
+												<td><input type="checkbox" class="checkbox" name="id[]"
+													th:value="${obj.Id}"></td>
+												<td>[[${obj.instance_name}]]</td>
+												<td>[[${obj.lab_tag}]]</td>
+												<td>[[${obj.ConsoleUsername}]]</td>
+												<td>[[${obj.ConsolePassword}]]</td>
+												<td>[[${obj.ConsoleProtocol}]]</td>
+												<td>[[${obj.SecurityMode}]]</td>
+												<td>[[${obj.ServerCertificate}]]</td>
+												<td>[[${obj.description}]]</td>
+												<td
+													th:text="${#strings.isEmpty(obj.virtualization_type) ? 'Hyper-V' : obj.virtualization_type}"></td>
+												<td>[[${obj.groupName}]]</td>
+												<td>[[${obj.physicalServerIP}]]</td>
+												<td>[[${obj.switch_id}]]</td>
+												<td>[[${obj.location_id}]]</td>
+												<td>[[${obj.Id}]]</td>
+												<td>[[${obj.getSubproduct_id().getIsSourceCreated()}]]</td>
+												<td>[[${obj.created_on}]]</td>
+												<td>[[${obj.location_id.getLocation_name}]]</td>
+												<td><a class="start-btn"
+													th:if="${obj.getSubproduct_id().getIsSourceCreated() != 'created'}"
+													th:onclick="'importSourceImage(' + ${obj.id} + ')'"> <i
+														class="fas fa-play"></i>Source Image
+												</a></td>
 
-											<td>[[${obj.groupName}]]</td>
-											<td>[[${obj.instance_name}]]</td>
-<!-- 											<td><span class="glow-span" -->
-<!-- 												th:if="${obj.instance_ip != null}" -->
-<!-- 												style="background-color: #f1faff; cursor: pointer">[[${obj.instance_ip}]]</span> -->
-<!-- 												<span th:if="${obj.instance_ip == null}">-</span></td> -->
-											<!-- 											<td> -->
-											<!-- 												<div class="row"> -->
-											<!-- 													<div class="col-md-2"></div> -->
+												<!-- Separate action buttons -->
+												<td class="text-center"><a
+													class="btn btn-sm btn-primary"
+													th:onclick="'editVM(' + ${obj.Id} + ')'"> <i
+														class="fas fa-edit"></i> Edit
+												</a></td>
 
-											<!-- 													<div class="col-md-10"> -->
-											<!-- 														<h3 class="card-title" -->
-											<!-- 															style="align-items: flex-start !important; flex-direction: column !important; display: flex;"> -->
+												<td class="text-center"><a class="btn btn-sm btn-info"
+													th:onclick="'viewInstruction(' + ${obj.Id} + ')'"> <i
+														class="fas fa-eye"></i> View Instruction
+												</a></td>
 
-											<!-- 															<span class="card-title" th:value="${obj.id}" -->
-											<!-- 																th:onclick="'viewCloudServerDetails(' + ${obj.id} + ')'" -->
-											<!-- 																style="font-weight: bold; cursor: pointer;"> -->
-											<!-- 																[[${obj.instance_name}]]</span> <span class="card-title" -->
-											<!-- 																style="font-size: 1rem !important; color: #b5b5c3 !important"></span> -->
-											<!-- 															<span th:text="${obj.cpuAssigned+ ' CPU' }"> </span> / <span -->
-											<!-- 																th:text="${obj.memoryAssigned+ ' RAM' }"> </span> -->
-											<!-- 														</h3> -->
-											<!-- 													</div> -->
+												<td class="text-center"><a
+													class="btn btn-sm btn-danger"
+													th:onclick="'deleteVM(' + ${obj.Id} + ')'"> <i
+														class="fas fa-trash"></i> Delete
+												</a></td>
 
-											<!-- 												</div> -->
-											<!-- 											</td> -->
-											<td>[[${obj.Id}]]</td>
-											<!-- 											<td th:text="${obj.vm_state}"></td> -->
+											</tr>
+										</tbody>
+									</table>
 
-											<td>[[${obj.getSubproduct_id().getIsSourceCreated()}]] </a></td>
-											<td>[[${obj.created_on}]]</td>
 
-											<td>[[${obj.location_id.getLocation_name}]]</td>
-											<td><a class="start-btn"
-												th:if="${obj.getSubproduct_id().getIsSourceCreated() != 'created'}"
-												th:onclick="'importSourceImage(' + ${obj.id} + ')'"> <i
-													class="fas fa-play"></i>Source Image
-											</a></td>
-										</tr>
-
-									</tbody>
-								</table>
+								</div>
 
 
 							</div>
@@ -690,7 +750,18 @@ keyframes spin {to { transform:rotate(360deg);
 	</div>
 
 
-
+	<div class="modal fade" id="instructionModal" tabindex="-1"
+		role="dialog">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Edit Setup Instructions</h5>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body" id="instructionModalBody"></div>
+			</div>
+		</div>
+	</div>
 	<!-- Footer -->
 	<div th:replace="fragments/footer :: footer"></div>
 	<!--Close Footer -->
@@ -815,41 +886,39 @@ keyframes spin {to { transform:rotate(360deg);
 	</script>
 
 	<script th:inline="javascript">
-		var table = $("#VmTable").DataTable({
-			"columnDefs": [{
-				'targets': 0,
-				'checkboxes': {
-					'selectRow': true
-				}
-			}],
-			"select": {
-				'style': 'multi'
-			},
-			// 			"order" : [ [ 1, 'asc' ] ],
-			"responsive": true,
-			"lengthChange": false,
-			"autoWidth": false,
-			"sScrollX": "100%",
-			"sScrollXInner": "140%",
-			"bScrollCollapse": true,
-			pageLength: 10,
-			searching: true,
-			"buttons": ["copy", "csv", "excel", "print",
-				"colvis"],
-		}).buttons().container().appendTo(
-			'#VmTable_wrapper .col-md-6:eq(0)');
+	var table = $("#VmTable").DataTable({
+		  "columnDefs": [{
+		    'targets': 0,
+		    'checkboxes': {
+		      'selectRow': true
+		    }
+		  }],
+		  "select": {
+		    'style': 'multi'
+		  },
+		  "responsive": false, // Change from true to false
+		  "scrollX": true,     // Enable horizontal scrolling
+		  "lengthChange": false,
+		  "autoWidth": false,
+		  "pageLength": 10,
+		  "searching": true,
+		  "buttons": ["copy", "csv", "excel", "print", "colvis"],
+		}).buttons().container().appendTo('#VmTable_wrapper .col-md-6:eq(0)');
+
+
+
 
 		var userRole = $('#UserRoleMainIDHere').text().trim();
 
 		if (userRole === 'SUPER ADMIN') {
 			// 			console.log("User is a Super Admin");
 			// Perform actions specific to super admin
-			table.column(16).visible(true); // To show
+			table.column(25).visible(true); // To show
 
 		} else {
 			// 			console.log("User is not a Super Admin");
 			// Perform other actions
-			table.column(16).visible(false);
+			table.column(25).visible(false);
 		}
 
 
@@ -871,6 +940,91 @@ keyframes spin {to { transform:rotate(360deg);
 				timer: 3000
 			})
 		}
+		
+		
+		function editVM(id) {
+		    console.log("Edit VM with Id:", id);
+		}
+
+		function viewInstruction(id) {
+		    console.log("View Instruction for Id:", id);
+		}
+
+		function deleteVM(id) {
+		    console.log("Delete VM with Id:", id);
+		}
+		
+		
+		function viewInstruction(id) {
+			$.ajax({
+				url : '/guac/getInstructionOfUser',
+				type : 'GET',
+				data : {
+					Id : id
+				},
+				success : function(response) {
+					// 					alert("response :" + response)
+					$("#instructionModalBody").html(response);
+					$("#instructionModal").modal("show");
+				},
+				error : function(xhr, status, error) {
+					$("#instructionModalBody").html(
+							"<div class='alert alert-danger'>Error loading instructions: "
+									+ error + "</div>");
+					$("#instructionModal").modal("show");
+				}
+			});
+		}
+
+		function saveInstruction(templateName, userName) {
+		    var instructions = [];
+
+		    // Loop through all instruction groups
+		    $("#instructionModalBody").find(".instruction-group").each(function () {
+		        var id = $(this).data("id"); // take hidden id
+		        var command = $(this).find("textarea.command").val();
+		        var instructionDetails = $(this).find(".instruction-content").html();
+
+		        instructions.push({
+		            id: id,
+		            command: command,
+		            instructionDetails: instructionDetails
+		        });
+		    });
+
+		    $.ajax({
+		        url: '/guac/saveInstructionOfUser',
+		        type: 'POST',
+		        contentType: 'application/json',   // ✅ send JSON
+		        data: JSON.stringify(instructions), // ✅ stringify
+		        success: function (response) {
+		            if (response === "success") {
+		                Swal.fire({
+		                    icon: 'success',
+		                    title: 'Updated Successfully!',
+		                    text: 'Instruction saved successfully!',
+		                    showConfirmButton: false,
+		                    timer: 2000
+		                });
+		                $("#instructionModal").modal("hide");
+		            } else {
+		                Swal.fire({
+		                    icon: 'error',
+		                    title: 'Failed',
+		                    text: response
+		                });
+		            }
+		        },
+		        error: function (xhr, status, error) {
+		            Swal.fire({
+		                icon: 'error',
+		                title: 'Error',
+		                text: "Error while saving: " + error
+		            });
+		        }
+		    });
+		}
+
 
 
 	</script>

@@ -332,36 +332,33 @@ public class GuacamoleController {
 //	    model.addAttribute("listObj", dockerNetworks);
 //	    return "View_DockerListing";
 //	}
-	
-	 @GetMapping("/View_DockerListing")
-	    public String viewDockerListing(Model model) {
 
-	        List<Object[]> results = DiscoverDockerNetworkRepository.fetchDockerNetworksWithUsersNative();
+	@GetMapping("/View_DockerListing")
+	public String viewDockerListing(Model model) {
 
-	        List<DockerNetworkUserDTO> dockerNetworks = new ArrayList<>();
-	        for (Object[] row : results) {
-	            String username = row[8] != null ? (String) row[8] : "unassigned";
+		List<Object[]> results = DiscoverDockerNetworkRepository.fetchDockerNetworksWithUsersNative();
 
-	            DockerNetworkUserDTO dto = new DockerNetworkUserDTO(
-	                (String) row[0],  // networkName
-	                (String) row[1],  // networkId
-	                (String) row[2],  // driver
-	                (String) row[3],  // scope
-	                (String) row[4],  // gateway
-	                (String) row[5],  // startIp
-	                (String) row[6],  // endIp
-	                (String) row[7],  // physicalServer
-	                username,         // ✅ fallback if NULL
-	                row[9] != null ? ((Number) row[9]).intValue() : null, 
-	                (String) row[10]  // lastActiveConnection
-	            );
-	            dockerNetworks.add(dto);
-	        }
+		List<DockerNetworkUserDTO> dockerNetworks = new ArrayList<>();
+		for (Object[] row : results) {
+			String username = row[8] != null ? (String) row[8] : "unassigned";
 
-	        model.addAttribute("listObj", dockerNetworks);
-	        return "View_DockerListing";
-	    }
+			DockerNetworkUserDTO dto = new DockerNetworkUserDTO((String) row[0], // networkName
+					(String) row[1], // networkId
+					(String) row[2], // driver
+					(String) row[3], // scope
+					(String) row[4], // gateway
+					(String) row[5], // startIp
+					(String) row[6], // endIp
+					(String) row[7], // physicalServer
+					username, // ✅ fallback if NULL
+					row[9] != null ? ((Number) row[9]).intValue() : null, (String) row[10] // lastActiveConnection
+			);
+			dockerNetworks.add(dto);
+		}
 
+		model.addAttribute("listObj", dockerNetworks);
+		return "View_DockerListing";
+	}
 
 //	@GetMapping("/View_Vm_Listing")
 //	public ModelAndView viewVmListing(@RequestParam("Id") int scenarioId, Model model, Principal principal) {
@@ -3317,51 +3314,59 @@ public class GuacamoleController {
 
 	@GetMapping("/UserWiseChartBoarView")
 	public ModelAndView getUserWiseChartBoarView(Principal principal) {
-	    ModelAndView mav = new ModelAndView("UserWiseChartBoarView");
-	    List<Map<String, Object>> finalList = new ArrayList<>();
+		ModelAndView mav = new ModelAndView("UserWiseChartBoarView");
+		List<Map<String, Object>> finalList = new ArrayList<>();
 
-	    try {
-	        int srno = 0;
-	        List<Object[]> rows = instructionTemplateRepository.findDistinctLabUserTemplate();
+		try {
+			int srno = 0;
+			List<Object[]> rows = instructionTemplateRepository.findDistinctLabUserTemplate();
 
-	        for (Object[] row : rows) {
-	            String labName = row[0] != null ? row[0].toString() : "";
-	            String userName = row[1] != null ? row[1].toString() : "";
-	            String templateName = row[2] != null ? row[2].toString() : "";
+			for (Object[] row : rows) {
+				String labName = row[0] != null ? row[0].toString() : "";
+				String userName = row[1] != null ? row[1].toString() : "";
+				String templateName = row[2] != null ? row[2].toString() : "";
 
-	            Map<String, Object> map = new HashMap<>();
-	            map.put("srNo", ++srno);
-	            map.put("labName", labName);
-	            map.put("userName", userName);
-	            map.put("templateName", templateName);
+				Map<String, Object> map = new HashMap<>();
+				map.put("srNo", ++srno);
+				map.put("labName", labName);
+				map.put("userName", userName);
+				map.put("templateName", templateName);
 
-	            String eyeButton = "<button type='button' class='btn btn-sm btn-primary' "
-	                    + "onclick=\"getInstructionOfUser('" + templateName + "','" + userName + "')\">"
-	                    + "<i class='fas fa-eye'></i></button>";
-	            map.put("action", eyeButton);
+				String eyeButton = "<button type='button' class='btn btn-sm btn-primary' "
+						+ "onclick=\"getInstructionOfUser('" + templateName + "','" + userName + "')\">"
+						+ "<i class='fas fa-eye'></i></button>";
+				map.put("action", eyeButton);
 
-	            finalList.add(map);
-	        }
+				finalList.add(map);
+			}
 
-	        mav.addObject("listObj", finalList);
+			mav.addObject("listObj", finalList);
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        mav.addObject("listObj", Collections.emptyList());
-	    }
-	    return mav;
+		} catch (Exception e) {
+			e.printStackTrace();
+			mav.addObject("listObj", Collections.emptyList());
+		}
+		return mav;
 	}
-
 
 	@GetMapping("/getInstructionOfUser")
 	@ResponseBody
-	public String getInstructionOfUser(@RequestParam String templateName, @RequestParam String userName) {
+	public String getInstructionOfUser(@RequestParam String Id, Principal principal) {
 		StringBuilder html = new StringBuilder();
 
 		try {
-			// Repository returning Object[] instead of entity
-			List<Object[]> instructions = instructionTemplateRepository.findByTemplateNameAndUserName(templateName,
-					userName);
+
+			Optional<CloudInstance> list = repository.findById(Integer.parseInt(Id));
+
+			CloudInstance instance = list.get();
+
+			Authentication auth = (Authentication) principal;
+			String username = auth.getName();
+			
+			String templateName = instance.getInstance_name();
+
+			List<Object[]> instructions = instructionTemplateRepository
+					.findByTemplateNameAndUserName(instance.getInstance_name(), username);
 
 			html.append(
 					"<section class='content'><div class='container-fluid'><div class='row'><div class='col-md-12'>");
@@ -3377,25 +3382,24 @@ public class GuacamoleController {
 
 //			int idx = 0;
 			for (Object[] row : instructions) {
-			    int id = row[0] != null ? ((Number) row[0]).intValue() : 0;  // get ID
-			    String command = row[2] != null ? row[2].toString() : "";
-			    byte[] detailsBytes = row[3] != null ? (byte[]) row[3] : null;
-			    String instructionDetails = detailsBytes != null ? new String(detailsBytes, StandardCharsets.UTF_8) : "";
+				int id = row[0] != null ? ((Number) row[0]).intValue() : 0; // get ID
+				String command = row[2] != null ? row[2].toString() : "";
+				byte[] detailsBytes = row[3] != null ? (byte[]) row[3] : null;
+				String instructionDetails = detailsBytes != null ? new String(detailsBytes, StandardCharsets.UTF_8)
+						: "";
 
-			    html.append("<div class='instruction-group mb-4 border p-3' data-id='").append(id).append("'>");
+				html.append("<div class='instruction-group mb-4 border p-3' data-id='").append(id).append("'>");
 
-			    html.append("<label><strong>Instruction</strong></label>");
-			    html.append("<div class='instruction-content mb-2 p-2 border' contenteditable='true' "
-			            + "style='background:#fff; border-radius:5px; min-height:80px;'>")
-			        .append(instructionDetails).append("</div>");
+				html.append("<label><strong>Instruction</strong></label>");
+				html.append("<div class='instruction-content mb-2 p-2 border' contenteditable='true' "
+						+ "style='background:#fff; border-radius:5px; min-height:80px;'>").append(instructionDetails)
+						.append("</div>");
 
-			    html.append("<label><strong>Command</strong></label>");
-			    html.append("<textarea class='form-control command' rows='2'>")
-			        .append(command).append("</textarea>");
+				html.append("<label><strong>Command</strong></label>");
+				html.append("<textarea class='form-control command' rows='2'>").append(command).append("</textarea>");
 
-			    html.append("</div>");
+				html.append("</div>");
 			}
-
 
 			// If no instructions found
 			if (instructions.isEmpty()) {
@@ -3405,7 +3409,7 @@ public class GuacamoleController {
 			html.append("</div></div>");
 
 			html.append("<div class='text-right mt-3'>").append("<button type='button' class='btn btn-success' ")
-					.append("onclick=\"saveInstruction('").append(templateName).append("','").append(userName)
+					.append("onclick=\"saveInstruction('").append(templateName).append("','").append(username)
 					.append("')\">").append("Save</button>").append("</div>");
 
 			html.append("</div></div></div></div></section>");
@@ -3424,24 +3428,20 @@ public class GuacamoleController {
 	@PostMapping("/saveInstructionOfUser")
 	@ResponseBody
 	public String saveInstructionOfUser(@RequestBody List<Map<String, String>> instructions) {
-	    try {
-	        for (Map<String, String> ins : instructions) {
-	            int id = Integer.parseInt(ins.get("id"));
-	            String command = ins.get("command");
-	            String instructionDetails = ins.get("instructionDetails");
+		try {
+			for (Map<String, String> ins : instructions) {
+				int id = Integer.parseInt(ins.get("id"));
+				String command = ins.get("command");
+				String instructionDetails = ins.get("instructionDetails");
 
-	            instructionTemplateRepository.updateInstructionById(
-	                id,
-	                command,
-	                instructionDetails.getBytes(StandardCharsets.UTF_8)
-	            );
-	        }
-	        return "success";
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return "Error: " + e.getMessage();
-	    }
+				instructionTemplateRepository.updateInstructionById(id, command,
+						instructionDetails.getBytes(StandardCharsets.UTF_8));
+			}
+			return "success";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "Error: " + e.getMessage();
+		}
 	}
-
 
 }

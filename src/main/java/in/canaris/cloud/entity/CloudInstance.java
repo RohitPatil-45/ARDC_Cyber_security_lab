@@ -114,28 +114,33 @@ public class CloudInstance implements Serializable {
 
 	@Column
 	private String web_id;
-	
+
 	@Column
 	private String ConsoleUsername;
-	
+
 	@Column
 	private String ConsolePassword;
-	
+
 	@Column
 	private String ConsoleProtocol;
-	
+
+	@Column
+	private String SecurityMode;
+
+	@Column
+	private String ServerCertificate;
+
 	@Column
 	private String AssignedLab;
-	
-	
+
 	@Column(name = "source_vm")
 	private String sourceVm;
-	
+
 	@Column(name = "docker_network_id")
 	private String docker_network_id;
-	
+
 	@Column(name = "docker_network_name ")
-	private String docker_network_name ;
+	private String docker_network_name;
 
 	@Lob
 	@Column(name = "description", nullable = true)
@@ -213,7 +218,7 @@ public class CloudInstance implements Serializable {
 
 	@Column(name = "kvm_vm_id")
 	private String kvmvmid;
-	
+
 	@Column
 	private String guacamoleId;
 
@@ -644,6 +649,23 @@ public class CloudInstance implements Serializable {
 	public void setDocker_network_name(String docker_network_name) {
 		this.docker_network_name = docker_network_name;
 	}
+
+	public String getSecurityMode() {
+		return SecurityMode;
+	}
+
+	public void setSecurityMode(String securityMode) {
+		SecurityMode = securityMode;
+	}
+
+	public String getServerCertificate() {
+		return ServerCertificate;
+	}
+
+	public void setServerCertificate(String serverCertificate) {
+		ServerCertificate = serverCertificate;
+	}
+	
 	
 
 }
