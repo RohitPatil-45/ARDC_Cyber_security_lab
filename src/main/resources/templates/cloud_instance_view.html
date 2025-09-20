@@ -657,7 +657,7 @@ keyframes spin {to { transform:rotate(360deg);
 												<td>[[${obj.instance_name}]]</td>
 												<td>[[${obj.lab_tag}]]</td>
 												<td>[[${obj.ConsoleUsername}]]</td>
-												<td>[[${obj.ConsolePassword}]]</td>
+												<td>[[${obj.instance_password}]]</td>
 												<td>[[${obj.ConsoleProtocol}]]</td>
 												<td>[[${obj.SecurityMode}]]</td>
 												<td>[[${obj.ServerCertificate}]]</td>
@@ -943,16 +943,71 @@ keyframes spin {to { transform:rotate(360deg);
 		
 		
 		function editVM(id) {
-		    console.log("Edit VM with Id:", id);
+			$.ajax({
+				url : '/guac/getCloundInstanceEdit',
+				type : 'GET',
+				data : {
+					Id : id
+				},
+				success : function(response) {
+					// 					alert("response :" + response)
+// 					$("#instructionModalBody").html(response);
+// 					$("#instructionModal").modal("show");
+				},
+				error : function(xhr, status, error) {
+// 					$("#instructionModalBody").html(
+// 							"<div class='alert alert-danger'>Error loading instructions: "
+// 									+ error + "</div>");
+// 					$("#instructionModal").modal("show");
+				}
+			});
 		}
 
-		function viewInstruction(id) {
-		    console.log("View Instruction for Id:", id);
-		}
+		
 
 		function deleteVM(id) {
-		    console.log("Delete VM with Id:", id);
+		    Swal.fire({
+		        title: 'Are you sure?',
+		        text: "Do you really want to delete this VM?",
+		        icon: 'warning',
+		        showCancelButton: true,
+		        confirmButtonColor: '#d33',
+		        cancelButtonColor: '#3085d6',
+		        confirmButtonText: 'Yes, delete it!',
+		        cancelButtonText: 'Cancel'
+		    }).then((result) => {
+		        if (result.isConfirmed) {
+		            $.ajax({
+		                url: '/guac/deleteVM',
+		                type: 'GET',
+		                data: { Id: id },
+		                success: function(response) {
+		                    Swal.fire({
+		                        icon: 'success',
+		                        title: 'Deleted!',
+		                        text: response,
+		                        timer: 1500,
+		                        showConfirmButton: false
+		                    }).then(() => {
+		                        // Reload the page after success
+		                        location.reload();
+		                    });
+		                },
+		                error: function(xhr, status, error) {
+		                    Swal.fire({
+		                        icon: 'error',
+		                        title: 'Error!',
+		                        text: xhr.responseText || 'Failed to delete VM',
+		                        showConfirmButton: true
+		                    });
+		                }
+		            });
+		        }
+		    });
 		}
+
+
+
 		
 		
 		function viewInstruction(id) {

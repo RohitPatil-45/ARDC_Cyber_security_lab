@@ -28,15 +28,13 @@ public interface UserPlaylistMappingRepository extends JpaRepository<UserPlaylis
 			+ "GROUP BY user_name", nativeQuery = true)
 	List<Object[]> getUserPlaylistSummary();
 
-
-	  @Query("SELECT u FROM UserPlaylistMapping u WHERE u.UserName = :UserName")
+	@Query("SELECT u FROM UserPlaylistMapping u WHERE u.UserName = :UserName")
 	List<UserPlaylistMapping> findByUserName(@Param("UserName") String UserName);
 
-
-	  
-		
-
-
+	@Modifying
+	@Transactional
+	@Query("DELETE FROM UserPlaylistMapping u WHERE u.UserName = :userName")
+	void deleteByUserName(@Param("userName") String userName);
 
 //	List<UserPlaylistMapping> findByUserName(String userName);
 

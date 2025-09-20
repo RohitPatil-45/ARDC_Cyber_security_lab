@@ -2,6 +2,8 @@ package in.canaris.cloud.repository;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,6 +22,11 @@ public interface UserScenarioMappingRepository extends JpaRepository<UserScenari
 
 	@Query(value = "SELECT * FROM user_scenario_mapping WHERE user_name = :userName", nativeQuery = true)
 	List<UserScenarioMapping> findByUserName(@Param("userName") String userName);
+
+	@Modifying
+	@Transactional
+	@Query("DELETE FROM UserScenarioMapping u WHERE u.UserName = :userName")
+	void deleteByUserName(@Param("userName") String userName);
 
 //	List<UserScenarioMapping> findByUserName(String userName);
 

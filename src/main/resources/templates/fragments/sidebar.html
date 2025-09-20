@@ -109,77 +109,77 @@
                    with font-awesome or any other icon font library -->
 
 					<!-- Openstack -->
-					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
-						class="nav-item"><a href="#" class="nav-link"> <i
-							class="nav-icon fas fa-table"></i>
-							<p>
-								Openstack <i class="right fas fa-angle-left"></i>
-							</p>
-					</a>
-						<ul class="nav nav-treeview">
-							<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a
-								href="/openstack/Projectview" class="nav-link"> <i
-									class="far fa-circle nav-icon"></i>
-									<p>Create Project</p>
-							</a></li>
-							<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a
-								href="/openstack/new" class="nav-link"> <i
-									class="far fa-circle nav-icon"></i>
-									<p>Create VM (Openstack)</p>
-							</a></li>
+<!-- 					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
+<!-- 						class="nav-item"><a href="#" class="nav-link"> <i -->
+<!-- 							class="nav-icon fas fa-table"></i> -->
+<!-- 							<p> -->
+<!-- 								Openstack <i class="right fas fa-angle-left"></i> -->
+<!-- 							</p> -->
+<!-- 					</a> -->
+<!-- 						<ul class="nav nav-treeview"> -->
+<!-- 							<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a -->
+<!-- 								href="/openstack/Projectview" class="nav-link"> <i -->
+<!-- 									class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Create Project</p> -->
+<!-- 							</a></li> -->
+<!-- 							<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a -->
+<!-- 								href="/openstack/new" class="nav-link"> <i -->
+<!-- 									class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Create VM (Openstack)</p> -->
+<!-- 							</a></li> -->
 
-							<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a
-								href="/OpenStackDiscover/view" class="nav-link"> <i
-									class="far fa-circle nav-icon"></i>
-									<p>Discover</p>
-							</a></li>
+<!-- 							<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a -->
+<!-- 								href="/OpenStackDiscover/view" class="nav-link"> <i -->
+<!-- 									class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Discover</p> -->
+<!-- 							</a></li> -->
 
-							<li class="nav-item"><a href="/openstack/viewProjects"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>View Projects</p>
-							</a></li>
-							<li class="nav-item"><a href="/InstanceVm/view"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>View VMs</p>
-							</a></li>
-							<li class="nav-item"><a href="/image/view" class="nav-link">
-									<i class="far fa-circle nav-icon"></i>
-									<p>Image</p>
-							</a></li>
-							<li class="nav-item"><a href="/flavor/view" class="nav-link">
-									<i class="far fa-circle nav-icon"></i>
-									<p>Flavor</p>
-							</a></li>
-							<li class="nav-item"><a href="/keyPair/view"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Key Pair</p>
-							</a></li>
-							<li class="nav-item"><a href="/network/view"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Networks</p>
-							</a></li>
-							<li class="nav-item"><a href="/securityGroup/view"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Security Group</p>
-							</a></li>
-							<li class="nav-item"><a href="/availabilityZoneInfo/view"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Availability Zone Info</p>
-							</a></li>
-							<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
-								class="nav-item"><a href="#" class="nav-link"> <i
-									class="nav-icon fas fa-check-circle"></i>
-									<p>
-										Approval <i class="fas fa-angle-left right"></i>
-									</p>
-							</a>
-								<ul class="nav nav-treeview">
-									<li class="nav-item"><a href="/openstack/allRequests"
-										class="nav-link"> <i class="far fa-circle nav-icon"></i>
-											<p>Openstack Approval Request</p>
-									</a></li>
-								</ul></li>
-						</ul></li>
+<!-- 							<li class="nav-item"><a href="/openstack/viewProjects" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>View Projects</p> -->
+<!-- 							</a></li> -->
+<!-- 							<li class="nav-item"><a href="/InstanceVm/view" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>View VMs</p> -->
+<!-- 							</a></li> -->
+<!-- 							<li class="nav-item"><a href="/image/view" class="nav-link"> -->
+<!-- 									<i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Image</p> -->
+<!-- 							</a></li> -->
+<!-- 							<li class="nav-item"><a href="/flavor/view" class="nav-link"> -->
+<!-- 									<i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Flavor</p> -->
+<!-- 							</a></li> -->
+<!-- 							<li class="nav-item"><a href="/keyPair/view" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Key Pair</p> -->
+<!-- 							</a></li> -->
+<!-- 							<li class="nav-item"><a href="/network/view" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Networks</p> -->
+<!-- 							</a></li> -->
+<!-- 							<li class="nav-item"><a href="/securityGroup/view" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Security Group</p> -->
+<!-- 							</a></li> -->
+<!-- 							<li class="nav-item"><a href="/availabilityZoneInfo/view" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Availability Zone Info</p> -->
+<!-- 							</a></li> -->
+<!-- 							<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
+<!-- 								class="nav-item"><a href="#" class="nav-link"> <i -->
+<!-- 									class="nav-icon fas fa-check-circle"></i> -->
+<!-- 									<p> -->
+<!-- 										Approval <i class="fas fa-angle-left right"></i> -->
+<!-- 									</p> -->
+<!-- 							</a> -->
+<!-- 								<ul class="nav nav-treeview"> -->
+<!-- 									<li class="nav-item"><a href="/openstack/allRequests" -->
+<!-- 										class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 											<p>Openstack Approval Request</p> -->
+<!-- 									</a></li> -->
+<!-- 								</ul></li> -->
+<!-- 						</ul></li> -->
 
 					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
 						class="nav-item"><a href="#" class="nav-link"> <i
@@ -462,24 +462,24 @@
 							</a></li>
 						</ul></li>
 
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a
-						href="#" class="nav-link"> <i class="nav-icon fas fa-laptop"></i>
-							<p>
-								Public IP(DNS) <i class="right fas fa-angle-left"></i>
-							</p>
-					</a>
-						<ul class="nav nav-treeview">
-							<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
-								class="nav-item"><a href="/floating_ip/view"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Public IP Master</p>
-							</a></li>
-							<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
-								class="nav-item"><a href="/floating_ip_assign/view"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Assign Public IP</p>
-							</a></li>
-						</ul></li>
+<!-- 					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a -->
+<!-- 						href="#" class="nav-link"> <i class="nav-icon fas fa-laptop"></i> -->
+<!-- 							<p> -->
+<!-- 								Public IP(DNS) <i class="right fas fa-angle-left"></i> -->
+<!-- 							</p> -->
+<!-- 					</a> -->
+<!-- 						<ul class="nav nav-treeview"> -->
+<!-- 							<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
+<!-- 								class="nav-item"><a href="/floating_ip/view" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Public IP Master</p> -->
+<!-- 							</a></li> -->
+<!-- 							<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
+<!-- 								class="nav-item"><a href="/floating_ip_assign/view" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Assign Public IP</p> -->
+<!-- 							</a></li> -->
+<!-- 						</ul></li> -->
 					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a
 						href="#" class="nav-link"> <i class="nav-icon fas fa-box"></i>
 							<p>
@@ -499,103 +499,103 @@
 							</a></li>
 						</ul></li>
 
-					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
-						class="nav-item"><a href="#" class="nav-link"> <i
-							class="nav-icon fas fa-check-circle"></i>
-							<p>
-								Approval <i class="fas fa-angle-left right"></i>
-							</p>
-					</a>
-						<ul class="nav nav-treeview">
-							<li class="nav-item"><a href="/approval/allRequests"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Approval Request</p>
-							</a></li>
-						</ul></li>
+<!-- 					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
+<!-- 						class="nav-item"><a href="#" class="nav-link"> <i -->
+<!-- 							class="nav-icon fas fa-check-circle"></i> -->
+<!-- 							<p> -->
+<!-- 								Approval <i class="fas fa-angle-left right"></i> -->
+<!-- 							</p> -->
+<!-- 					</a> -->
+<!-- 						<ul class="nav nav-treeview"> -->
+<!-- 							<li class="nav-item"><a href="/approval/allRequests" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Approval Request</p> -->
+<!-- 							</a></li> -->
+<!-- 						</ul></li> -->
 
-					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
-						class="nav-item"><a href="#" class="nav-link"> <i
-							class="nav-icon fas fa-file-alt"></i>
-							<p>
-								Reports <i class="fas fa-angle-left right"></i>
-							</p>
-					</a>
-						<ul class="nav nav-treeview">
+<!-- 					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
+<!-- 						class="nav-item"><a href="#" class="nav-link"> <i -->
+<!-- 							class="nav-icon fas fa-file-alt"></i> -->
+<!-- 							<p> -->
+<!-- 								Reports <i class="fas fa-angle-left right"></i> -->
+<!-- 							</p> -->
+<!-- 					</a> -->
+<!-- 						<ul class="nav nav-treeview"> -->
 
-							<li class="nav-item"><a href="/report/groupWise"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Group wise VM Report</p>
-							</a></li>
+<!-- 							<li class="nav-item"><a href="/report/groupWise" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Group wise VM Report</p> -->
+<!-- 							</a></li> -->
 
-							<li class="nav-item"><a
-								href="/report/vmStatusHistoryReport
-                            "
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>VM Status History</p>
-							</a></li>
+<!-- 							<li class="nav-item"><a -->
+<!-- 								href="/report/vmStatusHistoryReport -->
+<!--                             " -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>VM Status History</p> -->
+<!-- 							</a></li> -->
 
-							<li class="nav-item"><a href="/report/vmActivityReport"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>VM Activity Report</p>
-							</a></li>
+<!-- 							<li class="nav-item"><a href="/report/vmActivityReport" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>VM Activity Report</p> -->
+<!-- 							</a></li> -->
 
-							<li class="nav-item"><a href="/report/vmAvailability"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>VM Availability Report</p>
-							</a></li>
+<!-- 							<li class="nav-item"><a href="/report/vmAvailability" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>VM Availability Report</p> -->
+<!-- 							</a></li> -->
 
-							<li class="nav-item"><a href="/report/vmHealthHistoryReport"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>VM Health History Report</p>
-							</a></li>
+<!-- 							<li class="nav-item"><a href="/report/vmHealthHistoryReport" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>VM Health History Report</p> -->
+<!-- 							</a></li> -->
 
-							<li class="nav-item"><a href="/report/vmCpuThresholdReport"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>VM CPU Threshold Report</p>
-							</a></li>
+<!-- 							<li class="nav-item"><a href="/report/vmCpuThresholdReport" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>VM CPU Threshold Report</p> -->
+<!-- 							</a></li> -->
 
-							<li class="nav-item"><a
-								href="/report/vmMemoryThresholdReport" class="nav-link"> <i
-									class="far fa-circle nav-icon"></i>
-									<p>VM Memory Threshold Report</p>
-							</a></li>
+<!-- 							<li class="nav-item"><a -->
+<!-- 								href="/report/vmMemoryThresholdReport" class="nav-link"> <i -->
+<!-- 									class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>VM Memory Threshold Report</p> -->
+<!-- 							</a></li> -->
 
-							<li class="nav-item"><a href="/report/vmStartStopReport"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>VM Start/Stop Report</p>
-							</a></li>
-							<li class="nav-item"><a href="/report/statusWise"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Current Status VM Report</p>
-							</a></li>
+<!-- 							<li class="nav-item"><a href="/report/vmStartStopReport" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>VM Start/Stop Report</p> -->
+<!-- 							</a></li> -->
+<!-- 							<li class="nav-item"><a href="/report/statusWise" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Current Status VM Report</p> -->
+<!-- 							</a></li> -->
 
-							<li class="nav-item"><a href="/report/KVMviewPage"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Disk Utilization (Live)</p>
-							</a></li>
+<!-- 							<li class="nav-item"><a href="/report/KVMviewPage" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Disk Utilization (Live)</p> -->
+<!-- 							</a></li> -->
 
-							<li class="nav-item"><a href="/report/HealthMonitoring"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Health Monitoring (Live)</p>
-							</a></li>
+<!-- 							<li class="nav-item"><a href="/report/HealthMonitoring" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Health Monitoring (Live)</p> -->
+<!-- 							</a></li> -->
 
-							<li class="nav-item"><a href="/report/DiskandHealthviewPage"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Disk & Health Utilization (Live)</p>
-							</a></li>
+<!-- 							<li class="nav-item"><a href="/report/DiskandHealthviewPage" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Disk & Health Utilization (Live)</p> -->
+<!-- 							</a></li> -->
 
-							<li class="nav-item"><a
-								href="/report/vmDiskHistorylogReport" class="nav-link"> <i
-									class="far fa-circle nav-icon"></i>
-									<p>Disk Utilization (Historical)</p>
-							</a></li>
-						</ul></li>
+<!-- 							<li class="nav-item"><a -->
+<!-- 								href="/report/vmDiskHistorylogReport" class="nav-link"> <i -->
+<!-- 									class="far fa-circle nav-icon"></i> -->
+<!-- 									<p>Disk Utilization (Historical)</p> -->
+<!-- 							</a></li> -->
+<!-- 						</ul></li> -->
 
-					<li sec:authorize="hasAnyRole('ROLE_ADMIN')" class="nav-item"><a
-						href="/approval/userRequests" class="nav-link"> <i
-							class="nav-icon fas fa-hand-paper"></i>
-							<p>Raised Request</p>
-					</a></li>
+<!-- 					<li sec:authorize="hasAnyRole('ROLE_ADMIN')" class="nav-item"><a -->
+<!-- 						href="/approval/userRequests" class="nav-link"> <i -->
+<!-- 							class="nav-icon fas fa-hand-paper"></i> -->
+<!-- 							<p>Raised Request</p> -->
+<!-- 					</a></li> -->
 				</ul>
 			</nav>
 			<!-- /.sidebar-menu -->

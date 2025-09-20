@@ -1829,6 +1829,46 @@ public class CloudInstanceController {
 
 		return "redirect:/" + var_function_name + "/new";
 	}
+	
+	@GetMapping("/getCloundInstanceEdit")
+	public ModelAndView getCloundInstanceEdit(@RequestParam("Id") Integer Id, Principal principal) {
+	    System.out.println("Edit Controller called for Id = " + Id);
+
+	    ModelAndView mav = new ModelAndView("cloud_instance_edit");
+//	    mav.addObject("pageTitle", "Edit " + disp_function_name);
+//	    mav.addObject("action_name", var_function_name);
+
+	    try {
+	        Optional<CloudInstance> optionalInstance = repository.findById(Id);
+	        if (optionalInstance.isEmpty()) {
+	            mav.addObject("error", "CloudInstance not found for ID: " + Id);
+	            return mav;
+	        }
+
+	        CloudInstance instance = optionalInstance.get();
+
+	        // Add dropdowns (same as in /new)
+//	        mav.addObject("dcLocationList", repositoryLocation.getAllDClocations());
+//	        mav.addObject("vmlocationPathList", repositoryVMLocationPath.getAllVMlocationsPahts());
+//	        mav.addObject("securityGroupList", firewallRepository.getFirewall());
+//	        mav.addObject("sharedCpuPlan", priceRepository.getSharedCpuPlan());
+//	        mav.addObject("dedicatedCpuPlan", priceRepository.getDedicatedCpuPlan());
+//	        mav.addObject("highMemoryPlan", priceRepository.getHighMemoryPlan());
+//	        mav.addObject("switchList", switchRepository.getAllSwitch());
+//	        mav.addObject("physicalServerIPList", PhysicalServerRepository.getPhysicalServerIPs());
+
+	        // Send the selected CloudInstance for editing
+	        mav.addObject("objEnt", instance);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        mav.addObject("error", "Error fetching CloudInstance: " + e.getMessage());
+	    }
+
+	    return mav;
+	}
+
+
 
 	private byte[] createPlaceholderImage() {
 		try {

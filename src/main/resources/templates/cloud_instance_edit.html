@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud Portal</title>
+<link rel="icon" type="image/png"
+	href="/webtemplate/dist/img/magicboxEye3.png">
+<!-- Common CSS -->
+
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" th:href="@{/css/fontAwesome.css}">
+<!-- Font Awesome -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
+<!-- Ionicons -->
+<link rel="stylesheet" th:href="@{/css/ionicIcons.css}">
+<!-- Tempusdominus Bootstrap 4 -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css}">
+<!-- iCheck -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
+<!-- JQVMap -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/jqvmap/jqvmap.min.css}">
+<!-- Theme style -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/dist/css/adminlte.min.css}">
+<!-- overlayScrollbars -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/overlayScrollbars/css/OverlayScrollbars.min.css}">
+<!-- Daterange picker -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/daterangepicker/daterangepicker.css}">
+<!-- summernote -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/summernote/summernote-bs4.min.css}">
+
+<!--End Common CSS  -->
+
+<!-- <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+<link rel="stylesheet"
+	th:href="@{/webtemplate/css/cloudfont-awesome.min.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-responsive/css/responsive.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-buttons/css/buttons.bootstrap4.min.css}">
+
+<!-- Summernote CSS -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs4.min.css">
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+    <!-- Sidebar -->
+    <div th:replace="fragments/sidebar :: aside"></div>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <!-- Page header -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <h3 class="m-0">Edit Cloud Instance</h3>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <form th:action="@{'/' + ${action_name} + '/save'}"
+                      th:object="${objEnt}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" th:field="*{id}"/>
+
+                    <div class="row">
+                        <div class="col-md-8">
+
+                            <!-- Template Name -->
+                            <div class="form-group">
+                                <label>Template Name</label>
+                                <input type="text" th:field="*{instance_name}" class="form-control" required>
+                            </div>
+
+                            <!-- Image Upload -->
+                            <div class="form-group">
+                                <label>Upload Image</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="uploadedImage" name="uploadedImage">
+                                    <label class="custom-file-label" for="uploadedImage">Choose file</label>
+                                </div>
+                                <img th:if="*{lab_image != null}"
+                                     th:src="@{'/image/' + *{id}}"
+                                     alt="Current Image"
+                                     class="mt-2 current-image"
+                                     style="max-height: 150px; display:block;">
+                            </div>
+
+                            <!-- Template Tag -->
+                            <div class="form-group">
+                                <label>Template Tag</label>
+                                <input type="text" th:field="*{lab_tag}" class="form-control">
+                            </div>
+
+                            <!-- Username -->
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" th:field="*{consoleUsername}" class="form-control">
+                            </div>
+
+                            <!-- Password -->
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" th:field="*{consolePassword}" class="form-control">
+                            </div>
+
+                            <!-- Protocol -->
+                            <div class="form-group">
+                                <label>Protocol</label>
+                                <select th:field="*{consoleProtocol}" class="form-control select2" style="width: 100%;">
+                                    <option value="SSH">SSH</option>
+                                    <option value="RDP">RDP</option>
+                                    <option value="Telnet">Telnet</option>
+                                </select>
+                            </div>
+
+                            <!-- Security Mode -->
+                            <div class="form-group">
+                                <label>Security Mode</label>
+                                <select th:field="*{securityMode}" class="form-control select2" style="width: 100%;">
+                                    <option value="Password">Password</option>
+                                    <option value="Key">Key</option>
+                                </select>
+                            </div>
+
+                            <!-- Server Certificate -->
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="enableServerCert" th:checked="*{serverCertificate}">
+                                    Enable Server Certificate
+                                </label>
+                            </div>
+
+                            <div class="form-group" id="serverCertOptions" style="display: none;">
+                                <label>Upload Server Certificate</label>
+                                <input type="file" class="form-control-file" name="serverCertificateFile">
+                            </div>
+
+                            <!-- Virtualization Type -->
+                            <div class="form-group">
+                                <label>Virtualization Type</label>
+                                <select th:field="*{virtualization_type}" id="virtualization_type"
+                                        class="form-control select2" style="width: 100%;"
+                                        onchange="toggleNetworkOptions(this.value)">
+                                    <option value="KVM">KVM</option>
+                                    <option value="Docker">Docker</option>
+                                </select>
+                            </div>
+
+                            <!-- Physical Server IP -->
+                            <div class="form-group" id="kvmOptions">
+                                <label>Physical Server IP</label>
+                                <select id="physicalServerIP" th:field="*{physicalServerIP}" required
+                                        class="form-control select2" style="width: 100%;"
+                                        onchange="loadSwitches(this.value)">
+                                    <option th:each="serverIP : ${physicalServerIPList}"
+                                            th:value="${serverIP}"
+                                            th:text="${serverIP}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Switch ID -->
+                            <div class="form-group" id="switchOptions">
+                                <label>Switch ID</label>
+                                <select id="switch_id" th:field="*{switch_id}" class="form-control select2" style="width: 100%;">
+                                    <option th:each="sw : ${switchList}"
+                                            th:value="${sw.id}"
+                                            th:text="${sw.name}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Docker Network -->
+                            <div class="form-group" id="dockerOptions" style="display: none;">
+                                <label>Docker Network</label>
+                                <select id="docker_network_id" th:field="*{docker_network_id}" class="form-control select2" style="width: 100%;">
+                                    <option th:each="dn : ${dockerNetworkList}"
+                                            th:value="${dn.id}"
+                                            th:text="${dn.name}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="form-group">
+                                <label>Location</label>
+                                <select th:field="*{location_id}" class="form-control select2" style="width: 100%;">
+                                    <option th:each="loc : ${dcLocationList}"
+                                            th:value="${loc.id}"
+                                            th:text="${loc.name}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Security Group -->
+                            <div class="form-group">
+                                <label>Security Group</label>
+                                <select th:field="*{security_group_id}" class="form-control select2" style="width: 100%;">
+                                    <option th:each="sg : ${securityGroupList}"
+                                            th:value="${sg.id}"
+                                            th:text="${sg.name}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Submit -->
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+</div>
+
+<!-- Scripts -->
+<script src="/webtemplate/plugins/jquery/jquery.min.js"></script>
+<script src="/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/webtemplate/plugins/select2/js/select2.full.min.js"></script>
+
+<script>
+    $(function () {
+        $('.select2').select2({ theme: 'bootstrap4' });
+
+        // Custom file input label
+        $('#uploadedImage').on('change', function () {
+            let fileName = $(this).val().split('\\').pop();
+            $(this).next('.custom-file-label').html(fileName);
+        });
+
+        // Preview uploaded image
+        $('#uploadedImage').on('change', function (event) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                $('.current-image').attr('src', e.target.result).show();
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        });
+
+        // Server cert toggle
+        $('#enableServerCert').on('change', function () {
+            $('#serverCertOptions').toggle(this.checked);
+        });
+        if ($('#enableServerCert').is(':checked')) {
+            $('#serverCertOptions').show();
+        }
+
+        // Virtualization type toggle
+        const virtType = /*[[${objEnt.virtualization_type}]]*/ 'KVM';
+        toggleNetworkOptions(virtType);
+    });
+
+    function toggleNetworkOptions(type) {
+        if (type === 'KVM') {
+            $('#kvmOptions, #switchOptions').show();
+            $('#dockerOptions').hide();
+        } else if (type === 'Docker') {
+            $('#dockerOptions').show();
+            $('#kvmOptions, #switchOptions').hide();
+        }
+    }
+
+    function loadSwitches(serverIP) {
+        console.log("Load switches for server: " + serverIP);
+        // TODO: Add AJAX call if switch list depends on serverIP
+    }
+</script>
+</body>
+</html>

@@ -360,59 +360,7 @@ public class GuacamoleController {
 		return "View_DockerListing";
 	}
 
-//	@GetMapping("/View_Vm_Listing")
-//	public ModelAndView viewVmListing(@RequestParam("Id") int scenarioId, Model model, Principal principal) {
-//		System.out.println("Requested scenario Id = " + scenarioId);
-//
-//		Authentication auth = (Authentication) principal;
-//		String username = auth.getName();
-//
-//		ModelAndView mav = new ModelAndView("View_Vm_Listing");
-//
-//		List<UserLab> labs = UserLabRepository.findByScenarioIdAndUsername(scenarioId, username);
-//
-//		// Add percentage for each lab
-//		List<Map<String, Object>> labData = new ArrayList<>();
-//		for (UserLab lab : labs) {
-//			Map<String, Object> map = new HashMap<>();
-//			map.put("lab", lab);
-//
-//			// Fetch true and false counts from repository
-//			String insatnceName = lab.getTemplateName();
-//			
-//			
-//			
-//			List<CloudInstance> cloudobj = repository.findByInstanceName(insatnceName);
-//			CloudInstance instance = cloudobj.get();
-//
-//			String templateName = instance.getInstance_name();
-//			String password = instance.getInstance_password();
-//			String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
-//			
-//			Long labIdLong = lab.getLabId();
-//			int labId = labIdLong.intValue();
-//
-//			Integer falseCountObj = instructionTemplateRepository.getfalseCompletionCountsByTemplateName(labId);
-//			Integer trueCountObj = instructionTemplateRepository.gettrueCompletionCountsByTemplateName(labId);
-//
-//			// Handle null values
-//			int falseCount = (falseCountObj != null) ? falseCountObj : 0;
-//			int trueCount = (trueCountObj != null) ? trueCountObj : 0;
-//
-//			int total = trueCount + falseCount;
-//
-//			// Calculate percentage (avoid division by zero)
-//			int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
-//			map.put("percentage", percentage);
-//
-//			labData.add(map);
-//
-//			System.out.println("labData ::" + labData);
-//		}
-//
-//		model.addAttribute("labData", labData);
-//		return mav;
-//	}
+
 
 	@GetMapping("/View_Vm_Listing")
 	public ModelAndView viewVmListing(@RequestParam("Id") int scenarioId, Model model, Principal principal) {
@@ -851,13 +799,33 @@ public class GuacamoleController {
 			int temp = Integer.parseInt(LabId);
 
 			List<UserLab> labDetails = UserLabRepository.findByguacamoleId(temp);
+			
+			
 
 			if (!labDetails.isEmpty()) {
 				UserLab userLab = labDetails.get(0);
+				
+				String instanceName = userLab.getTemplateName();
+				
+				List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
+				String password = "";
+				if (!cloudInstances.isEmpty()) {
+					CloudInstance instance = cloudInstances.get(0); // ✅ first match
+
+					String templateName = instance.getInstance_name();
+					 password = instance.getInstance_password();
+					String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+
+					// You can store them in the map if needed
+//		            map.put("templateName", templateName);
+//		            map.put("password", password);
+					
+				}
 
 				response.put("success", true);
-				response.put("username", username);
-				response.put("labName", userLab.getTemplateName());
+				response.put("username", userLab.getInstanceUser());
+				response.put("password", password);
+				response.put("labName", userLab.getInstanceName());
 				response.put("ipAddress", userLab.getIpAddress());
 			} else {
 				response.put("success", false);
@@ -3108,32 +3076,6 @@ public class GuacamoleController {
 		}
 	}
 
-//	@PostMapping("/save_UserWisePlaylist")
-//	public String saveUserWisePlaylist(@ModelAttribute UserWisePlaylistForm form) {
-//
-//		try {
-//
-//			// Get username from AppUser table
-//			String userName = AppUserRepository.getUserNameById(form.getUserId());
-//
-//			// Save or update for each playlist
-//			for (Integer playlistId : form.getPlaylistIds()) {
-//				UserPlaylistMappingRepository.upsertUserPlaylist(userName, playlistId);
-//			}
-//			
-////			user_subplaylist_mapping
-//			UserSubplaylistMappingRepository.insert
-//			
-////			user_scenario_mapping
-//			
-//			UserScenarioMappingRepository.insert
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//
-//		return "redirect:/guac/Add_UserWisePlaylist";
-//	}
 
 	@PostMapping("/save_UserWisePlaylist")
 	public String saveUserWisePlaylist(@RequestParam(required = false) String groupId,
@@ -3222,6 +3164,75 @@ public class GuacamoleController {
 
 		return mav;
 	}
+	
+	
+	
+	@PostMapping("/Update_UserWisePlaylistScenarioSubplaylist")
+	public String updateUserMappings(
+	        @RequestParam(value = "userId", required = false) Long userId,
+	        @RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
+	        @RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
+	        @RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds) {
+
+	    // Redirect to summary page
+	    String redirectUrl = "redirect:/guac/user_playlist_summary";
+
+	    try {
+	        // If userId is null or 0, skip processing
+	        if (userId == null || userId == 0) {
+	            return redirectUrl;
+	        }
+
+	        // 1. Find username by userId
+	        String userName = AppUserRepository.getUserNameById(userId);
+
+	        if (userName == null || userName.isEmpty()) {
+	            return redirectUrl;
+	        }
+
+	        // 2. Delete existing mappings for this user
+	        UserPlaylistMappingRepository.deleteByUserName(userName);
+	        UserSubplaylistMappingRepository.deleteByUserName(userName);
+	        UserScenarioMappingRepository.deleteByUserName(userName);
+
+	        // 3. Insert new playlist mappings if list is not empty
+	        if (playlistIds != null && !playlistIds.isEmpty()) {
+	            for (Integer playlistId : playlistIds) {
+	                UserPlaylistMapping entity = new UserPlaylistMapping();
+	                entity.setUserName(userName);
+	                entity.setPlaylistId(playlistId);
+	                UserPlaylistMappingRepository.save(entity);
+	            }
+	        }
+
+	        // 4. Insert new subplaylist mappings
+	        if (subplaylistIds != null && !subplaylistIds.isEmpty()) {
+	            for (Integer subplaylistId : subplaylistIds) {
+	                UserSubplaylistMapping entity = new UserSubplaylistMapping();
+	                entity.setUserName(userName);
+	                entity.setSubPlaylistId(subplaylistId);
+	                UserSubplaylistMappingRepository.save(entity);
+	            }
+	        }
+
+	        // 5. Insert new scenario mappings
+	        if (scenarioIds != null && !scenarioIds.isEmpty()) {
+	            for (Integer scenarioId : scenarioIds) {
+	                UserScenarioMapping entity = new UserScenarioMapping();
+	                entity.setUserName(userName);
+	                entity.setScenarioId(scenarioId);
+	                UserScenarioMappingRepository.save(entity);
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace(); // Log exception
+	    }
+
+	    return redirectUrl;
+	}
+
+
 
 	@GetMapping("/getUserMappings")
 	@ResponseBody
@@ -3443,5 +3454,68 @@ public class GuacamoleController {
 			return "Error: " + e.getMessage();
 		}
 	}
+	
+	
+	@GetMapping("/getCloundInstanceEdit")
+	public String getCloundInstanceEdit(@RequestParam("Id") Integer Id, Principal principal) {
+	    System.out.println("Edit Controller called for Id = " + Id);
+
+	    ModelAndView mav = new ModelAndView("cloud_instance_edit");
+//	    mav.addObject("pageTitle", "Edit " + disp_function_name);
+//	    mav.addObject("action_name", var_function_name);
+
+	    try {
+	        Optional<CloudInstance> optionalInstance = repository.findById(Id);
+	        if (optionalInstance.isEmpty()) {
+	            mav.addObject("error", "CloudInstance not found for ID: " + Id);
+//	            return mav;
+	        }
+
+	        CloudInstance instance = optionalInstance.get();
+
+	        // Add dropdowns (same as in /new)
+//	        mav.addObject("dcLocationList", repositoryLocation.getAllDClocations());
+//	        mav.addObject("vmlocationPathList", repositoryVMLocationPath.getAllVMlocationsPahts());
+//	        mav.addObject("securityGroupList", firewallRepository.getFirewall());
+//	        mav.addObject("sharedCpuPlan", priceRepository.getSharedCpuPlan());
+//	        mav.addObject("dedicatedCpuPlan", priceRepository.getDedicatedCpuPlan());
+//	        mav.addObject("highMemoryPlan", priceRepository.getHighMemoryPlan());
+//	        mav.addObject("switchList", switchRepository.getAllSwitch());
+//	        mav.addObject("physicalServerIPList", PhysicalServerRepository.getPhysicalServerIPs());
+
+	        // Send the selected CloudInstance for editing
+	        mav.addObject("objEnt", instance);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        mav.addObject("error", "Error fetching CloudInstance: " + e.getMessage());
+	    }
+
+	    return "redirect:/guac/cloud_instance_edit";
+	}
+	
+	@GetMapping("/deleteVM")
+	@ResponseBody
+	public ResponseEntity<String> deleteVM(@RequestParam("Id") Integer id, Principal principal) {
+	    try {
+	        Optional<CloudInstance> optionalInstance = repository.findById(id);
+
+	        if (optionalInstance.isEmpty()) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                                 .body("VM not found with ID: " + id);
+	        }
+
+	        // Delete the VM
+	        repository.deleteById(id);
+
+	        return ResponseEntity.ok("VM deleted successfully");
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                             .body("Error deleting VM: " + e.getMessage());
+	    }
+	}
+
 
 }

@@ -54,12 +54,6 @@ body {
 	font-weight: 500;
 }
 
-.required-field::after {
-	content: "*";
-	color: var(--danger);
-	margin-left: 4px;
-}
-
 /* Style for the All option in group dropdown */
 .option-all {
 	font-weight: bold;
@@ -84,8 +78,7 @@ body {
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
-								<li class="breadcrumb-item"><a href="#"><i
-										class="fas fa-home"></i> Home</a></li>
+								<li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i> Home</a></li>
 								<li class="breadcrumb-item active">Playlists</li>
 							</ol>
 						</div>
@@ -105,71 +98,51 @@ body {
 								</div>
 
 								<!-- FORM START -->
-								<form th:action="@{/guac/save_UserWisePlaylist}" method="post"
-									onsubmit="return validateForm()">
+								<form th:action="@{/guac/Update_UserWisePlaylistScenarioSubplaylist}" method="post" id="updateForm">
 									<div class="card-body">
 										<div class="row">
-											<!-- Group Dropdown -->
 
-
-											<!-- User Dropdown - Now Multiselect -->
+											<!-- User Dropdown -->
 											<div class="col-md-12">
 												<div class="form-group">
-													<label for="userIds" class="required-field">Select
-														User</label> <select id="userIds" name="userId"
-														class="form-control" required>
+													<label for="userIds">Select User</label>
+													<select id="userIds" name="userId" class="form-control">
 														<option value="">-- Select User --</option>
-														<option th:each="user : ${users}"
-															th:value="${user.userId}" th:text="${user.userName}">
-														</option>
+														<option th:each="user : ${users}" th:value="${user.userId}" th:text="${user.userName}"></option>
 													</select>
-													<div class="invalid-feedback">Please select a user</div>
 												</div>
 											</div>
 
 											<!-- Playlists Multi-select -->
 											<div class="col-md-4">
 												<div class="form-group">
-													<label for="playlistIds" class="required-field">Select
-														Playlists</label> <select id="playlistIds" name="playlistIds"
-														class="form-control" multiple required>
-														<option th:each="pl : ${playlists}" th:value="${pl.id}"
-															th:text="${pl.playlistName}"></option>
+													<label for="playlistIds">Select Playlists</label>
+													<select id="playlistIds" name="playlistIds" class="form-control" multiple>
+														<option th:each="pl : ${playlists}" th:value="${pl.id}" th:text="${pl.playlistName}"></option>
 													</select>
-													<div class="invalid-feedback">Please select at least
-														one playlist</div>
 												</div>
 											</div>
 
 											<!-- Sub Playlists Multi-select -->
 											<div class="col-md-4">
 												<div class="form-group">
-													<label for="subplaylistIds" class="required-field">Select
-														Sub Playlists</label> <select id="subplaylistIds"
-														name="subplaylistIds" class="form-control" multiple
-														required>
-														<option th:each="subpl : ${subplaylists}"
-															th:value="${subpl.id}" th:text="${subpl.playlistName}"></option>
+													<label for="subplaylistIds">Select Sub Playlists</label>
+													<select id="subplaylistIds" name="subplaylistIds" class="form-control" multiple>
+														<option th:each="subpl : ${subplaylists}" th:value="${subpl.id}" th:text="${subpl.playlistName}"></option>
 													</select>
-													<div class="invalid-feedback">Please select at least
-														one sub playlist</div>
 												</div>
 											</div>
 
 											<!-- Scenarios Multi-select -->
 											<div class="col-md-4">
 												<div class="form-group">
-													<label for="scenarioIds" class="required-field">Select
-														Scenario</label> <select id="scenarioIds" name="scenarioIds"
-														class="form-control" multiple required>
-														<option th:each="scenario : ${scenarios}"
-															th:value="${scenario.id}"
-															th:text="${scenario.scenarioName}"></option>
+													<label for="scenarioIds">Select Scenario</label>
+													<select id="scenarioIds" name="scenarioIds" class="form-control" multiple>
+														<option th:each="scenario : ${scenarios}" th:value="${scenario.id}" th:text="${scenario.scenarioName}"></option>
 													</select>
-													<div class="invalid-feedback">Please select at least
-														one scenario</div>
 												</div>
 											</div>
+
 										</div>
 									</div>
 
@@ -178,13 +151,11 @@ body {
 										<a th:href="@{/}" class="btn btn-outline-secondary mr-2">
 											<i class="fas fa-times mr-1"></i> Cancel
 										</a>
-										<button type="reset" class="btn btn-outline-secondary mr-2"
-											onclick="resetForm()">
+										<button type="reset" class="btn btn-outline-secondary mr-2" onclick="resetForm()">
 											<i class="fas fa-undo mr-1"></i> Reset
 										</button>
 										<button type="submit" id="saveBtn" class="btn btn-primary">
-											<i class="fas fa-save mr-1"></i> Save <span id="spinner"
-												class="spinner-border spinner-border-sm ml-2 d-none"></span>
+											<i class="fas fa-save mr-1"></i> Save <span id="spinner" class="spinner-border spinner-border-sm ml-2 d-none"></span>
 										</button>
 									</div>
 								</form>
@@ -202,133 +173,75 @@ body {
 
 	<div th:replace="template :: jsscript"></div>
 
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/js/bootstrap-multiselect.min.js"></script>
-
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/js/bootstrap-multiselect.min.js"></script>
 
 	<script type="text/javascript">
 		$(document).ready(function() {
 			// Initialize multiselects
 			$('#playlistIds').multiselect({
-				includeSelectAllOption : true,
-				enableFiltering : true,
-				maxHeight : 250,
-				buttonWidth : '100%'
+				includeSelectAllOption: true,
+				enableFiltering: true,
+				maxHeight: 250,
+				buttonWidth: '100%'
 			});
 
 			$('#subplaylistIds').multiselect({
-				includeSelectAllOption : true,
-				enableFiltering : true,
-				maxHeight : 250,
-				buttonWidth : '100%'
+				includeSelectAllOption: true,
+				enableFiltering: true,
+				maxHeight: 250,
+				buttonWidth: '100%'
 			});
 
 			$('#scenarioIds').multiselect({
-				includeSelectAllOption : true,
-				enableFiltering : true,
-				maxHeight : 250,
-				buttonWidth : '100%'
+				includeSelectAllOption: true,
+				enableFiltering: true,
+				maxHeight: 250,
+				buttonWidth: '100%'
 			});
 		});
 
-		function validateForm() {
-			let isValid = true;
-			$('.is-invalid').removeClass('is-invalid');
+		$('#userIds').change(function() {
+			var userId = $(this).val();
 
-			// Validate user (single select)
-			const selectedUser = $('#userIds').val();
-			if (!selectedUser || selectedUser === '') {
-				$('#userIds').addClass('is-invalid');
-				isValid = false;
+			// Clear multiselects if no user selected
+			if (!userId) {
+				$('#playlistIds').multiselect('deselectAll', false).multiselect('updateButtonText');
+				$('#subplaylistIds').multiselect('deselectAll', false).multiselect('updateButtonText');
+				$('#scenarioIds').multiselect('deselectAll', false).multiselect('updateButtonText');
+				return;
 			}
 
-			// Validate playlists
-			if (!$('#playlistIds').val()
-					|| $('#playlistIds').val().length === 0) {
-				$('#playlistIds').closest('.form-group').find('.multiselect')
-						.addClass('is-invalid');
-				isValid = false;
-			}
-
-			// Validate sub playlists
-			if (!$('#subplaylistIds').val()
-					|| $('#subplaylistIds').val().length === 0) {
-				$('#subplaylistIds').closest('.form-group')
-						.find('.multiselect').addClass('is-invalid');
-				isValid = false;
-			}
-
-			// Validate scenarios
-			if (!$('#scenarioIds').val()
-					|| $('#scenarioIds').val().length === 0) {
-				$('#scenarioIds').closest('.form-group').find('.multiselect')
-						.addClass('is-invalid');
-				isValid = false;
-			}
-
-			if (!isValid) {
-				$('html, body').animate({
-					scrollTop : $('.is-invalid:first').offset().top - 100
-				}, 500);
-				return false;
-			}
-
-			$('#spinner').removeClass('d-none');
-			$('#saveBtn').prop('disabled', true);
-			return true;
-		}
-
-		$('#userIds').change(
-				function() {
-					var userId = $(this).val();
-
-					if (!userId) {
-						// Clear multiselects if no user selected
-						$('#playlistIds').multiselect('deselectAll', false)
-								.multiselect('updateButtonText');
-						$('#subplaylistIds').multiselect('deselectAll', false)
-								.multiselect('updateButtonText');
-						$('#scenarioIds').multiselect('deselectAll', false)
-								.multiselect('updateButtonText');
-						return;
+			// Fetch user mappings via AJAX
+			$.ajax({
+				url: '/guac/getUserMappings',
+				type: 'GET',
+				data: { userId: userId },
+				success: function(data) {
+					if (data.status === 'success') {
+						$('#playlistIds').multiselect('deselectAll', false).multiselect('select', data.playlistIds);
+						$('#subplaylistIds').multiselect('deselectAll', false).multiselect('select', data.subplaylistIds);
+						$('#scenarioIds').multiselect('deselectAll', false).multiselect('select', data.scenarioIds);
 					}
+				}
+			});
+		});
 
-					$.ajax({
-						url : '/guac/getUserMappings',
-						type : 'GET',
-						data : {
-							userId : userId
-						},
-						success : function(data) {
-							if (data.status === 'success') {
-								// Update Playlists
-								$('#playlistIds').multiselect('deselectAll',
-										false);
-								$('#playlistIds').multiselect('select',
-										data.playlistIds);
+		$("#updateForm").submit(function(e) {
+			e.preventDefault();
+			let form = $(this);
+			let url = form.attr('action');
+			let formData = form.serialize();
 
-								// Update SubPlaylists
-								$('#subplaylistIds').multiselect('deselectAll',
-										false);
-								$('#subplaylistIds').multiselect('select',
-										data.subplaylistIds);
-
-								// Update Scenarios
-								$('#scenarioIds').multiselect('deselectAll',
-										false);
-								$('#scenarioIds').multiselect('select',
-										data.scenarioIds);
-
-							} else {
-								alert('Error fetching data: ' + data.message);
-							}
-						},
-						error : function(err) {
-							alert('AJAX error: ' + err.responseText);
-						}
-					});
-				});
+			$.post(url, formData, function(data) {
+				if (data.status === "success") {
+					Swal.fire({ icon: 'success', title: 'Success', text: data.message });
+				} else {
+					Swal.fire({ icon: 'success', title: 'Success', text: data.message });
+				}
+			}).fail(function() {
+				Swal.fire({ icon: 'success', title: 'Success', text: data.message });
+			});
+		});
 	</script>
-
 </body>
 </html>
