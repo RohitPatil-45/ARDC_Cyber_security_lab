@@ -42,6 +42,9 @@ public class UserWiseChatBoatInstructionTemplate implements Serializable {
 
     @Column(name = "commandExecutedCheckTime")
     private Timestamp commandExecutedCheckTime;
+    
+    @Column(name = "scenarioId", length = 50)
+    private int ScenarioId;
 
     // Getters and Setters
 
@@ -124,4 +127,14 @@ public class UserWiseChatBoatInstructionTemplate implements Serializable {
     public void setCommandExecutedCheckTime(Timestamp commandExecutedCheckTime) {
         this.commandExecutedCheckTime = commandExecutedCheckTime;
     }
+
+	public int getScenarioId() {
+		return ScenarioId;
+	}
+
+	public void setScenarioId(int scenarioId) {
+		ScenarioId = scenarioId;
+	}
+    
+    
 }

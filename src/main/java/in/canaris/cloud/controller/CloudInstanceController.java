@@ -136,6 +136,7 @@ import in.canaris.cloud.server.repository.NodeStatusHistoryRepository;
 import in.canaris.cloud.server.repository.VMHealthRepository;
 import in.canaris.cloud.service.DockerService;
 import in.canaris.cloud.service.GuacamoleService;
+import in.canaris.cloud.service.ProxmoxService;
 import in.canaris.cloud.utils.CMPUtil;
 import in.canaris.cloud.utils.CommandResult;
 import in.canaris.cloud.utils.ExecutePSCommand;
@@ -280,6 +281,9 @@ public class CloudInstanceController {
 
 	@Autowired
 	private ScenarioLabTemplateRepository scenarioLabTemplateRepository;
+	
+	@Autowired
+	private ProxmoxService proxmoxService;
 
 	@Autowired
 	private GuacamoleService guacService;
@@ -3485,131 +3489,156 @@ public class CloudInstanceController {
 	}
 
 	// Docker Container
-	@PostMapping("/docker")
-	public @ResponseBody String docker(@RequestParam("scenarioId") String scenarioId, Principal principal) {
-		System.out.println("Inside_Docker_Method :::: ");
-		System.out.println("scenarioId :::: " + scenarioId);
-		String result = null;
-		Map<Integer, Integer> portMappings = null;
+		@PostMapping("/docker")
+		public @ResponseBody String docker(@RequestParam("scenarioId") String scenarioId, Principal principal) {
+			System.out.println("Inside_Docker_Method :::: ");
+			System.out.println("scenarioId :::: " + scenarioId);
+			String result = null;
+			Map<Integer, Integer> portMappings = null;
 
-		String network = null;
-		Integer newVncPort;
-		Integer newNoVncPort;
-		Integer newRdpPort;
+			String network = null;
+			Integer newVncPort;
+			Integer newNoVncPort;
+			Integer newRdpPort;
 
-		String containerIP = null;
-		String TemplateName = null;
+			String containerIP = null;
 
-		String jsonResponse = null;
+			String jsonResponse = null;
 
-		String username = ((User) ((Authentication) principal).getPrincipal()).getUsername();
+			String username = ((User) ((Authentication) principal).getPrincipal()).getUsername();
 
-		try {
+			String scenarioName = null;
 
-			List<ScenarioLabTemplate> templates = scenarioLabTemplateRepository
-					.findByScenarioId(Integer.valueOf(scenarioId));
+			try {
 
-			System.out.println("rDokcer_templates : " + templates);
-			for (ScenarioLabTemplate temp : templates) {
+				List<ScenarioLabTemplate> templates = scenarioLabTemplateRepository
+						.findByScenarioId(Integer.valueOf(scenarioId));
 
-				System.out.println("Inside_Dokcer_templates : " + templates);
+				System.out.println("rDokcer_templates : " + templates);
+				for (ScenarioLabTemplate temp : templates) {
 
-				Optional<CloudInstance> obj = repository.findById(temp.getTemplateId());
-				CloudInstance instance = obj.get();
+					System.out.println("Inside_Dokcer_templates : " + templates);
 
-				String templateName = instance.getInstance_name();
-				String password = instance.getInstance_password();
-				String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
-				String filePath = instance.getSubproduct_id().getIso_file_path();
-				File file = new File(filePath);
-				String imageName = file.getName().replaceFirst("[.][^.]+$", "");
-				TemplateName = temp.getScenarioName();
+					Optional<CloudInstance> obj = repository.findById(temp.getTemplateId());
+					CloudInstance instance = obj.get();
 
-				System.out.println("imageNameimageName ::::" + imageName);
+					String templateName = instance.getInstance_name();
+					String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+					String filePath = instance.getSubproduct_id().getIso_file_path();
+					File file = new File(filePath);
+					String imageName = file.getName().replaceFirst("[.][^.]+$", "");
+					int templateId = instance.getProxmoxTemplateId();
+					scenarioName = temp.getScenarioName();
 
-				portMappings = new HashMap<>();
-				newVncPort = portDetailsRepository.findMaxVncPorts() + 1;
-				newNoVncPort = portDetailsRepository.findMaxnoVncPort() + 1;
-				newRdpPort = portDetailsRepository.findMaxRdpPort() + 1;
-				if (os.equalsIgnoreCase("Windows")) {
-					portMappings.put(newRdpPort, 3389);
-				}
+					System.out.println("imageNameimageName ::::" + imageName);
 
-				else {
-					portMappings.put(newVncPort, 5901);
-				}
+					Integer maxLabId1 = userLabRepository.findMaxLabId();
 
-				portMappings.put(newNoVncPort, 8080);
+					int maxLabId = (maxLabId1 != null) ? maxLabId1 : 0;
 
-				network = instance.getDocker_network_name();
+					maxLabId++;
 
-				Integer maxLabId1 = userLabRepository.findMaxLabId();
+					String newInstanceName = instance.getInstance_name() + maxLabId;
+					System.out.println("Inside__newInstanceName : " + newInstanceName);
 
-				int maxLabId = (maxLabId1 != null) ? maxLabId1 : 0;
+					if (instance.getVirtualization_type().equalsIgnoreCase("Proxmox")) {
+						Map<String, Object> resp = proxmoxService.cloneVm(templateId, newInstanceName, filePath, instance.getPhysicalServerIP());
+						System.out.println("Proxmox vm creation output : " + resp.toString());
+						if ("fail".equalsIgnoreCase((String) resp.get("status"))) {
+						    result = "fail";
+						} else {
+							saveInUserLab(newInstanceName, username, instance.getConsoleProtocol(),
+									instance.getInstance_name(), resp.get("vm_id").toString(), 0, 0, instance.getInstance_password(), 
+									"-" , scenarioId);
 
-				maxLabId++;
-
-				String newInstanceName = instance.getInstance_name() + "_" + maxLabId;
-				System.out.println("Inside_Dokcer_newInstanceName : " + newInstanceName);
-
-				if (os.equalsIgnoreCase("windows")) {
-					result = dockerService.runWindowsContainer(imageName, newInstanceName, portMappings, network);
-					if (result.equalsIgnoreCase("success")) {
-						System.out.println("inside windows docker : " + result);
-						jsonResponse = guacService.createConnection(newInstanceName, "rdp",
-								instance.getPhysicalServerIP(), newRdpPort, "admin", "Admin@123!", "", "true", "", "", "", "",
-								"", "", "", "", "");
-						if (guacService.getConnectionIdByName(jsonResponse) != null) {
-							containerIP = dockerService.getContainerIpViaCli(newInstanceName);
-							insertIntoPortDetailsForWindows(newInstanceName, newRdpPort, newNoVncPort);
-							insertIntoUserLabForWindows(newInstanceName, username, "rdp", templateName,
-									guacService.getConnectionIdByName(jsonResponse), newRdpPort, newNoVncPort, "Admin@123!",
-									"admin", containerIP, scenarioId);
-
-							insertUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName,
-									username);
-
+							insertUserWiseChatBoatInstruction(temp.getTemplateId(), instance.getInstance_name(),
+									newInstanceName, username,scenarioId);
+							
+							result = "success";
 						}
 
 					}
 
-				} else {
+					else {
 
-					result = dockerService.runContainer(imageName, newInstanceName, portMappings, network);
+						portMappings = new HashMap<>();
+						newVncPort = portDetailsRepository.findMaxVncPorts() + 1;
+						newNoVncPort = portDetailsRepository.findMaxnoVncPort() + 1;
+						newRdpPort = portDetailsRepository.findMaxRdpPort() + 1;
 
-					if (result.equalsIgnoreCase("success")) {
-						System.out.println("inside linux docker : " + result);
-						// Create connection in Guacamole
-						jsonResponse = guacService.createConnection(newInstanceName, "vnc",
-								instance.getPhysicalServerIP(), newVncPort, "kali", "kalilinux", "", "", "", "", "", "",
-								"", "", "", "", "");
-						if (guacService.getConnectionIdByName(jsonResponse) != null) {
-							containerIP = dockerService.getContainerIpViaCli(newInstanceName);
-							insertIntoPortDetails(newInstanceName, newVncPort, newNoVncPort);
-							insertIntoUserLab(newInstanceName, username, "vnc", templateName,
-									guacService.getConnectionIdByName(jsonResponse), newVncPort, newNoVncPort,
-									"kalilinux", containerIP, scenarioId);
+						if (os.equalsIgnoreCase("Windows")) {
+							portMappings.put(newRdpPort, 3389);
+						}
 
-							insertUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName,
-									username);
+						else {
+							portMappings.put(newVncPort, 5901);
+						}
 
+						portMappings.put(newNoVncPort, 8080);
+
+						network = instance.getDocker_network_name();
+
+						if (os.equalsIgnoreCase("windows")) {
+							result = dockerService.runWindowsContainer(imageName, newInstanceName, portMappings, network);
+							if (result.equalsIgnoreCase("success")) {
+								System.out.println("inside windows docker : " + result);
+								jsonResponse = guacService.createConnection(newInstanceName, "rdp",
+										instance.getPhysicalServerIP(), newRdpPort, "admin", "12345", "", "true", "", "", "",
+										"", "", "", "", "", "");
+								if (guacService.getConnectionIdByName(jsonResponse) != null) {
+									containerIP = dockerService.getContainerIpViaCli(newInstanceName);
+									insertIntoPortDetailsForWindows(newInstanceName, newRdpPort, newNoVncPort);
+									insertIntoUserLabForWindows(newInstanceName, username, "rdp", templateName,
+											guacService.getConnectionIdByName(jsonResponse), newRdpPort, newNoVncPort,
+											"12345", "admin", containerIP, scenarioId);
+
+									insertUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName,
+											username,scenarioId);
+								}
+
+							}
+
+						} else {
+
+							result = dockerService.runContainer(imageName, newInstanceName, portMappings, network);
+
+							if (result.equalsIgnoreCase("success")) {
+								System.out.println("inside linux docker : " + result);
+								// Create connection in Guacamole
+								jsonResponse = guacService.createConnection(newInstanceName, "vnc",
+										instance.getPhysicalServerIP(), newVncPort, "kali", "kalilinux", "", "", "", "", "",
+										"", "", "", "", "", "");
+								if (guacService.getConnectionIdByName(jsonResponse) != null) {
+									containerIP = dockerService.getContainerIpViaCli(newInstanceName);
+									insertIntoPortDetails(newInstanceName, newVncPort, newNoVncPort);
+									insertIntoUserLab(newInstanceName, username, "vnc", templateName,
+											guacService.getConnectionIdByName(jsonResponse), newVncPort, newNoVncPort,
+											"kalilinux", containerIP, scenarioId);
+
+									insertUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName,
+											username,scenarioId);
+								}
+
+							}
 						}
 
 					}
+
+				}
+				if(result.equalsIgnoreCase("success"))
+				{
+					insertUserScenerio(scenarioId, scenarioName, username);
 				}
 
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println("Exception_Dokcer_method : " + e);
+				result = "fail";
 			}
 
-			insertUserScenerio(scenarioId, TemplateName, username);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Exception_Dokcer_method : " + e);
-			result = "fail";
+			return result;
+
 		}
-
-		return result;
-
-	}
 
 	public void insertIntoUserLab(String newInstanceName, String username, String remoteType, String templateName,
 			String guacamoleId, Integer newVncPort, Integer newNoVncPort, String password, String containerIP,
@@ -3628,6 +3657,29 @@ public class CloudInstanceController {
 		lab.setStatus("InProgress");
 		lab.setTemplateName(templateName);
 		lab.setScenarioId(Integer.valueOf(scenarioId));
+		lab.setLastActiveConnection(new Timestamp(System.currentTimeMillis()));
+		
+		userLabRepository.save(lab);
+
+	}
+	
+	public void saveInUserLab(String newInstanceName, String username, String remoteType, String templateName,
+			String guacamoleId, Integer newVncPort, Integer newNoVncPort, String password, String containerIP,
+			String scenarioId) {
+		UserLab lab = new UserLab();
+		lab.setInstanceName(newInstanceName);
+		lab.setGuacamoleId(Integer.valueOf(guacamoleId));
+		lab.setUsername(username);
+		lab.setPassword(password);
+		lab.setInstanceUser("admin");
+		lab.setRemoteType(remoteType);
+		lab.setNoVncPort(newNoVncPort);
+		lab.setVncPort(newVncPort);
+		lab.setIpAddress(containerIP);
+		lab.setStatus("InProgress");
+		lab.setTemplateName(templateName);
+		lab.setScenarioId(Integer.valueOf(scenarioId));
+		lab.setLastActiveConnection(new Timestamp(System.currentTimeMillis()));
 
 		userLabRepository.save(lab);
 
@@ -3650,6 +3702,7 @@ public class CloudInstanceController {
 		lab.setStatus("InProgress");
 		lab.setTemplateName(templateName);
 		lab.setScenarioId(Integer.valueOf(scenarioId));
+		lab.setLastActiveConnection(new Timestamp(System.currentTimeMillis()));
 
 		userLabRepository.save(lab);
 
@@ -3684,7 +3737,7 @@ public class CloudInstanceController {
 	}
 
 	public void insertUserWiseChatBoatInstruction(int templateId, String templateName, String LabName,
-			String username) {
+			String username,String scenarioId) {
 
 		try {
 
@@ -3709,6 +3762,7 @@ public class CloudInstanceController {
 					userWiseTemplate.setUsername(username);
 					userWiseTemplate.setIsCommandExecuted("false");
 					userWiseTemplate.setCommandExecutedCheckTime(new Timestamp(System.currentTimeMillis()));
+					userWiseTemplate.setScenarioId(Integer.parseInt(scenarioId));
 
 					instructionTemplateRepository.save(userWiseTemplate);
 				}

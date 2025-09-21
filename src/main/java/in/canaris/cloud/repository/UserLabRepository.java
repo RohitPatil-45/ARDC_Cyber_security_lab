@@ -23,6 +23,11 @@ public interface UserLabRepository extends JpaRepository<UserLab, Integer> {
 	List<UserLab> findByLabId(Long userLabId);
 
 	List<UserLab> findByguacamoleId(int id);
+	
+	@Query("SELECT u FROM UserLab u where u.guacamoleId=:id")
+	UserLab getByProxmoxId(int id);
+	
+	UserLab findByInstanceName(String instanceName);
 
 //	@Transactional
 //	@Modifying
@@ -54,5 +59,8 @@ public interface UserLabRepository extends JpaRepository<UserLab, Integer> {
 
 	@Query("Select u FROM UserLab u WHERE u.instanceName = :containerName")
 	List<UserLab> findByInstnaceName(@Param("containerName") String containerName);
+
+	@Query("Select u FROM UserLab u WHERE u.username = :username")
+	List<UserLab> findByusername(@Param("username") String username);
 
 }

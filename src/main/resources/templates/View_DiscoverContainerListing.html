@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Cloud Portal - Docker Container</title>
+    <head th:include="templateListing :: headFragment"></head> <!-- Consider removing nested <head> -->
+    <link rel="icon" type="image/png" href="/webtemplate/dist/img/magicboxEye3.png">
+    <style>
+      /* Add horizontal scroll if needed */
+      .table-responsive {
+          overflow-x: auto;
+      }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div th:replace="fragments/header :: header"></div>
+        <div th:replace="fragments/sidebar :: aside"></div>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <!-- ... your breadcrumb and header ... -->
+            </section>
+
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card card-secondary">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-10">
+                                            <h3 class="card-title" style="padding-top: 10px">Docker Container Details</h3>
+                                        </div>
+                                        <div class="col-md-2"></div>
+                                    </div>
+                                </div>
+                                <div class="card-body table-responsive">  <!-- Added table-responsive here -->
+                                    <table id="dockerContainerTable" class="table table-bordered table-hover" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th>Container ID</th>
+                                                <th>Image Name</th>
+                                                <th>Command</th>
+                                                <th>Created</th>
+                                                <th>Status</th>
+                                                <th>Ports</th>
+                                                <th>Container Name</th>
+                                                <th>Physical Server IP</th>
+                                                <th>Username</th>
+                                                <th>Scenario Name</th>
+                                                <th>Last Active Connection</th>
+                                                <th>Edit</th>
+                                                <th>Delete</th>
+                                                <th>Start/Stop</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="obj : ${listObj}">
+                                                <td th:text="${obj.containerId}"></td>
+                                                <td th:text="${obj.imageName}"></td>
+                                                <td th:text="${obj.command}"></td>
+                                                <td th:text="${#dates.format(obj.created, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                                <td th:text="${obj.status}"></td>
+                                                <td th:text="${obj.ports}"></td>
+                                                <td th:text="${obj.containerName}"></td>
+                                                <td th:text="${obj.physicalServerIp}"></td>
+                                                <td th:text="${obj.username}"></td>
+                                                <td th:text="${obj.scenarioName}"></td>
+                                                <td th:text="${obj.lastActiveConnection != null ? #dates.format(obj.lastActiveConnection, 'yyyy-MM-dd HH:mm:ss') : '-'}"></td>
+                                                <td>
+                                                    <button th:attr="data-id=${obj.id}" class="btn btn-primary btn-sm" onclick="editContainer(this)">Edit</button>
+                                                </td>
+                                                <td>
+                                                    <button th:attr="data-id=${obj.id}" class="btn btn-danger btn-sm" onclick="deleteContainer(this)">Delete</button>
+                                                </td>
+                                                <td>
+                                                    <button th:attr="data-id=${obj.id}" class="btn btn-warning btn-sm" onclick="stopContainer(this)">Stop</button>
+                                                    <button th:attr="data-id=${obj.id}" class="btn btn-success btn-sm" onclick="startContainer(this)">Start</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
+
+    <div th:replace="templateListing :: jsscript"></div>
+
+    <script th:inline="javascript">
+        $(function() {
+            $("#dockerContainerTable").DataTable({
+                responsive: true,
+                lengthChange: false,
+                autoWidth: false,
+                buttons: ["csv", "excel", "print", "colvis"]
+            }).buttons().container().appendTo('#dockerContainerTable_wrapper .col-md-6:eq(0)');
+        });
+
+        function deleteContainer(button) {
+            const id = button.getAttribute('data-id');
+            if (confirm('Are you sure to delete container ' + id + '?')) {
+                // AJAX call to delete endpoint
+            }
+        }
+
+        function stopContainer(button) {
+            const id = button.getAttribute('data-id');
+            // AJAX call to stop container
+        }
+
+        function startContainer(button) {
+            const id = button.getAttribute('data-id');
+            // AJAX call to start container
+        }
+
+        function editContainer(button) {
+            const id = button.getAttribute('data-id');
+            // Redirect or open modal for editing container
+        }
+    </script>
+</body>
+</html>

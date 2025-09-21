@@ -3,7 +3,8 @@
 <head>
 <title>Cloud Portal - Docker Networks</title>
 <head th:include="templateListing :: headFragment"></head>
-<link rel="icon" type="image/png" href="/webtemplate/dist/img/magicboxEye3.png">
+<link rel="icon" type="image/png"
+	href="/webtemplate/dist/img/magicboxEye3.png">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 	<div class="wrapper">
@@ -51,14 +52,11 @@
 												<th>Start IP</th>
 												<th>End IP</th>
 												<th>Physical Server</th>
-												<th>Username</th>
-												<th>Scenario ID</th>
-												<th>Last Active Connection</th>
 											</tr>
 										</thead>
 										<tbody>
 											<tr th:each="obj : ${listObj}">
-												<td th:text="${obj.networkName}"></td>
+												<td th:text="${obj.name}"></td>
 												<td th:text="${obj.networkId}"></td>
 												<td th:text="${obj.driver}"></td>
 												<td th:text="${obj.scope}"></td>
@@ -66,12 +64,10 @@
 												<td th:text="${obj.startIp}"></td>
 												<td th:text="${obj.endIp}"></td>
 												<td th:text="${obj.physicalServer}"></td>
-												<td th:text="${obj.username}"></td>
-												<td th:text="${obj.scenarioId}"></td>
-												<td th:text="${obj.lastActiveConnection}"></td>
 											</tr>
 										</tbody>
 									</table>
+									
 
 								</div>
 							</div>

@@ -1,5 +1,7 @@
 package in.canaris.cloud.openstack.entity;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -54,6 +56,9 @@ public class UserLab {
 	
 	@Column(name = "instance_user")
 	private String instanceUser;
+	
+	@Column(name = "last_active_connection")
+	private Timestamp lastActiveConnection;
 
 	public Long getLabId() {
 		return labId;
@@ -166,6 +171,15 @@ public class UserLab {
 
 	public void setInstanceUser(String instanceUser) {
 		this.instanceUser = instanceUser;
+	}
+	
+
+	public Timestamp getLastActiveConnection() {
+		return lastActiveConnection;
+	}
+
+	public void setLastActiveConnection(Timestamp lastActiveConnection) {
+		this.lastActiveConnection = lastActiveConnection;
 	}
 
 	@Override

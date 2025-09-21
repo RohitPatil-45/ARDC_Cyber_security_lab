@@ -132,6 +132,9 @@ public class CloudInstance implements Serializable {
 
 	@Column
 	private String AssignedLab;
+	
+	@Column(name = "proxmox_template_id")
+	private int proxmoxTemplateId;
 
 	@Column(name = "source_vm")
 	private String sourceVm;
@@ -664,6 +667,14 @@ public class CloudInstance implements Serializable {
 
 	public void setServerCertificate(String serverCertificate) {
 		ServerCertificate = serverCertificate;
+	}
+
+	public int getProxmoxTemplateId() {
+		return proxmoxTemplateId;
+	}
+
+	public void setProxmoxTemplateId(int proxmoxTemplateId) {
+		this.proxmoxTemplateId = proxmoxTemplateId;
 	}
 	
 	

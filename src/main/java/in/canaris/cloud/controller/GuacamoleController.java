@@ -16,9 +16,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -54,8 +56,8 @@ import in.canaris.cloud.openstack.entity.UserPlaylistMapping;
 import in.canaris.cloud.openstack.entity.Add_Scenario;
 import in.canaris.cloud.openstack.entity.ChartBoatInstructionTemplate;
 import in.canaris.cloud.openstack.entity.CommandHistory;
+import in.canaris.cloud.openstack.entity.ContainerUserLabDTO;
 import in.canaris.cloud.openstack.entity.Discover_Docker_Network;
-import in.canaris.cloud.openstack.entity.DockerNetworkUserDTO;
 import in.canaris.cloud.openstack.entity.InstructionCommand;
 import in.canaris.cloud.openstack.entity.Playlist;
 import in.canaris.cloud.openstack.entity.PlaylistItem;
@@ -89,11 +91,13 @@ import in.canaris.cloud.repository.AppUserRepository;
 import in.canaris.cloud.repository.UserPlaylistMappingRepository;
 import in.canaris.cloud.repository.UserSubplaylistMappingRepository;
 import in.canaris.cloud.repository.UserScenarioMappingRepository;
+import in.canaris.cloud.repository.DiscoverContainerRepository;
 
 import in.canaris.cloud.repository.SubPlaylistRepository;
 import in.canaris.cloud.repository.UserLabRepository;
 import in.canaris.cloud.service.DockerService;
 import in.canaris.cloud.service.GuacamoleService;
+import in.canaris.cloud.service.ProxmoxService;
 import in.canaris.cloud.utils.GuacIdentifierUtil;
 
 @Controller
@@ -170,10 +174,16 @@ public class GuacamoleController {
 	GroupRepository GroupRepository;
 
 	@Autowired
+	private ProxmoxService proxmoxService;
+
+	@Autowired
 	UserSubplaylistMappingRepository UserSubplaylistMappingRepository;
 
 	@Autowired
 	UserScenarioMappingRepository UserScenarioMappingRepository;
+	
+	@Autowired
+	DiscoverContainerRepository DiscoverContainerRepository;
 
 	@GetMapping("/")
 	public String home() {
@@ -326,40 +336,47 @@ public class GuacamoleController {
 		return "redirect:/guac/Create_docker_network";
 	}
 
-//	@GetMapping("/View_DockerListing")
-//	public String viewDockerListing(Model model) {
-//	    List<DockerNetworkUserDTO> dockerNetworks = DiscoverDockerNetworkRepository.fetchDockerNetworksWithUsers();
-//	    model.addAttribute("listObj", dockerNetworks);
-//	    return "View_DockerListing";
-//	}
-
 	@GetMapping("/View_DockerListing")
 	public String viewDockerListing(Model model) {
-
-		List<Object[]> results = DiscoverDockerNetworkRepository.fetchDockerNetworksWithUsersNative();
-
-		List<DockerNetworkUserDTO> dockerNetworks = new ArrayList<>();
-		for (Object[] row : results) {
-			String username = row[8] != null ? (String) row[8] : "unassigned";
-
-			DockerNetworkUserDTO dto = new DockerNetworkUserDTO((String) row[0], // networkName
-					(String) row[1], // networkId
-					(String) row[2], // driver
-					(String) row[3], // scope
-					(String) row[4], // gateway
-					(String) row[5], // startIp
-					(String) row[6], // endIp
-					(String) row[7], // physicalServer
-					username, // ✅ fallback if NULL
-					row[9] != null ? ((Number) row[9]).intValue() : null, (String) row[10] // lastActiveConnection
-			);
-			dockerNetworks.add(dto);
-		}
-
+		List<Discover_Docker_Network> dockerNetworks = DiscoverDockerNetworkRepository.findAll();
 		model.addAttribute("listObj", dockerNetworks);
 		return "View_DockerListing";
 	}
 
+	@GetMapping("/View_DiscoverContainerListing")
+	public String viewDiscoverContainerListing(Model model) {
+
+	    List<Object[]> results = DiscoverContainerRepository.fetchContainerWithUserLab();
+
+	    // Map raw Object[] results to a DTO or Map to pass to view
+	    List<ContainerUserLabDTO> dtoList = results.stream().map(record -> {
+	        ContainerUserLabDTO dto = new ContainerUserLabDTO();
+
+	        dto.setId((Integer) record[0]);
+	        dto.setContainerId((String) record[1]);
+	        dto.setImageName((String) record[2]);
+	        dto.setCommand((String) record[3]);
+	        dto.setCreated(record[4] != null ? (Timestamp) record[4] : null);
+	        dto.setStatus((String) record[5]);
+	        dto.setPorts((String) record[6]);
+	        dto.setContainerName((String) record[7]);
+	        dto.setPhysicalServerIp((String) record[8]);
+
+	        String username = (String) record[9];
+	        dto.setUsername(username != null ? username : "unassigned");
+
+	        String scenarioName = (String) record[10];
+	        dto.setScenarioName(scenarioName != null ? scenarioName : "-");
+
+	        Timestamp lastActive = record[11] != null ? (Timestamp) record[11] : null;
+	        dto.setLastActiveConnection(lastActive);
+
+	        return dto;
+	    }).toList();
+
+	    model.addAttribute("listObj", dtoList);
+	    return "View_DiscoverContainerListing";
+	}
 
 
 	@GetMapping("/View_Vm_Listing")
@@ -433,34 +450,31 @@ public class GuacamoleController {
 
 	@GetMapping("/viewPlaylistConnection/{id}")
 	public String viewPlaylistConnection(@PathVariable String id, Model model) {
-		String identifier = GuacIdentifierUtil.encode(id, "mysql");
-		String url = guacService.getEmbedUrl(identifier);
-		model.addAttribute("embedUrl", url);
 
-		List<CloudInstance> instances = null;
-		instances = repository.findByGuacamoleId(id);
+		String url = null;
+		try {
 
-//		List<UserLab> labDetails = UserLabRepository.findByLabId(UserLabId);
-//
-//		if (!labDetails.isEmpty()) {
-//			// Get the first item from the list.
-//			UserLab userLab = labDetails.get(0);
-//			;
-//			// Get the guacamoleId from the retrieved object.
-//			Integer guacamoleId = userLab.getGuacamoleId();
-//			Integer scenarioId = userLab.getScenarioId();
-//			String templateIdString = userLab.getTemplateName();
-//			String LabName = userLab.getInstanceName();
+			UserLab lab = UserLabRepository.getByProxmoxId(Integer.valueOf(id));
+			CloudInstance inst = repository.findByInstance(lab.getTemplateName());
 
-//		List<UserWiseChatBoatInstructionTemplate> instances = null;
-//		instances = instructionTemplateRepository.findByGuacamoleId(id);
+			if (inst.getVirtualization_type().equalsIgnoreCase("Proxmox")) {
+				url = proxmoxService.getProxmoxConsoleUrl(Integer.valueOf(id), lab.getInstanceName());
+			} else {
+				String identifier = GuacIdentifierUtil.encode(id, "mysql");
+				url = guacService.getEmbedUrl(identifier);
+			}
 
-		model.addAttribute("instructionsdata", instances);
+			model.addAttribute("embedUrl", url);
 
-//		List<InstructionCommand> instrucion = null;
-//		instrucion = InstructionCommandRepository.findByLabId(id);
-//		
-//		model.addAttribute("instructionscommanddata", instrucion);
+			List<CloudInstance> instances = null;
+			instances = repository.findByGuacamoleId(id);
+
+			model.addAttribute("instructionsdata", instances);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		return "viewConnection";
 	}
 
@@ -799,27 +813,25 @@ public class GuacamoleController {
 			int temp = Integer.parseInt(LabId);
 
 			List<UserLab> labDetails = UserLabRepository.findByguacamoleId(temp);
-			
-			
 
 			if (!labDetails.isEmpty()) {
 				UserLab userLab = labDetails.get(0);
-				
+
 				String instanceName = userLab.getTemplateName();
-				
+
 				List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
 				String password = "";
 				if (!cloudInstances.isEmpty()) {
 					CloudInstance instance = cloudInstances.get(0); // ✅ first match
 
 					String templateName = instance.getInstance_name();
-					 password = instance.getInstance_password();
+					password = instance.getInstance_password();
 					String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
 
 					// You can store them in the map if needed
 //		            map.put("templateName", templateName);
 //		            map.put("password", password);
-					
+
 				}
 
 				response.put("success", true);
@@ -2661,30 +2673,30 @@ public class GuacamoleController {
 		}
 	}
 
-	@PostMapping("/getPercenetageParticularScenerio")
+	@PostMapping("/getPercentageParticularScenario")
 	@ResponseBody
-	public String getPercentageParticularScenario(Principal principal) {
+	public String getPercentageParticularScenario(Principal principal, @RequestParam("scenarioId") int scenarioId,
+			@RequestParam("scenarioName") String scenarioName) {
 		try {
+			String username = principal.getName();
+			System.out.println("scenarioId : " + scenarioId);
 
-			Authentication auth = (Authentication) principal;
-			String username = auth.getName();
+			Integer falseCount = instructionTemplateRepository.getFalseCompletionCountsByusernameandscenarioId(username,
+					scenarioId);
+			Integer trueCount = instructionTemplateRepository.getTrueCompletionCountsByusernameandscenarioId(username,
+					scenarioId);
 
-			Integer falseCountObj = instructionTemplateRepository.getFalseCompletionCountsByTemplateId(username);
-			Integer trueCountObj = instructionTemplateRepository.getTrueCompletionCountsByTemplateId(username);
+			falseCount = (falseCount != null) ? falseCount : 0;
+			trueCount = (trueCount != null) ? trueCount : 0;
 
-			int falseCount = (falseCountObj != null) ? falseCountObj : 0;
-			int trueCount = (trueCountObj != null) ? trueCountObj : 0;
-
-			System.out.println("True count: " + trueCount + ", False count: " + falseCount);
-
-			int total = trueCount + falseCount;
+			int total = falseCount + trueCount;
 
 			if (total == 0) {
 				return "0";
 			}
 
 			int percentage = (trueCount * 100) / total;
-			System.out.println("Percentage: " + percentage + "%");
+			System.out.println("percentage : " + percentage);
 
 			return String.valueOf(percentage);
 
@@ -3076,7 +3088,6 @@ public class GuacamoleController {
 		}
 	}
 
-
 	@PostMapping("/save_UserWisePlaylist")
 	public String saveUserWisePlaylist(@RequestParam(required = false) String groupId,
 			@RequestParam("userIds") List<Long> userIds, @RequestParam("playlistIds") List<Integer> playlistIds,
@@ -3164,75 +3175,70 @@ public class GuacamoleController {
 
 		return mav;
 	}
-	
-	
-	
+
 	@PostMapping("/Update_UserWisePlaylistScenarioSubplaylist")
-	public String updateUserMappings(
-	        @RequestParam(value = "userId", required = false) Long userId,
-	        @RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
-	        @RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
-	        @RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds) {
+	public String updateUserMappings(@RequestParam(value = "userId", required = false) Long userId,
+			@RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
+			@RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
+			@RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds) {
 
-	    // Redirect to summary page
-	    String redirectUrl = "redirect:/guac/user_playlist_summary";
+		// Redirect to summary page
+		String redirectUrl = "redirect:/guac/user_playlist_summary";
 
-	    try {
-	        // If userId is null or 0, skip processing
-	        if (userId == null || userId == 0) {
-	            return redirectUrl;
-	        }
+		try {
+			// If userId is null or 0, skip processing
+			if (userId == null || userId == 0) {
+				return redirectUrl;
+			}
 
-	        // 1. Find username by userId
-	        String userName = AppUserRepository.getUserNameById(userId);
+			// 1. Find username by userId
+			String userName = AppUserRepository.getUserNameById(userId);
 
-	        if (userName == null || userName.isEmpty()) {
-	            return redirectUrl;
-	        }
+			if (userName == null || userName.isEmpty()) {
+				return redirectUrl;
+			}
 
-	        // 2. Delete existing mappings for this user
-	        UserPlaylistMappingRepository.deleteByUserName(userName);
-	        UserSubplaylistMappingRepository.deleteByUserName(userName);
-	        UserScenarioMappingRepository.deleteByUserName(userName);
+			// 2. Delete existing mappings for this user
+			UserPlaylistMappingRepository.deleteByUserName(userName);
+			UserSubplaylistMappingRepository.deleteByUserName(userName);
+			UserScenarioMappingRepository.deleteByUserName(userName);
 
-	        // 3. Insert new playlist mappings if list is not empty
-	        if (playlistIds != null && !playlistIds.isEmpty()) {
-	            for (Integer playlistId : playlistIds) {
-	                UserPlaylistMapping entity = new UserPlaylistMapping();
-	                entity.setUserName(userName);
-	                entity.setPlaylistId(playlistId);
-	                UserPlaylistMappingRepository.save(entity);
-	            }
-	        }
+			// 3. Insert new playlist mappings if list is not empty
+			if (playlistIds != null && !playlistIds.isEmpty()) {
+				for (Integer playlistId : playlistIds) {
+					UserPlaylistMapping entity = new UserPlaylistMapping();
+					entity.setUserName(userName);
+					entity.setPlaylistId(playlistId);
+					UserPlaylistMappingRepository.save(entity);
+				}
+			}
 
-	        // 4. Insert new subplaylist mappings
-	        if (subplaylistIds != null && !subplaylistIds.isEmpty()) {
-	            for (Integer subplaylistId : subplaylistIds) {
-	                UserSubplaylistMapping entity = new UserSubplaylistMapping();
-	                entity.setUserName(userName);
-	                entity.setSubPlaylistId(subplaylistId);
-	                UserSubplaylistMappingRepository.save(entity);
-	            }
-	        }
+			// 4. Insert new subplaylist mappings
+			if (subplaylistIds != null && !subplaylistIds.isEmpty()) {
+				for (Integer subplaylistId : subplaylistIds) {
+					UserSubplaylistMapping entity = new UserSubplaylistMapping();
+					entity.setUserName(userName);
+					entity.setSubPlaylistId(subplaylistId);
+					UserSubplaylistMappingRepository.save(entity);
+				}
+			}
 
-	        // 5. Insert new scenario mappings
-	        if (scenarioIds != null && !scenarioIds.isEmpty()) {
-	            for (Integer scenarioId : scenarioIds) {
-	                UserScenarioMapping entity = new UserScenarioMapping();
-	                entity.setUserName(userName);
-	                entity.setScenarioId(scenarioId);
-	                UserScenarioMappingRepository.save(entity);
-	            }
-	        }
+			// 5. Insert new scenario mappings
+			if (scenarioIds != null && !scenarioIds.isEmpty()) {
+				for (Integer scenarioId : scenarioIds) {
+					UserScenarioMapping entity = new UserScenarioMapping();
+					entity.setUserName(userName);
+					entity.setScenarioId(scenarioId);
+					UserScenarioMappingRepository.save(entity);
+				}
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace(); // Log exception
-	    }
+		} catch (Exception e) {
+			e.printStackTrace(); // Log exception
+		}
 
-	    return redirectUrl;
+		return redirectUrl;
 	}
-
-
 
 	@GetMapping("/getUserMappings")
 	@ResponseBody
@@ -3373,7 +3379,7 @@ public class GuacamoleController {
 
 			Authentication auth = (Authentication) principal;
 			String username = auth.getName();
-			
+
 			String templateName = instance.getInstance_name();
 
 			List<Object[]> instructions = instructionTemplateRepository
@@ -3454,67 +3460,210 @@ public class GuacamoleController {
 			return "Error: " + e.getMessage();
 		}
 	}
-	
-	
-	@GetMapping("/getCloundInstanceEdit")
-	public String getCloundInstanceEdit(@RequestParam("Id") Integer Id, Principal principal) {
-	    System.out.println("Edit Controller called for Id = " + Id);
 
-	    ModelAndView mav = new ModelAndView("cloud_instance_edit");
-//	    mav.addObject("pageTitle", "Edit " + disp_function_name);
-//	    mav.addObject("action_name", var_function_name);
+//	@GetMapping("/editplaylist/{id}")
+//	public ModelAndView editplaylist(@PathVariable("id") Integer id) {
+//
+//		try {
+//			ModelAndView mav = new ModelAndView("Add_Playlist");
+////			mav.addObject("action_name", var_function_name);
+//			mav.addObject("playlist", PlaylistRepository.findById(id).get());
+//			mav.addObject("pageTitle", "Edit Playlist (ID: " + id + ")");
+////			mav.addObject("pageTitle",  "Edit " + disp_function_name + " (ID: " + id + ")");
+//			return mav;
+//		} catch (Exception e) {
+//			ModelAndView mav = new ModelAndView("Add_Playlist");
+////			mav.addObject("action_name", var_function_name);
+//			mav.addObject("message", e.getMessage());
+//			return mav;
+//		}
+//	}
 
-	    try {
-	        Optional<CloudInstance> optionalInstance = repository.findById(Id);
-	        if (optionalInstance.isEmpty()) {
-	            mav.addObject("error", "CloudInstance not found for ID: " + Id);
-//	            return mav;
-	        }
+	@PostMapping("/getCloundInstanceEdit")
+	public ModelAndView getCloundInstanceEdit(@RequestParam String id, Principal principal) {
+		System.out.println("Edit Controller called for Id = " + id);
 
-	        CloudInstance instance = optionalInstance.get();
+		ModelAndView mav = new ModelAndView("cloud_instance_edit");
 
-	        // Add dropdowns (same as in /new)
-//	        mav.addObject("dcLocationList", repositoryLocation.getAllDClocations());
-//	        mav.addObject("vmlocationPathList", repositoryVMLocationPath.getAllVMlocationsPahts());
-//	        mav.addObject("securityGroupList", firewallRepository.getFirewall());
-//	        mav.addObject("sharedCpuPlan", priceRepository.getSharedCpuPlan());
-//	        mav.addObject("dedicatedCpuPlan", priceRepository.getDedicatedCpuPlan());
-//	        mav.addObject("highMemoryPlan", priceRepository.getHighMemoryPlan());
-//	        mav.addObject("switchList", switchRepository.getAllSwitch());
-//	        mav.addObject("physicalServerIPList", PhysicalServerRepository.getPhysicalServerIPs());
+		try {
+			// Convert String ID to Integer
+			int instanceId = Integer.parseInt(id);
 
-	        // Send the selected CloudInstance for editing
-	        mav.addObject("objEnt", instance);
+			// Fetch the CloudInstance
+			Optional<CloudInstance> optionalInstance = repository.findById(instanceId);
+			if (optionalInstance.isEmpty()) {
+				mav.addObject("error", "Instance not found");
+				return mav;
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        mav.addObject("error", "Error fetching CloudInstance: " + e.getMessage());
-	    }
+			CloudInstance instance = optionalInstance.get();
+			mav.addObject("objEnt", instance);
 
-	    return "redirect:/guac/cloud_instance_edit";
+			// Add any other dropdown data here if needed
+			// e.g., mav.addObject("dcLocationList",
+			// repositoryLocation.getAllDClocations());
+
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			mav.addObject("error", "Invalid ID format: " + id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			mav.addObject("error", "Error fetching CloudInstance: " + e.getMessage());
+		}
+
+		return mav;
 	}
-	
+
+//	@PostMapping("/getCloundInstanceEdit")
+//	public String getCloundInstanceEdit(@RequestParam String id, Model model, Principal principal) {
+//	    System.out.println("Edit Controller called for Id = " + id);
+//
+//	    try {
+//	        Optional<CloudInstance> optionalInstance = repository.findById(Integer.parseInt(id));
+//	        if (optionalInstance.isEmpty()) {
+//	            model.addAttribute("error", "Instance not found");
+//	            return "error_page"; // or return some error fragment
+//	        }
+//
+//	        CloudInstance instance = optionalInstance.get();
+//	        model.addAttribute("objEnt", instance);
+//
+//	        // Load dropdowns here if needed
+//
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	        model.addAttribute("error", "Error fetching CloudInstance: " + e.getMessage());
+//	    }
+//
+//	    return "redirect:/Create_docker_network";
+////	    return "cloud_instance_edit"; 
+//	}
+
 	@GetMapping("/deleteVM")
 	@ResponseBody
 	public ResponseEntity<String> deleteVM(@RequestParam("Id") Integer id, Principal principal) {
-	    try {
-	        Optional<CloudInstance> optionalInstance = repository.findById(id);
+		try {
+			Optional<CloudInstance> optionalInstance = repository.findById(id);
 
-	        if (optionalInstance.isEmpty()) {
-	            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-	                                 .body("VM not found with ID: " + id);
-	        }
+			if (optionalInstance.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("VM not found with ID: " + id);
+			}
 
-	        // Delete the VM
-	        repository.deleteById(id);
+			// Delete the VM
+			repository.deleteById(id);
 
-	        return ResponseEntity.ok("VM deleted successfully");
+			return ResponseEntity.ok("VM deleted successfully");
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                             .body("Error deleting VM: " + e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting VM: " + e.getMessage());
+		}
+	}
+
+	@GetMapping("/View_All_Vm_Listing")
+	public ModelAndView viewVmListing(Model model, Principal principal) {
+		// Get the username of the authenticated user
+		Authentication auth = (Authentication) principal;
+		String username = auth.getName();
+
+		// Create the ModelAndView
+		ModelAndView mav = new ModelAndView("View_All_Vm_Listing");
+
+		// Fetch all labs for the authenticated user
+		List<UserLab> labs = UserLabRepository.findAll();
+
+		// Add percentage for each lab
+		List<Map<String, Object>> labData = new ArrayList<>();
+		for (UserLab lab : labs) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("lab", lab);
+
+			// Fetch CloudInstance by instance name
+			String instanceName = lab.getTemplateName();
+			List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
+
+			if (!cloudInstances.isEmpty()) {
+				CloudInstance instance = cloudInstances.get(0); // ✅ first match
+
+				String templateName = instance.getInstance_name();
+				String PhysicalServerIP = instance.getPhysicalServerIP();
+				String password = instance.getInstance_password();
+				String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+
+				// You can store them in the map if needed
+				map.put("os", os);
+				map.put("PhysicalServerIP", PhysicalServerIP);
+			} else {
+				System.out.println("No CloudInstance found for name: " + instanceName);
+			}
+
+			int ScenarioId = lab.getScenarioId();
+			Optional<Add_Scenario> Scenariolist = ScenarioRepository.findById(ScenarioId);
+
+			if (Scenariolist.isPresent()) {
+				Add_Scenario Scenarioinstance = Scenariolist.get(); // Use get() on Optional to extract the value
+
+				String ScenarioName = Scenarioinstance.getScenarioName();
+
+				map.put("ScenarioName", ScenarioName);
+			} else {
+				System.out.println("No Add_Scenario found for id: " + ScenarioId);
+			}
+
+			// Handle LabId
+			Long labIdLong = lab.getLabId();
+			int labId = labIdLong.intValue();
+
+			// Get true and false counts for completion
+			Integer falseCountObj = instructionTemplateRepository.getfalseCompletionCountsByTemplateName(labId);
+			Integer trueCountObj = instructionTemplateRepository.gettrueCompletionCountsByTemplateName(labId);
+
+			// Handle null values
+			int falseCount = (falseCountObj != null) ? falseCountObj : 0;
+			int trueCount = (trueCountObj != null) ? trueCountObj : 0;
+
+			// Calculate total and percentage
+			int total = trueCount + falseCount;
+
+			// Avoid division by zero
+			int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
+			map.put("percentage", percentage);
+
+			labData.add(map);
+
+			System.out.println("labData ::" + labData);
+		}
+
+		// Add the lab data to the model
+		model.addAttribute("labData", labData);
+
+		// Return the view
+		return mav;
+	}
+	
+	@GetMapping("/getScenarioByUsername")
+	@ResponseBody
+	public Set<Add_Scenario> getScenarioByUsername(@RequestParam("username") String username) {
+	    // 1. Find all user labs associated with the given username.
+	    List<UserLab> userLabs = UserLabRepository.findByusername(username);  // make sure method name matches your repo
+
+	    // 2. Extract unique scenario IDs from the list of UserLab objects using a HashSet.
+	    Set<Integer> scenarioIds = new HashSet<>();
+	    for (UserLab userLab : userLabs) {
+	        scenarioIds.add(userLab.getScenarioId());
 	    }
+
+	    // 3. Find all scenarios that correspond to the extracted scenario IDs.
+	    Set<Add_Scenario> scenarios = new HashSet<>();
+	    for (Integer scenarioId : scenarioIds) {
+	        Optional<Add_Scenario> scenario = ScenarioRepository.findById(scenarioId);
+	        if (scenario.isPresent()) {
+	            scenarios.add(scenario.get());
+	        }
+	    }
+
+	    // Return the set of unique scenarios.
+	    return scenarios;
 	}
 
 

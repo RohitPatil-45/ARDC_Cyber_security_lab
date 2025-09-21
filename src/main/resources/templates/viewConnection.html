@@ -196,6 +196,15 @@ body {
 	height: auto;
 	border-radius: 8px;
 	margin-top: 8px;
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	cursor: pointer;
+}
+
+.message-content img:hover {
+	transform: scale(1.5);
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+	z-index: 1000;
+	position: relative;
 }
 
 .message-time {
@@ -548,12 +557,72 @@ body {
 	margin-left: 10px;
 	cursor: pointer;
 }
+
+/* Modal for enlarged images */
+.image-modal {
+	display: none;
+	position: fixed;
+	z-index: 2000;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.9);
+	overflow: auto;
+}
+
+.modal-content {
+	display: block;
+	margin: auto;
+	max-width: 90%;
+	max-height: 80%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.close-modal {
+	position: absolute;
+	top: 15px;
+	right: 35px;
+	color: #f1f1f1;
+	font-size: 40px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+	color: #bbb;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+/* Image caption in modal */
+.modal-caption {
+	position: absolute;
+	bottom: 20px;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	color: white;
+	padding: 10px;
+	background-color: rgba(0, 0, 0, 0.7);
+}
 </style>
 
 <link rel="stylesheet" th:href="@{/webtemplate/css/style_connetion.css}">
 </head>
 
 <body>
+	<!-- Image Modal -->
+	<div id="imageModal" class="image-modal">
+		<span class="close-modal">&times;</span>
+		<img class="modal-content" id="modalImage">
+		<div id="modalCaption" class="modal-caption"></div>
+	</div>
+
 	<div class="connection-container">
 		<!-- Top controls bar -->
 		<div class="top-controls">
@@ -728,6 +797,36 @@ body {
 		}
 	}
 	
+	// Function to set up image modal functionality
+	function setupImageModal() {
+		// Get the modal
+		const modal = document.getElementById("imageModal");
+		const modalImg = document.getElementById("modalImage");
+		const captionText = document.getElementById("modalCaption");
+		
+		// Get all images in chat messages and add click event
+		$('#chat-messages').on('click', '.message-content img', function() {
+			modal.style.display = "block";
+			modalImg.src = this.src;
+			captionText.innerHTML = this.alt || "Instruction Image";
+		});
+		
+		// Get the <span> element that closes the modal
+		const span = document.getElementsByClassName("close-modal")[0];
+		
+		// When the user clicks on <span> (x), close the modal
+		span.onclick = function() { 
+			modal.style.display = "none";
+		}
+		
+		// When the user clicks anywhere outside of the modal, close it
+		modal.onclick = function(event) {
+			if (event.target == modal) {
+				modal.style.display = "none";
+			}
+		}
+	}
+	
 	$(document).ready(function() {
 		// Toggle sidebar visibility
 		$('#sidebar-toggle').click(function() {
@@ -868,6 +967,9 @@ body {
 				}
 			});
 		});
+		
+		// Set up image modal functionality
+		setupImageModal();
 	});
 	
 	function ActionforLAbOnload(id) {
@@ -950,8 +1052,11 @@ body {
 					
 					setTimeout(() => {
 						// Add instruction (HTML including image)
-						const instructionHtml = $('<div class="message incoming"><div class="message-content"></div></div>');
-						instructionHtml.find('.message-content').html(newInstruction);
+						const instructionHtml = $(`
+							<div class="message incoming">
+								<div class="message-content">${newInstruction}</div>
+							</div>
+						`);
 						$('#chat-messages').append(instructionHtml);
 
 						// Add command (plain text)
@@ -978,6 +1083,9 @@ body {
 						
 						// Update notification badge
 						updateNotificationBadge();
+						
+						// Set up image modal for any new images
+						setupImageModal();
 
 						// Disable continue button if it's the last
 						if (isLast) {
@@ -1024,18 +1132,18 @@ body {
 	                
 	                setTimeout(() => {
 		                // Instruction HTML
-		                const instructionHtml = `
+		                const instructionHtml = $(`
 		                    <div class="message incoming">
 		                        <div class="message-content">${newInstruction}</div>
 		                    </div>
-		                `;
+		                `);
 
 		                // Command HTML
-		                const commandHtml = `
+		                const commandHtml = $(`
 		                    <div class="message incoming command-message">
 		                        <div class="message-content"><strong>${newCommand}</strong></div>
 		                    </div>
-		                `;
+		                `);
 
 		                // Append to chat window
 		                $('#chat-messages').append(instructionHtml).append(commandHtml);
@@ -1049,6 +1157,9 @@ body {
 		                
 		                // Update notification badge
 		                updateNotificationBadge();
+		                
+		                // Set up image modal for any new images
+		                setupImageModal();
 
 		                // Call function if it's the last step
 		                if (isLast) {
@@ -1082,13 +1193,13 @@ body {
 	        success: function(response) {
 	        	if (response==="success") {
 	        	    // Add completion message to chat
-	        	    const completionMessage = `
+	        	    const completionMessage = $(`
 	        	        <div class="message incoming important-message">
 	        	            <div class="message-content">
 	        	                <i class="fas fa-check-circle"></i> Congratulations! You've completed all lab instructions.
 	        	            </div>
 	        	        </div>
-	        	    `;
+	        	    `);
 	        	    $('#chat-messages').append(completionMessage);
 	        	    
 	        	    // Auto scroll to bottom
@@ -1229,6 +1340,9 @@ body {
 	                // Auto-scroll to bottom
 	                const chatMessages = $('#chat-messages');
 	                chatMessages.scrollTop(chatMessages.prop("scrollHeight"));
+	                
+	                // Set up image modal for any images in completed commands
+	                setupImageModal();
 	            } else {
 	                $('#chat-messages').empty();
 	                $('#chat-messages').append('<div>No completed commands found.</div>');
@@ -1264,6 +1378,9 @@ body {
 
 	                    const chatMessages = $('#chat-messages');
 	                    chatMessages.scrollTop(chatMessages.prop("scrollHeight"));
+	                    
+	                    // Set up image modal for any images in completed commands
+	                    setupImageModal();
 	                } catch (e) {
 	                    console.error('Error parsing completed commands from localStorage', e);
 	                }

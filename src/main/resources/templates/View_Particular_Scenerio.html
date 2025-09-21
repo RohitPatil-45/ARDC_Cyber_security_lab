@@ -969,9 +969,14 @@ function showLabButtonOn_Check() {
 function getPercenetageParticularScenerio() {
     $.ajax({
         type: "POST",
-        url: '/guac/getPercenetageParticularScenerio',
+        url: '/guac/getPercentageParticularScenario',
+        data: {
+            "scenarioId": scenarioId,
+            "scenarioName": scenarioName
+        },
         success: function(result) {
             result = result.trim();
+            
 
             if (!isNaN(result)) {
                 document.getElementById("Complete_Per").innerText = result + "%";

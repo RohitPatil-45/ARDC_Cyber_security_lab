@@ -644,7 +644,7 @@ keyframes spin {to { transform:rotate(360deg);
 												<th class="text-center">Source Image</th>
 
 												<!-- Separate action columns -->
-												<th class="text-center">Edit</th>
+<!-- 												<th class="text-center">Edit</th> -->
 												<th class="text-center">View Instruction</th>
 												<th class="text-center">Delete</th>
 											</tr>
@@ -679,11 +679,11 @@ keyframes spin {to { transform:rotate(360deg);
 												</a></td>
 
 												<!-- Separate action buttons -->
-												<td class="text-center"><a
-													class="btn btn-sm btn-primary"
-													th:onclick="'editVM(' + ${obj.Id} + ')'"> <i
-														class="fas fa-edit"></i> Edit
-												</a></td>
+<!-- 												<td class="text-center"><a -->
+<!-- 													class="btn btn-sm btn-primary" -->
+<!-- 													th:onclick="'editVM(' + ${obj.Id} + ')'"> <i -->
+<!-- 														class="fas fa-edit"></i> Edit -->
+<!-- 												</a></td> -->
 
 												<td class="text-center"><a class="btn btn-sm btn-info"
 													th:onclick="'viewInstruction(' + ${obj.Id} + ')'"> <i
@@ -943,25 +943,21 @@ keyframes spin {to { transform:rotate(360deg);
 		
 		
 		function editVM(id) {
-			$.ajax({
-				url : '/guac/getCloundInstanceEdit',
-				type : 'GET',
-				data : {
-					Id : id
+		    $.ajax({
+		        url: '/guac/getCloundInstanceEdit',  // Using query parameter
+		        type: 'POST',
+		        data : {
+					"id" : id
 				},
-				success : function(response) {
-					// 					alert("response :" + response)
-// 					$("#instructionModalBody").html(response);
-// 					$("#instructionModal").modal("show");
-				},
-				error : function(xhr, status, error) {
-// 					$("#instructionModalBody").html(
-// 							"<div class='alert alert-danger'>Error loading instructions: "
-// 									+ error + "</div>");
-// 					$("#instructionModal").modal("show");
-				}
-			});
+		        success: function(response) {
+		            // Handle response (e.g., update modal content)
+		        },
+		        error: function(xhr, status, error) {
+		            // Handle error
+		        }
+		    });
 		}
+
 
 		
 
