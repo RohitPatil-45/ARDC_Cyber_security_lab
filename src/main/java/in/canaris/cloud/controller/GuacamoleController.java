@@ -372,7 +372,7 @@ public class GuacamoleController {
 	        dto.setLastActiveConnection(lastActive);
 
 	        return dto;
-	    }).toList();
+	    }).collect(Collectors.toList());
 
 	    model.addAttribute("listObj", dtoList);
 	    return "View_DiscoverContainerListing";
@@ -3491,7 +3491,7 @@ public class GuacamoleController {
 
 			// Fetch the CloudInstance
 			Optional<CloudInstance> optionalInstance = repository.findById(instanceId);
-			if (optionalInstance.isEmpty()) {
+			if (!optionalInstance.isPresent()) {
 				mav.addObject("error", "Instance not found");
 				return mav;
 			}
@@ -3545,7 +3545,7 @@ public class GuacamoleController {
 		try {
 			Optional<CloudInstance> optionalInstance = repository.findById(id);
 
-			if (optionalInstance.isEmpty()) {
+			if (!optionalInstance.isPresent()) {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("VM not found with ID: " + id);
 			}
 
