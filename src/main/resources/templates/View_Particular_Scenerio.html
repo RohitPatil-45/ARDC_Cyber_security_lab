@@ -12,32 +12,35 @@
 
 <style>
 body {
-	background-color: #121212;
-	color: #e0e0e0;
+	background-color: #ffffff;
+	color: #333333;
 	font-family: 'Roboto', sans-serif;
 }
 
 .content-wrapper {
-	background-color: #121212;
+	background-color: #f8f9fa;
 }
 
 /* Card Styling */
 .playlist-card {
-	background-color: #1e1e1e;
-	border: 2px solid #2d4fa6;
+	background-color: #ffffff;
+	border: 2px solid #e0e0e0;
 	border-radius: 12px;
 	overflow: hidden;
-	color: #e0e0e0;
+	color: #333333;
 	cursor: pointer;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+	transition: transform 0.2s, box-shadow 0.2s;
 }
+
+
 
 .card-image img {
 	width: 100%;
 	height: 300px;
 	object-fit: cover;
 	display: block;
-	border-bottom: 2px solid #444;
+	border-bottom: 2px solid #e9ecef;
 }
 
 .card-content {
@@ -51,14 +54,15 @@ body {
 	font-family: 'Poppins', sans-serif;
 	font-size: 1.8rem;
 	font-weight: 700;
-	color: #3b82f6;
+	color: #2d4fa6;
 	margin: 0;
 }
 
 .card-description {
 	font-size: 1rem;
-	color: #b0b0b0;
+	color: #666666;
 	margin: 0;
+	line-height: 1.5;
 }
 
 .card-tags {
@@ -72,8 +76,8 @@ body {
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	background: #2d2d2d;
-	color: #3b82f6;
+	background: #f1f5f9;
+	color: #2d4fa6;
 	font-size: 0.85rem;
 	font-weight: 500;
 	padding: 6px 12px;
@@ -84,28 +88,29 @@ body {
 /* Additional Info outside card */
 .scenario-info {
 	margin-top: 20px;
-	background-color: #1a1a1a;
-	border: 1px solid #333;
+	background-color: #ffffff;
+	border: 1px solid #e0e0e0;
 	border-radius: 12px;
 	padding: 20px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .scenario-info h4 {
-	color: #3b82f6;
+	color: #2d4fa6;
 	margin-bottom: 10px;
 }
 
 .scenario-info p {
-	color: #e0e0e0;
+	color: #333333;
 	margin-bottom: 6px;
 	font-size: 0.95rem;
 }
 
 /* Footer & other elements */
 .main-footer {
-	background-color: #1a1a1a;
-	border-top: 1px solid #333;
-	color: #e0e0e0;
+	background-color: #f8f9fa;
+	border-top: 1px solid #e0e0e0;
+	color: #333333;
 }
 
 .start-btn {
@@ -119,16 +124,11 @@ body {
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 	transition: all 0.3s ease;
 }
 
-.start-btn:hover {
-	background: linear-gradient(90deg, #15803d, #16a34a);
-	transform: translateY(-2px);
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-	text-decoration: none;
-}
+
 
 .start-btn i {
 	font-size: 0.9rem;
@@ -136,11 +136,12 @@ body {
 
 /* Comments Section Styles */
 .comment {
-	background-color: #2a2a2a;
+	background-color: #f8f9fa;
 	border-radius: 8px;
 	padding: 15px;
 	margin-bottom: 15px;
 	position: relative;
+	border-left: 3px solid #2d4fa6;
 }
 
 .comment-header {
@@ -152,16 +153,16 @@ body {
 
 .comment-author {
 	font-weight: 600;
-	color: #3b82f6;
+	color: #2d4fa6;
 }
 
 .comment-date {
-	color: #888;
+	color: #666;
 	font-size: 0.85rem;
 }
 
 .comment-content {
-	color: #e0e0e0;
+	color: #333333;
 	line-height: 1.5;
 	margin-bottom: 10px;
 }
@@ -174,7 +175,7 @@ body {
 .comment-action-btn {
 	background: none;
 	border: none;
-	color: #3b82f6;
+	color: #2d4fa6;
 	cursor: pointer;
 	font-size: 0.9rem;
 	display: flex;
@@ -183,28 +184,33 @@ body {
 	transition: color 0.2s;
 }
 
-.comment-action-btn:hover {
-	color: #60a5fa;
-}
+
 
 .comment-form {
-	background-color: #2a2a2a;
+	background-color: #f8f9fa;
 	border-radius: 8px;
 	padding: 20px;
 	margin-bottom: 20px;
+	border: 1px solid #e0e0e0;
 }
 
 .comment-textarea {
 	width: 100%;
-	background-color: #1e1e1e;
-	border: 1px solid #444;
+	background-color: #ffffff;
+	border: 1px solid #ced4da;
 	border-radius: 6px;
-	color: #e0e0e0;
+	color: #333333;
 	padding: 12px;
 	resize: vertical;
 	min-height: 100px;
 	margin-bottom: 15px;
 	font-family: 'Roboto', sans-serif;
+}
+
+.comment-textarea:focus {
+	outline: none;
+	border-color: #2d4fa6;
+	box-shadow: 0 0 0 2px rgba(45, 79, 166, 0.2);
 }
 
 .comment-form-actions {
@@ -219,17 +225,21 @@ body {
 	font-weight: 500;
 	cursor: pointer;
 	border: none;
+	transition: all 0.2s;
 }
 
 .comment-submit-btn {
-	background-color: #3b82f6;
+	background-color: #2d4fa6;
 	color: white;
 }
 
+
+
 .comment-cancel-btn {
-	background-color: #6b7280;
+	background-color: #6c757d;
 	color: white;
 }
+
 
 .comment-edit-form {
 	margin-top: 10px;
@@ -246,7 +256,7 @@ body {
 	inset: 0; /* top:0 right:0 bottom:0 left:0 */
 	display: grid;
 	place-items: center; /* perfect centering */
-	background: rgba(0, 0, 0, 0.4);
+	background: rgba(255, 255, 255, 0.9);
 	backdrop-filter: blur(2px);
 	/* subtle polish (ignored if unsupported) */
 	z-index: 9999;
@@ -258,32 +268,30 @@ body {
 	height: 64px;
 	border-radius: 50%;
 	border: 6px solid #e6e6e6; /* track */
-	border-top-color: #2563eb; /* indicator */
+	border-top-color: #2d4fa6; /* indicator */
 	animation: spin 0.9s linear infinite;
 }
 
-@
-keyframes spin {to { transform:rotate(360deg);
-	
-}
-
+@keyframes spin {
+	to { 
+		transform:rotate(360deg);
+	}
 }
 
 /* Optional loading text */
 .loader-text {
 	margin-top: 14px;
-	color: #ffffff;
+	color: #2d4fa6;
 	font: 500 14px/1.2 system-ui, -apple-system, Segoe UI, Roboto,
 		sans-serif;
-	text-shadow: 0 1px 2px rgba(0, 0, 0, .45);
 	letter-spacing: .2px;
 }
 
 /* Respect users who prefer reduced motion */
-@media ( prefers-reduced-motion : reduce) {
+@media (prefers-reduced-motion: reduce) {
 	.spinner {
 		animation: none;
-		border-top-color: #2563eb;
+		border-top-color: #2d4fa6;
 	}
 }
 
@@ -302,20 +310,20 @@ keyframes spin {to { transform:rotate(360deg);
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(0, 0, 0, 0.7);
+	background-color: rgba(0, 0, 0, 0.5);
 	z-index: 10000;
 	justify-content: center;
 	align-items: center;
 }
 
 .modal-content {
-	background-color: #1e1e1e;
+	background-color: #ffffff;
 	border-radius: 12px;
 	padding: 24px;
 	width: 90%;
 	max-width: 500px;
-	border: 2px solid #2d4fa6;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+	border: 1px solid #e0e0e0;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .modal-header {
@@ -324,28 +332,28 @@ keyframes spin {to { transform:rotate(360deg);
 	align-items: center;
 	margin-bottom: 20px;
 	padding-bottom: 15px;
-	border-bottom: 1px solid #333;
+	border-bottom: 1px solid #e0e0e0;
 }
 
 .modal-title {
 	font-family: 'Poppins', sans-serif;
 	font-size: 1.5rem;
 	font-weight: 700;
-	color: #3b82f6;
+	color: #2d4fa6;
 	margin: 0;
 }
 
 .modal-close {
 	background: none;
 	border: none;
-	color: #aaa;
+	color: #666;
 	font-size: 1.5rem;
 	cursor: pointer;
 	transition: color 0.2s;
 }
 
 .modal-close:hover {
-	color: #fff;
+	color: #333;
 }
 
 .modal-body {
@@ -355,16 +363,17 @@ keyframes spin {to { transform:rotate(360deg);
 .modal-select {
 	width: 100%;
 	padding: 10px 12px;
-	background-color: #2a2a2a;
-	border: 1px solid #444;
+	background-color: #ffffff;
+	border: 1px solid #ced4da;
 	border-radius: 6px;
-	color: #e0e0e0;
+	color: #333333;
 	font-size: 1rem;
 }
 
 .modal-select:focus {
 	outline: none;
-	border-color: #3b82f6;
+	border-color: #2d4fa6;
+	box-shadow: 0 0 0 2px rgba(45, 79, 166, 0.2);
 }
 
 .modal-footer {
@@ -379,20 +388,94 @@ keyframes spin {to { transform:rotate(360deg);
 	font-weight: 500;
 	cursor: pointer;
 	border: none;
+	transition: all 0.2s;
 }
 
 .modal-btn-primary {
-	background-color: #3b82f6;
+	background-color: #2d4fa6;
 	color: white;
+}
+
+.modal-btn-primary:hover {
+	background-color: #1e3a8a;
 }
 
 .modal-btn-secondary {
-	background-color: #6b7280;
+	background-color: #6c757d;
 	color: white;
+}
+
+.modal-btn-secondary:hover {
+	background-color: #5a6268;
+}
+
+/* Breadcrumb styling */
+.breadcrumb {
+	background-color: transparent;
+}
+
+.breadcrumb-item a {
+	color: #2d4fa6;
+	text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+	color: #1e3a8a;
+	text-decoration: underline;
+}
+
+/* Form controls */
+.form-control {
+	background-color: #ffffff;
+	border: 1px solid #ced4da;
+	color: #333333;
+}
+
+.form-control:focus {
+	border-color: #2d4fa6;
+	box-shadow: 0 0 0 2px rgba(45, 79, 166, 0.2);
+}
+
+.btn-outline-primary {
+	color: #2d4fa6;
+	border-color: #2d4fa6;
+}
+
+.btn-outline-primary:hover {
+	background-color: #2d4fa6;
+	border-color: #2d4fa6;
+	color: white;
+}
+
+/* Content header */
+.content-header h1 {
+	color: #2d4fa6;
+}
+
+/* Success button */
+.btn-success {
+	background-color: #22c55e;
+	border-color: #22c55e;
+}
+
+.btn-success:hover {
+	background-color: #16a34a;
+	border-color: #16a34a;
+}
+
+/* Primary button */
+.btn-primary {
+	background-color: #2d4fa6;
+	border-color: #2d4fa6;
+}
+
+.btn-primary:hover {
+	background-color: #1e3a8a;
+	border-color: #1e3a8a;
 }
 </style>
 
-<body class="hold-transition sidebar-mini layout-fixed dark-mode">
+<body class="hold-transition sidebar-mini layout-fixed">
 	<div class="wrapper">
 		<div th:replace="fragments/header :: header"></div>
 		<div th:replace="fragments/sidebar :: aside"></div>
@@ -414,6 +497,8 @@ keyframes spin {to { transform:rotate(360deg);
 							</ol>
 							<div></div>
 						</div>
+					</div>
+				</div>
 			</section>
 
 			<section class="content">
@@ -426,7 +511,7 @@ keyframes spin {to { transform:rotate(360deg);
 			<div class="col-md-12 mt-4">
 				<div class="card playlist-card">
 					<div class="card-content">
-						<h4 style="margin-bottom: 16px; color: #3b82f6;">Comments</h4>
+						<h4 style="margin-bottom: 16px; color: #2d4fa6;">Comments</h4>
 
 						<!-- Comment Form (initially hidden) -->
 						<div id="commentForm" class="comment-form hidden">
@@ -439,7 +524,7 @@ keyframes spin {to { transform:rotate(360deg);
 						</div>
 
 						<div id="commentsContainer">
-							<p id="noComments" style="color: #aaa;">No comments available
+							<p id="noComments" style="color: #666;">No comments available
 								for this scenario.</p>
 							<!-- Comments will be dynamically inserted here -->
 						</div>
@@ -470,11 +555,6 @@ keyframes spin {to { transform:rotate(360deg);
 					<button class="modal-close" onclick="closeMoveModal()">&times;</button>
 				</div>
 				<div class="modal-body">
-					<!-- 					<p>Select a playlist to move this scenario to:</p> -->
-					<!-- 					<select id="playlistSelect" class="modal-select"> -->
-					<!-- 						<option value="">Loading playlists...</option> -->
-					<!-- 					</select> -->
-
 					<div class="form-group">
 						<label for="scenarioDropdown">Select Playlist</label> <select
 							id="scenarioDropdown" class="form-control custom-select">
@@ -497,7 +577,6 @@ keyframes spin {to { transform:rotate(360deg);
 	</div>
 
 	<div th:replace="template :: jsscript"></div>
-
 
 	<script>
 // Global variables
@@ -545,7 +624,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                    
                     <div class="d-flex justify-content-between align-items-center flex-wrap mb-3" style="gap: 10px;">
-                        <h5 class="card-subtitle mb-0" style="font-weight: 500; color: #555;">
+                        <h5 class="card-subtitle mb-0" style="font-weight: 500; color: #666;">
                             ${item.Scenario_Name || 'N/A'}
                         </h5>
                         <div class="d-flex align-items-center" style="gap: 10px;">
@@ -814,83 +893,6 @@ function showMoveModal() {
 function closeMoveModal() {
     document.getElementById("moveScenarioModal").style.display = "none";
     currentScenarioIdForMove = null;
-}
-
-// function loadPlaylists() {
-//     // Show loading state
-//     const selectElement = document.getElementById("playlistSelect");
-//     selectElement.innerHTML = '<option value="">Loading playlists...</option>';
-    
-//     // AJAX call to fetch playlists
-//     $.ajax({
-//         url: "/guac/getPlaylists", // Update with your actual endpoint
-//         type: "GET",
-//         dataType: "json",
-//         success: function(playlists) {
-//             if (playlists && playlists.length > 0) {
-//                 selectElement.innerHTML = '<option value="">Select a playlist</option>';
-                
-//                 playlists.forEach(playlist => {
-//                     const option = document.createElement("option");
-//                     option.value = playlist.id;
-//                     option.textContent = playlist.name;
-//                     selectElement.appendChild(option);
-//                 });
-//             } else {
-//                 selectElement.innerHTML = '<option value="">No playlists available</option>';
-//             }
-//         },
-//         error: function(xhr, status, error) {
-//             console.error("Error loading playlists:", error);
-//             selectElement.innerHTML = '<option value="">Error loading playlists</option>';
-//         }
-//     });
-// }
-
-function submitMoveScenario() {
-    const playlistSelect = document.getElementById("playlistSelect");
-    const selectedPlaylistId = playlistSelect.value;
-    
-    if (!selectedPlaylistId) {
-        Swal.fire("Error", "Please select a playlist", "error");
-        return;
-    }
-    
-    if (!currentScenarioIdForMove) {
-        Swal.fire("Error", "No scenario selected for moving", "error");
-        return;
-    }
-    
-    // Show loading
-    $("#pageLoader").show();
-    
-    // AJAX call to move scenario
-    $.ajax({
-        url: "/guac/moveScenarioToPlaylist", 
-        type: "POST",
-        data: {
-            scenarioId: currentScenarioIdForMove,
-            playlistId: selectedPlaylistId
-        },
-        success: function(response) {
-            $("#pageLoader").hide();
-            
-            if (response === "success") {
-                Swal.fire("Success", "Scenario moved successfully!", "success").then(() => {
-                    closeMoveModal();
-                    // Optionally reload the page or update UI
-                    window.location.reload();
-                });
-            } else {
-                Swal.fire("Error", response.message || "Failed to move scenario", "error");
-            }
-        },
-        error: function(xhr, status, error) {
-            $("#pageLoader").hide();
-            console.error("Error moving scenario:", error);
-            Swal.fire("Error", "An error occurred while moving the scenario", "error");
-        }
-    });
 }
 
 function editScenerio(id) {

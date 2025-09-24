@@ -2722,7 +2722,7 @@ public class GuacamoleController {
 
 	@PostMapping("/showLabButtonOn_Check")
 	@ResponseBody
-	public String showLabButtonOn_Check(@RequestParam("scenarioId") String scenarioId,
+	public String showLabButtonOn_Check(@RequestParam("scenarioId") Integer scenarioId,
 			@RequestParam("scenarioName") String scenarioName, Principal principal) {
 		try {
 //			System.out.println("Checking scenarioId: " + scenarioId); usernmae
@@ -2730,13 +2730,13 @@ public class GuacamoleController {
 			User loginedUser = (User) ((Authentication) principal).getPrincipal();
 			String username = loginedUser.getUsername();
 
-			Optional<UserScenario> scenarioOpt = UserScenerioRepository.findByScenarioId(scenarioId, username);
+//			Optional<UserScenario> scenarioOpt = UserScenerioRepository.findByScenarioId(scenarioId, username);
 
-			if (scenarioOpt.isPresent()) {
-//				System.out.println("Scenario found.");
+			List<UserLab> labs = UserLabRepository.findByScenarioIdAndUsername(scenarioId, username);
+
+			if (!labs.isEmpty()) {
 				return "available";
 			} else {
-//				System.out.println("Scenario NOT found.");
 				return "notavailable";
 			}
 
@@ -2840,9 +2840,9 @@ public class GuacamoleController {
 				instructionTemplateRepository.deleteByLabName(containerName);
 				UserLabRepository.deleteByInstanceName(containerName);
 
-				if (scenarioId != null) {
-					UserScenerioRepository.deleteByScenarioIdAndUsername(getUsername, scenarioIdStr);
-				}
+//				if (scenarioId != null) {
+//					UserScenerioRepository.deleteByScenarioIdAndUsername(getUsername, scenarioIdStr);
+//				}
 			} else {
 				System.out.println("No UserLab found for instanceName: " + containerName);
 			}
@@ -3181,10 +3181,17 @@ public class GuacamoleController {
 				}
 			}
 
-			SubPlaylistRepository.save(obj);
+			SubPlaylist savedObj = SubPlaylistRepository.save(obj);
+
 			redirectAttributes.addFlashAttribute("message", "Playlist saved successfully!");
 			redirectAttributes.addFlashAttribute("status", "success");
-			return "redirect:/guac/Add_Sub_Playlist";
+
+			// redirect logic
+			if (isNew) {
+				return "redirect:/guac/Add_Sub_Playlist";
+			} else {
+				return "redirect:/guac/View_Particular_SubPlaylist?Id=" + savedObj.getId();
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -3552,7 +3559,6 @@ public class GuacamoleController {
 		JSONArray Finalarray = new JSONArray();
 
 		try {
-
 			List<AppUser> dataList = AppUserRepository.findAll();
 
 			int srno = 0;
@@ -3568,7 +3574,6 @@ public class GuacamoleController {
 				int trueCount = (trueCountObj != null) ? trueCountObj : 0;
 
 				int total = trueCount + falseCount;
-
 				int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
 
 				srno++;
@@ -3576,10 +3581,15 @@ public class GuacamoleController {
 				array.put(srno);
 				array.put(userName);
 				array.put(percentage + "%");
-//				String eyeButton = "<button type='button' class='btn btn-sm btn-primary' "
-//						+ "onclick=\"getuserPerformance('" + userName + "')\">"
-//						+ "<i class='fas fa-eye'></i></button>";
-//				array.put(eyeButton);
+
+				// 4th column: action button
+				String actionBtn = "<button class='btn btn-info action-btn' " + "onclick=\"getuserPerformance('"
+						+ userName + "')\" " + "data-bs-toggle='modal' data-bs-target='#performanceModal' "
+						+ "data-username='" + userName + "'>"
+						+ "<i class='fas fa-chart-line'></i> View Scenarios</button>";
+
+				array.put(actionBtn);
+
 				Finalarray.put(array);
 			}
 
@@ -3911,41 +3921,71 @@ public class GuacamoleController {
 	@GetMapping("/getScenarioByUsername")
 	@ResponseBody
 	public JSONArray getScenarioByUsername(@RequestParam("username") String username) {
-	    // Fetch all scenarios for the given username
-	    List<UserWiseChatBoatInstructionTemplate> scenarios = instructionTemplateRepository.findByUsername(username);
-
 	    JSONArray response = new JSONArray();
 
-	    for (UserWiseChatBoatInstructionTemplate scenario : scenarios) {
-	        Integer labId = scenario.getLabId();
+	    try {
+	        List<UserLab> labs = UserLabRepository.findByusername(username);
 
-	        // Get completion counts
-	        Integer falseCountObj = instructionTemplateRepository.getfalseCompletionCountsByTemplateName(labId);
-	        Integer trueCountObj = instructionTemplateRepository.gettrueCompletionCountsByTemplateName(labId);
+	        int srno = 0;
+	        for (UserLab lab : labs) {
+	            srno++;
+	            JSONArray row = new JSONArray();
 
-	        int falseCount = (falseCountObj != null) ? falseCountObj : 0;
-	        int trueCount = (trueCountObj != null) ? trueCountObj : 0;
+	            // Serial No
+	            row.put(srno);
 
-	        int total = trueCount + falseCount;
-	        int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
+	            // Scenario
+	            String scenarioName = "";
+	            Integer scenarioId = lab.getScenarioId();
+	            if (scenarioId != null) {
+	                Optional<Add_Scenario> scenarioOpt = ScenarioRepository.findById(scenarioId);
+	                if (scenarioOpt.isPresent()) {
+	                    scenarioName = scenarioOpt.get().getScenarioName();
+	                }
+	            }
+	            row.put(scenarioName);
 
-	        // Fetch Scenario entity to get name
-	        Optional<Add_Scenario> scenarioEntityOpt = ScenarioRepository.findById(scenario.getScenarioId());
-	        String scenarioName = scenarioEntityOpt.map(Add_Scenario::getScenarioName).orElse("Unknown");
+	            // CloudInstance details
+	            String instanceName = lab.getTemplateName();
+	            List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
 
-	        // Create JSON object for this scenario
-	        JSONArray temp = new JSONArray();
-	        temp.put(scenario.getScenarioId());
-	        temp.put( scenarioName);
-	        temp.put( percentage + "%");
+	            if (!cloudInstances.isEmpty()) {
+	                CloudInstance instance = cloudInstances.get(0);
 
-	        // Add to response array
-	        response.put(temp);
+	                String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+	                String physicalServerIP = instance.getPhysicalServerIP();
+
+	                row.put( os);
+	                row.put(physicalServerIP);
+	                row.put(instance.getInstance_name());
+	            }
+
+	            // Get true/false completion counts
+	            Integer falseCountObj = instructionTemplateRepository
+	                    .getFalseCompletionCountsByusernameandscenarioId(username, scenarioId);
+	            Integer trueCountObj = instructionTemplateRepository
+	                    .getTrueCompletionCountsByusernameandscenarioId(username, scenarioId);
+
+	            int falseCount = (falseCountObj != null) ? falseCountObj : 0;
+	            int trueCount = (trueCountObj != null) ? trueCountObj : 0;
+
+	            int total = trueCount + falseCount;
+	            int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
+
+	            row.put(percentage + "%");
+
+	            // Add row to response
+	            response.put(row);
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
 	    }
 
-	    System.out.println("response :" + response);
+	    System.out.println("Final response JSON :: " + response);
 	    return response;
 	}
+
 
 
 	@PostMapping("/update_last_session")

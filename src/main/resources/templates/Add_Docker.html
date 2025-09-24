@@ -258,8 +258,11 @@
             icon: "success",
             title: "Docker networks discovered successfully!",
             showConfirmButton: true
+        }).then(() => {
+            window.location.href = "/guac/View_DockerListing";
         });
-    } else {
+    }
+ else {
         Swal.fire({
             position: "top",
             icon: "warning",

@@ -3527,7 +3527,7 @@ public class CloudInstanceController {
 					String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
 					String filePath = instance.getSubproduct_id().getIso_file_path();
 					File file = new File(filePath);
-					String imageName = file.getName().replaceFirst("[.][^.]+$", "");
+					String imageName = instance.getSubproduct_id().getVariant();
 					int templateId = instance.getProxmoxTemplateId();
 					scenarioName = temp.getScenarioName();
 
@@ -3584,14 +3584,14 @@ public class CloudInstanceController {
 							if (result.equalsIgnoreCase("success")) {
 								System.out.println("inside windows docker : " + result);
 								jsonResponse = guacService.createConnection(newInstanceName, "rdp",
-										instance.getPhysicalServerIP(), newRdpPort, "admin", "12345", "", "true", "", "", "",
+										instance.getPhysicalServerIP(), newRdpPort, "admin", "Admin@123!", "", "true", "", "", "",
 										"", "", "", "", "", "");
 								if (guacService.getConnectionIdByName(jsonResponse) != null) {
 									containerIP = dockerService.getContainerIpViaCli(newInstanceName);
 									insertIntoPortDetailsForWindows(newInstanceName, newRdpPort, newNoVncPort);
 									insertIntoUserLabForWindows(newInstanceName, username, "rdp", templateName,
 											guacService.getConnectionIdByName(jsonResponse), newRdpPort, newNoVncPort,
-											"12345", "admin", containerIP, scenarioId);
+											"Admin@123!", "admin", containerIP, scenarioId);
 
 									insertUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName,
 											username,scenarioId);

@@ -174,6 +174,8 @@
 
 	<div th:replace="templateListing :: jsscript"></div>
 
+	<!-- Common JS  -->
+	<!-- jQuery -->
 	<script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
 	<!-- jQuery UI 1.11.4 -->
 	<script th:src="@{/webtemplate/plugins/jquery-ui/jquery-ui.min.js}"></script>
@@ -245,88 +247,67 @@
 		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.colVis.min.js}"></script>
 	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
 
+	<script th:inline="javascript">
+    let rawData = [[${listObj}]]; // ✅ not inside quotes
+    let jsonData = [];
+
+    try {
+        jsonData = (typeof rawData === "string") ? JSON.parse(rawData) : rawData;
+    } catch (e) {
+        console.error("Invalid JSON data for UserWisePerformance:", e);
+    }
+
+    $("#userPerformanceTable").DataTable({
+        data: jsonData,
+        responsive: false,
+        lengthChange: false,
+        autoWidth: false,
+        buttons: ["csv", "excel", "print", "colvis"]
+    }).buttons().container().appendTo('#userPerformanceTable_wrapper .col-md-6:eq(0)');
+</script>
+
 
 	<script>
-		$(function() {
-			let rawData = '[[${listObj}]]';
-			rawData = rawData.replace(/&quot;/g, '"');
-			let jsonData = [];
-			try {
-				jsonData = JSON.parse(rawData);
-			} catch (e) {
-				console.error("Invalid JSON data for UserWisePerformance:", e);
-			}
-
-			$("#userPerformanceTable")
-					.DataTable({
-						data : jsonData,
-						columns : [ {
-							title : "Sr No."
-						}, {
-							title : "User Name"
-						}, {
-							title : "Performance %"
-						}, {
-						    title: "Action",
-						    render: function(data, type, row) {
-						        const username = row[1]; // assuming the username is in the 2nd column
-						        return `<button class="btn btn-info action-btn" 
-						                        onclick="getuserPerformance('${username}')" 
-						                        data-bs-toggle="modal" 
-						                        data-bs-target="#performanceModal" 
-						                        data-username="${username}">
-						                    <i class="fas fa-chart-line"></i> View Scenarios
-						                </button>`;
-						    }
-						}
- ],
-						responsive : false,
-						lengthChange : false,
-						autoWidth : false,
-						buttons : [ "csv", "excel", "print", "colvis" ]
-					}).buttons().container().appendTo(
-							'#userPerformanceTable_wrapper .col-md-6:eq(0)');
-
-			// Handle modal show event
-		
-		});
-		
 	
-		function getuserPerformance(username) {
-		    const modal = $("#performanceModal");
-		    const modalBody = modal.find("#modalBodyContent");
 
-		    modal.find("#modalUsername").text(username);
-		    modalBody.html('<p>Loading performance data...</p>');
-		    modal.modal("show");
+	function getuserPerformance(username) {
+	    const modal = $("#performanceModal");
+	    modal.find("#modalUsername").text(username);
 
-		    $.ajax({
-		        url: '/guac/getScenarioByUsername',
-		        type: 'GET',
-		        data: { username: username },
-		        success: function (jsonData) {
-		        	$("#modalScenarioTable").DataTable({
-						"data" : jsonData,
-						"responsive" : false,
-						"lengthChange" : false,
-						"autoWidth" : false,
-						"buttons" : [ "csv", "excel", "print", "colvis" ]
-					}).buttons().container().appendTo(
-							'#modalScenarioTable_wrapper .col-md-6:eq(0)');
-				},
-		    
-		       
-		    
-		        error: function () {
-		            modalBody.html('<p class="text-danger">Failed to load scenario data.</p>');
-		        }
-		    });
-		}
+	    // Show the modal (Bootstrap 5)
+	    const bsModal = new bootstrap.Modal(document.getElementById('performanceModal'));
+	    bsModal.show();
 
+	    // Destroy existing DataTable before reinitializing
+	    if ($.fn.DataTable.isDataTable("#modalScenarioTable")) {
+	        $('#modalScenarioTable').DataTable().clear().destroy();
+	    }
 
+	    // Show loading
+	    $("#modalScenarioTable tbody").html("<tr><td colspan='3'>Loading...</td></tr>");
 
+	    $.ajax({
+	        url: '/guac/getScenarioByUsername',
+	        type: 'GET',
+	        dataType: "json",
+	        data: { username: username },
+	        success: function (data) {
+	        	alert("data : "+data)
+	            $('#modalScenarioTable').DataTable({
+	                data: data,
+	                responsive: true,
+	                lengthChange: false,
+	                autoWidth: false,
+	                buttons: ["csv", "excel", "print", "colvis"]
+	            }).buttons().container().appendTo('#modalScenarioTable_wrapper .col-md-6:eq(0)');
+	        },
+	        error: function () {
+	            $("#modalScenarioTable tbody").html("<tr><td colspan='3' class='text-danger'>Failed to load scenario data.</td></tr>");
+	        }
+	    });
+	}
 
+</script>
 
-	</script>
 </body>
 </html>

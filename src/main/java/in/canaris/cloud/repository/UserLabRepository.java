@@ -1,6 +1,7 @@
 package in.canaris.cloud.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -67,6 +68,8 @@ public interface UserLabRepository extends JpaRepository<UserLab, Integer> {
 	@Transactional
 	@Query("UPDATE UserLab u SET u.lastActiveConnection = CURRENT_TIMESTAMP WHERE u.scenarioId = :scenarioId AND u.username = :username")
 	int updateLastActiveConnection(@Param("scenarioId") Integer scenarioId, @Param("username") String username);
+
+	
 
 
 

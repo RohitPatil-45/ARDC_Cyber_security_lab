@@ -3,7 +3,8 @@
 
 <head>
 <title>View RDP Connections | CMP</title>
-<link rel="icon" type="image/png" href="/webtemplate/dist/img/magicboxEye3.png">
+<link rel="icon" type="image/png"
+	href="/webtemplate/dist/img/magicboxEye3.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -107,7 +108,6 @@ body {
 	align-self: flex-end;
 	margin-left: auto;
 }
-
 
 .message-time {
 	font-size: 0.75rem;
@@ -501,11 +501,19 @@ body {
 	animation: messagePulse 2s ease;
 }
 
-@keyframes messagePulse {
-	0% { background-color: rgba(59, 130, 246, 0.3); }
-	100% { background-color: #2d3748; }
+@
+keyframes messagePulse { 0% {
+	background-color: rgba(59, 130, 246, 0.3);
 }
 
+100
+%
+{
+background-color
+:
+#2d3748;
+}
+}
 .command-message {
 	border-left: 3px solid #48bb78;
 }
@@ -592,8 +600,7 @@ body {
 	cursor: pointer;
 }
 
-.close-modal:hover,
-.close-modal:focus {
+.close-modal:hover, .close-modal:focus {
 	color: #bbb;
 	text-decoration: none;
 	cursor: pointer;
@@ -614,42 +621,42 @@ body {
 /* New styles for copy functionality */
 /* Simplified copy button styles */
 .command-container {
-    position: relative;
-    margin: 10px 0;
-    padding: 12px;
-    background-color: #2d3748;
-    border-radius: 8px;
-    border-left: 3px solid #48bb78;
+	position: relative;
+	margin: 10px 0;
+	padding: 12px;
+	background-color: #2d3748;
+	border-radius: 8px;
+	border-left: 3px solid #48bb78;
 }
 
 .command-text {
-    font-family: 'Courier New', monospace;
-    font-size: 14px;
-    color: #f8f9fa;
-    margin-right: 30px; /* Space for the copy button */
-    word-break: break-all;
+	font-family: 'Courier New', monospace;
+	font-size: 14px;
+	color: #f8f9fa;
+	margin-right: 30px; /* Space for the copy button */
+	word-break: break-all;
 }
 
 .copy-button {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background-color: transparent;
-    color: #a0aec0;
-    border: none;
-    border-radius: 4px;
-    padding: 5px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: color 0.3s;
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	background-color: transparent;
+	color: #a0aec0;
+	border: none;
+	border-radius: 4px;
+	padding: 5px;
+	font-size: 12px;
+	cursor: pointer;
+	transition: color 0.3s;
 }
 
 .copy-button:hover {
-    color: #007bff;
+	color: #007bff;
 }
 
 .copy-button.copied {
-    color: #28a745;
+	color: #28a745;
 }
 /* Focus management for RDP frame */
 .rdp-frame:focus {
@@ -664,8 +671,8 @@ body {
 <body>
 	<!-- Image Modal -->
 	<div id="imageModal" class="image-modal">
-		<span class="close-modal">&times;</span>
-		<img class="modal-content" id="modalImage">
+		<span class="close-modal">&times;</span> <img class="modal-content"
+			id="modalImage">
 		<div id="modalCaption" class="modal-caption"></div>
 	</div>
 
@@ -699,13 +706,12 @@ body {
 		<!-- Main content area -->
 		<div class="main-content">
 			<!-- RDP Frame -->
-			<div class="rdp-frame-container" id="rdp-container">
-				<div class="connection-loading" id="loading-indicator">
-					<div class="spinner"></div>
-					<p>Establishing secure connection...</p>
-				</div>
+
+
+			<div class="rdp-frame-container">
 				<iframe th:src="${embedUrl}" class="rdp-frame" id="rdp-frame"></iframe>
 			</div>
+
 
 			<!-- Sidebar with instructions and chat -->
 			<div class="sidebar" id="instruction-sidebar">
@@ -715,8 +721,9 @@ body {
 					</button>
 
 					<button class="sidebar-tab" data-tab="chat" id="chat-tab-button">
-						<i class="fas fa-comments"></i> Chat Support
-						<span class="notification-badge" id="chat-notification" style="display: none;">3</span>
+						<i class="fas fa-comments"></i> Chat Support <span
+							class="notification-badge" id="chat-notification"
+							style="display: none;">3</span>
 					</button>
 
 					<button class="sidebar-tab" data-tab="details">
@@ -755,11 +762,12 @@ body {
 						<div class="chat-container">
 							<div id="chat-messages">
 								<div class="system-message">
-									<i class="fas fa-info-circle"></i> Your lab assistant is ready to help. Follow the instructions to complete the lab.
+									<i class="fas fa-info-circle"></i> Your lab assistant is ready
+									to help. Follow the instructions to complete the lab.
 								</div>
 								<!-- Messages will be dynamically appended here -->
 							</div>
-							
+
 							<div class="user-typing" id="typing-indicator"></div>
 
 							<!-- Continue button for each Command -->
@@ -773,7 +781,8 @@ body {
 					<!-- Details Tab -->
 					<div class="tab-pane" id="details-tab">
 						<div class="details-container">
-							<h5 class="mb-3" style="color: aliceblue;">Connection Details</h5>
+							<h5 class="mb-3" style="color: aliceblue;">Connection
+								Details</h5>
 							<div class="details-grid">
 								<div id="connection_details">
 									<!-- Connection details will be dynamically loaded here -->
@@ -783,9 +792,10 @@ body {
 					</div>
 				</div>
 			</div>
-			
+
 			<!-- Sidebar toggle button -->
-			<button class="sidebar-toggler" id="sidebar-toggle" style="display: none">
+			<button class="sidebar-toggler" id="sidebar-toggle"
+				style="display: none">
 				<i class="fas fa-chevron-left" id="sidebar-toggle-icon"></i>
 			</button>
 		</div>
