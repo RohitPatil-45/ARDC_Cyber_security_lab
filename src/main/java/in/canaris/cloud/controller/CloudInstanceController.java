@@ -1844,7 +1844,7 @@ public class CloudInstanceController {
 
 	    try {
 	        Optional<CloudInstance> optionalInstance = repository.findById(Id);
-	        if (optionalInstance.isEmpty()) {
+	        if (!optionalInstance.isPresent()) {
 	            mav.addObject("error", "CloudInstance not found for ID: " + Id);
 	            return mav;
 	        }
@@ -1862,6 +1862,7 @@ public class CloudInstanceController {
 //	        mav.addObject("physicalServerIPList", PhysicalServerRepository.getPhysicalServerIPs());
 
 	        // Send the selected CloudInstance for editing
+	        
 	        mav.addObject("objEnt", instance);
 
 	    } catch (Exception e) {

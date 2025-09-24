@@ -1,6 +1,7 @@
 package in.canaris.cloud.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import in.canaris.cloud.openstack.entity.ChartBoatInstructionTemplate;
+import in.canaris.cloud.openstack.entity.Playlist;
 import in.canaris.cloud.openstack.entity.UserWiseChatBoatInstructionTemplate;
 
 public interface UserWiseChatBoatInstructionTemplateRepository
@@ -89,6 +91,8 @@ public interface UserWiseChatBoatInstructionTemplateRepository
 
 	@Query("SELECT COUNT(u) FROM UserWiseChatBoatInstructionTemplate u WHERE u.username = :userName AND u.ScenarioId = :scenarioId AND u.isCommandExecuted = 'true'")
 	Integer getTrueCompletionCountsByusernameandscenarioId(@Param("userName") String userName,@Param("scenarioId") int scenarioId);
+
+	List<UserWiseChatBoatInstructionTemplate> findByUsername(String username);
 
 //	@Query(value = "SELECT COUNT(*) FROM userwise_chatboat_instruction_template "
 //			+ "WHERE isCommandExecuted='false' and username=:username", nativeQuery = true)

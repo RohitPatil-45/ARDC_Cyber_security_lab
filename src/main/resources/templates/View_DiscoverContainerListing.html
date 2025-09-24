@@ -11,6 +11,21 @@
       }
     </style>
 </head>
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link
+	href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap"
+	rel="stylesheet">
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Bootstrap CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         <div th:replace="fragments/header :: header"></div>
@@ -34,7 +49,7 @@
                                     </div>
                                 </div>
                                 <div class="card-body table-responsive">  <!-- Added table-responsive here -->
-                                    <table id="dockerContainerTable" class="table table-bordered table-hover" style="width:100%">
+                                     <table id="dockerContainerTable" class="table table-bordered table-hover" style="width:100%">
                                         <thead>
                                             <tr>
                                                 <th>Container ID</th>
@@ -48,9 +63,7 @@
                                                 <th>Username</th>
                                                 <th>Scenario Name</th>
                                                 <th>Last Active Connection</th>
-                                                <th>Edit</th>
-                                                <th>Delete</th>
-                                                <th>Start/Stop</th>
+                                                <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -67,14 +80,31 @@
                                                 <td th:text="${obj.scenarioName}"></td>
                                                 <td th:text="${obj.lastActiveConnection != null ? #dates.format(obj.lastActiveConnection, 'yyyy-MM-dd HH:mm:ss') : '-'}"></td>
                                                 <td>
-                                                    <button th:attr="data-id=${obj.id}" class="btn btn-primary btn-sm" onclick="editContainer(this)">Edit</button>
-                                                </td>
-                                                <td>
-                                                    <button th:attr="data-id=${obj.id}" class="btn btn-danger btn-sm" onclick="deleteContainer(this)">Delete</button>
-                                                </td>
-                                                <td>
-                                                    <button th:attr="data-id=${obj.id}" class="btn btn-warning btn-sm" onclick="stopContainer(this)">Stop</button>
-                                                    <button th:attr="data-id=${obj.id}" class="btn btn-success btn-sm" onclick="startContainer(this)">Start</button>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-cyber dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="fas fa-cog"></i> Actions
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                           
+                                                            <li>
+                                                                <a class="dropdown-item" href="#" th:attr="data-id=${obj.containerName}" onclick="deleteContainer(this)">
+                                                                    <i class="fas fa-trash"></i> Delete
+                                                                </a>
+                                                            </li>
+   
+																
+                                                            <li>
+                                                                <a class="dropdown-item" href="#" th:attr="data-id=${obj.containerName}" onclick="startContainer(this)">
+                                                                    <i class="fas fa-play"></i> Start
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item" href="#" th:attr="data-id=${obj.containerName}" onclick="stopContainer(this)">
+                                                                    <i class="fas fa-stop"></i> Stop
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -90,6 +120,22 @@
     </div>
 
     <div th:replace="templateListing :: jsscript"></div>
+    
+     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+     
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
 
     <script th:inline="javascript">
         $(function() {
@@ -101,26 +147,219 @@
             }).buttons().container().appendTo('#dockerContainerTable_wrapper .col-md-6:eq(0)');
         });
 
-        function deleteContainer(button) {
-            const id = button.getAttribute('data-id');
-            if (confirm('Are you sure to delete container ' + id + '?')) {
-                // AJAX call to delete endpoint
-            }
+//         function deleteContainer(button) {
+//             const id = button.getAttribute('data-id');
+//             alert()
+//             if (confirm('Are you sure to delete container ' + id + '?')) {
+//                 // AJAX call to delete endpoint
+//             }
+//         }
+
+//         function stopContainer(button) {
+//             const id = button.getAttribute('data-id');
+//             // AJAX call to stop container
+//         }
+
+//         function startContainer(button) {
+//             const id = button.getAttribute('data-id');
+//             // AJAX call to start container
+//         }
+
+//         function editContainer(button) {
+//             const id = button.getAttribute('data-id');
+//             // Redirect or open modal for editing container
+//         }
+        
+        
+        function startContainer(button) {
+        	 const containerName = button.getAttribute('data-id');
+        	alert("sdsd")
+            swal.fire({
+                title: 'Start Lab?',
+                html: `Are you sure you want to start <b>${containerName}</b>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-play"></i> Start Lab',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: '/guac/start_lab', // Make sure your backend supports this
+                        data: {
+                            "containerName": containerName
+                        },
+                        success: function(result) {
+                            if (result === 'success') {
+                            	swal.fire({
+                                    icon: 'success',
+                                    title: 'Started!',
+                                    html: `Lab <b>${containerName}</b> has been started successfully.`,
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                            	swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Failed to start the lab!'
+                                });
+                            }
+                        },
+                        error: function() {
+                        	swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Failed to start the lab!'
+                            });
+                        }
+                    });
+                }
+            });
         }
+
 
         function stopContainer(button) {
-            const id = button.getAttribute('data-id');
-            // AJAX call to stop container
+        	 const containerName = button.getAttribute('data-id');
+        	swal.fire({
+                title: 'Stop Lab?',
+                html: `Are you sure you want to stop <b>${containerName}</b>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-stop"></i> Stop Lab',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: '/guac/stop_lab',
+                        data: {
+                            "containerName": containerName
+                        },
+                        success: function(result) {
+                            if (result === 'success') {
+                            	swal.fire({
+                                    icon: 'success',
+                                    title: 'Stopped!',
+                                    html: `Lab <b>${containerName}</b> has been stopped successfully.`,
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                            	swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Failed to stop the lab!'
+                                });
+                            }
+                        },
+                        error: function() {
+                        	swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Failed to stop the lab!'
+                            });
+                        }
+                    });
+                }
+            });
         }
 
-        function startContainer(button) {
-            const id = button.getAttribute('data-id');
-            // AJAX call to start container
+        function deleteContainer(button) {
+        	 const containerName = button.getAttribute('data-id');
+        	swal.fire({
+                title: 'Remove Lab?',
+                html: `Are you sure you want to remove <b>${containerName}</b>?<br><span class="text-danger">This action cannot be undone!</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-trash"></i> Yes, remove it!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: '/guac/remove_lab',
+                        data: {
+                            "containerName": containerName
+                        },
+                        success: function(result) {
+                            if (result === 'success') {
+                            	swal.fire({
+                                    icon: 'success',
+                                    title: 'Removed!',
+                                    html: `Lab <b>${containerName}</b> has been removed successfully.`,
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                            	swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Failed to remove the lab!'
+                                });
+                            }
+                        },
+                        error: function() {
+                        	swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Failed to remove the lab!'
+                            });
+                        }
+                    });
+                }
+            });
         }
 
-        function editContainer(button) {
-            const id = button.getAttribute('data-id');
-            // Redirect or open modal for editing container
+        function resetLab(button) {
+        	 const containerName = button.getAttribute('data-id');
+        	swal.fire({
+                title: 'Reset Lab?',
+                html: `This will reset <b>${containerName}</b> to its initial state.<br><span class="text-warning">All progress will be lost!</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-redo"></i> Yes, reset it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: '/guac/reset_lab',
+                        data: {
+                            "containerName": containerName
+                        },
+                        success: function(result) {
+                            if (result === 'success') {
+                                swal.fire({
+                                    icon: 'success',
+                                    title: 'Reset!',
+                                    html: `Lab <b>${containerName}</b> has been reset successfully.`,
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                            	swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Failed to reset the lab!'
+                                });
+                            }
+                        },
+                        error: function() {
+                        	swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Failed to reset the lab!'
+                            });
+                        }
+                    });
+                }
+            });
         }
     </script>
 </body>

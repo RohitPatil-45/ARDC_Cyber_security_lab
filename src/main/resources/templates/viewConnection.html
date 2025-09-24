@@ -610,6 +610,52 @@ body {
 	padding: 10px;
 	background-color: rgba(0, 0, 0, 0.7);
 }
+
+/* New styles for copy functionality */
+/* Simplified copy button styles */
+.command-container {
+    position: relative;
+    margin: 10px 0;
+    padding: 12px;
+    background-color: #2d3748;
+    border-radius: 8px;
+    border-left: 3px solid #48bb78;
+}
+
+.command-text {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: #f8f9fa;
+    margin-right: 30px; /* Space for the copy button */
+    word-break: break-all;
+}
+
+.copy-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: transparent;
+    color: #a0aec0;
+    border: none;
+    border-radius: 4px;
+    padding: 5px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.copy-button:hover {
+    color: #007bff;
+}
+
+.copy-button.copied {
+    color: #28a745;
+}
+/* Focus management for RDP frame */
+.rdp-frame:focus {
+	outline: 2px solid #007bff;
+	outline-offset: -2px;
+}
 </style>
 
 <link rel="stylesheet" th:href="@{/webtemplate/css/style_connetion.css}">
@@ -827,6 +873,140 @@ body {
 		}
 	}
 	
+	// Function to copy command to clipboard
+	function copyCommandToClipboard(commandText) {
+		// Create a temporary textarea element
+		const textArea = document.createElement("textarea");
+		textArea.value = commandText;
+		textArea.style.position = "fixed";
+		textArea.style.opacity = 0;
+		document.body.appendChild(textArea);
+		textArea.focus();
+		textArea.select();
+		
+		try {
+			// Execute the copy command
+			const successful = document.execCommand('copy');
+			if (successful) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (err) {
+			console.error('Failed to copy text: ', err);
+			return false;
+		} finally {
+			// Clean up
+			document.body.removeChild(textArea);
+		}
+	}
+	
+	// Function to focus on RDP frame for pasting
+function focusRDPFrame() {
+	const iframe = document.getElementById("rdp-frame");
+	if (iframe) {
+		iframe.setAttribute("tabindex", "0"); // ensure it's focusable
+		iframe.focus();
+	}
+}
+
+	
+	// Function to set up copy buttons for commands
+// 	function setupCopyButtons() {
+// 		// Set up event delegation for copy buttons
+// 		$(document).on('click', '.copy-button', function() {
+// 			const commandText = $(this).closest('.command-container').find('.command-text').text();
+// 			const button = $(this);
+			
+// 			// Copy command to clipboard
+// 			if (copyCommandToClipboard(commandText)) {
+// 				// Show success feedback
+// 				button.addClass('copied');
+// 				button.html('<i class="fas fa-check"></i> Copied!');
+				
+// 				// Focus on RDP frame for pasting
+// 				focusRDPFrame();
+				
+// 				// Reset button after 2 seconds
+// 				setTimeout(function() {
+// 					button.removeClass('copied');
+// 					button.html('<i class="fas fa-copy"></i> Copy');
+// 				}, 2000);
+// 			} else {
+// 				// Show error message
+// 				Swal.fire({
+// 					icon: 'error',
+// 					title: 'Copy Failed',
+// 					text: 'Failed to copy command to clipboard. Please try again.',
+// 					timer: 2000,
+// 					showConfirmButton: false
+// 				});
+// 			}
+// 		});
+// 	}
+	
+	
+	function setupCopyButtons() {
+	// Set up event delegation for dynamically loaded copy buttons
+	$(document).on('click', '.copy-button', function () {
+		const commandText = $(this).closest('.command-container').find('.command-text').text().trim();
+		const button = $(this);
+
+		// Try to copy command to clipboard
+		navigator.clipboard.writeText(commandText)
+			.then(() => {
+				// Success feedback
+				button.addClass('copied');
+				button.html('<i class="fas fa-check"></i>');
+
+				// Focus the RDP iframe
+				focusRDPFrame();
+
+				// Reset button after 2 seconds
+				setTimeout(function () {
+					button.removeClass('copied');
+					button.html('<i class="fas fa-copy"></i>');
+				}, 2000);
+			})
+			.catch(() => {
+				// Error feedback
+				Swal.fire({
+					icon: 'error',
+					title: 'Copy Failed',
+					text: 'Failed to copy command to clipboard. Please try again.',
+					timer: 2000,
+					showConfirmButton: false
+				});
+			});
+	});
+}
+
+	
+	// Function to format command messages with copy functionality
+// 	function formatCommandWithCopy(commandText) {
+// 		return `
+// 			<div class="command-container">
+// 				<div class="command-text">${commandText}</div>
+// 				<button class="copy-button">
+// 					<i class="fas fa-copy"></i> Copy
+// 				</button>
+// 				<div class="copy-hint">Click to copy, then paste in VM with Ctrl+V</div>
+// 			</div>
+// 		`;
+// 	}
+	
+	
+	function formatCommandWithCopy(commandText) {
+    return `
+        <div class="command-container">
+            <div class="command-text">${commandText}</div>
+            <button class="copy-button">
+                <i class="fas fa-copy"></i>
+            </button>
+        </div>
+    `;
+}
+	
 	$(document).ready(function() {
 		// Toggle sidebar visibility
 		$('#sidebar-toggle').click(function() {
@@ -854,6 +1034,9 @@ body {
 			$(this).toggleClass('active');
 			$('.image-container').toggle();
 		});
+		
+		// Set up copy buttons functionality
+		setupCopyButtons();
 		
 		// Load initial instructions on page load
 		if (currentLabId) {
@@ -1047,7 +1230,7 @@ body {
 					// Clear previous messages except system message
 					$('#chat-messages').children().not('.system-message').remove();
 
-					// Show typing indicator before adding new message
+						// Show typing indicator before adding new message
 					showTypingIndicator();
 					
 					setTimeout(() => {
@@ -1059,13 +1242,9 @@ body {
 						`);
 						$('#chat-messages').append(instructionHtml);
 
-						// Add command (plain text)
+						// Add command with copy functionality
 						if (newCommand.trim() !== '') {
-							const commandHtml = $(`
-								<div class="message incoming command-message">
-									<div class="message-content"><strong>${newCommand}</strong></div>
-								</div>
-							`);
+							const commandHtml = formatCommandWithCopy(newCommand);
 							$('#chat-messages').append(commandHtml);
 						}
 
@@ -1138,12 +1317,8 @@ body {
 		                    </div>
 		                `);
 
-		                // Command HTML
-		                const commandHtml = $(`
-		                    <div class="message incoming command-message">
-		                        <div class="message-content"><strong>${newCommand}</strong></div>
-		                    </div>
-		                `);
+		                // Command with copy functionality
+		                const commandHtml = formatCommandWithCopy(newCommand);
 
 		                // Append to chat window
 		                $('#chat-messages').append(instructionHtml).append(commandHtml);
@@ -1318,14 +1493,19 @@ body {
 	                `);
 
 	                response.completedCommands.forEach(cmd => {
-	                    const completedCommandHtml = $(`
+	                    // Add instruction
+	                    const instructionHtml = $(`
 	                        <div class="message incoming">
 	                            <div class="message-content">${cmd.instruction || ''}</div>
-	                            <div class="message-content"><strong>${cmd.command || ''}</strong></div>
-	                            <div class="message-time">Completed</div>
 	                        </div>
 	                    `);
-	                    $('#chat-messages').append(completedCommandHtml);
+	                    $('#chat-messages').append(instructionHtml);
+	                    
+	                    // Add command with copy functionality
+	                    if (cmd.command && cmd.command.trim() !== '') {
+	                        const commandHtml = formatCommandWithCopy(cmd.command);
+	                        $('#chat-messages').append(commandHtml);
+	                    }
 	                });
 
 	                const completionHtml = $(`
@@ -1358,14 +1538,19 @@ body {
 	                    const completedCommands = JSON.parse(completedCommandsStr);
 	                    $('#chat-messages').empty();
 	                    completedCommands.forEach(cmd => {
-	                        const completedCommandHtml = $(`
+	                        // Add instruction
+	                        const instructionHtml = $(`
 	                            <div class="message incoming">
 	                                <div class="message-content">${cmd.instruction || ''}</div>
-	                                <div class="message-content"><strong>${cmd.command || ''}</strong></div>
-	                                <div class="message-time">Completed</div>
 	                            </div>
 	                        `);
-	                        $('#chat-messages').append(completedCommandHtml);
+	                        $('#chat-messages').append(instructionHtml);
+	                        
+	                        // Add command with copy functionality
+	                        if (cmd.command && cmd.command.trim() !== '') {
+	                            const commandHtml = formatCommandWithCopy(cmd.command);
+	                            $('#chat-messages').append(commandHtml);
+	                        }
 	                    });
 	                    // Completion message
 	                    $('#chat-messages').append(`

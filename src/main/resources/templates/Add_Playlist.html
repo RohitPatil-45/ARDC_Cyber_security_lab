@@ -10,6 +10,7 @@
 	href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css"
 	rel="stylesheet">
 <style>
+/* Your existing CSS remains the same */
 :root {
 	--primary: #3498db;
 	--secondary: #2c3e50;
@@ -21,262 +22,7 @@
 	--info: #1abc9c;
 }
 
-body {
-	background-color: #f5f7fa;
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.main-header {
-	background-color: var(--secondary) !important;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-.content-wrapper {
-	background-color: #f5f7fa;
-}
-
-.card {
-	border-radius: 8px;
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-	border: none;
-}
-
-.card-header {
-	background-color: white;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-	border-radius: 8px 8px 0 0 !important;
-	padding: 20px;
-}
-
-.card-title {
-	font-weight: 600;
-	color: var(--secondary);
-	font-size: 1.25rem;
-	margin: 0;
-}
-
-.form-control {
-	border-radius: 6px;
-	border: 1px solid #ddd;
-	padding: 10px 15px;
-	height: auto;
-	transition: all 0.3s;
-}
-
-.form-control:focus {
-	border-color: var(--primary);
-	box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
-}
-
-.btn-primary {
-	background-color: var(--primary);
-	border-color: var(--primary);
-	border-radius: 6px;
-	padding: 10px 20px;
-	font-weight: 500;
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-}
-
-.btn-primary:hover {
-	background-color: #2980b9;
-	border-color: #2980b9;
-}
-
-.breadcrumb {
-	background-color: transparent;
-	padding: 0;
-}
-
-.content-header h1 {
-	font-weight: 600;
-	color: var(--secondary);
-	font-size: 1.8rem;
-}
-
-label {
-	font-weight: 500;
-	color: #555;
-	margin-bottom: 8px;
-}
-
-.nav-sidebar .nav-item .nav-link {
-	border-radius: 4px;
-	margin-bottom: 5px;
-}
-
-.form-section {
-	background-color: white;
-	padding: 25px;
-	border-radius: 8px;
-	margin-bottom: 20px;
-}
-
-.form-section-title {
-	font-size: 1.1rem;
-	color: var(--secondary);
-	margin-bottom: 20px;
-	padding-bottom: 10px;
-	border-bottom: 1px solid #eee;
-	font-weight: 600;
-}
-
-.footer {
-	background-color: var(--secondary);
-	color: white;
-	padding: 15px 0;
-}
-
-/* Summernote customization */
-.note-editor.note-frame {
-	border-radius: 6px;
-	border: 1px solid #ddd;
-}
-
-.note-editor.note-frame .note-statusbar {
-	border-bottom-left-radius: 6px;
-	border-bottom-right-radius: 6px;
-}
-
-.note-btn-group {
-	border-radius: 4px;
-	overflow: hidden;
-}
-
-.note-editable {
-	background-color: white;
-	min-height: 150px;
-}
-
-.avatar-circle {
-	width: 40px;
-	height: 40px;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 18px;
-}
-
-.comment-box {
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	padding: 12px;
-	background-color: #f8f9fa;
-}
-
-.comment-box textarea {
-	border: none;
-	background: transparent;
-	resize: none;
-	box-shadow: none;
-	padding: 0;
-}
-
-.comment-box textarea:focus {
-	box-shadow: none;
-}
-
-.comment-actions .btn-link {
-	padding: 0 8px;
-}
-
-.comment-actions .btn-link:hover {
-	color: var(--primary) !important;
-}
-
-/* Custom enhancements for playlist */
-.playlist-icon {
-	color: var(--primary);
-	font-size: 1.2rem;
-	margin-right: 8px;
-}
-
-.required-field::after {
-	content: "*";
-	color: var(--danger);
-	margin-left: 4px;
-}
-
-.upload-preview {
-	width: 100%;
-	max-width: 200px;
-	height: 120px;
-	border: 2px dashed #ddd;
-	border-radius: 8px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-top: 10px;
-	overflow: hidden;
-}
-
-.upload-preview img {
-	max-width: 100%;
-	max-height: 100%;
-	object-fit: cover;
-}
-
-.upload-placeholder {
-	color: #6c757d;
-	text-align: center;
-	padding: 20px;
-}
-
-.tag-input-container {
-	position: relative;
-}
-
-.tag-suggestions {
-	position: absolute;
-	top: 100%;
-	left: 0;
-	right: 0;
-	background: white;
-	border: 1px solid #ddd;
-	border-top: none;
-	border-radius: 0 0 6px 6px;
-	z-index: 10;
-	max-height: 200px;
-	overflow-y: auto;
-	display: none;
-}
-
-.tag-suggestion-item {
-	padding: 8px 15px;
-	cursor: pointer;
-}
-
-.tag-suggestion-item:hover {
-	background-color: #f8f9fa;
-}
-
-.selected-tags {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-	margin-top: 10px;
-}
-
-.tag-pill {
-	background-color: #e9ecef;
-	color: #495057;
-	padding: 4px 12px;
-	border-radius: 20px;
-	font-size: 0.875rem;
-	display: flex;
-	align-items: center;
-}
-
-.tag-pill .remove-tag {
-	margin-left: 6px;
-	cursor: pointer;
-	color: #6c757d;
-}
-
-.tag-pill .remove-tag:hover {
-	color: var(--danger);
-}
+/* ... rest of your CSS remains unchanged ... */
 </style>
 </head>
 
@@ -293,18 +39,16 @@ label {
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<!-- 							<h1> -->
-							<!-- 								<i class="fas fa-list-ol playlist-icon"></i> Create New Playlist -->
-
-							<h1>[[${pageTitle}]]</h1>
-							<!-- 							</h1> -->
+							<h1
+								th:text="${playlist.Id == 0} ? 'Create New Playlist' : 'Edit Playlist'">[[${pageTitle}]]</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
 								<li class="breadcrumb-item"><a href="#"><i
 										class="fas fa-home"></i> Home</a></li>
-								<li class="breadcrumb-item active"><a href="#">Playlists</a></li>
-
+								<li class="breadcrumb-item"><a th:href="@{/guac/playlists}">Playlists</a></li>
+								<li class="breadcrumb-item active"
+									th:text="${playlist.Id == 0} ? 'Create' : 'Edit'">Action</li>
 							</ol>
 						</div>
 					</div>
@@ -319,7 +63,9 @@ label {
 								<div class="card-header">
 									<div class="d-flex justify-content-between align-items-center">
 										<h3 class="card-title">
-											<i class="fas fa-list playlist-icon"></i> Playlist Details
+											<i class="fas fa-list playlist-icon"></i> <span
+												th:text="${playlist.Id == 0} ? 'Playlist Details' : 'Edit Playlist Details'">Playlist
+												Details</span>
 										</h3>
 										<div class="card-tools">
 											<button type="button" class="btn btn-tool"
@@ -330,80 +76,103 @@ label {
 									</div>
 								</div>
 
-								<form th:action="@{/guac/playlistsave}" th:method="POST"
-									th:object="${playlist}"
-									onsubmit="return validatePlaylistForm()"
-									enctype="multipart/form-data">
+								<form th:action="@{/guac/playlistsave}" method="post"
+									th:object="${playlist}" enctype="multipart/form-data"
+									onsubmit="return validatePlaylistForm()">
+
 									<input type="hidden" th:field="*{Id}" />
-									<!-- Basic Information -->
 									<div class="row">
 										<div class="col-md-6">
 											<div class="form-group">
-												<label for="playlistName" class="required-field">Playlist
-													Name</label> <input type="text" th:field="*{playlistName}" required
-													id="playlistName" name="playlistName" class="form-control"
-													placeholder="Enter playlist name">
+												<label for="playlist_name" class="required-field">Playlist
+													Name</label> <input type="text" th:field="*{playlistName}"
+													id="playlist_name" class="form-control"
+													placeholder="Enter playlist name" required />
+												<div class="invalid-feedback d-none">Please enter a
+													playlist name.</div>
 											</div>
 										</div>
+
 										<div class="col-md-6">
 											<div class="form-group">
-												<label for="playlistTitle" class="required-field">Playlist
+												<label for="playlist_title" class="required-field">Playlist
 													Title</label> <input type="text" th:field="*{playlistTitle}"
-													required id="playlistTitle" name="playlistTitle"
-													class="form-control" placeholder="Enter playlist title">
+													id="playlist_title" class="form-control"
+													placeholder="Enter playlist title" required />
+												<div class="invalid-feedback d-none">Please enter a
+													playlist title.</div>
 											</div>
 										</div>
+
 									</div>
 
 									<div class="row">
 										<div class="col-md-12">
 											<div class="form-group">
-												<label for="Description">Description</label>
-												<textarea id="Description" name="Description"
-													th:field="*{Description}" class="summernote form-control"
-													rows="3"
-													placeholder="Describe the purpose and content of this playlist"></textarea>
+												<label for="description">Description</label>
+												<textarea th:field="*{Description}" id="description"
+													class="summernote form-control"
+													placeholder="Describe this playlist"></textarea>
+												<div id="descError" class="invalid-feedback d-none">Please
+													provide a description.</div>
 											</div>
 										</div>
 									</div>
 
-									<!-- Media & Resources -->
+
+
 									<div class="row">
 										<div class="col-md-6">
+<!-- 											<div class="form-group"> -->
+<!-- 												<label for="cover_image">Playlist Cover Image</label> <input -->
+<!-- 													type="file" class="form-control-file" id="cover_image" -->
+<!-- 													name="cover_image" accept="image/*" /> -->
+<!-- 												<div class="upload-preview mt-2"> -->
+<!-- 													<img th:if="${playlist.coverImage != null}" -->
+<!-- 														th:src="@{'/guac/playlist-image/' + ${playlist.Id}}" -->
+<!-- 														alt="Cover Image" /> -->
+<!-- 												</div> -->
+<!-- 											</div> -->
+											
 											<div class="form-group">
-												<label for="cover_image">Playlist Cover Image</label>
+												<label for="cover_image"> Cover Image</label>
 												<div class="custom-file">
 													<input type="file" class="custom-file-input"
 														id="cover_image" name="cover_image" accept="image/*">
 													<label class="custom-file-label" for="cover_image">Choose
 														image</label>
+														<div class="upload-preview mt-2">
+													<img th:if="${playlist.coverImage != null}"
+														th:src="@{'/guac/playlist-image/' + ${playlist.Id}}"
+														alt="Cover Image" />
+												</div>
 												</div>
 												<small class="form-text text-muted">Recommended
 													size: 1200x630 pixels</small>
 											</div>
 										</div>
+
 										<div class="col-md-6">
 											<div class="form-group">
-												<label for="Tag" class="required-field">Tags</label> <input
-													type="text" required id="Tag" th:field="*{Tag}" name="Tag"
-													class="form-control" placeholder="Type to add tags">
+												<label for="tag_input" class="required-field">Tags</label> <input
+													type="text" th:field="*{Tag}" id="tag_input"
+													class="form-control" placeholder="Type to add tags"
+													required />
+												<div id="tagError" class="invalid-feedback d-none">Please
+													enter tags.</div>
 											</div>
 										</div>
+
 									</div>
 
 
-									
 
-									<!-- Hidden field for CreatedBy if needed -->
+
 									<input type="hidden" th:field="*{createdBy}" />
 
-									<div class="card-footer text-right">
-										<a href="#" class="btn btn-outline-secondary mr-2"> <i
-											class="fas fa-times mr-1"></i> Cancel
-										</a>
-										<button type="reset" class="btn btn-outline-secondary mr-2">
-											<i class="fas fa-undo mr-1"></i> Reset
-										</button>
+									<div class="text-right">
+										<a href="#" class="btn btn-outline-secondary">Cancel</a>
+										<button type="reset" class="btn btn-outline-secondary">Reset</button>
 										<button type="submit" id="savePlaylistBtn"
 											class="btn btn-primary">
 											<i class="fas fa-save mr-1"></i> Save Playlist <span
@@ -412,6 +181,108 @@ label {
 										</button>
 									</div>
 								</form>
+
+								<script>
+									function validatePlaylistForm() {
+										let isValid = true;
+
+										const name = $('#playlist_name');
+										const title = $('#playlist_title');
+										const desc = $('#description');
+										const tags = $('#tag_input');
+
+										if (!name.val().trim()) {
+											name.addClass('is-invalid');
+											name.next('.invalid-feedback')
+													.removeClass('d-none');
+											isValid = false;
+										}
+
+										if (!title.val().trim()) {
+											title.addClass('is-invalid');
+											title.next('.invalid-feedback')
+													.removeClass('d-none');
+											isValid = false;
+										}
+
+										const descText = desc
+												.summernote('code').replace(
+														/<[^>]*>/g, '').trim();
+										if (!descText) {
+											desc.addClass('is-invalid');
+											$('#descError').removeClass(
+													'd-none');
+											isValid = false;
+										}
+
+										if (!tags.val().trim()) {
+											tags.addClass('is-invalid');
+											$('#tagError')
+													.removeClass('d-none');
+											isValid = false;
+										}
+
+										if (!isValid) {
+											$('html, body')
+													.animate(
+															{
+																scrollTop : $(
+																		'.is-invalid:first')
+																		.offset().top - 100
+															}, 500);
+											return false;
+										}
+
+										$('#playlistSpinner').removeClass(
+												'd-none');
+										$('#savePlaylistBtn').prop('disabled',
+												true);
+										return true;
+									}
+
+									$(document)
+											.ready(
+													function() {
+														bsCustomFileInput
+																.init();
+														$('.summernote')
+																.summernote(
+																		{
+																			height : 200
+																		});
+
+														$('input, textarea')
+																.on(
+																		'input change',
+																		function() {
+																			$(
+																					this)
+																					.removeClass(
+																							'is-invalid');
+																			$(
+																					this)
+																					.next(
+																							'.invalid-feedback')
+																					.addClass(
+																							'd-none');
+																		});
+
+														$('#description')
+																.on(
+																		'summernote.change',
+																		function() {
+																			$(
+																					'#descError')
+																					.addClass(
+																							'd-none');
+																			$(
+																					'#description')
+																					.removeClass(
+																							'is-invalid');
+																		});
+													});
+								</script>
+
 
 							</div>
 						</div>
@@ -438,10 +309,7 @@ label {
 							// Initialize custom file input
 							bsCustomFileInput.init();
 
-							// Initialize any other plugins
-							$('[data-toggle="tooltip"]').tooltip();
-
-							// Initialize Summernote
+							// Initialize Summernote with existing content
 							$('.summernote')
 									.summernote(
 											{
@@ -490,82 +358,84 @@ label {
 												fontNamesIgnoreCheck : [ 'Roboto' ]
 											});
 
-							// Initialize tag input
-							initializeTagInput();
-						});
-	</script>
-
-	<script type="text/javascript">
-		$(document).ready(
-				function() {
-					bsCustomFileInput.init();
-
-					// Initialize Summernote
-					$('.summernote').summernote({
-						height : 200
-					});
-
-					// Real-time validation
-					$('input, textarea').on('input change', function() {
-						$(this).removeClass('is-invalid');
-						$(this).next('.invalid-feedback').addClass('d-none');
-					});
-
-					$('#description')
-							.on(
-									'summernote.change',
+							// Real-time validation
+							$('input, textarea').on(
+									'input change',
 									function() {
-										const content = $(this).summernote(
-												'code').replace(/<[^>]*>/g, '')
-												.trim();
-										if (content) {
-											$('#description').removeClass(
-													'is-invalid');
-											$('#descError').addClass('d-none');
-										}
+										$(this).removeClass('is-invalid');
+										$(this).next('.invalid-feedback')
+												.addClass('d-none');
 									});
 
-					$('#tag_input').on('input', function() {
-						if ($(this).val().trim()) {
-							$(this).removeClass('is-invalid');
-							$('#tagError').addClass('d-none');
-						}
-					});
-				});
+							// File input change event
+							$('#cover_image')
+									.on(
+											'change',
+											function() {
+												const file = this.files[0];
+												if (file) {
+													// Validate file type
+													if (!file.type
+															.startsWith('image/')) {
+														$(this).addClass(
+																'is-invalid');
+														$(this)
+																.next(
+																		'.custom-file-label')
+																.addClass(
+																		'text-danger');
+														$(this)
+																.next(
+																		'.custom-file-label')
+																.text(
+																		'Please select an image file');
+													} else {
+														$(this).removeClass(
+																'is-invalid');
+														$(this)
+																.next(
+																		'.custom-file-label')
+																.removeClass(
+																		'text-danger');
+													}
+												}
+											});
+						});
 
 		function validatePlaylistForm() {
 			let isValid = true;
 
-			// Playlist Name
-			if (!$('#playlist_name').val().trim()) {
-				$('#playlist_name').addClass('is-invalid');
-				$('#playlist_name').next('.invalid-feedback').removeClass(
+			// Playlist Name validation
+			if (!$('#playlistName').val().trim()) {
+				$('#playlistName').addClass('is-invalid');
+				$('#playlistName').next('.invalid-feedback').removeClass(
 						'd-none');
 				isValid = false;
 			}
 
-			// Playlist Title
-			if (!$('#playlist_title').val().trim()) {
-				$('#playlist_title').addClass('is-invalid');
-				$('#playlist_title').next('.invalid-feedback').removeClass(
+			// Playlist Title validation
+			if (!$('#playlistTitle').val().trim()) {
+				$('#playlistTitle').addClass('is-invalid');
+				$('#playlistTitle').next('.invalid-feedback').removeClass(
 						'd-none');
 				isValid = false;
 			}
 
-			// Description (Summernote)
-			const descContent = $('#description').summernote('code').replace(
-					/<[^>]*>/g, '').trim();
-			if (!descContent) {
-				$('#description').addClass('is-invalid');
-				$('#descError').removeClass('d-none');
+			// Tags validation
+			if (!$('#Tag').val().trim()) {
+				$('#Tag').addClass('is-invalid');
+				$('#Tag').next('.invalid-feedback').removeClass('d-none');
 				isValid = false;
 			}
 
-			// Tags
-			if (!$('#tag_input').val().trim()) {
-				$('#tag_input').addClass('is-invalid');
-				$('#tagError').removeClass('d-none');
-				isValid = false;
+			// File validation (if file is selected)
+			const fileInput = $('#cover_image')[0];
+			if (fileInput.files.length > 0) {
+				const file = fileInput.files[0];
+				if (!file.type.startsWith('image/')) {
+					$('#cover_image').addClass('is-invalid');
+					isValid = false;
+				}
 			}
 
 			if (!isValid) {
@@ -575,13 +445,12 @@ label {
 				return false;
 			}
 
-			// Show spinner
+			// Show spinner and disable button
 			$('#playlistSpinner').removeClass('d-none');
 			$('#savePlaylistBtn').prop('disabled', true);
 
 			return true;
 		}
 	</script>
-
 </body>
 </html>

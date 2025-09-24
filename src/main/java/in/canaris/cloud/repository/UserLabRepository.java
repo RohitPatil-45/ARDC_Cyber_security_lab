@@ -63,4 +63,11 @@ public interface UserLabRepository extends JpaRepository<UserLab, Integer> {
 	@Query("Select u FROM UserLab u WHERE u.username = :username")
 	List<UserLab> findByusername(@Param("username") String username);
 
+	@Modifying
+	@Transactional
+	@Query("UPDATE UserLab u SET u.lastActiveConnection = CURRENT_TIMESTAMP WHERE u.scenarioId = :scenarioId AND u.username = :username")
+	int updateLastActiveConnection(@Param("scenarioId") Integer scenarioId, @Param("username") String username);
+
+
+
 }

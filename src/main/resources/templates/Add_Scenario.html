@@ -2,7 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head th:include="template :: headFragment(${pageTitle})">
-<link rel="icon" type="image/png" href="/webtemplate/dist/img/magicboxEye3.png">
+<link rel="icon" type="image/png"
+	href="/webtemplate/dist/img/magicboxEye3.png">
 <title>Scenario Manager | CMP</title>
 
 <link rel="stylesheet"
@@ -29,36 +30,35 @@
 }
 
 body {
-    background-color: #ffffff; /* White background */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	background-color: #ffffff;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .content-wrapper {
-    background-color: #ffffff; /* Ensure content wrapper is also white */
+	background-color: #ffffff;
 }
 
 .card {
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); /* Light shadow for contrast */
-    border: none;
-    background-color: #ffffff; /* Card background white */
+	border-radius: 8px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+	border: none;
+	background-color: #ffffff;
 }
 
 .card-header {
-    background-color: #ffffff; /* Card header white */
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 8px 8px 0 0 !important;
-    padding: 20px;
+	background-color: #ffffff;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+	border-radius: 8px 8px 0 0 !important;
+	padding: 20px;
 }
 
 .content-header h1 {
-    color: #111111; /* Dark text for title */
+	color: #111111;
 }
 
 label {
-    color: #111111; /* Dark text for labels */
+	color: #111111;
 }
-
 
 .card-title {
 	font-weight: 600;
@@ -139,7 +139,6 @@ label {
 	padding: 15px 0;
 }
 
-/* Summernote customization */
 .note-editor.note-frame {
 	border-radius: 6px;
 	border: 1px solid #ddd;
@@ -205,7 +204,6 @@ label {
 	font-size: 14px;
 }
 
-/* Selected tags */
 .select2-container--default .select2-selection--multiple .select2-selection__choice
 	{
 	background-color: #007bff;
@@ -218,7 +216,6 @@ label {
 	font-size: 13px;
 }
 
-/* X (remove button) inside tag */
 .select2-container--default .select2-selection--multiple .select2-selection__choice__remove
 	{
 	color: #fff;
@@ -232,13 +229,11 @@ label {
 	color: #ffdddd;
 }
 
-/* Dropdown styling */
 .select2-container--default .select2-results__option--highlighted {
 	background-color: #007bff;
 	color: #fff;
 }
 
-/* Custom styles for instance-based selection */
 .selection-limit {
 	font-size: 0.875rem;
 	margin-top: 5px;
@@ -271,6 +266,18 @@ label {
 	background-color: #e9ecef;
 	cursor: not-allowed;
 }
+
+.is-invalid {
+	border-color: #dc3545 !important;
+}
+
+.note-editor.is-invalid {
+	border-color: #dc3545 !important;
+}
+
+.select2-selection.is-invalid {
+	border-color: #dc3545 !important;
+}
 </style>
 </head>
 
@@ -294,6 +301,8 @@ label {
 								<li class="breadcrumb-item"><a href="#"><i
 										class="fas fa-home"></i> Home</a></li>
 								<li class="breadcrumb-item"><a href="#">Scenarios</a></li>
+								<li class="breadcrumb-item active"
+									th:text="${isEdit} ? 'Edit Scenario' : 'Create Scenario'"></li>
 							</ol>
 						</div>
 					</div>
@@ -308,7 +317,8 @@ label {
 								<div class="card-header">
 									<div class="d-flex justify-content-between align-items-center">
 										<h3 class="card-title">
-											<i class="fas fa-plus-circle mr-2"></i> Scenario Details
+											<i class="fas fa-plus-circle mr-2"></i> <span
+												th:text="${isEdit} ? 'Edit Scenario Details' : 'Create Scenario Details'"></span>
 										</h3>
 										<div class="card-tools">
 											<button type="button" class="btn btn-tool"
@@ -332,7 +342,7 @@ label {
 											<div class="row">
 												<div class="col-md-6">
 													<div class="form-group">
-														<label for="title">Scenario Title <span
+														<label for="ScenarioTitle">Scenario Title <span
 															class="text-danger">*</span></label> <input type="text" required
 															id="ScenarioTitle" name="ScenarioTitle"
 															th:field="*{ScenarioTitle}" class="form-control"
@@ -340,9 +350,8 @@ label {
 													</div>
 												</div>
 												<div class="col-md-6">
-
 													<div class="form-group">
-														<label for="title">Scenario Name <span
+														<label for="ScenarioName">Scenario Name <span
 															class="text-danger">*</span></label> <input type="text" required
 															id="ScenarioName" name="ScenarioName"
 															th:field="*{ScenarioName}" class="form-control"
@@ -354,9 +363,10 @@ label {
 											<div class="row">
 												<div class="col-md-12">
 													<div class="form-group">
-														<label for="description">Description</label>
+														<label for="Description">Description</label>
 														<textarea id="Description" name="Description"
-															class="summernote form-control" rows="3"
+															th:field="*{Description}" class="summernote form-control"
+															rows="3"
 															placeholder="Briefly describe the scenario objectives"></textarea>
 													</div>
 												</div>
@@ -385,7 +395,7 @@ label {
 												</div>
 												<div class="col-md-4">
 													<div class="form-group">
-														<label for="type">Scenario Type <span
+														<label for="ScenarioType">Scenario Type <span
 															class="text-danger">*</span></label> <select required
 															id="ScenarioType" th:field="*{ScenarioType}"
 															name="ScenarioType" class="form-control">
@@ -398,7 +408,7 @@ label {
 												</div>
 												<div class="col-md-4">
 													<div class="form-group">
-														<label for="mode">Play Mode <span
+														<label for="Mode">Play Mode <span
 															class="text-danger">*</span></label> <select required id="Mode"
 															th:field="*{Mode}" name="Mode" class="form-control">
 															<option value="">-- Select Mode --</option>
@@ -413,7 +423,7 @@ label {
 											<div class="row">
 												<div class="col-md-4">
 													<div class="form-group">
-														<label for="Difficulty">Difficulty Level <span
+														<label for="DifficultyLevel">Difficulty Level <span
 															class="text-danger">*</span></label> <select required
 															th:field="*{DifficultyLevel}" id="DifficultyLevel"
 															name="DifficultyLevel" class="form-control">
@@ -435,7 +445,7 @@ label {
 												</div>
 												<div class="col-md-4">
 													<div class="form-group">
-														<label for="max_players">Max Players (if
+														<label for="MaxPlayers">Max Players (if
 															multiplayer)</label> <input type="number" min="1" max="20"
 															th:field="*{MaxPlayers}" id="MaxPlayers"
 															name="MaxPlayers" class="form-control" placeholder="5">
@@ -455,16 +465,27 @@ label {
 														<div class="custom-file">
 															<input type="file" class="custom-file-input"
 																id="cover_image" name="cover_image" accept="image/*">
-															<label class="custom-file-label" for="cover_image">Choose
-																file</label>
+															<label class="custom-file-label" for="cover_image"
+																id="coverImageLabel"> <span
+																th:if="${scenario.coverImage != null}">Current
+																	image exists - choose new file to replace</span> <span
+																th:unless="${scenario.coverImage != null}">Choose
+																	file</span>
+															</label>
 														</div>
 														<small class="form-text text-muted">Recommended
 															size: 1200x630 pixels</small>
+														<div th:if="${scenario.coverImage != null}" class="mt-2">
+															<small class="text-success"> <i
+																class="fas fa-check-circle"></i> Cover image already
+																uploaded
+															</small>
+														</div>
 													</div>
 												</div>
 												<div class="col-md-6">
 													<div class="form-group">
-														<label for="NoOfInstance">Number of Instance <span
+														<label for="NumberofInstance">Number of Instance <span
 															class="text-danger">*</span></label> <input type="number" min="1"
 															max="2000" th:field="*{NumberofInstance}"
 															id="NumberofInstance" name="NumberofInstance"
@@ -482,14 +503,15 @@ label {
 											<div class="row mt-4">
 												<div class="col-md-12">
 													<div class="form-group">
-														<label for="Labs" class="form-label fw-bold">Select
-															Lab Template <span class="text-danger">*</span>
+														<label for="Labs" class="form-label fw-bold">
+															Select Lab Template <span class="text-danger">*</span>
 														</label> <select id="Labs" name="Labs" class="form-control"
 															th:field="*{Labs}" multiple="multiple" disabled>
-															<option th:each="scenario : ${instanceNameList}"
-																th:value="${scenario.id + '~' + scenario.instance_name}"
-																th:text="${scenario.instance_name}"></option>
-														</select>
+															<option th:each="instance : ${instanceNameList}"
+																th:value="${instance.id + '~' + instance.instance_name}"
+																th:text="${instance.instance_name}"></option>
+														</select> 
+
 														<div class="selection-limit" id="selectionLimit">
 															You can select up to <span id="maxSelections">0</span>
 															lab templates
@@ -497,17 +519,25 @@ label {
 													</div>
 												</div>
 											</div>
+
 										</div>
+
+
 									</div>
 
 									<div class="card-footer text-right">
+										<a th:href="@{/scenarioList}"
+											class="btn btn-outline-secondary mr-2"> <i
+											class="fas fa-arrow-left mr-1"></i> Back to List
+										</a>
 										<button type="reset" class="btn btn-outline-secondary mr-2">
 											<i class="fas fa-undo mr-1"></i> Reset
 										</button>
 										<button type="submit" id="saveScenarioBtn"
 											class="btn btn-primary">
-											<i class="fas fa-save mr-1"></i> Save Scenario <span
-												id="scenarioSpinner"
+											<i class="fas fa-save mr-1"></i> <span
+												th:text="${isEdit} ? 'Update Scenario' : 'Save Scenario'"></span>
+											<span id="scenarioSpinner"
 												class="spinner-border spinner-border-sm ml-2 d-none"></span>
 										</button>
 									</div>
@@ -536,7 +566,6 @@ label {
 		src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
 	<script
 		src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 	<script type="text/javascript">
@@ -544,7 +573,12 @@ label {
 			// Initialize custom file input
 			bsCustomFileInput.init();
 
-			// Initialize Summernote
+			// Get edit mode flag from Thymeleaf
+			const isEdit = /*[[${isEdit}]]*/ false;
+			const existingDescription = /*[[${scenario.Description}]]*/ '';
+			const existingLabs = /*[[${scenario.Labs}]]*/ '';
+
+			// Initialize Summernote with existing content for edit mode
 			$('.summernote').summernote({
 				height: 200,
 				toolbar: [
@@ -563,6 +597,11 @@ label {
 				fontNamesIgnoreCheck: ['Roboto']
 			});
 
+			// Set existing description content for edit mode
+			if (isEdit && existingDescription) {
+				$('#Description').summernote('code', existingDescription);
+			}
+
 			// Initialize Select2 for multi-select
 			$('#Labs').select2({
 				placeholder: "Select lab templates (max: 0)",
@@ -570,6 +609,37 @@ label {
 				width: '100%',
 				closeOnSelect: false
 			});
+
+			// Handle edit mode initialization
+			if (isEdit) {
+				// Enable Labs dropdown based on existing NumberofInstance value
+				const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
+				if (instanceCount > 0) {
+					$('#Labs').prop('disabled', false);
+					$('#instanceWarning').hide();
+					$('#maxSelections').text(instanceCount);
+					$('#selectionLimit').removeClass('error');
+					
+					// Update placeholder text
+					if ($('#Labs').data('select2')) {
+						$('#Labs').data('select2').$container.find('.select2-selection__placeholder').text(`Select lab templates (max: ${instanceCount})`);
+					}
+				}
+
+				// Set pre-selected labs after a short delay to ensure Select2 is initialized
+				setTimeout(function() {
+					if (existingLabs) {
+						const labArray = existingLabs.split(',');
+						$('#Labs').val(labArray).trigger('change');
+						
+						// Update selection count
+						const currentSelections = $('#Labs').val() ? $('#Labs').val().length : 0;
+						if (instanceCount > 0 && currentSelections > 0) {
+							$('#selectionLimit').html(`You have selected ${currentSelections} of ${instanceCount} allowed lab templates`);
+						}
+					}
+				}, 500);
+			}
 
 			// Handle instance number change
 			$('#NumberofInstance').on('input', function() {
@@ -582,12 +652,13 @@ label {
 					$('#selectionLimit').removeClass('error');
 					
 					// Update placeholder text
-					$('#Labs').data('select2').$container.find('.select2-selection__placeholder').text(`Select lab templates (max: ${instanceCount})`);
+					if ($('#Labs').data('select2')) {
+						$('#Labs').data('select2').$container.find('.select2-selection__placeholder').text(`Select lab templates (max: ${instanceCount})`);
+					}
 					
 					// If current selections exceed the new limit, remove the extra ones
 					const selectedOptions = $('#Labs').val() || [];
 					if (selectedOptions.length > instanceCount) {
-						// Remove excess selections
 						$('#Labs').val(selectedOptions.slice(0, instanceCount)).trigger('change');
 						$('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>Selection limit exceeded! Only ${instanceCount} lab templates allowed.`);
 					} else if (selectedOptions.length > 0) {
@@ -613,10 +684,10 @@ label {
 					e.preventDefault();
 					$('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>You can only select up to ${instanceCount} lab templates.`);
 					
-					// Show warning for 2 seconds
 					setTimeout(function() {
 						$('#selectionLimit').removeClass('error');
-						$('#selectionLimit').html(`You have selected ${currentSelections} of ${instanceCount} allowed lab templates`);
+						const updatedSelections = $('#Labs').select2('data').length;
+						$('#selectionLimit').html(`You have selected ${updatedSelections} of ${instanceCount} allowed lab templates`);
 					}, 2000);
 				}
 			});
@@ -628,7 +699,6 @@ label {
 				
 				if (instanceCount > 0) {
 					if (currentSelections > instanceCount) {
-						// This shouldn't happen with the prevention above, but just in case
 						const selectedOptions = $('#Labs').val() || [];
 						$('#Labs').val(selectedOptions.slice(0, instanceCount)).trigger('change');
 					} else if (currentSelections > 0) {
@@ -663,6 +733,12 @@ label {
 				} else {
 					$(this).closest('.form-group').find('.note-editor').addClass('is-invalid');
 				}
+			});
+
+			// Handle file input change
+			$('#cover_image').on('change', function() {
+				const fileName = $(this).val().split('\\').pop();
+				$('#coverImageLabel').text(fileName || 'Choose file');
 			});
 		});
 
@@ -709,51 +785,61 @@ label {
 			}
 
 			if (!isValid) {
-				// Scroll to first invalid field
 				$('html, body').animate({
 					scrollTop: $('.is-invalid:first').offset().top - 100
 				}, 500);
 				return false;
 			}
 
-			// Show loading spinner
 			$('#scenarioSpinner').removeClass('d-none');
 			$('#saveScenarioBtn').prop('disabled', true);
-
 			return true;
 		}
-		
-		
-		
 	</script>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    var result = [[${result}]];
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var result = [[${result}]];
+		var isEdit = [[${isEdit}]];
 
-    if (result === 'success') {
-        Swal.fire({
-            title: 'Scenario Saved!',
-            text: 'The scenario has been saved successfully.',
-            icon: 'success',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#3498db'
-        });
-    } else if (result && result !== '') {
-        Swal.fire({
-            title: 'Error',
-            text: result,
-            icon: 'error',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#e74c3c'
-        });
-    }
-    /*]]>*/
+		if (result === 'success') {
+			Swal.fire({
+				title: isEdit ? 'Scenario Updated!' : 'Scenario Saved!',
+				text: isEdit ? 'The scenario has been updated successfully.' : 'The scenario has been saved successfully.',
+				icon: 'success',
+				confirmButtonText: 'OK',
+				confirmButtonColor: '#3498db'
+			}).then((result) => {
+				if (result.isConfirmed) {
+					window.location.href = '/Scenario_Details';
+				}
+			});
+		} else if (result && result !== '') {
+			Swal.fire({
+				title: 'Error',
+				text: result,
+				icon: 'error',
+				confirmButtonText: 'OK',
+				confirmButtonColor: '#e74c3c'
+			});
+		}
+		/*]]>*/
+	</script>
+	
+	
+	<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        // Get labs from Thymeleaf (already "id~name" format)
+        var assignedLabs = /*[[${scenario.Labs}]]*/ "";
+        
+        if (assignedLabs) {
+            var selectedValues = assignedLabs.split(",");
+            
+            // Set the values in the select box
+            $("#Labs").val(selectedValues).trigger("change");
+        }
+    });
 </script>
-
-
-
-
-
+	
 </body>
 </html>

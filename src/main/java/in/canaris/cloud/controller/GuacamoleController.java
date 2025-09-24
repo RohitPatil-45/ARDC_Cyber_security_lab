@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 import org.glassfish.jersey.internal.inject.ParamConverters.TypeValueOf;
 import org.json.JSONArray;
@@ -38,6 +40,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -181,7 +184,7 @@ public class GuacamoleController {
 
 	@Autowired
 	UserScenarioMappingRepository UserScenarioMappingRepository;
-	
+
 	@Autowired
 	DiscoverContainerRepository DiscoverContainerRepository;
 
@@ -346,38 +349,41 @@ public class GuacamoleController {
 	@GetMapping("/View_DiscoverContainerListing")
 	public String viewDiscoverContainerListing(Model model) {
 
-	    List<Object[]> results = DiscoverContainerRepository.fetchContainerWithUserLab();
+		List<Object[]> results = DiscoverContainerRepository.fetchContainerWithUserLab();
 
-	    // Map raw Object[] results to a DTO or Map to pass to view
-	    List<ContainerUserLabDTO> dtoList = results.stream().map(record -> {
-	        ContainerUserLabDTO dto = new ContainerUserLabDTO();
+		// Map raw Object[] results to a DTO or Map to pass to view
+		List<ContainerUserLabDTO> dtoList = results.stream().map(record -> {
+			ContainerUserLabDTO dto = new ContainerUserLabDTO();
 
-	        dto.setId((Integer) record[0]);
-	        dto.setContainerId((String) record[1]);
-	        dto.setImageName((String) record[2]);
-	        dto.setCommand((String) record[3]);
-	        dto.setCreated(record[4] != null ? (Timestamp) record[4] : null);
-	        dto.setStatus((String) record[5]);
-	        dto.setPorts((String) record[6]);
-	        dto.setContainerName((String) record[7]);
-	        dto.setPhysicalServerIp((String) record[8]);
+			dto.setId((Integer) record[0]);
+			dto.setContainerId((String) record[1]);
+			dto.setImageName((String) record[2]);
+			dto.setCommand((String) record[3]);
+			dto.setCreated(record[4] != null ? (Timestamp) record[4] : null);
+			dto.setStatus((String) record[5]);
+			dto.setPorts((String) record[6]);
+			dto.setContainerName((String) record[7]);
+			dto.setPhysicalServerIp((String) record[8]);
 
-	        String username = (String) record[9];
-	        dto.setUsername(username != null ? username : "unassigned");
+			String username = (String) record[9];
+			dto.setUsername(username != null ? username : "unassigned");
 
-	        String scenarioName = (String) record[10];
-	        dto.setScenarioName(scenarioName != null ? scenarioName : "-");
+			String scenarioName = (String) record[10];
+			dto.setScenarioName(scenarioName != null ? scenarioName : "-");
 
-	        Timestamp lastActive = record[11] != null ? (Timestamp) record[11] : null;
-	        dto.setLastActiveConnection(lastActive);
+			Timestamp lastActive = record[11] != null ? (Timestamp) record[11] : null;
+			dto.setLastActiveConnection(lastActive);
 
-	        return dto;
-	    }).collect(Collectors.toList());
+			dto.setGuacamoleId(record[12] != null ? String.valueOf(record[12]) : null);
 
-	    model.addAttribute("listObj", dtoList);
-	    return "View_DiscoverContainerListing";
+//	        dto.setGuacamoleId(guacamole_id);
+
+			return dto;
+		}).collect(Collectors.toList());
+
+		model.addAttribute("listObj", dtoList);
+		return "View_DiscoverContainerListing";
 	}
-
 
 	@GetMapping("/View_Vm_Listing")
 	public ModelAndView viewVmListing(@RequestParam("Id") int scenarioId, Model model, Principal principal) {
@@ -1021,25 +1027,94 @@ public class GuacamoleController {
 		return response;
 	}
 
-	@GetMapping("/Add_Playlist")
-	public ModelAndView showAddPlaylistForm() {
-		ModelAndView mav = new ModelAndView("Add_Playlist");
-//		pageTitle
-		mav.addObject("pageTitle", "Create New Playlist");
+//	@GetMapping("/Add_Playlist")
+//	public ModelAndView showAddPlaylistForm() {
+//		ModelAndView mav = new ModelAndView("Add_Playlist");
+////		pageTitle
+//		mav.addObject("pageTitle", "Create New Playlist");
+//
+//		mav.addObject("playlist", new Playlist()); // This is crucial!
+//		return mav;
+//	}
 
-		mav.addObject("playlist", new Playlist()); // This is crucial!
-		return mav;
+	@GetMapping("/Add_Playlist")
+	public String showCreatePlaylistForm(@RequestParam(value = "Id", required = false) Integer id, Model model) {
+		Playlist playlist = (id != null) ? PlaylistRepository.findById(id).orElse(new Playlist()) : new Playlist();
+		model.addAttribute("playlist", playlist);
+
+		model.addAttribute("pageTitle", (id != null) ? "Edit Playlist" : "Create Playlist");
+		return "add_playlist"; // your Thymeleaf page
 	}
+
+//	@GetMapping("/Add_Sub_Playlist")
+//	public ModelAndView showAdd_Sub_PlaylistForm() {
+//		ModelAndView mav = new ModelAndView("Add_Sub_Playlist");
+////		pageTitle
+//		mav.addObject("pageTitle", "Create New Sub Playlist");
+//
+//		mav.addObject("playlist", new SubPlaylist());
+//		return mav;
+//	}
 
 	@GetMapping("/Add_Sub_Playlist")
-	public ModelAndView showAdd_Sub_PlaylistForm() {
-		ModelAndView mav = new ModelAndView("Add_Sub_Playlist");
-//		pageTitle
-		mav.addObject("pageTitle", "Create New Sub Playlist");
-
-		mav.addObject("playlist", new Playlist());
-		return mav;
+	public String showCreateForm(Model model) {
+		model.addAttribute("playlist", new SubPlaylist());
+		model.addAttribute("pageTitle", "Create New Sub Playlist");
+		return "Add_Sub_Playlist";
 	}
+
+	@GetMapping("/Edit_Sub_Playlist/{id}")
+	public String showEditForm(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) {
+		Optional<SubPlaylist> optional = SubPlaylistRepository.findById(id);
+		if (optional.isPresent()) {
+			model.addAttribute("playlist", optional.get());
+			model.addAttribute("pageTitle", "Edit Sub Playlist");
+		} else {
+			redirectAttributes.addFlashAttribute("message", "Sub Playlist not found.");
+			redirectAttributes.addFlashAttribute("status", "error");
+			return "redirect:/guac/Add_Sub_Playlist";
+		}
+		return "Add_Sub_Playlist";
+	}
+
+	@GetMapping("/deletesubplaylist/{id}")
+	public String deletesubplaylist(@PathVariable("id") Integer id) {
+
+		try {
+			ModelAndView mav = new ModelAndView("Add_Sub_Playlist");
+//			mav.addObject("action_name", var_function_name);
+//			mav.addObject("playlist", PlaylistRepository.deleteById(id));
+			SubPlaylistRepository.deleteById(id);
+
+//			mav.addObject("pageTitle",  "Edit " + disp_function_name + " (ID: " + id + ")");
+//			return mav;
+		} catch (Exception e) {
+			ModelAndView mav = new ModelAndView("Add_Sub_Playlist");
+//			mav.addObject("action_name", var_function_name);
+			mav.addObject("message", e.getMessage());
+//			return mav;
+		}
+
+		return "redirect:/guac/View_SubPalylist";
+	}
+
+//	    @GetMapping("/Edit_Sub_Playlist/{id}")
+//		public ModelAndView showEditForm(@PathVariable("id") Integer id) {
+//
+//			try {
+//				ModelAndView mav = new ModelAndView("Add_Sub_Playlist");
+////				mav.addObject("action_name", var_function_name);
+//				mav.addObject("playlist", SubPlaylistRepository.findById(id).get());
+//				mav.addObject("pageTitle", "EEdit Sub Playlist (ID: " + id + ")");
+////				mav.addObject("pageTitle",  "Edit " + disp_function_name + " (ID: " + id + ")");
+//				return mav;
+//			} catch (Exception e) {
+//				ModelAndView mav = new ModelAndView("Add_Sub_Playlist");
+////				mav.addObject("action_name", var_function_name);
+//				mav.addObject("message", e.getMessage());
+//				return mav;
+//			}
+//		}
 
 	@GetMapping("/Add_Scenario_and_Sub_Playlist_In_Playlist")
 	public ModelAndView showAddScenarioAndSubPlaylistForm() {
@@ -1363,85 +1438,149 @@ public class GuacamoleController {
 //		return "redirect:/guac/Add_Playlist";
 //	}
 
+//	@PostMapping("/playlistsave")
+//	public String savePlaylistData(Playlist obj, RedirectAttributes redirectAttributes,
+//			@RequestParam(required = false) MultipartFile cover_image, Principal principal) {
+//
+//		try {
+//			// Set createdBy
+//			if (principal != null) {
+//				obj.setCreatedBy(principal.getName());
+//			}
+//
+//			boolean isNew = (obj.getId() == 0);
+//
+//			if (isNew) {
+//				// New playlist - handle image
+//				if (cover_image != null && !cover_image.isEmpty()) {
+//					String contentType = cover_image.getContentType();
+//					if (contentType != null && contentType.startsWith("image/")) {
+//						obj.setCoverImage(cover_image.getBytes());
+//						System.out.println("Uploaded image saved to database");
+//					} else {
+//						redirectAttributes.addFlashAttribute("message",
+//								"Invalid file type. Please upload an image file.");
+//						redirectAttributes.addFlashAttribute("status", "error");
+//					}
+//				} else {
+//					// No image uploaded - load default
+//					String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
+//					try {
+//						byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
+//						obj.setCoverImage(defaultImageBytes);
+//						System.out.println("Default image loaded and saved to database");
+//					} catch (IOException e) {
+//						System.err.println("Error loading default image: " + e.getMessage());
+//						obj.setCoverImage(createPlaceholderImage());
+//						System.out.println("Placeholder image created and saved to database");
+//					}
+//				}
+//			} else {
+//				// Editing existing playlist
+//				Optional<Playlist> existing = PlaylistRepository.findById(obj.getId());
+//				if (existing.isPresent()) {
+//					Playlist existingPlaylist = existing.get();
+//
+//					// Retain existing image if new one isn't uploaded
+//					if (cover_image == null || cover_image.isEmpty()) {
+//						obj.setCoverImage(existingPlaylist.getCoverImage());
+//					} else {
+//						String contentType = cover_image.getContentType();
+//						if (contentType != null && contentType.startsWith("image/")) {
+//							obj.setCoverImage(cover_image.getBytes());
+//							System.out.println("Updated image saved to database");
+//						} else {
+//							redirectAttributes.addFlashAttribute("message",
+//									"Invalid file type. Please upload an image file.");
+//							redirectAttributes.addFlashAttribute("status", "error");
+//						}
+//					}
+//				}
+//			}
+//
+//			// Save to DB
+//			Playlist saved = PlaylistRepository.save(obj);
+//			redirectAttributes.addFlashAttribute("message", "The playlist has been saved successfully!");
+//			redirectAttributes.addFlashAttribute("status", "success");
+//
+//			// Redirect based on new/edit
+//			if (isNew) {
+//				return "redirect:/guac/Add_Playlist";
+//			} else {
+//				return "redirect:/guac/View_Particular_Playlist?Id=" + saved.getId();
+//			}
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			redirectAttributes.addFlashAttribute("message", "Error while saving playlist: " + e.getMessage());
+//			redirectAttributes.addFlashAttribute("status", "error");
+//			return "redirect:/guac/Add_Playlist";
+//		}
+//	}
+
 	@PostMapping("/playlistsave")
-	public String savePlaylistData(Playlist obj, RedirectAttributes redirectAttributes,
-			@RequestParam(required = false) MultipartFile cover_image, Principal principal) {
+	public String savePlaylistData(@ModelAttribute("playlist") Playlist obj, RedirectAttributes redirectAttributes,
+			@RequestParam(value = "cover_image", required = false) MultipartFile coverImage, Principal principal) {
 
 		try {
-			// Set createdBy
+			boolean isNew = (obj.getId() == 0);
+
+			// Set createdBy if available
 			if (principal != null) {
 				obj.setCreatedBy(principal.getName());
 			}
 
-			boolean isNew = (obj.getId() == 0);
-
-			if (isNew) {
-				// New playlist - handle image
-				if (cover_image != null && !cover_image.isEmpty()) {
-					String contentType = cover_image.getContentType();
-					if (contentType != null && contentType.startsWith("image/")) {
-						obj.setCoverImage(cover_image.getBytes());
-						System.out.println("Uploaded image saved to database");
-					} else {
-						redirectAttributes.addFlashAttribute("message",
-								"Invalid file type. Please upload an image file.");
-						redirectAttributes.addFlashAttribute("status", "error");
-					}
+			// Handle cover image
+			if (coverImage != null && !coverImage.isEmpty()) {
+				String contentType = coverImage.getContentType();
+				if (contentType != null && contentType.startsWith("image/")) {
+					obj.setCoverImage(coverImage.getBytes());
 				} else {
-					// No image uploaded - load default
-					String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
-					try {
-						byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
-						obj.setCoverImage(defaultImageBytes);
-						System.out.println("Default image loaded and saved to database");
-					} catch (IOException e) {
-						System.err.println("Error loading default image: " + e.getMessage());
-						obj.setCoverImage(createPlaceholderImage());
-						System.out.println("Placeholder image created and saved to database");
-					}
+					redirectAttributes.addFlashAttribute("message", "Invalid file type. Upload an image.");
+					redirectAttributes.addFlashAttribute("status", "error");
+					return "redirect:/guac/Add_Playlist";
 				}
-			} else {
-				// Editing existing playlist
+			} else if (!isNew) {
+				// Retain existing image
 				Optional<Playlist> existing = PlaylistRepository.findById(obj.getId());
-				if (existing.isPresent()) {
-					Playlist existingPlaylist = existing.get();
-
-					// Retain existing image if new one isn't uploaded
-					if (cover_image == null || cover_image.isEmpty()) {
-						obj.setCoverImage(existingPlaylist.getCoverImage());
-					} else {
-						String contentType = cover_image.getContentType();
-						if (contentType != null && contentType.startsWith("image/")) {
-							obj.setCoverImage(cover_image.getBytes());
-							System.out.println("Updated image saved to database");
-						} else {
-							redirectAttributes.addFlashAttribute("message",
-									"Invalid file type. Please upload an image file.");
-							redirectAttributes.addFlashAttribute("status", "error");
-						}
-					}
+				existing.ifPresent(existingPlaylist -> obj.setCoverImage(existingPlaylist.getCoverImage()));
+			} else {
+				// Load default image for new playlist
+				String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
+				try {
+					obj.setCoverImage(Files.readAllBytes(Paths.get(defaultImagePath)));
+				} catch (IOException e) {
+					obj.setCoverImage(new byte[0]); // fallback to empty image
 				}
 			}
 
-			// Save to DB
+			// Save playlist
 			Playlist saved = PlaylistRepository.save(obj);
-			redirectAttributes.addFlashAttribute("message", "The playlist has been saved successfully!");
+			redirectAttributes.addFlashAttribute("message", "Playlist saved successfully!");
 			redirectAttributes.addFlashAttribute("status", "success");
 
-			// Redirect based on new/edit
-			if (isNew) {
-				return "redirect:/guac/Add_Playlist";
-			} else {
-				return "redirect:/guac/View_Particular_Playlist?Id=" + saved.getId();
-			}
+			return isNew ? "redirect:/guac/Add_Playlist"
+					: "redirect:/guac/View_Particular_Playlist?Id=" + saved.getId();
 
 		} catch (Exception e) {
-			e.printStackTrace();
-			redirectAttributes.addFlashAttribute("message", "Error while saving playlist: " + e.getMessage());
+			redirectAttributes.addFlashAttribute("message", "Error saving playlist: " + e.getMessage());
 			redirectAttributes.addFlashAttribute("status", "error");
 			return "redirect:/guac/Add_Playlist";
 		}
 	}
+
+//	    @GetMapping("/playlist-image/{id}")
+//	    public void getPlaylistImage(@PathVariable("id") int id, HttpServletResponse response) throws IOException {
+//	        Optional<Playlist> playlistOpt = playlistRepository.findById(id);
+//	        if (playlistOpt.isPresent() && playlistOpt.get().getCoverImage() != null) {
+//	            byte[] imageBytes = playlistOpt.get().getCoverImage();
+//	            response.setContentType("image/jpeg"); // or "image/png"
+//	            response.getOutputStream().write(imageBytes);
+//	            response.getOutputStream().flush();
+//	        } else {
+//	            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+//	        }
+//	    }
 
 	// Add this method if you don't have it
 	private byte[] createPlaceholderImage() {
@@ -1870,48 +2009,6 @@ public class GuacamoleController {
 		return mav;
 	}
 
-	@GetMapping("/editsceneriolist/{id}")
-	public ModelAndView editsceneriolist(@PathVariable("id") Integer id) {
-
-		try {
-			List<CloudInstance> instances = null;
-			instances = repository.getInstanceNameNotAssigned();
-
-			ModelAndView mav = new ModelAndView("Add_Scenario");
-//			mav.addObject("action_name", var_function_name);
-			mav.addObject("scenario", ScenarioRepository.findById(id).get());
-			mav.addObject("instanceNameList", instances);
-			mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
-//			mav.addObject("pageTitle",  "Edit " + disp_function_name + " (ID: " + id + ")");
-			return mav;
-		} catch (Exception e) {
-			ModelAndView mav = new ModelAndView("Add_Scenario");
-//			mav.addObject("action_name", var_function_name);
-			mav.addObject("message", e.getMessage());
-			return mav;
-		}
-	}
-
-	@GetMapping("/deletsceneriolist/{id}")
-	public String deletsceneriolist(@PathVariable("id") Integer id) {
-
-		try {
-			ModelAndView mav = new ModelAndView("Add_Playlist");
-//			mav.addObject("action_name", var_function_name);
-//			mav.addObject("playlist", PlaylistRepository.deleteById(id));
-			ScenarioRepository.deleteById(id);
-//			mav.addObject("pageTitle",  "Edit " + disp_function_name + " (ID: " + id + ")");
-//			return mav;
-		} catch (Exception e) {
-			ModelAndView mav = new ModelAndView("Add_Playlist");
-//			mav.addObject("action_name", var_function_name);
-			mav.addObject("message", e.getMessage());
-//			return mav;
-		}
-
-		return "redirect:/guac/View_Scenario";
-	}
-
 	@PostMapping("/saveScenarioData")
 	public String saveScenarioData(@ModelAttribute("scenario") Add_Scenario scenarioObj,
 			RedirectAttributes redirectAttributes, @RequestParam(required = false) MultipartFile cover_image,
@@ -2013,6 +2110,119 @@ public class GuacamoleController {
 			redirectAttributes.addFlashAttribute("status", "error");
 			return "redirect:/guac/Scenario_Details";
 		}
+	}
+
+//	@GetMapping("/editsceneriolist/{id}")
+//	public ModelAndView editsceneriolist(@PathVariable("id") Integer id) {
+//
+//		try {
+//			List<CloudInstance> instances = null;
+//			instances = repository.getInstanceNameNotAssigned();
+//
+//			ModelAndView mav = new ModelAndView("Add_Scenario");
+////			mav.addObject("action_name", var_function_name);
+//			mav.addObject("scenario", ScenarioRepository.findById(id).get());
+//			mav.addObject("instanceNameList", instances);
+//			mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
+////			mav.addObject("pageTitle",  "Edit " + disp_function_name + " (ID: " + id + ")");
+//			return mav;
+//		} catch (Exception e) {
+//			ModelAndView mav = new ModelAndView("Add_Scenario");
+////			mav.addObject("action_name", var_function_name);
+//			mav.addObject("message", e.getMessage());
+//			return mav;
+//		}
+//	}
+
+//	  @GetMapping("/editsceneriolist/{id}")
+//	    public ModelAndView editScenario(@PathVariable("id") Integer id) {
+//	        try {
+//	            List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
+//	            Optional<Add_Scenario> scenario = ScenarioRepository.findById(id);
+//
+//	            ModelAndView mav = new ModelAndView("Add_Scenario");
+//	            mav.addObject("scenario", scenario.orElse(new Add_Scenario()));
+//	            mav.addObject("instanceNameList", instances);
+//	            mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
+//	            return mav;
+//	        } catch (Exception e) {
+//	            ModelAndView mav = new ModelAndView("Add_Scenario");
+//	            mav.addObject("message", e.getMessage());
+//	            return mav;
+//	        }
+//	    }
+
+//	@GetMapping("/editsceneriolist/{id}")
+//	public ModelAndView editsceneriolist(@PathVariable("id") Integer id) {
+//	    try {
+//	        List<CloudInstance> instances = null;
+//	        instances = repository.getInstanceNameNotAssigned();
+//
+//	        ModelAndView mav = new ModelAndView("Add_Scenario");
+//	        Add_Scenario scenario = ScenarioRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid scenario ID: " + id));
+//	        
+//	        mav.addObject("scenario", scenario);
+//	        mav.addObject("instanceNameList", instances);
+//	        mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
+//	        mav.addObject("isEdit", true); // Add this flag
+//	        return mav;
+//	    } catch (Exception e) {
+//	        ModelAndView mav = new ModelAndView("Add_Scenario");
+//	        mav.addObject("message", e.getMessage());
+//	        mav.addObject("isEdit", false);
+//	        return mav;
+//	    }
+//	}
+
+	@GetMapping("/editsceneriolist/{id}")
+	public ModelAndView editsceneriolist(@PathVariable("id") Integer id) {
+		try {
+			List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
+
+			ModelAndView mav = new ModelAndView("Add_Scenario");
+			Add_Scenario scenario = ScenarioRepository.findById(id)
+					.orElseThrow(() -> new IllegalArgumentException("Invalid scenario ID: " + id));
+
+			// Convert lab names back into "id~name" format for dropdown pre-selection
+			List<ScenarioLabTemplate> assignedLabs = ScenarioLabTemplateRepository.findByScenarioId(id);
+			List<String> assignedLabPairs = assignedLabs.stream()
+					.map(l -> l.getTemplateId() + "~" + l.getTemplateName()).toList();
+
+			System.out.println("assignedLabPairs :" + assignedLabPairs);
+
+			scenario.setLabs(String.join(",", assignedLabPairs));
+
+			mav.addObject("scenario", scenario);
+			mav.addObject("instanceNameList", instances);
+			mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
+			mav.addObject("isEdit", true);
+			return mav;
+		} catch (Exception e) {
+			ModelAndView mav = new ModelAndView("Add_Scenario");
+			mav.addObject("message", e.getMessage());
+			mav.addObject("isEdit", false);
+			return mav;
+		}
+	}
+
+	@GetMapping("/deletsceneriolist/{id}")
+	public String deletsceneriolist(@PathVariable("id") Integer id) {
+
+		try {
+			ModelAndView mav = new ModelAndView("Add_Playlist");
+//			mav.addObject("action_name", var_function_name);
+//			mav.addObject("playlist", PlaylistRepository.deleteById(id));
+			ScenarioRepository.deleteById(id);
+//			mav.addObject("pageTitle",  "Edit " + disp_function_name + " (ID: " + id + ")");
+//			return mav;
+		} catch (Exception e) {
+			ModelAndView mav = new ModelAndView("Add_Playlist");
+//			mav.addObject("action_name", var_function_name);
+			mav.addObject("message", e.getMessage());
+//			return mav;
+		}
+
+		return "redirect:/guac/View_Scenario";
 	}
 
 //	@GetMapping("/View_Scenario")
@@ -2174,148 +2384,140 @@ public class GuacamoleController {
 		return mav;
 	}
 
-//	@GetMapping("/My_Scenario")
-//	public ModelAndView getMy_View_Scenario(Principal principal) {
-//		ModelAndView mav = new ModelAndView("My_View_Scenario");
-//		JSONArray Finalarray = new JSONArray();
-//		List<Add_Scenario> dataList;
-//		try {
-//			// start
-//
-//			Authentication authentication = (Authentication) principal;
-//			User loginedUser = (User) authentication.getPrincipal();
-//
-//			String userName = loginedUser.getUsername();
-//			String groupName = "";
-//			StringBuilder vmNamesBuilder = new StringBuilder();
-//
-//			List<AppUser> userList = userRepository.findByuserName(userName);
-//
-//			boolean isSuperAdmin = authentication.getAuthorities().stream()
-//					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
-//
-//			boolean isAdmin = authentication.getAuthorities().stream()
-//					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-//
-//			if (isSuperAdmin) {
-//				dataList = ScenarioRepository.findByUserScenario();
-//			} else {
-//
-//				for (AppUser appUser : userList) {
-//					groupName = appUser.getGroupName(); // Assuming only one AppUser per username
-//				}
-//
-//				List<String> groups = new ArrayList<>();
-//				StringTokenizer groupTokenizer = new StringTokenizer(groupName, ",");
-//				while (groupTokenizer.hasMoreTokens()) {
-//					groups.add(groupTokenizer.nextToken());
-//				}
-//
-//				// Get VM names by group
-//				List<Object[]> vmList = repository.getInstanceNameByGroup(groups, true);
-//				for (Object[] vmEntry : vmList) {
-//					vmNamesBuilder.append(vmEntry[1].toString()).append(",");
-//				}
-//
-//				// Split VM names string into a list
-//				List<String> vmGroups = new ArrayList<>();
-//				String vmNames = vmNamesBuilder.toString();
-//				if (!vmNames.isEmpty()) {
-//					StringTokenizer vmTokenizer = new StringTokenizer(vmNames, ",");
-//					while (vmTokenizer.hasMoreTokens()) {
-//						vmGroups.add(vmTokenizer.nextToken());
-//					}
-//				}
-////				dataList = ScenarioRepository.getView_Scenario(vmGroups);
-//				dataList = ScenarioRepository.findByUserScenario();
-//			}
-//
-////			 dataList = kVMDriveDetailsRepository.findBykVMDetails();
-//			System.out.println("Fetched Data: " + dataList.toString()); // Print to console
-//			int srno = 0;
-//			for (Add_Scenario temp : dataList) {
-//				JSONObject obj = new JSONObject();
-//
-//				String Scenario_Name = temp.getScenarioName() != null ? temp.getScenarioName() : "";
-//				String Scenario_Title = temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "";
-//				String Description = temp.getDescription() != null ? temp.getDescription() : "";
-//				String Category = temp.getCategory() != null ? temp.getCategory() : "";
-//				String Scenario_Type = temp.getScenarioType() != null ? temp.getScenarioType() : "";
-//				String Mode = temp.getMode() != null ? temp.getMode() : "";
-//				String Difficulty_Level = temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "";
-//				String Duration = temp.getDuration() != null ? temp.getDuration() : "";
-//				String Labs = temp.getLabs() != null ? temp.getLabs() : "";
-////				String Cover_Image = temp.getCover_Image() != null ? temp.getCover_Image() : "";
-//				String Cover_Image = "";
-//				int SrNo = temp.getId();
-//
-////				srno++;
-//
-//				obj.put("Scenario_Name", Scenario_Name);
-//				obj.put("Scenario_Title", Scenario_Title);
-////				obj.put("Description", Description);
-//				obj.put("Category", Category);
-//				obj.put("Scenario_Type", Scenario_Type);
-//				obj.put("Mode", Mode);
-//				obj.put("Difficulty_Level", Difficulty_Level);
-//				obj.put("Duration", Duration);
-////				obj.put("Labs", Labs);
-//				obj.put("Cover_Image", Cover_Image);
-//				obj.put("Id", SrNo);
-//
-//				Finalarray.put(obj);
-//			}
-//
-////			System.out.println("Finalarray_getView_Scenario ::" + Finalarray);
-//
-//			mav.addObject("listObj", Finalarray.toString());
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			mav.addObject("listObj", null);
-//			mav.addObject("error", e.getMessage());
-//			System.out.println("Error fetching data: " + e.getMessage());
-//		}
-//		return mav;
-//	}
-
-	@GetMapping("/My_Scenario")
-	public ModelAndView getMy_View_Scenario(Principal principal) {
+	@GetMapping("/My_Scenario_Inprogress")
+	public ModelAndView getMy_View_Scenario(Principal principal, Model model) {
 		ModelAndView mav = new ModelAndView("My_View_Scenario");
-		JSONArray Finalarray = new JSONArray();
-		List<Add_Scenario> dataList = new ArrayList<>();
+		JSONArray finalArray = new JSONArray();
 
 		try {
 			Authentication authentication = (Authentication) principal;
 			User loginedUser = (User) authentication.getPrincipal();
-
 			String userName = loginedUser.getUsername();
+
+			model.addAttribute("pageTitle", "My Scenario Inprogress");
+			List<UserScenario> scenarioIds = UserScenerioRepository.findByUsername(userName);
+
+			for (UserScenario objs : scenarioIds) {
+				Add_Scenario temp = ScenarioRepository.findById(Integer.parseInt(objs.getScenarioId())).orElse(null);
+
+				if (temp == null) {
+					continue; // skip if scenario not found
+				}
+
+				String username = principal.getName();
+				System.out.println("scenarioId : " + objs.getId());
+
+				Integer falseCount = instructionTemplateRepository
+						.getFalseCompletionCountsByusernameandscenarioId(username, temp.getId());
+				Integer trueCount = instructionTemplateRepository
+						.getTrueCompletionCountsByusernameandscenarioId(username, temp.getId());
+
+				falseCount = (falseCount != null) ? falseCount : 0;
+				trueCount = (trueCount != null) ? trueCount : 0;
+
+				int total = falseCount + trueCount;
+				int percentage = 0;
+
+				if (total > 0) {
+					percentage = (trueCount * 100) / total;
+				}
+
+				System.out.println("percentage : " + percentage);
+				System.out.println("percentage : " + percentage);
+
+				// ✅ compare integers, not string
+				if (percentage != 100) {
+					JSONObject obj = new JSONObject();
+					obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
+					obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
+					obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
+					obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
+					obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
+					obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
+					obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
+					obj.put("Cover_Image", ""); // add image path if available
+					obj.put("Id", temp.getId());
+
+					finalArray.put(obj);
+				}
+			}
+
+			System.out.println("Finalarray_getMy_View_Scenario ::" + finalArray);
+			mav.addObject("listObj", finalArray.toString());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			mav.addObject("listObj", null);
+			mav.addObject("error", e.getMessage());
+			System.out.println("Error fetching data: " + e.getMessage());
+		}
+
+		return mav;
+	}
+
+	@GetMapping("/My_Scenario_Completed")
+	public ModelAndView getMy_View_Scenario_Completed(Principal principal, Model model) {
+		ModelAndView mav = new ModelAndView("My_View_Scenario");
+		JSONArray finalArray = new JSONArray();
+
+		try {
+			Authentication authentication = (Authentication) principal;
+			User loginedUser = (User) authentication.getPrincipal();
+			String userName = loginedUser.getUsername();
+
+			model.addAttribute("pageTitle", "My Scenario Completed");
 
 			List<UserScenario> scenarioIds = UserScenerioRepository.findByUsername(userName);
 
 			for (UserScenario objs : scenarioIds) {
-				Add_Scenario temp = ScenarioRepository.findById(Integer.parseInt(objs.getScenarioId())).get();
-				JSONObject obj = new JSONObject();
+				Add_Scenario temp = ScenarioRepository.findById(Integer.parseInt(objs.getScenarioId())).orElse(null);
 
-				obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
-				obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
-				obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
-				obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
-				obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
-				obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
-				obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
-				obj.put("Cover_Image", "");
-				obj.put("Id", temp.getId());
+				if (temp == null) {
+					continue; // skip if scenario not found
+				}
 
-				Finalarray.put(obj);
+				String username = principal.getName();
+				System.out.println("scenarioId : " + objs.getId());
+
+				Integer falseCount = instructionTemplateRepository
+						.getFalseCompletionCountsByusernameandscenarioId(username, temp.getId());
+				Integer trueCount = instructionTemplateRepository
+						.getTrueCompletionCountsByusernameandscenarioId(username, temp.getId());
+
+				falseCount = (falseCount != null) ? falseCount : 0;
+				trueCount = (trueCount != null) ? trueCount : 0;
+
+				int total = falseCount + trueCount;
+				int percentage = 0;
+
+				if (total > 0) {
+					percentage = (trueCount * 100) / total;
+				}
+
+				System.out.println("percentage : " + percentage);
+				System.out.println("percentage : " + percentage);
+
+				// ✅ compare integers, not string
+				if (percentage == 100) {
+					JSONObject obj = new JSONObject();
+					obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
+					obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
+					obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
+					obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
+					obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
+					obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
+					obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
+					obj.put("Cover_Image", ""); // add image path if available
+					obj.put("Id", temp.getId());
+
+					finalArray.put(obj);
+				}
 			}
 
-			System.out.println("Finalarray_getMy_View_Scenario ::" + Finalarray);
-			mav.addObject("listObj", Finalarray.toString());
+			System.out.println("Finalarray_getMy_View_Scenario ::" + finalArray);
+			mav.addObject("listObj", finalArray.toString());
 
-		} catch (
-
-		Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			mav.addObject("listObj", null);
 			mav.addObject("error", e.getMessage());
@@ -2853,12 +3055,87 @@ public class GuacamoleController {
 //		}
 //	}
 
-	@PostMapping("/subplaylistsave")
-	public String subplaylistsaveData(SubPlaylist obj, RedirectAttributes redirectAttributes,
-			@RequestParam(required = false) MultipartFile cover_image, Principal principal) {
+//	@PostMapping("/subplaylistsave")
+//	public String subplaylistsaveData(SubPlaylist obj, RedirectAttributes redirectAttributes,
+//			@RequestParam(required = false) MultipartFile cover_image, Principal principal) {
+//
+//		try {
+//			// Set createdBy
+//			if (principal != null) {
+//				obj.setCreatedBy(principal.getName());
+//			}
+//
+//			boolean isNew = (obj.getId() == 0);
+//
+//			if (isNew) {
+//				// New playlist - handle image
+//				if (cover_image != null && !cover_image.isEmpty()) {
+//					String contentType = cover_image.getContentType();
+//					if (contentType != null && contentType.startsWith("image/")) {
+//						obj.setCoverImage(cover_image.getBytes());
+//						System.out.println("Uploaded image saved to database");
+//					} else {
+//						redirectAttributes.addFlashAttribute("message",
+//								"Invalid file type. Please upload an image file.");
+//						redirectAttributes.addFlashAttribute("status", "error");
+//					}
+//				} else {
+//					// No image uploaded - load default
+//					String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
+//					try {
+//						byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
+//						obj.setCoverImage(defaultImageBytes);
+//						System.out.println("Default image loaded and saved to database");
+//					} catch (IOException e) {
+//						System.err.println("Error loading default image: " + e.getMessage());
+//						obj.setCoverImage(createPlaceholderImage());
+//						System.out.println("Placeholder image created and saved to database");
+//					}
+//				}
+//			} else {
+//				// Editing existing playlist
+//				Optional<SubPlaylist> existing = SubPlaylistRepository.findById(obj.getId());
+//				if (existing.isPresent()) {
+//					SubPlaylist existingPlaylist = existing.get();
+//
+//					// Retain existing image if new one isn't uploaded
+//					if (cover_image == null || cover_image.isEmpty()) {
+//						obj.setCoverImage(existingPlaylist.getCoverImage());
+//					} else {
+//						String contentType = cover_image.getContentType();
+//						if (contentType != null && contentType.startsWith("image/")) {
+//							obj.setCoverImage(cover_image.getBytes());
+//							System.out.println("Updated image saved to database");
+//						} else {
+//							redirectAttributes.addFlashAttribute("message",
+//									"Invalid file type. Please upload an image file.");
+//							redirectAttributes.addFlashAttribute("status", "error");
+//						}
+//					}
+//				}
+//			}
+//
+//			// Save to DB
+//			SubPlaylistRepository.save(obj);
+//
+//			redirectAttributes.addFlashAttribute("message", "The playlist has been saved successfully!");
+//			redirectAttributes.addFlashAttribute("status", "success");
+//
+////	        return "redirect:/guac/View_Particular_Playlist?Id=" + obj.getId();
+//			return "redirect:/guac/Add_Sub_Playlist";
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			redirectAttributes.addFlashAttribute("message", "Error while saving playlist: " + e.getMessage());
+//			redirectAttributes.addFlashAttribute("status", "error");
+//			return "redirect:/guac/Add_Sub_Playlist";
+//		}
+//	}
 
+	@PostMapping("/subplaylistsave")
+	public String saveSubPlaylist(@ModelAttribute("playlist") SubPlaylist obj, RedirectAttributes redirectAttributes,
+			@RequestParam(required = false) MultipartFile cover_image, Principal principal) {
 		try {
-			// Set createdBy
 			if (principal != null) {
 				obj.setCreatedBy(principal.getName());
 			}
@@ -2866,65 +3143,52 @@ public class GuacamoleController {
 			boolean isNew = (obj.getId() == 0);
 
 			if (isNew) {
-				// New playlist - handle image
+				// New Playlist
 				if (cover_image != null && !cover_image.isEmpty()) {
-					String contentType = cover_image.getContentType();
-					if (contentType != null && contentType.startsWith("image/")) {
+					if (cover_image.getContentType().startsWith("image/")) {
 						obj.setCoverImage(cover_image.getBytes());
-						System.out.println("Uploaded image saved to database");
 					} else {
-						redirectAttributes.addFlashAttribute("message",
-								"Invalid file type. Please upload an image file.");
+						redirectAttributes.addFlashAttribute("message", "Invalid file type.");
 						redirectAttributes.addFlashAttribute("status", "error");
+						return "redirect:/guac/Add_Sub_Playlist";
 					}
 				} else {
-					// No image uploaded - load default
+					// Set default image
 					String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
 					try {
 						byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
 						obj.setCoverImage(defaultImageBytes);
-						System.out.println("Default image loaded and saved to database");
 					} catch (IOException e) {
-						System.err.println("Error loading default image: " + e.getMessage());
-						obj.setCoverImage(createPlaceholderImage());
-						System.out.println("Placeholder image created and saved to database");
+						obj.setCoverImage(new byte[0]); // Placeholder
 					}
 				}
 			} else {
-				// Editing existing playlist
-				Optional<SubPlaylist> existing = SubPlaylistRepository.findById(obj.getId());
-				if (existing.isPresent()) {
-					SubPlaylist existingPlaylist = existing.get();
-
-					// Retain existing image if new one isn't uploaded
+				// Update Playlist
+				Optional<SubPlaylist> existingOpt = SubPlaylistRepository.findById(obj.getId());
+				if (existingOpt.isPresent()) {
+					SubPlaylist existing = existingOpt.get();
 					if (cover_image == null || cover_image.isEmpty()) {
-						obj.setCoverImage(existingPlaylist.getCoverImage());
+						obj.setCoverImage(existing.getCoverImage()); // retain old image
 					} else {
-						String contentType = cover_image.getContentType();
-						if (contentType != null && contentType.startsWith("image/")) {
+						if (cover_image.getContentType().startsWith("image/")) {
 							obj.setCoverImage(cover_image.getBytes());
-							System.out.println("Updated image saved to database");
 						} else {
-							redirectAttributes.addFlashAttribute("message",
-									"Invalid file type. Please upload an image file.");
+							redirectAttributes.addFlashAttribute("message", "Invalid file type.");
 							redirectAttributes.addFlashAttribute("status", "error");
+							return "redirect:/guac/Edit_Sub_Playlist?id=" + obj.getId();
 						}
 					}
 				}
 			}
 
-			// Save to DB
 			SubPlaylistRepository.save(obj);
-
-			redirectAttributes.addFlashAttribute("message", "The playlist has been saved successfully!");
+			redirectAttributes.addFlashAttribute("message", "Playlist saved successfully!");
 			redirectAttributes.addFlashAttribute("status", "success");
-
-//	        return "redirect:/guac/View_Particular_Playlist?Id=" + obj.getId();
 			return "redirect:/guac/Add_Sub_Playlist";
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			redirectAttributes.addFlashAttribute("message", "Error while saving playlist: " + e.getMessage());
+			redirectAttributes.addFlashAttribute("message", "Error: " + e.getMessage());
 			redirectAttributes.addFlashAttribute("status", "error");
 			return "redirect:/guac/Add_Sub_Playlist";
 		}
@@ -3312,7 +3576,10 @@ public class GuacamoleController {
 				array.put(srno);
 				array.put(userName);
 				array.put(percentage + "%");
-
+//				String eyeButton = "<button type='button' class='btn btn-sm btn-primary' "
+//						+ "onclick=\"getuserPerformance('" + userName + "')\">"
+//						+ "<i class='fas fa-eye'></i></button>";
+//				array.put(eyeButton);
 				Finalarray.put(array);
 			}
 
@@ -3640,31 +3907,64 @@ public class GuacamoleController {
 		// Return the view
 		return mav;
 	}
-	
+
 	@GetMapping("/getScenarioByUsername")
 	@ResponseBody
-	public Set<Add_Scenario> getScenarioByUsername(@RequestParam("username") String username) {
-	    // 1. Find all user labs associated with the given username.
-	    List<UserLab> userLabs = UserLabRepository.findByusername(username);  // make sure method name matches your repo
+	public JSONArray getScenarioByUsername(@RequestParam("username") String username) {
+	    // Fetch all scenarios for the given username
+	    List<UserWiseChatBoatInstructionTemplate> scenarios = instructionTemplateRepository.findByUsername(username);
 
-	    // 2. Extract unique scenario IDs from the list of UserLab objects using a HashSet.
-	    Set<Integer> scenarioIds = new HashSet<>();
-	    for (UserLab userLab : userLabs) {
-	        scenarioIds.add(userLab.getScenarioId());
+	    JSONArray response = new JSONArray();
+
+	    for (UserWiseChatBoatInstructionTemplate scenario : scenarios) {
+	        Integer labId = scenario.getLabId();
+
+	        // Get completion counts
+	        Integer falseCountObj = instructionTemplateRepository.getfalseCompletionCountsByTemplateName(labId);
+	        Integer trueCountObj = instructionTemplateRepository.gettrueCompletionCountsByTemplateName(labId);
+
+	        int falseCount = (falseCountObj != null) ? falseCountObj : 0;
+	        int trueCount = (trueCountObj != null) ? trueCountObj : 0;
+
+	        int total = trueCount + falseCount;
+	        int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
+
+	        // Fetch Scenario entity to get name
+	        Optional<Add_Scenario> scenarioEntityOpt = ScenarioRepository.findById(scenario.getScenarioId());
+	        String scenarioName = scenarioEntityOpt.map(Add_Scenario::getScenarioName).orElse("Unknown");
+
+	        // Create JSON object for this scenario
+	        JSONArray temp = new JSONArray();
+	        temp.put(scenario.getScenarioId());
+	        temp.put( scenarioName);
+	        temp.put( percentage + "%");
+
+	        // Add to response array
+	        response.put(temp);
 	    }
 
-	    // 3. Find all scenarios that correspond to the extracted scenario IDs.
-	    Set<Add_Scenario> scenarios = new HashSet<>();
-	    for (Integer scenarioId : scenarioIds) {
-	        Optional<Add_Scenario> scenario = ScenarioRepository.findById(scenarioId);
-	        if (scenario.isPresent()) {
-	            scenarios.add(scenario.get());
-	        }
-	    }
-
-	    // Return the set of unique scenarios.
-	    return scenarios;
+	    System.out.println("response :" + response);
+	    return response;
 	}
 
+
+	@PostMapping("/update_last_session")
+	@ResponseBody
+	public ResponseEntity<String> updateLastSession(@RequestParam("id") Integer scenarioId, Principal principal) {
+		try {
+			String username = principal.getName();
+
+			int updatedRows = UserLabRepository.updateLastActiveConnection(scenarioId, username);
+			if (updatedRows > 0) {
+				return ResponseEntity.ok("Last session updated");
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lab not found");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Error updating session: " + e.getMessage());
+		}
+	}
 
 }

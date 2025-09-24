@@ -17,6 +17,8 @@ public class ContainerUserLabDTO {
 	    private String username;
 	    private String scenarioName;
 	    private Timestamp lastActiveConnection;
+	    
+	    private String guacamoleId;
 		public int getId() {
 			return id;
 		}
@@ -88,6 +90,12 @@ public class ContainerUserLabDTO {
 		}
 		public void setLastActiveConnection(Timestamp lastActiveConnection) {
 			this.lastActiveConnection = lastActiveConnection;
+		}
+		public String getGuacamoleId() {
+			return guacamoleId;
+		}
+		public void setGuacamoleId(String guacamoleId) {
+			this.guacamoleId = guacamoleId;
 		}
 	    
 	    

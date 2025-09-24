@@ -561,10 +561,15 @@ document.addEventListener("DOMContentLoaded", function () {
                                 </select>
                             </div>
                             
-                            <div id="viewLab_btn" >
-                            <a  href="/guac/View_Vm_Listing?Id=${item.Id}" class="btn btn-sm btn-success start-btn create-btn">
-                            <i class="fas fa-play"></i> View Lab </a>
-                            </div>
+                            <div id="viewLab_btn">
+                            <a href="javascript:void(0);"
+                               class="btn btn-sm btn-success start-btn create-btn"
+                               onclick="updateLastActiveSession('${item.Id}')">
+                               <i class="fas fa-play"></i> View Lab
+                            </a>
+                        </div>
+
+
                           
 							<div id="createLab_btn" style="display:none">
 								<button   type="button" class="start-btn create-btn" onclick="createDockerContainer()">
@@ -977,12 +982,25 @@ function getPercenetageParticularScenerio() {
         success: function(result) {
             result = result.trim();
             
-
             if (!isNaN(result)) {
-                document.getElementById("Complete_Per").innerText = result + "%";
+                let percentage = parseFloat(result);
+                const el = document.getElementById("Complete_Per");
+                el.innerText = "Completion: " + percentage + "%";
+
+                // Optional: add color based on value
+                if (percentage == 100) {
+                    el.style.color = "green";
+                } else if (percentage >= 50) {
+                    el.style.color = "orange";
+                } else {
+                    el.style.color = "red";
+                }
             } else {
-                document.getElementById("Complete_Per").innerText = "N/A";
+                const el = document.getElementById("Complete_Per");
+                el.innerText = "Completion: N/A";
+                el.style.color = "gray";
             }
+
         },
         error: function(err) {
             console.error("AJAX error:", err);
@@ -990,6 +1008,29 @@ function getPercenetageParticularScenerio() {
         }
     });
 }
+
+function updateLastActiveSession(itemId) {
+	
+    $.ajax({
+        type: "POST",
+        url: "/guac/update_last_session",
+        data: {
+            id: itemId
+        },
+        success: function(response) {
+            // Redirect to the lab page after successful update
+            window.location.href = `/guac/View_Vm_Listing?Id=${itemId}`;
+        },
+        error: function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed',
+                text: 'Could not update last active session.'
+            });
+        }
+    });
+}
+
 </script>
 </body>
 </html>
