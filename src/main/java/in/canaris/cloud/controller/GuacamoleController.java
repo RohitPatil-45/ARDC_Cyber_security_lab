@@ -3414,60 +3414,66 @@ public class GuacamoleController {
 	}
 
 	@PostMapping("/save_UserWisePlaylist")
-	public String saveUserWisePlaylist(@RequestParam(required = false) String groupId,
-			@RequestParam("userIds") List<Long> userIds, @RequestParam("playlistIds") List<Integer> playlistIds,
-			@RequestParam("subplaylistIds") List<Integer> subplaylistIds,
-			@RequestParam("scenarioIds") List<Integer> scenarioIds) {
-		try {
-			// Loop over all selected users
-			for (Long userId : userIds) {
-				String userName = AppUserRepository.getUserNameById(userId);
-				System.out.println("Processing userId: " + userId + " -> userName: " + userName);
+	public String saveUserWisePlaylist(
+	        @RequestParam(required = false) String groupId,
+	        @RequestParam(value = "userIds", required = false) List<Long> userIds,
+	        @RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
+	        @RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
+	        @RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds) {
 
-				if (userName == null) {
-					throw new RuntimeException("No username found for userId=" + userId);
-				}
+	    try {
+	        // Check if userIds exist
+	        if (userIds != null && !userIds.isEmpty()) {
+	            for (Long userId : userIds) {
+	                String userName = AppUserRepository.getUserNameById(userId);
+	                System.out.println("Processing userId: " + userId + " -> userName: " + userName);
 
-//
-//				SubPlaylistScenarioRepository.save(joinEntity);
-				// Save playlists
-				for (Integer playlistId : playlistIds) {
+	                if (userName == null) {
+	                    System.err.println("⚠ No username found for userId=" + userId);
+	                    continue; // Skip if no username found
+	                }
 
-					UserPlaylistMapping UserPlaylistEntity = new UserPlaylistMapping();
-					UserPlaylistEntity.setPlaylistId(playlistId);
-					UserPlaylistEntity.setUserName(userName);
+	                // Save playlists
+	                if (playlistIds != null && !playlistIds.isEmpty()) {
+	                    for (Integer playlistId : playlistIds) {
+	                        UserPlaylistMapping userPlaylistEntity = new UserPlaylistMapping();
+	                        userPlaylistEntity.setPlaylistId(playlistId);
+	                        userPlaylistEntity.setUserName(userName);
+	                        UserPlaylistMappingRepository.save(userPlaylistEntity);
+	                    }
+	                }
 
-					UserPlaylistMappingRepository.save(UserPlaylistEntity);
-				}
+	                // Save subplaylists
+	                if (subplaylistIds != null && !subplaylistIds.isEmpty()) {
+	                    for (Integer subplaylistId : subplaylistIds) {
+	                        UserSubplaylistMapping userSubplaylistEntity = new UserSubplaylistMapping();
+	                        userSubplaylistEntity.setSubPlaylistId(subplaylistId);
+	                        userSubplaylistEntity.setUserName(userName);
+	                        UserSubplaylistMappingRepository.save(userSubplaylistEntity);
+	                    }
+	                }
 
-				// Save subplaylists
-				for (Integer subplaylistId : subplaylistIds) {
+	                // Save scenarios
+	                if (scenarioIds != null && !scenarioIds.isEmpty()) {
+	                    for (Integer scenarioId : scenarioIds) {
+	                        UserScenarioMapping userScenarioEntity = new UserScenarioMapping();
+	                        userScenarioEntity.setScenarioId(scenarioId);
+	                        userScenarioEntity.setUserName(userName);
+	                        UserScenarioMappingRepository.save(userScenarioEntity);
+	                    }
+	                }
+	            }
+	        } else {
+	            System.err.println("⚠ No userIds provided, skipping save.");
+	        }
 
-					UserSubplaylistMapping UserSubplaylistEntity = new UserSubplaylistMapping();
-					UserSubplaylistEntity.setSubPlaylistId(subplaylistId);
-					UserSubplaylistEntity.setUserName(userName);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
 
-					UserSubplaylistMappingRepository.save(UserSubplaylistEntity);
-				}
-
-				// Save scenarios
-				for (Integer scenarioId : scenarioIds) {
-
-					UserScenarioMapping UserScenarioEntity = new UserScenarioMapping();
-					UserScenarioEntity.setScenarioId(scenarioId);
-					UserScenarioEntity.setUserName(userName);
-
-					UserScenarioMappingRepository.save(UserScenarioEntity);
-				}
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-
-		}
-
-		return "redirect:/guac/Add_UserWisePlaylist";
+	    return "redirect:/guac/Add_UserWisePlaylist";
 	}
+
 
 	@GetMapping("/user_playlist_summary")
 	public ModelAndView showUserPlaylistSummary() {
@@ -3637,12 +3643,12 @@ public class GuacamoleController {
 				array.put(percentage + "%");
 
 				// 4th column: action button
-				String actionBtn = "<button class='btn btn-info action-btn' " + "onclick=\"getuserPerformance('"
-						+ userName + "')\" " + "data-bs-toggle='modal' data-bs-target='#performanceModal' "
-						+ "data-username='" + userName + "'>"
-						+ "<i class='fas fa-chart-line'></i> View Scenarios</button>";
-
-				array.put(actionBtn);
+//				String actionBtn = "<button class='btn btn-info action-btn' " + "onclick=\"getuserPerformance('"
+//						+ userName + "')\" " + "data-bs-toggle='modal' data-bs-target='#performanceModal' "
+//						+ "data-username='" + userName + "'>"
+//						+ "<i class='fas fa-chart-line'></i> View Scenarios</button>";
+//
+//				array.put(actionBtn);
 
 				Finalarray.put(array);
 			}

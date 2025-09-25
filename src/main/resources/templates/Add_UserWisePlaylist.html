@@ -105,19 +105,17 @@ body {
 								</div>
 
 								<!-- FORM START -->
-								<form th:action="@{/guac/save_UserWisePlaylist}" method="post"
-									onsubmit="return validateForm()">
+								<form th:action="@{/guac/save_UserWisePlaylist}" method="post">
 									<div class="card-body">
 										<div class="row">
 											<!-- Group Dropdown -->
 											<div class="col-md-6">
 												<div class="form-group">
-													<label for="groupId" class="required-field">Select
-														Group</label> <select id="groupId" name="groupId"
+													<label for="groupId" class="required-field">Select Group</label> 
+													<select id="groupId" name="groupId"
 														class="form-control" required>
 														<option value="">-- Select Group --</option>
-														<option value="all" class="option-all">-- All
-															Groups --</option>
+														<option value="all" class="option-all">-- All Groups --</option>
 														<option th:each="group : ${groups}"
 															th:value="${group.group_name}"
 															th:text="${group.group_name}"></option>
@@ -126,61 +124,49 @@ body {
 												</div>
 											</div>
 
-											<!-- User Dropdown - Now Multiselect -->
+											<!-- User Dropdown - Multiselect -->
 											<div class="col-md-6">
 												<div class="form-group">
-													<label for="userIds" class="required-field">Select
-														User(s)</label> <select id="userIds" name="userIds"
+													<label for="userIds" class="required-field">Select User(s)</label> 
+													<select id="userIds" name="userIds"
 														class="form-control" multiple required>
 														<option value="">-- Select Users --</option>
-														<!-- Users will be populated dynamically -->
 													</select>
-													<div class="invalid-feedback">Please select at least
-														one user</div>
+													<div class="invalid-feedback">Please select at least one user</div>
 												</div>
 											</div>
 
-											<!-- Playlists Multi-select -->
+											<!-- Playlists Multi-select (NO REQUIRED) -->
 											<div class="col-md-4">
 												<div class="form-group">
-													<label for="playlistIds" class="required-field">Select
-														Playlists</label> <select id="playlistIds" name="playlistIds"
-														class="form-control" multiple required>
+													<label for="playlistIds">Select Playlists</label> 
+													<select id="playlistIds" name="playlistIds" class="form-control" multiple>
 														<option th:each="pl : ${playlists}" th:value="${pl.id}"
 															th:text="${pl.playlistName}"></option>
 													</select>
-													<div class="invalid-feedback">Please select at least
-														one playlist</div>
 												</div>
 											</div>
 
-											<!-- Sub Playlists Multi-select -->
+											<!-- Sub Playlists Multi-select (NO REQUIRED) -->
 											<div class="col-md-4">
 												<div class="form-group">
-													<label for="subplaylistIds" class="required-field">Select
-														Sub Playlists</label> <select id="subplaylistIds"
-														name="subplaylistIds" class="form-control" multiple
-														required>
+													<label for="subplaylistIds">Select Sub Playlists</label> 
+													<select id="subplaylistIds" name="subplaylistIds" class="form-control" multiple>
 														<option th:each="subpl : ${subplaylists}"
 															th:value="${subpl.id}" th:text="${subpl.playlistName}"></option>
 													</select>
-													<div class="invalid-feedback">Please select at least
-														one sub playlist</div>
 												</div>
 											</div>
 
-											<!-- Scenarios Multi-select -->
+											<!-- Scenarios Multi-select (NO REQUIRED) -->
 											<div class="col-md-4">
 												<div class="form-group">
-													<label for="scenarioIds" class="required-field">Select
-														Scenario</label> <select id="scenarioIds" name="scenarioIds"
-														class="form-control" multiple required>
+													<label for="scenarioIds">Select Scenario</label> 
+													<select id="scenarioIds" name="scenarioIds" class="form-control" multiple>
 														<option th:each="scenario : ${scenarios}"
 															th:value="${scenario.id}"
 															th:text="${scenario.scenarioName}"></option>
 													</select>
-													<div class="invalid-feedback">Please select at least
-														one scenario</div>
 												</div>
 											</div>
 										</div>
@@ -215,210 +201,87 @@ body {
 
 	<div th:replace="template :: jsscript"></div>
 
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/js/bootstrap-multiselect.min.js"></script>
-
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/js/bootstrap-multiselect.min.js"></script>
 
 	<script type="text/javascript">
-		$(document)
-				.ready(
-						function() {
-							// Initialize multiselects
-							$('#playlistIds').multiselect({
-								includeSelectAllOption : true,
-								enableFiltering : true,
-								maxHeight : 250,
-								buttonWidth : '100%'
-							});
+		$(document).ready(function() {
+			// Initialize multiselects
+			$('#playlistIds').multiselect({
+				includeSelectAllOption : true,
+				enableFiltering : true,
+				maxHeight : 250,
+				buttonWidth : '100%'
+			});
 
-							$('#subplaylistIds').multiselect({
-								includeSelectAllOption : true,
-								enableFiltering : true,
-								maxHeight : 250,
-								buttonWidth : '100%'
-							});
+			$('#subplaylistIds').multiselect({
+				includeSelectAllOption : true,
+				enableFiltering : true,
+				maxHeight : 250,
+				buttonWidth : '100%'
+			});
 
-							$('#scenarioIds').multiselect({
-								includeSelectAllOption : true,
-								enableFiltering : true,
-								maxHeight : 250,
-								buttonWidth : '100%'
-							});
+			$('#scenarioIds').multiselect({
+				includeSelectAllOption : true,
+				enableFiltering : true,
+				maxHeight : 250,
+				buttonWidth : '100%'
+			});
 
-							// Initialize user multiselect
-							$('#userIds').multiselect({
-								includeSelectAllOption : true,
-								enableFiltering : true,
-								maxHeight : 250,
-								buttonWidth : '100%'
-							});
+			$('#userIds').multiselect({
+				includeSelectAllOption : true,
+				enableFiltering : true,
+				maxHeight : 250,
+				buttonWidth : '100%'
+			});
 
-							// Group change event for AJAX user filtering
-							$('#groupId')
-									.change(
-											function() {
-												const groupValue = $(this)
-														.val();
-												const userSelect = $('#userIds');
+			// Group change event
+			$('#groupId').change(function() {
+				const groupValue = $(this).val();
+				const userSelect = $('#userIds');
 
-												// Show loading indicator
-												userSelect.addClass('loading');
-												userSelect.prop('disabled',
-														true);
+				userSelect.addClass('loading');
+				userSelect.prop('disabled', true);
 
-												// Clear current options except the first one
-												userSelect.multiselect(
-														'deselectAll', false);
-												userSelect.empty();
-												
+				userSelect.multiselect('deselectAll', false);
+				userSelect.empty();
 
-												if (groupValue) {
-													// 					let url = '/guac/getUsersByGroup';
-													// 					let params = {};
-													// 					alert("groupValue :" + groupValue)
-													// 					alert("groupValuecheck :" + (groupValue === 'all'));
-													// 					if (groupValue === 'all') {
-													// 						// Get all users
-													// 						url = '/guac/getAllUsers';
-													// 					} else {
-													// 						// Get users by specific group
-													// 						params = {
-													// 							groupName : groupValue
-													// 						};
-													// 					}
+				if (groupValue) {
+					let url = '/guac/getUsersByGroup';
+					let params = {};
 
-													let url = '/guac/getUsersByGroup';
-													let params = {};
+					if (groupValue.trim().toLowerCase() === 'all') {
+						params = { groupName : 'all' };
+					} else {
+						params = { groupName : groupValue };
+					}
 
-													if (groupValue
-															&& groupValue
-																	.trim()
-																	.toLowerCase() === 'all') {
-														params = {
-															groupName : 'all'
-														}; // server will treat this as "all users"
-													} else {
-														params = {
-															groupName : groupValue
-														};
-													}
-
-													// Fetch users via AJAX
-													$
-															.get(url, params)
-															.done(
-																	function(
-																			users) {
-																		// Add users to dropdown
-																		users
-																				.forEach(function(
-																						user) {
-																					userSelect
-																							.append($(
-																									'<option>',
-																									{
-																										value : user.userId,
-																										text : user.userName
-																									}));
-																				});
-
-																		// Refresh multiselect
-																		userSelect
-																				.multiselect('rebuild');
-																	})
-															.fail(
-																	function() {
-																		alert('Error loading users. Please try again.');
-																	})
-															.always(
-																	function() {
-																		// Remove loading indicator
-																		userSelect
-																				.removeClass('loading');
-																		userSelect
-																				.prop(
-																						'disabled',
-																						false);
-																	});
-												} else {
-													// If no group selected, enable the dropdown
-													userSelect
-															.removeClass('loading');
-													userSelect.prop('disabled',
-															false);
-													userSelect
-															.multiselect('rebuild');
-												}
-
-												// Reset validation
-												userSelect
-														.removeClass('is-invalid');
-											});
+					$.get(url, params).done(function(users) {
+						users.forEach(function(user) {
+							userSelect.append($('<option>', {
+								value : user.userId,
+								text : user.userName
+							}));
 						});
-
-		function validateForm() {
-			let isValid = true;
-
-			// Reset validation
-			$('.is-invalid').removeClass('is-invalid');
-
-			// Validate group
-			if (!$('#groupId').val()) {
-				$('#groupId').addClass('is-invalid');
-				isValid = false;
-			}
-
-			// Validate user - check if any user is selected
-			const selectedUsers = $('#userIds').val();
-			if (!selectedUsers || selectedUsers.length === 0
-					|| (selectedUsers.length === 1 && selectedUsers[0] === '')) {
-				$('#userIds').closest('.form-group').find('.multiselect')
-						.addClass('is-invalid');
-				isValid = false;
-			}
-
-			// Validate playlists
-			if (!$('#playlistIds').val()
-					|| $('#playlistIds').val().length === 0) {
-				$('#playlistIds').closest('.form-group').find('.multiselect')
-						.addClass('is-invalid');
-				isValid = false;
-			}
-
-			// Validate sub playlists
-			if (!$('#subplaylistIds').val()
-					|| $('#subplaylistIds').val().length === 0) {
-				$('#subplaylistIds').closest('.form-group')
-						.find('.multiselect').addClass('is-invalid');
-				isValid = false;
-			}
-
-			// Validate scenarios
-			if (!$('#scenarioIds').val()
-					|| $('#scenarioIds').val().length === 0) {
-				$('#scenarioIds').closest('.form-group').find('.multiselect')
-						.addClass('is-invalid');
-				isValid = false;
-			}
-
-			if (!isValid) {
-				$('html, body').animate({
-					scrollTop : $('.is-invalid:first').offset().top - 100
-				}, 500);
-				return false;
-			}
-
-			$('#spinner').removeClass('d-none');
-			$('#saveBtn').prop('disabled', true);
-			return true;
-		}
+						userSelect.multiselect('rebuild');
+					}).fail(function() {
+						alert('Error loading users. Please try again.');
+					}).always(function() {
+						userSelect.removeClass('loading');
+						userSelect.prop('disabled', false);
+					});
+				} else {
+					userSelect.removeClass('loading');
+					userSelect.prop('disabled', false);
+					userSelect.multiselect('rebuild');
+				}
+				userSelect.removeClass('is-invalid');
+			});
+		});
 
 		function resetForm() {
-			// Clear all selections
 			$('.is-invalid').removeClass('is-invalid');
 			$('#groupId').val('');
 
-			// Reset user multiselect
 			$('#userIds').multiselect('deselectAll', false);
 			$('#userIds').empty();
 			$('#userIds').append($('<option>', {
@@ -427,7 +290,6 @@ body {
 			}));
 			$('#userIds').multiselect('rebuild');
 
-			// Reset other multiselects
 			$('#playlistIds').multiselect('deselectAll', false);
 			$('#playlistIds').multiselect('refresh');
 

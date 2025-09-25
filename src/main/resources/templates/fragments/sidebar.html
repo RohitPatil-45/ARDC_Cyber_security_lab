@@ -78,7 +78,7 @@
 			<a href="javascript:void(0);" id="logo" class="logo logo-admin"
 				style="margin-left: 11px;"> <img
 				src="/webtemplate/dist/img/Magicbox-logo.png" width="100px"
-				alt="Magicbox logo" style="width: 90%;"> 
+				alt="Magicbox logo" style="width: 90%;">
 			</a>
 
 
@@ -363,8 +363,9 @@
 									</p>
 							</a>
 								<ul class="nav nav-treeview">
-									<li class="nav-item"><a href="/guac/My_Scenario_Inprogress"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+									<li class="nav-item"><a
+										href="/guac/My_Scenario_Inprogress" class="nav-link"> <i
+											class="far fa-dot-circle nav-icon"></i>
 											<p>My Scenario Inprogress</p>
 									</a></li>
 									<li class="nav-item"><a href="/guac/My_Scenario_Completed"
@@ -414,13 +415,14 @@
 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 											<p>View Docker Network</p>
 									</a></li>
-									
-									<li class="nav-item"><a href="/guac/View_DiscoverContainerListing"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+
+									<li class="nav-item"><a
+										href="/guac/View_DiscoverContainerListing" class="nav-link">
+											<i class="far fa-dot-circle nav-icon"></i>
 											<p>View Discover Container</p>
 									</a></li>
-									
-									
+
+
 								</ul></li>
 
 							<!-- Connections -->
@@ -454,17 +456,32 @@
 							</a></li>
 
 							<li class="nav-item"><a href="/guac/View_Scenario"
-								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+								class="nav-link"> <i class="far fa-circle nav-icon"></i>
 									<p>View Scenario</p>
 							</a></li>
 
-							<li
-								sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_USER','ROLE_SUPERADMIN')"
-								class="nav-item"><a href="/guac/My_Scenario"
+
+							<li class="nav-item has-treeview"><a href="#"
 								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>My Scenario</p>
-							</a></li>
+									<p>
+										In Progress Task <i class="right fas fa-angle-left"></i>
+									</p>
+							</a>
+								<ul class="nav nav-treeview">
+									<li class="nav-item"><a
+										href="/guac/My_Scenario_Inprogress" class="nav-link"> <i
+											class="far fa-dot-circle nav-icon"></i>
+											<p>My Scenario Inprogress</p>
+									</a></li>
+									<li class="nav-item"><a href="/guac/My_Scenario_Completed"
+										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+											<p>My Scenario Completed</p>
+									</a></li>
+
+								</ul></li>
+
 						</ul></li>
+
 
 					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
 						class="nav-item"><a href="#" class="nav-link"> <i
