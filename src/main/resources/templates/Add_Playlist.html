@@ -123,29 +123,40 @@
 
 									<div class="row">
 										<div class="col-md-6">
-<!-- 											<div class="form-group"> -->
-<!-- 												<label for="cover_image">Playlist Cover Image</label> <input -->
-<!-- 													type="file" class="form-control-file" id="cover_image" -->
-<!-- 													name="cover_image" accept="image/*" /> -->
-<!-- 												<div class="upload-preview mt-2"> -->
-<!-- 													<img th:if="${playlist.coverImage != null}" -->
-<!-- 														th:src="@{'/guac/playlist-image/' + ${playlist.Id}}" -->
-<!-- 														alt="Cover Image" /> -->
-<!-- 												</div> -->
-<!-- 											</div> -->
-											
+											<!-- 											<div class="form-group"> -->
+											<!-- 												<label for="cover_image">Playlist Cover Image</label> <input -->
+											<!-- 													type="file" class="form-control-file" id="cover_image" -->
+											<!-- 													name="cover_image" accept="image/*" /> -->
+											<!-- 												<div class="upload-preview mt-2"> -->
+											<!-- 													<img th:if="${playlist.coverImage != null}" -->
+											<!-- 														th:src="@{'/guac/playlist-image/' + ${playlist.Id}}" -->
+											<!-- 														alt="Cover Image" /> -->
+											<!-- 												</div> -->
+											<!-- 											</div> -->
+
 											<div class="form-group">
 												<label for="cover_image"> Cover Image</label>
+												<!-- 												<div class="custom-file"> -->
+												<!-- 													<input type="file" class="custom-file-input" -->
+												<!-- 														id="cover_image" name="cover_image" accept="image/*"> -->
+												<!-- 													<label class="custom-file-label" for="cover_image">Choose -->
+												<!-- 														image</label> -->
+												<!-- 														<div class="upload-preview mt-2"> -->
+												<!-- 													<img th:if="${playlist.coverImage != null}" -->
+												<!-- 														th:src="@{'/guac/playlist-image/' + ${playlist.Id}}" -->
+												<!-- 														alt="Cover Image" /> -->
+												<!-- 												</div> -->
+												<!-- 												</div> -->
 												<div class="custom-file">
 													<input type="file" class="custom-file-input"
 														id="cover_image" name="cover_image" accept="image/*">
-													<label class="custom-file-label" for="cover_image">Choose
-														image</label>
-														<div class="upload-preview mt-2">
-													<img th:if="${playlist.coverImage != null}"
-														th:src="@{'/guac/playlist-image/' + ${playlist.Id}}"
-														alt="Cover Image" />
-												</div>
+													<label class="custom-file-label" for="cover_image"
+														id="coverImageLabel"> <span
+														th:if="${playlist.CoverImage != null}">Current
+															image exists - choose new file to replace</span> <span
+														th:unless="${playlist.CoverImage != null}">Choose
+															file</span>
+													</label>
 												</div>
 												<small class="form-text text-muted">Recommended
 													size: 1200x630 pixels</small>

@@ -463,12 +463,8 @@ public class GuacamoleController {
 			UserLab lab = UserLabRepository.getByProxmoxId(Integer.valueOf(id));
 			CloudInstance inst = repository.findByInstance(lab.getTemplateName());
 
-			if (inst.getVirtualization_type().equalsIgnoreCase("Proxmox")) {
-				url = proxmoxService.getProxmoxConsoleUrl(Integer.valueOf(id), lab.getInstanceName());
-			} else {
-				String identifier = GuacIdentifierUtil.encode(id, "mysql");
-				url = guacService.getEmbedUrl(identifier);
-			}
+			String identifier = GuacIdentifierUtil.encode(id, "mysql");
+			url = guacService.getEmbedUrl(identifier);
 
 			model.addAttribute("embedUrl", url);
 
@@ -1043,7 +1039,7 @@ public class GuacamoleController {
 		model.addAttribute("playlist", playlist);
 
 		model.addAttribute("pageTitle", (id != null) ? "Edit Playlist" : "Create Playlist");
-		return "add_playlist"; // your Thymeleaf page
+		return "Add_Playlist"; 
 	}
 
 //	@GetMapping("/Add_Sub_Playlist")
@@ -2009,108 +2005,121 @@ public class GuacamoleController {
 		return mav;
 	}
 
+
+	
 	@PostMapping("/saveScenarioData")
 	public String saveScenarioData(@ModelAttribute("scenario") Add_Scenario scenarioObj,
-			RedirectAttributes redirectAttributes, @RequestParam(required = false) MultipartFile cover_image,
-			Principal principal) {
+	                               RedirectAttributes redirectAttributes,
+	                               @RequestParam(required = false) MultipartFile cover_image,
+	                               Principal principal) {
 
-		try {
-			boolean isNew = (scenarioObj.getId() == 0);
+	    try {
+	        boolean isNew = (scenarioObj.getId() == 0);
 
-			// Set creator if needed
-			if (principal != null) {
-				// scenarioObj.setCreatedBy(principal.getName());
-			}
+	        // Set creator if needed
+	        if (principal != null) {
+	            // scenarioObj.setCreatedBy(principal.getName());
+	        }
 
-			// Step 1: Parse Labs - format: "101~Lab A,102~Lab B"
-			String labsString = scenarioObj.getLabs();
-			String[] labsArray = labsString.split(",");
-			List<String> labIds = new ArrayList<>();
-			List<String> labNames = new ArrayList<>();
+	        // Step 1: Parse Labs - format: "101~Lab A,102~Lab B"
+	        String labsString = scenarioObj.getLabs();
+	        String[] labsArray = labsString.split(",");
+	        List<String> labIds = new ArrayList<String>();
+	        List<String> labNames = new ArrayList<String>();
 
-			for (String lab : labsArray) {
-				String[] parts = lab.split("~");
-				if (parts.length == 2) {
-					String labId = parts[0].trim();
-					String labName = parts[1].trim();
+	        for (String lab : labsArray) {
+	            String[] parts = lab.split("~");
+	            if (parts.length == 2) {
+	                String labId = parts[0].trim();
+	                String labName = parts[1].trim();
 
-					labIds.add(labId);
-					labNames.add(labName);
+	                labIds.add(labId);
+	                labNames.add(labName);
 
-					try {
-						repository.updateInstanceNameAssigned(Integer.parseInt(labId));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
+	                try {
+	                    repository.updateInstanceNameAssigned(Integer.parseInt(labId));
+	                } catch (Exception e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	        }
 
-			// For saving readable lab names in scenarioObj
-			scenarioObj.setLabs(String.join(",", labNames));
-			scenarioObj.setComments("");
+	        // For saving readable lab names in scenarioObj
+	        StringBuilder sb = new StringBuilder();
+	        for (int i = 0; i < labNames.size(); i++) {
+	            sb.append(labNames.get(i));
+	            if (i < labNames.size() - 1) {
+	                sb.append(",");
+	            }
+	        }
+	        scenarioObj.setLabs(sb.toString());
+	        scenarioObj.setComments("");
 
-			// Handle cover image
-			if (cover_image != null && !cover_image.isEmpty()) {
-				String contentType = cover_image.getContentType();
-				if (contentType != null && contentType.startsWith("image/")) {
-					scenarioObj.setCoverImage(cover_image.getBytes());
-				} else {
-					redirectAttributes.addFlashAttribute("message", "Invalid file type. Please upload an image file.");
-					redirectAttributes.addFlashAttribute("status", "error");
-				}
-			} else if (isNew) {
-				// Use default image for new scenario
-				String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
-				try {
-					byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
-					scenarioObj.setCoverImage(defaultImageBytes);
-				} catch (IOException e) {
-					scenarioObj.setCoverImage(createPlaceholderImage());
-				}
-			} else {
-				// Use existing image for edit
-				Optional<Add_Scenario> existing = ScenarioRepository.findById(scenarioObj.getId());
-				existing.ifPresent(existingScenario -> {
-					scenarioObj.setCoverImage(existingScenario.getCoverImage());
-				});
-			}
+	        // Handle cover image
+	        if (cover_image != null && !cover_image.isEmpty()) {
+	            String contentType = cover_image.getContentType();
+	            if (contentType != null && contentType.startsWith("image/")) {
+	                scenarioObj.setCoverImage(cover_image.getBytes());
+	            } else {
+	                redirectAttributes.addFlashAttribute("message", "Invalid file type. Please upload an image file.");
+	                redirectAttributes.addFlashAttribute("status", "error");
+	            }
+	        } else if (isNew) {
+	            // Use default image for new scenario
+	            String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
+	            try {
+	                byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
+	                scenarioObj.setCoverImage(defaultImageBytes);
+	            } catch (IOException e) {
+	                scenarioObj.setCoverImage(createPlaceholderImage());
+	            }
+	        } else {
+	            // Use existing image for edit
+	            Optional<Add_Scenario> existing = ScenarioRepository.findById(scenarioObj.getId());
+	            existing.ifPresent(existingScenario -> {
+	                scenarioObj.setCoverImage(existingScenario.getCoverImage());
+	            });
+	        }
 
-			// Save scenario and get saved entity with ID
-			Add_Scenario savedScenario = ScenarioRepository.save(scenarioObj);
+	        // Save scenario and get saved entity with ID
+	        Add_Scenario savedScenario = ScenarioRepository.save(scenarioObj);
 
-			// Save lab templates into ScenarioLabTemplate table
-			for (String lab : labsArray) {
-				String[] parts = lab.split("~");
-				if (parts.length == 2) {
-					ScenarioLabTemplate labTemplate = new ScenarioLabTemplate();
-					labTemplate.setScenarioId(savedScenario.getId());
-					labTemplate.setScenarioName(savedScenario.getScenarioName());
-					labTemplate.setTemplateId(Integer.parseInt(parts[0].trim()));
-					labTemplate.setTemplateName(parts[1].trim());
+	        // 🔥 Delete existing labs for this scenario before inserting new ones
+	        ScenarioLabTemplateRepository.deleteByScenarioId(savedScenario.getId());
 
-					ScenarioLabTemplateRepository.save(labTemplate);
-				}
-			}
+	        // Save lab templates into ScenarioLabTemplate table
+	        for (String lab : labsArray) {
+	            String[] parts = lab.split("~");
+	            if (parts.length == 2) {
+	                ScenarioLabTemplate labTemplate = new ScenarioLabTemplate();
+	                labTemplate.setScenarioId(savedScenario.getId());
+	                labTemplate.setScenarioName(savedScenario.getScenarioName());
+	                labTemplate.setTemplateId(Integer.parseInt(parts[0].trim()));
+	                labTemplate.setTemplateName(parts[1].trim());
 
-			redirectAttributes.addFlashAttribute("message", "Scenario saved successfully!");
-			redirectAttributes.addFlashAttribute("status", "success");
+	                ScenarioLabTemplateRepository.save(labTemplate);
+	            }
+	        }
 
-			redirectAttributes.addFlashAttribute("result", "success");
+	        redirectAttributes.addFlashAttribute("message", "Scenario saved successfully!");
+	        redirectAttributes.addFlashAttribute("status", "success");
+	        redirectAttributes.addFlashAttribute("result", "success");
 
-			// Redirect based on whether it's new or edit
-			if (isNew) {
-				return "redirect:/guac/Scenario_Details";
-			} else {
-				return "redirect:/guac/View_Particular_Scenerio?Id=" + savedScenario.getId();
-			}
+	        // Redirect based on whether it's new or edit
+	        if (isNew) {
+	            return "redirect:/guac/Scenario_Details";
+	        } else {
+	            return "redirect:/guac/View_Particular_Scenerio?Id=" + savedScenario.getId();
+	        }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			redirectAttributes.addFlashAttribute("message", "Error while saving scenario: " + e.getMessage());
-			redirectAttributes.addFlashAttribute("status", "error");
-			return "redirect:/guac/Scenario_Details";
-		}
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("message", "Error while saving scenario: " + e.getMessage());
+	        redirectAttributes.addFlashAttribute("status", "error");
+	        return "redirect:/guac/Scenario_Details";
+	    }
 	}
+
 
 //	@GetMapping("/editsceneriolist/{id}")
 //	public ModelAndView editsceneriolist(@PathVariable("id") Integer id) {
@@ -2173,37 +2182,82 @@ public class GuacamoleController {
 //	        return mav;
 //	    }
 //	}
-
+//	@GetMapping("/editsceneriolist/{id}")
+//	public ModelAndView editsceneriolist(@PathVariable("id") Integer id) {
+//	    try {
+//	        List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
+//
+//	        ModelAndView mav = new ModelAndView("Add_Scenario");
+//	        Add_Scenario scenario = ScenarioRepository.findById(id)
+//	                .orElseThrow(() -> new IllegalArgumentException("Invalid scenario ID: " + id));
+//
+//	        // Convert lab names back into "id~name" format for dropdown pre-selection
+//	        List<ScenarioLabTemplate> assignedLabs = ScenarioLabTemplateRepository.findByScenarioId(id);
+//	        List<String> assignedLabPairs = assignedLabs.stream()
+//	                .map(l -> l.getTemplateId() + "~" + l.getTemplateName())
+//	                .collect(Collectors.toList()); // ✅ works in Java 8+
+//
+//	        System.out.println("assignedLabPairs :" + assignedLabPairs);
+//
+//	        scenario.setLabs(String.join(",", assignedLabPairs));
+//
+//	        mav.addObject("scenario", scenario);
+//	        mav.addObject("instanceNameList", instances);
+//	        mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
+//	        mav.addObject("isEdit", true);
+//	        return mav;
+//	    } catch (Exception e) {
+//	        ModelAndView mav = new ModelAndView("Add_Scenario");
+//	        mav.addObject("message", e.getMessage());
+//	        mav.addObject("isEdit", false);
+//	        return mav;
+//	    }
+//	}
+	
+	
 	@GetMapping("/editsceneriolist/{id}")
 	public ModelAndView editsceneriolist(@PathVariable("id") Integer id) {
-		try {
-			List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
+	    try {
+	        List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
 
-			ModelAndView mav = new ModelAndView("Add_Scenario");
-			Add_Scenario scenario = ScenarioRepository.findById(id)
-					.orElseThrow(() -> new IllegalArgumentException("Invalid scenario ID: " + id));
+	        ModelAndView mav = new ModelAndView("Add_Scenario");
+	        Add_Scenario scenario = ScenarioRepository.findByCheckId(id);
+	        if (scenario == null) {
+	            throw new IllegalArgumentException("Invalid scenario ID: " + id);
+	        }
 
-			// Convert lab names back into "id~name" format for dropdown pre-selection
-			List<ScenarioLabTemplate> assignedLabs = ScenarioLabTemplateRepository.findByScenarioId(id);
-			List<String> assignedLabPairs = assignedLabs.stream()
-					.map(l -> l.getTemplateId() + "~" + l.getTemplateName()).toList();
+	        // Convert lab names back into "id~name" format for dropdown pre-selection
+	        List<ScenarioLabTemplate> assignedLabs = ScenarioLabTemplateRepository.findByScenarioId(id);
+	        List<String> assignedLabPairs = new ArrayList<String>();
 
-			System.out.println("assignedLabPairs :" + assignedLabPairs);
+	        for (ScenarioLabTemplate l : assignedLabs) {
+	            assignedLabPairs.add(l.getTemplateId() + "~" + l.getTemplateName());
+	        }
 
-			scenario.setLabs(String.join(",", assignedLabPairs));
+	        // Manual join (since String.join is Java 8+)
+	        StringBuilder sb = new StringBuilder();
+	        for (int i = 0; i < assignedLabPairs.size(); i++) {
+	            sb.append(assignedLabPairs.get(i));
+	            if (i < assignedLabPairs.size() - 1) {
+	                sb.append(",");
+	            }
+	        }
+	        scenario.setLabs(sb.toString());
 
-			mav.addObject("scenario", scenario);
-			mav.addObject("instanceNameList", instances);
-			mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
-			mav.addObject("isEdit", true);
-			return mav;
-		} catch (Exception e) {
-			ModelAndView mav = new ModelAndView("Add_Scenario");
-			mav.addObject("message", e.getMessage());
-			mav.addObject("isEdit", false);
-			return mav;
-		}
+	        mav.addObject("scenario", scenario);
+	        mav.addObject("instanceNameList", instances);
+	        mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
+	        mav.addObject("isEdit", true);
+	        return mav;
+	    } catch (Exception e) {
+	        ModelAndView mav = new ModelAndView("Add_Scenario");
+	        mav.addObject("message", e.getMessage());
+	        mav.addObject("isEdit", false);
+	        return mav;
+	    }
 	}
+
+
 
 	@GetMapping("/deletsceneriolist/{id}")
 	public String deletsceneriolist(@PathVariable("id") Integer id) {

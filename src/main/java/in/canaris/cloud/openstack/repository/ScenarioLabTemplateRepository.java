@@ -18,4 +18,6 @@ public interface ScenarioLabTemplateRepository extends JpaRepository<ScenarioLab
 
 	List<ScenarioLabTemplate> findByScenarioId(int scenarioId);
 
+	void deleteByScenarioId(int id);
+
 }

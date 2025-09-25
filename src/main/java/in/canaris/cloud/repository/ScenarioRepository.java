@@ -20,6 +20,9 @@ public interface ScenarioRepository extends JpaRepository<Add_Scenario, Integer>
 	@Query("SELECT a FROM Add_Scenario a WHERE a.ScenarioName IN (SELECT u.ScenarioName FROM UserScenario u)")
 	List<Add_Scenario> findByUserScenario();
 
+	@Query("SELECT d FROM Add_Scenario d WHERE d.Id = :id")
+	Add_Scenario findByCheckId(@Param("id") Integer id);
+
 
 
 }

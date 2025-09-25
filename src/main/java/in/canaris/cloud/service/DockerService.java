@@ -54,7 +54,7 @@ public class DockerService {
 
 		Ports ports = new Ports();
 
-		// Map hostPort -> containerPort
+// Map hostPort -> containerPort
 		portMappings.forEach((hostPort, containerPort) -> {
 			ExposedPort exposedPort = ExposedPort.tcp(containerPort);
 			ports.bind(exposedPort, Ports.Binding.bindPort(hostPort));
@@ -68,7 +68,10 @@ public class DockerService {
 
 		CreateContainerResponse container = dockerClient.createContainerCmd(imageName).withName(containerName)
 				.withTty(true) // same as -it
-				.withHostConfig(hostConfig).withEnv(envVars) // <--- set environment variables here
+				.withHostConfig(hostConfig).withEnv(envVars)
+				.withCmd("bash", "-c", "echo 'export CONTAINER_NAME=" + containerName + "' >> ~/.bashrc")
+				.withAttachStdout(true)
+			    .withAttachStderr(true)
 				.exec();
 
 		dockerClient.startContainerCmd(container.getId()).exec();
@@ -80,7 +83,6 @@ public class DockerService {
 		} else {
 			return "fail";
 		}
-
 	}
 
 	public void stopContainer(String containerId) {
@@ -268,7 +270,7 @@ public class DockerService {
 	}
 
 	public String runWindowsContainer(String imageName, String newInstanceName, Map<Integer, Integer> portMappings,
-			String network) {
+			String network, String filepath) {
 		try {
 			Integer rdpPort = null;
 			Integer novncPort = null;
@@ -285,9 +287,7 @@ public class DockerService {
 				throw new IllegalArgumentException("RDP (3389) and noVNC (8006) ports must be mapped in portMappings");
 			}
 
-			String scriptPath = "/home/ubuntu/Desktop/ARDC_Lab/windows-docker/win.sh";
-
-			ProcessBuilder pb = new ProcessBuilder("bash", scriptPath, "--lab-name", newInstanceName, "--rdp-port",
+			ProcessBuilder pb = new ProcessBuilder("bash", filepath, "--lab-name", newInstanceName, "--rdp-port",
 					String.valueOf(rdpPort), "--novnc-port", String.valueOf(novncPort), "--net-name", network);
 
 			pb.redirectErrorStream(true);

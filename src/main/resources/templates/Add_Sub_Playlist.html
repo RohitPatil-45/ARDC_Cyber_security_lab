@@ -374,12 +374,24 @@ label {
 
 											<div class="form-group">
 												<label for="cover_image"> Cover Image</label>
-												<div class="custom-file">
-													<input type="file" class="custom-file-input"
-														id="cover_image" name="cover_image" accept="image/*">
-													<label class="custom-file-label" for="cover_image">Choose
-														image</label>
-												</div>
+<!-- 												<div class="custom-file"> -->
+<!-- 													<input type="file" class="custom-file-input" -->
+<!-- 														id="cover_image" name="cover_image" accept="image/*"> -->
+<!-- 													<label class="custom-file-label" for="cover_image">Choose -->
+<!-- 														image</label> -->
+<!-- 												</div> -->
+
+<div class="custom-file">
+															<input type="file" class="custom-file-input"
+																id="cover_image" name="cover_image" accept="image/*">
+															<label class="custom-file-label" for="cover_image"
+																id="coverImageLabel"> <span
+																th:if="${coverImage != null}">Current
+																	image exists - choose new file to replace</span> <span
+																th:unless="${CoverImage != null}">Choose
+																	file</span>
+															</label>
+														</div>
 												<small class="form-text text-muted">Recommended
 													size: 1200x630 pixels</small>
 											</div>

@@ -2,14 +2,14 @@ package in.canaris.cloud.service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -99,11 +99,11 @@ public class ProxmoxService {
 		}
 	}
 
-	public Map<String, Object> cloneVm(int templateId, String newVmName, String filepath, String physicalServerIp) {
+	public Map<String, Object> cloneVm(int templateId, String newVmName, String filepath, String physicalServerIp, String ip) {
 		Map<String, Object> result = new HashMap<>();
 		try {
 			ProcessBuilder processBuilder = new ProcessBuilder("bash", filepath, String.valueOf(templateId), newVmName,
-					physicalServerIp);
+					physicalServerIp, ip);
 			processBuilder.redirectErrorStream(true);
 
 			Process process = processBuilder.start();
@@ -127,6 +127,7 @@ public class ProxmoxService {
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			result.clear();
 			result.put("status", "fail");
 			result.put("error", e.getMessage());
@@ -147,6 +148,13 @@ public class ProxmoxService {
 		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
 		return response.getStatusCode().is2xxSuccessful();
+	}
+
+	public String getNextIp(String ip) throws Exception {
+		byte[] bytes = InetAddress.getByName(ip).getAddress();
+		int ipInt = ByteBuffer.wrap(bytes).getInt();
+		int nextIpInt = ipInt + 1;
+		return InetAddress.getByAddress(ByteBuffer.allocate(4).putInt(nextIpInt).array()).getHostAddress();
 	}
 
 }
