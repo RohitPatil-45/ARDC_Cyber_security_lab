@@ -59,6 +59,9 @@ public class UserLab {
 	
 	@Column(name = "last_active_connection")
 	private Timestamp lastActiveConnection;
+	
+	 @Column(name = "mandatory_command_executed")
+	    private Boolean mandatoryCommandExecuted = false;
 
 	public Long getLabId() {
 		return labId;
@@ -181,6 +184,14 @@ public class UserLab {
 	public void setLastActiveConnection(Timestamp lastActiveConnection) {
 		this.lastActiveConnection = lastActiveConnection;
 	}
+	
+	public Boolean getMandatoryCommandExecuted() {
+        return mandatoryCommandExecuted != null ? mandatoryCommandExecuted : false;
+    }
+    
+    public void setMandatoryCommandExecuted(Boolean mandatoryCommandExecuted) {
+        this.mandatoryCommandExecuted = mandatoryCommandExecuted;
+    }
 
 	@Override
 	public String toString() {

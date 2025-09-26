@@ -158,6 +158,8 @@ public interface CloudInstanceRepository extends JpaRepository<CloudInstance, In
 	
 	@Query("SELECT  c FROM CloudInstance c WHERE instance_name=:instance_name")
 	CloudInstance findByInstance(String instance_name);
+
+	
 	
 
 	

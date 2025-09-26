@@ -50,10 +50,16 @@ public interface UserWiseChatBoatInstructionTemplateRepository
 			+ "WHERE isCommandExecuted='true' AND username = :username", nativeQuery = true)
 	Integer getTrueCompletionCountsByTemplateId(@Param("username") String username);
 
+//	@Modifying
+//	@Transactional
+//	@Query(value = "UPDATE userwise_chatboat_instruction_template SET isCommandExecuted = 'false' WHERE lab_name = :containerName", nativeQuery = true)
+//	void UpdateresetByLabName(@Param("containerName") String containerName);
+	
 	@Modifying
 	@Transactional
-	@Query(value = "UPDATE userwise_chatboat_instruction_template SET isCommandExecuted = 'false' WHERE lab_name = :containerName", nativeQuery = true)
-	void UpdateresetByLabName(@Param("containerName") String containerName);
+	@Query(value = "UPDATE userwise_chatboat_instruction_template  SET isCommandExecuted = 'false' WHERE lab_name = :containerName", nativeQuery = true)
+	int UpdateresetByLabName(@Param("containerName") String containerName);
+
 
 	@Query(value = "SELECT * FROM userwise_chatboat_instruction_template WHERE lab_name = :labName AND isCommandExecuted = 'true' ORDER BY id ASC", nativeQuery = true)
 	List<UserWiseChatBoatInstructionTemplate> findExecutedByLabName(@Param("labName") String labName);

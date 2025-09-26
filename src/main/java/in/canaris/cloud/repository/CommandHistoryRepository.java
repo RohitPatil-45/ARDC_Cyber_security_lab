@@ -26,6 +26,12 @@ public interface CommandHistoryRepository extends JpaRepository<CommandHistory, 
 	@Query("SELECT ch FROM CommandHistory ch WHERE ch.ContainerName = :lab_name")
 	List<CommandHistory> findByContainerName(@Param("lab_name") String lab_name);
 
+	@Query("SELECT ch FROM CommandHistory ch WHERE ch.Command = :labcommand")
+	List<CommandHistory> findByCommand(@Param("labcommand") String labcommand);
+
+	@Query("SELECT ch FROM CommandHistory ch WHERE ContainerName =:labName and ch.Command = :labcommand")
+	List<CommandHistory> findByContainerNameAndCommand(@Param("labName") String labName ,@Param("labcommand") String labcommand);
+
 
 //	 @Query("SELECT ch FROM CommandHistory ch WHERE ch.ContainerName = :labId AND ch.Command = :command")
 //	    Optional<CommandHistory> findByLabIdAndCommand(@Param("labId") String labId, @Param("command") String command);

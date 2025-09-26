@@ -1813,6 +1813,7 @@ public class CloudInstanceController {
 				obj.setDocker_network_id(parts[0]);
 				obj.setDocker_network_name(parts[1]);
 			}
+			obj.setMonitoring(true);
 
 			repository.save(obj);
 

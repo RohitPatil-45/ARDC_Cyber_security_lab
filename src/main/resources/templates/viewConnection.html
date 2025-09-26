@@ -775,6 +775,7 @@ background-color
 								<button class="continue-button" id="continue-button"
 									data-labid="" data-command="">Continue</button>
 							</div>
+			
 						</div>
 					</div>
 
@@ -853,35 +854,50 @@ background-color
 		}
 	}
 	
-	// Function to set up image modal functionality
-	function setupImageModal() {
-		// Get the modal
-		const modal = document.getElementById("imageModal");
-		const modalImg = document.getElementById("modalImage");
-		const captionText = document.getElementById("modalCaption");
-		
-		// Get all images in chat messages and add click event
-		$('#chat-messages').on('click', '.message-content img', function() {
-			modal.style.display = "block";
-			modalImg.src = this.src;
-			captionText.innerHTML = this.alt || "Instruction Image";
-		});
-		
-		// Get the <span> element that closes the modal
-		const span = document.getElementsByClassName("close-modal")[0];
-		
-		// When the user clicks on <span> (x), close the modal
-		span.onclick = function() { 
-			modal.style.display = "none";
-		}
-		
-		// When the user clicks anywhere outside of the modal, close it
-		modal.onclick = function(event) {
-			if (event.target == modal) {
-				modal.style.display = "none";
-			}
-		}
-	}
+
+	
+	// Replace the existing setupImageModal function with this enhanced version:
+function setupImageModal() {
+    // Get the modal elements
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImage");
+    const captionText = document.getElementById("modalCaption");
+    
+    // Function to handle image clicks
+    function handleImageClick(event) {
+        modal.style.display = "block";
+        modalImg.src = event.target.src;
+        captionText.innerHTML = event.target.alt || "Instruction Image";
+    }
+    
+    // Set up click events for images in chat messages
+    $('#chat-messages').on('click', '.message-content img', handleImageClick);
+    
+    // Set up click events for images in lab instructions
+    $('#Lab_Instructions').on('click', '.image-container img', handleImageClick);
+    
+    // Get the close button
+    const span = document.getElementsByClassName("close-modal")[0];
+    
+    // When the user clicks on (x), close the modal
+    span.onclick = function() { 
+        modal.style.display = "none";
+    }
+    
+    // When the user clicks anywhere outside of the modal, close it
+    modal.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+    
+    // Also close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            modal.style.display = "none";
+        }
+    });
+}
 	
 	// Function to copy command to clipboard
 	function copyCommandToClipboard(commandText) {
@@ -920,40 +936,7 @@ function focusRDPFrame() {
 	}
 }
 
-	
-	// Function to set up copy buttons for commands
-// 	function setupCopyButtons() {
-// 		// Set up event delegation for copy buttons
-// 		$(document).on('click', '.copy-button', function() {
-// 			const commandText = $(this).closest('.command-container').find('.command-text').text();
-// 			const button = $(this);
-			
-// 			// Copy command to clipboard
-// 			if (copyCommandToClipboard(commandText)) {
-// 				// Show success feedback
-// 				button.addClass('copied');
-// 				button.html('<i class="fas fa-check"></i> Copied!');
-				
-// 				// Focus on RDP frame for pasting
-// 				focusRDPFrame();
-				
-// 				// Reset button after 2 seconds
-// 				setTimeout(function() {
-// 					button.removeClass('copied');
-// 					button.html('<i class="fas fa-copy"></i> Copy');
-// 				}, 2000);
-// 			} else {
-// 				// Show error message
-// 				Swal.fire({
-// 					icon: 'error',
-// 					title: 'Copy Failed',
-// 					text: 'Failed to copy command to clipboard. Please try again.',
-// 					timer: 2000,
-// 					showConfirmButton: false
-// 				});
-// 			}
-// 		});
-// 	}
+
 	
 	
 	function setupCopyButtons() {
@@ -991,19 +974,6 @@ function focusRDPFrame() {
 	});
 }
 
-	
-	// Function to format command messages with copy functionality
-// 	function formatCommandWithCopy(commandText) {
-// 		return `
-// 			<div class="command-container">
-// 				<div class="command-text">${commandText}</div>
-// 				<button class="copy-button">
-// 					<i class="fas fa-copy"></i> Copy
-// 				</button>
-// 				<div class="copy-hint">Click to copy, then paste in VM with Ctrl+V</div>
-// 			</div>
-// 		`;
-// 	}
 	
 	
 	function formatCommandWithCopy(commandText) {
@@ -1051,7 +1021,7 @@ function focusRDPFrame() {
 		// Load initial instructions on page load
 		if (currentLabId) {
 			ActionforLAbOnload(currentLabId);
-			continueActionforLAbOnload(currentLabId);
+// 			continueActionforLAbOnload(currentLabId);
 			ConnectionDetails(currentLabId); // Call ConnectionDetails on page load
 			 checkLabCompletionStatus(currentLabId); // Check if lab is already completed
 		}
@@ -1059,16 +1029,21 @@ function focusRDPFrame() {
 		// Set up event handler for continue button
 		$('#continue-button').on('click', handleContinueClick);
 		
-		// Set up event handler for chat tab click
-		$('#chat-tab-button').on('click', function() {
-			if (currentLabId) {
-				continueActionforLAbOnload(currentLabId);
-			}
-			// Reset notification when chat tab is opened
-			newMessagesCount = 0;
-			$('#chat-notification').hide();
-			$(this).removeClass('has-new-messages');
-		});
+		
+		// Update the chat tab click handler in your $(document).ready function:
+$('#chat-tab-button').on('click', function() {
+    // Only load chat content if it's empty and lab is not completed
+    if (currentLabId && $('#chat-messages').children().length <= 1) { // Only system message exists
+        const isCompleted = $('#continue-button').prop('disabled');
+        if (!isCompleted) {
+            continueActionforLAbOnload(currentLabId);
+        }
+    }
+    
+    newMessagesCount = 0;
+    $('#chat-notification').hide();
+    $(this).removeClass('has-new-messages');
+});
 		
 		// Toggle sidebar visibility (old button)
 		$('#toggle-sidebar').click(function() {
@@ -1165,66 +1140,140 @@ function focusRDPFrame() {
 		setupImageModal();
 	});
 	
-	function ActionforLAbOnload(id) {
-	    $.ajax({
-	        type: "POST",
-	        url: "/guac/ActionloadInitialInstruction",
-	        data: { labId: id },
-	        success: function(response) {
-	            if (response.success) {
-	                const instructions = response.instructions || [];
+// 	function ActionforLAbOnload(id) {
+// 	    $.ajax({
+// 	        type: "POST",
+// 	        url: "/guac/ActionloadInitialInstruction",
+// 	        data: { labId: id },
+// 	        success: function(response) {
+// 	            if (response.success) {
+// 	                const instructions = response.instructions || [];
 
-	                // Clear previous messages
-	                $('#Lab_Instructions').empty();
+// 	                // Clear previous messages
+// 	                $('#Lab_Instructions').empty();
 
-	                instructions.forEach(instr => {
-	                    const command = instr.command || '';
-	                    const details = instr.instructionDetails || '';
+// 	                instructions.forEach(instr => {
+// 	                    const command = instr.command || '';
+// 	                    const details = instr.instructionDetails || '';
 
-	                    // Parse the instruction details to separate text and images
-	                    const $content = $('<div>').html(details);
-	                    const textContent = $content.text().trim();
-	                    const images = $content.find('img');
+// 	                    // Parse the instruction details to separate text and images
+// 	                    const $content = $('<div>').html(details);
+// 	                    const textContent = $content.text().trim();
+// 	                    const images = $content.find('img');
 	                    
-	                    // Create instruction container
-	                    const instructionHtml = $(`
-	                        <div class="instruction-item">
-	                            <div class="instruction-text">${textContent}</div>
-	                            <div class="message-command"><strong>${command}</strong></div>
-	                        </div>
-	                    `);
+// 	                    // Create instruction container
+// 	                    const instructionHtml = $(`
+// 	                        <div class="instruction-item">
+// 	                            <div class="instruction-text">${textContent}</div>
+// 	                            <div class="message-command"><strong>${command}</strong></div>
+// 	                        </div>
+// 	                    `);
 	                    
-	                    // Add images if any
-	                    if (images.length > 0) {
-	                        images.each(function() {
-	                            const src = $(this).attr('src');
-	                            const alt = $(this).attr('alt') || '';
-	                            const imageContainer = $(`
-	                                <div class="image-container">
-	                                    <img src="${src}" alt="${alt}">
-	                                    ${alt ? `<div class="image-caption">${alt}</div>` : ''}
-	                                </div>
-	                            `);
-	                            instructionHtml.append(imageContainer);
-	                        });
-	                    }
+// 	                    // Add images if any
+// 	                    if (images.length > 0) {
+// 	                        images.each(function() {
+// 	                            const src = $(this).attr('src');
+// 	                            const alt = $(this).attr('alt') || '';
+// 	                            const imageContainer = $(`
+// 	                                <div class="image-container">
+// 	                                    <img src="${src}" alt="${alt}">
+// 	                                    ${alt ? `<div class="image-caption">${alt}</div>` : ''}
+// 	                                </div>
+// 	                            `);
+// 	                            instructionHtml.append(imageContainer);
+// 	                        });
+// 	                    }
 	                    
-	                    $('#Lab_Instructions').append(instructionHtml);
-	                });
+// 	                    $('#Lab_Instructions').append(instructionHtml);
+// 	                });
 
-	            } else {
-	                console.error('Failed to load instructions:', response.error);
-	            }
-	        },
-	        error: function() {
-	            Swal.fire({
-	                icon: 'error',
-	                title: 'Error',
-	                text: 'An error occurred while fetching data.'
-	            });
-	        }
-	    });
-	}
+// 	            } else {
+// 	                console.error('Failed to load instructions:', response.error);
+// 	            }
+// 	        },
+// 	        error: function() {
+// 	            Swal.fire({
+// 	                icon: 'error',
+// 	                title: 'Error',
+// 	                text: 'An error occurred while fetching data.'
+// 	            });
+// 	        }
+// 	    });
+// 	}
+
+function ActionforLAbOnload(id) {
+    $.ajax({
+        type: "POST",
+        url: "/guac/ActionloadInitialInstruction",
+        data: { labId: id },
+        success: function(response) {
+            if (response.success) {
+                const instructions = response.instructions || [];
+                
+                // Clear previous content
+                $('#Lab_Instructions').empty();
+                
+                if (instructions.length === 0) {
+                    $('#Lab_Instructions').html('<div class="text-muted">No instructions available</div>');
+                    return;
+                }
+                
+                instructions.forEach((instr, index) => {
+                    const command = instr.command || '';
+                    const details = instr.instructionDetails || '';
+                    
+                    // Parse the instruction details
+                    const $content = $('<div>').html(details);
+                    const textContent = $content.text().trim();
+                    const images = $content.find('img');
+                    
+                    // Create instruction container with step number
+                    const instructionHtml = $(`
+                        <div class="instruction-item mb-4 p-3" style="border-left: 3px solid #007bff; background-color: rgba(255,255,255,0.05);">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0" style="color: #63b3ed;">Step ${index + 1}</h6>
+                            </div>
+                            <div class="instruction-text mb-2">${textContent}</div>
+                            ${command ? `<div class="message-command"><strong>Command: ${command}</strong></div>` : ''}
+                        </div>
+                    `);
+                    
+                    // Add images if any
+                    if (images.length > 0) {
+                        images.each(function() {
+                            const src = $(this).attr('src');
+                            const alt = $(this).attr('alt') || '';
+                            const imageContainer = $(`
+                                <div class="image-container mt-2">
+                                    <img src="${src}" alt="${alt}" style="cursor: pointer; max-width: 100%; height: auto; border-radius: 8px;">
+                                    ${alt ? `<div class="image-caption">${alt}</div>` : ''}
+                                </div>
+                            `);
+                            instructionHtml.append(imageContainer);
+                        });
+                    }
+                    
+                    $('#Lab_Instructions').append(instructionHtml);
+                });
+                
+                // Set up image modal for lab instruction images
+                setupImageModal();
+                
+            } else {
+                $('#Lab_Instructions').html('<div class="text-muted">Error loading instructions</div>');
+                console.error('Failed to load instructions:', response.error);
+            }
+        },
+        error: function() {
+            $('#Lab_Instructions').html('<div class="text-muted">Error loading instructions</div>');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while fetching instructions.'
+            });
+        }
+    });
+}
 
 	function continueActionforLAbOnload(id) {
 		$.ajax({
@@ -1233,6 +1282,8 @@ function focusRDPFrame() {
 			data: { labId: id },
 			success: function(response) {
 				if (response.success) {
+					
+
 					const newInstruction = response.instructionText || '';
 					const newCommand = response.command || '';
 					const isLast = response.isLast || false;
@@ -1245,6 +1296,7 @@ function focusRDPFrame() {
 					
 					setTimeout(() => {
 						// Add instruction (HTML including image)
+						document.getElementById("chat-messages").innerHTML = "";
 						const instructionHtml = $(`
 							<div class="message incoming">
 								<div class="message-content">${newInstruction}</div>
@@ -1307,6 +1359,9 @@ function focusRDPFrame() {
 	        },
 	        success: function(response) {
 	            if (response.success) {
+	            	
+	            	
+	            	
 	                const newInstruction = response.instruction;
 	                const newCommand = response.command;
 	                const isLast = response.isLast || false;
@@ -1320,6 +1375,7 @@ function focusRDPFrame() {
 	                showTypingIndicator();
 	                
 	                setTimeout(() => {
+	                	document.getElementById("chat-messages").innerHTML = "";
 		                // Instruction HTML
 		                const instructionHtml = $(`
 		                    <div class="message incoming">
@@ -1583,6 +1639,8 @@ function focusRDPFrame() {
 	        }
 	    });
 	}
+	
+	
 
 	const iframe = document.getElementById("rdp-frame");
 

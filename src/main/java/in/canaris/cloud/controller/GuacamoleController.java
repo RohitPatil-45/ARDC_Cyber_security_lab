@@ -55,6 +55,7 @@ import in.canaris.cloud.entity.Discount;
 import in.canaris.cloud.entity.Group;
 import in.canaris.cloud.entity.PlaylistScenario;
 import in.canaris.cloud.entity.PlaylistScenarioId;
+import in.canaris.cloud.entity.SubProduct;
 import in.canaris.cloud.openstack.entity.UserPlaylistMapping;
 import in.canaris.cloud.openstack.entity.Add_Scenario;
 import in.canaris.cloud.openstack.entity.ChartBoatInstructionTemplate;
@@ -454,12 +455,36 @@ public class GuacamoleController {
 		return "view";
 	}
 
+//	@GetMapping("/viewPlaylistConnection/{id}")
+//	public String viewPlaylistConnection(@PathVariable String id, Model model) {
+//
+//		String url = null;
+//		try {
+//
+//			UserLab lab = UserLabRepository.getByProxmoxId(Integer.valueOf(id));
+//			CloudInstance inst = repository.findByInstance(lab.getTemplateName());
+//
+//			String identifier = GuacIdentifierUtil.encode(id, "mysql");
+//			url = guacService.getEmbedUrl(identifier);
+//
+//			model.addAttribute("embedUrl", url);
+//
+//			List<CloudInstance> instances = null;
+//			instances = repository.findByGuacamoleId(id);
+//
+//			model.addAttribute("instructionsdata", instances);
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//
+//		return "viewConnection";
+//	}
+
 	@GetMapping("/viewPlaylistConnection/{id}")
 	public String viewPlaylistConnection(@PathVariable String id, Model model) {
-
 		String url = null;
 		try {
-
 			UserLab lab = UserLabRepository.getByProxmoxId(Integer.valueOf(id));
 			CloudInstance inst = repository.findByInstance(lab.getTemplateName());
 
@@ -468,10 +493,14 @@ public class GuacamoleController {
 
 			model.addAttribute("embedUrl", url);
 
-			List<CloudInstance> instances = null;
-			instances = repository.findByGuacamoleId(id);
-
+			List<CloudInstance> instances = repository.findByGuacamoleId(id);
 			model.addAttribute("instructionsdata", instances);
+
+			// ✅ Add OS to the model
+			if (inst != null) {
+				String os = inst.getSubproduct_id().getProduct_id().getProduct_name();
+				model.addAttribute("os", os);
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -480,70 +509,6 @@ public class GuacamoleController {
 		return "viewConnection";
 	}
 
-//	@PostMapping("/loadInitialInstruction")
-//	@ResponseBody
-//	public Map<String, Object> loadInitialInstruction(@RequestParam String labId) {
-//		Map<String, Object> response = new HashMap<>();
-//		try {
-//			InstructionCommand instructionCommand = InstructionCommandRepository.findNextUnexecutedByLabId(labId);
-//
-//			if (instructionCommand != null) {
-//				response.put("success", true);
-//				response.put("instruction", instructionCommand.getInstruction());
-//				response.put("command", instructionCommand.getCommand());
-//				response.put("isLast", false); // Set this properly if needed
-//			} else {
-//				response.put("success", false);
-//				response.put("error", "No unexecuted instructions found.");
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			response.put("success", false);
-//			response.put("error", "Failed to load instruction.");
-//		}
-//
-//		return response;
-//	}
-
-//	@PostMapping("/loadInitialInstruction")
-//	@ResponseBody
-//	public Map<String, Object> loadInitialInstruction(@RequestParam String labId) {
-//		Map<String, Object> response = new HashMap<>();
-//		try {
-////			InstructionCommand instructionCommand = InstructionCommandRepository.findNextUnexecutedByLabId(labId);
-//			UserWiseChatBoatInstructionTemplate instructionCommand = instructionTemplateRepository.findNextUnexecutedByLabId(labId);
-////			
-//			if (instructionCommand != null) {
-//				String newCommand = instructionCommand.getInstructionCommand();
-//
-//				// ✅ Compare with the last stored command
-//				String lastCommand = lastCommandMap.get(labId + "~" + newCommand);
-//
-//				if (newCommand != null && newCommand.equals(lastCommand)) {
-////					response.put("success", false);
-////					response.put("error", "Duplicate command. Nothing new to return.");
-////					return response;
-//				} else {
-//
-//					response.put("success", true);
-//					response.put("instruction", instructionCommand.getInstructionDetails());
-//					response.put("command", newCommand);
-//					response.put("isLast", false);
-//					lastCommandMap.put(labId + "~" + newCommand, newCommand);
-//				}
-//
-//			} else {
-//				response.put("success", false);
-//				response.put("error", "No unexecuted instructions found.");
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			response.put("success", false);
-//			response.put("error", "Failed to load instruction.");
-//		}
-//
-//		return response;
-//	}
 
 	@PostMapping("/ActionloadInitialInstruction")
 	@ResponseBody
@@ -598,171 +563,300 @@ public class GuacamoleController {
 		return response;
 	}
 
-	private final ConcurrentHashMap<String, String> lastCommandMap = new ConcurrentHashMap<>();
 
-	@PostMapping("/chatloadInitialInstruction")
-	@ResponseBody
-	public Map<String, Object> chatloadInitialInstruction(@RequestParam String labId) {
-		Map<String, Object> response = new HashMap<>();
+//	// Helper method to determine OS based on template name or lab name
+	private String determineOS(String templateName, String labName) {
+		
+		String value = "";
+		System.out.println("labName_value ::: "+labName);
 
-		try {
-			System.out.println("chatlabId ::" + labId);
+		if (labName != null) {
+			String lab = labName;
 
-			int temp = Integer.parseInt(labId);
+			if (lab.equalsIgnoreCase("windows")) {
 
-			List<UserLab> labDetails = UserLabRepository.findByguacamoleId(temp);
+				value = "windows";
+			} else if (lab.equalsIgnoreCase("Kali Linux")) {
+				value = "kali Linux";
+			}
 
-			if (!labDetails.isEmpty()) {
-				UserLab userLab = labDetails.get(0);
-//				String templateName = userLab.getTemplateName();
-//				Long laabId = userLab.getLabId();
-				String LabName = userLab.getInstanceName();
+		}
+System.out.println("check_value ::: "+value);
+		// Default to linux
+		return value;
+	}
+	
+	private String getMandatoryCommand(String osType, String labName) {
+	    if ("windows".equalsIgnoreCase(osType)) {
+	       
+	        System.out.println("inside_Windows ::: ");
+	        return "[System.Environment]::SetEnvironmentVariable(\"container\", \"" + labName + "\", \"Machine\")";
+	    } else {
+	        
+	        System.out.println("inside_Linux ::: ");
+	        return "source /etc/bash.bashrc";
+	    }
+	}
+	
+	private String getMandatoryInstruction(String osType) {
+		String osDisplay = "Kali Linux";
+		if ("windows".equalsIgnoreCase(osType)) {
+			osDisplay = "Windows";
+		}
+		// For any non-Windows OS, show Linux/Kali instruction
+		return "<div class='system-message'>" + "<i class='fas fa-info-circle'></i> "
+				+ "<strong>Mandatory Setup Command</strong><br>" + "Please execute this " + osDisplay
+				+ " environment setup command before proceeding with the lab instructions." + "</div>";
+	}
+	
 
-				Long labIdLong = userLab.getLabId();
-				int laabId = labIdLong.intValue();
-				System.out.println("laabId ::" + laabId);
-				// Fetch next instruction
-				UserWiseChatBoatInstructionTemplate instructionCommand = instructionTemplateRepository
-						.findNextUnexecutedByLabId(laabId);
+//	// Helper method to check if commands match (with flexible comparison)
+	private boolean isCommandMatch(String historyCommand, String currentCommand) {
+	    if (historyCommand == null || currentCommand == null) return false;
+	    
+	    // Normalize both commands for comparison
+	    String normalizedHistory = historyCommand.replaceAll("\\s+", " ")
+	                                           .replace("'", "\"")
+	                                           .trim()
+	                                           .toLowerCase();
+	    
+	    String normalizedCurrent = currentCommand.replaceAll("\\s+", " ")
+	                                            .replace("'", "\"")
+	                                            .trim()
+	                                            .toLowerCase();
+	    
+	    return normalizedHistory.equals(normalizedCurrent);
+	}
+//
+	private boolean isMandatoryCommand(String command) {
+	    if (command == null) return false;
 
-				if (instructionCommand != null) {
-					System.out.println("LabName_if ::" + LabName);
-					String newCommand = instructionCommand.getInstructionCommand();
-					System.out.println("newCommand ::" + newCommand);
+	    String trimmedCommand = command.trim();
+	    
+	    // Normalize the command
+	    String normalizedCommand = trimmedCommand.replaceAll("\\s+", " ")
+	                                            .replace("'", "\"")
+	                                            .trim()
+	                                            .toLowerCase();
+	    
+	    // Linux mandatory command
+	    String linuxCommand = "source /etc/bash.bashrc";
+	    String normalizedLinux = linuxCommand.replaceAll("\\s+", " ")
+	                                        .trim()
+	                                        .toLowerCase();
+	    
+	    // Windows mandatory command pattern (generic, without lab name)
+	    String windowsCommandPattern = "setenvironmentvariable(\"container\",";
+	    String normalizedWindowsPattern = windowsCommandPattern.replaceAll("\\s+", " ")
+	                                                          .trim()
+	                                                          .toLowerCase();
+	    
+	    System.out.println("Checking mandatory command:");
+	    System.out.println("Normalized input: " + normalizedCommand);
+	    System.out.println("Linux pattern: " + normalizedLinux);
+	    System.out.println("Windows pattern: " + normalizedWindowsPattern);
+	    
+	    boolean isLinuxMatch = normalizedCommand.equals(normalizedLinux);
+	    boolean isWindowsMatch = normalizedCommand.contains(normalizedWindowsPattern);
+	    
+	    System.out.println("Is Linux match: " + isLinuxMatch);
+	    System.out.println("Is Windows match: " + isWindowsMatch);
+	    
+	    return isLinuxMatch || isWindowsMatch;
+	}
+	
 
-//					String lastCommand = lastCommandMap.get(labId + "~last");
-//					System.out.println("lastCommand ::" + lastCommand);
-					System.out.println("getInstructionDetails ::" + instructionCommand.getInstructionDetails());
+	
+	
 
-					byte[] htmlBytes = instructionCommand.getInstructionDetails();
-					String decodedHtml = new String(htmlBytes, StandardCharsets.UTF_8);
-					System.out.println("decodedHtml ::" + decodedHtml);
+//	@PostMapping("/chatloadInitialInstruction")
+//	@ResponseBody
+//	public Map<String, Object> chatloadInitialInstruction(@RequestParam String labId) {
+//	    Map<String, Object> response = new HashMap<>();
+//	    try {
+//	        int temp = Integer.parseInt(labId);
+//
+//	        List<UserLab> labDetails = UserLabRepository.findByguacamoleId(temp);
+//
+//	        if (!labDetails.isEmpty()) {
+//	            UserLab userLab = labDetails.get(0);
+//	            Long labIdLong = userLab.getLabId();
+//	            int laabId = labIdLong.intValue();
+//	            String  containerName = userLab.getInstanceName();
+//
+//	            // Fetch next instruction
+//	            UserWiseChatBoatInstructionTemplate instructionCommand =
+//	                    instructionTemplateRepository.findNextUnexecutedByLabId(laabId);
+//
+//	            if (instructionCommand != null) {
+//
+//	                int templateId = instructionCommand.getTemplateId();
+//	                CloudInstance tempid = repository.getById(templateId);
+//
+//	                String os = tempid.getSubproduct_id().getProduct_id().getProduct_name();
+//	                String newCommand;
+//
+//	                // Key to check if mandatory was already executed
+//	                String mandatoryKey = labId + "~mandatory";
+//	                boolean mandatoryExecuted = lastCommandMap.containsKey(mandatoryKey);
+//
+//	                if (!mandatoryExecuted) {
+//	                    // Show mandatory command only once // Kali Linux
+//	                    if (os.equalsIgnoreCase("Windows")) {
+//	                        newCommand = "source /etc/bash.bashrc";
+//	                        response.put("instructionText", "Execute this command first to get started.");
+//	                    } else if (os.equalsIgnoreCase("WindowsLabTemplate")) {
+//	                        newCommand = "SetEnvironmentVariable('container', containerName, 'Machine')"; 
+//	                        response.put("instructionText", "Execute this command first to get started.");
+//	                    } else {
+//	                        // If other OS, just skip mandatory logic
+//	                        newCommand = instructionCommand.getInstructionCommand();
+//	                        byte[] htmlBytes = instructionCommand.getInstructionDetails();
+//	                        String decodedHtml = new String(htmlBytes, StandardCharsets.UTF_8);
+//	                        response.put("instructionText", decodedHtml);
+//	                    }
+//
+//	                    // ✅ Mark mandatory command as executed so it won't be shown again
+//	                    lastCommandMap.put(mandatoryKey, "done");
+//
+//	                } else {
+//	                    // Normal DB command flow
+//	                    newCommand = instructionCommand.getInstructionCommand();
+//	                    byte[] htmlBytes = instructionCommand.getInstructionDetails();
+//	                    String decodedHtml = new String(htmlBytes, StandardCharsets.UTF_8);
+//	                    response.put("instructionText", decodedHtml);
+//	                }
+//
+//	                response.put("success", true);
+//	                response.put("command", newCommand);
+//	                response.put("isLast", false);
+//
+//	                // Save last executed command (for duplicate detection)
+//	                lastCommandMap.put(labId + "~last", newCommand);
+//
+//	            } else {
+//	                response.put("success", false);
+//	                response.put("error", "No unexecuted instructions found.");
+//	            }
+//
+//	        } else {
+//	            response.put("success", false);
+//	            response.put("error", "Lab not found.");
+//	        }
+//
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	        response.put("success", false);
+//	        response.put("error", "Failed to load instruction.");
+//	    }
+//
+//	    return response;
+//	}
 
-//					if (newCommand != null && newCommand.equals(lastCommand)) {
-					// If duplicate, return but mark it as duplicate
-					response.put("success", false);
-					response.put("error", "Duplicate command skipped.");
-//					} else {
-					// Normal flow
-					response.put("success", true);
-					response.put("instructionText", decodedHtml); // ✅ decoded HTML
-					response.put("command", newCommand);
-					response.put("isLast", false); // you can adjust logic here
-
-					// Save last executed command
-					lastCommandMap.put(labId + "~last", newCommand);
+//	@PostMapping("/continueActionInstruction")
+//	@ResponseBody
+//	public Map<String, Object> continueActionInstruction(@RequestParam String labId, @RequestParam String labcommand) {
+//
+//		Map<String, Object> response = new HashMap<>();
+//
+//		try {
+//			int gucamleid = Integer.parseInt(labId);
+//
+//			List<UserLab> labDetails = UserLabRepository.findByguacamoleId(gucamleid);
+//
+//			if (!labDetails.isEmpty()) {
+//				UserLab userLab = labDetails.get(0);
+////				Long laabId = userLab.getLabId();
+//				String LabName = userLab.getInstanceName();
+//
+//				Long labIdLong = userLab.getLabId();
+//				int laabId = labIdLong.intValue();
+//				System.out.println("LabId ::" + laabId);
+//
+//				List<CommandHistory> commandHistoryList = CommandHistoryRepository.findByContainerName(LabName,
+//						labcommand);
+//
+//				boolean commandMatched = false;
+//				for (CommandHistory ch : commandHistoryList) {
+//					if (ch.getCommand().equalsIgnoreCase(labcommand)) {
+//						commandMatched = true;
+//						break;
 //					}
+//				}
+//
+//				if (commandMatched) {
+//					// Case 1: Command found in history
+//					System.out.println("Inside: command matched in history");
+//
+//					int updatedRows = instructionTemplateRepository.modifyCommandByLabId(laabId, labcommand);
+//
+//					if (updatedRows > 0) {
+//
+//						UserWiseChatBoatInstructionTemplate instructionCommand = instructionTemplateRepository
+//								.findNextUnexecutedByLabId(laabId);
+//						System.out.println("Lab Updatedd.");
+//						if (instructionCommand != null) {
+//							byte[] htmlBytes = instructionCommand.getInstructionDetails();
+//							String decodedHtml = new String(htmlBytes, StandardCharsets.UTF_8);
+//
+//							response.put("success", true);
+//							response.put("instruction", decodedHtml);
+//							response.put("command", instructionCommand.getInstructionCommand());
+//							response.put("isLast", false);
+//							System.out.println("Lab Next Command.");
+//						} else {
+//							// No more instructions → Lab completed
+//							System.out.println("Lab not completed.");
+//							response.put("success", true);
+//							response.put("instruction", "Lab is completed.");
+//							response.put("command", "");
+//							response.put("isLast", true);
+//						}
+//					} else {
+//						System.out.println("Execute this command first.");
+//						response.put("success", true);
+//						response.put("instruction", "Execute this command first.");
+//						response.put("command", labcommand);
+//						response.put("isLast", false);
+//					}
+//
+//				} else {
+//					response.put("success", true);
+//					response.put("instruction", "Execute this command first.");
+//					response.put("command", labcommand);
+//					response.put("isLast", false);
+//				}
+//
+//			} else {
+//				System.out.println("Lab not found.");
+//				response.put("success", false);
+//				response.put("error", "Lab not found.");
+//			}
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			System.out.println("Failed to load process Lab not found.");
+//			response.put("success", false);
+//			response.put("error", "Failed to process command.");
+//		}
+//		System.out.println("response Lab " + response);
+//		return response;
+//	}
 
-				} else {
-					response.put("success", false);
-					response.put("error", "No unexecuted instructions found.");
-				}
 
-			} else {
-				response.put("success", false);
-				response.put("error", "Lab not found.");
-			}
+	// Helper method to check if a command is a mandatory command
 
-			System.out.println("chatLoadresponse :::" + response);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			response.put("success", false);
-			response.put("error", "Failed to load instruction.");
-		}
-
-		return response;
-	}
-
-	@PostMapping("/continueActionInstruction")
-	@ResponseBody
-	public Map<String, Object> continueActionInstruction(@RequestParam String labId, @RequestParam String labcommand) {
-
-		Map<String, Object> response = new HashMap<>();
-
-		try {
-			int gucamleid = Integer.parseInt(labId);
-
-			List<UserLab> labDetails = UserLabRepository.findByguacamoleId(gucamleid);
-
-			if (!labDetails.isEmpty()) {
-				UserLab userLab = labDetails.get(0);
-//				Long laabId = userLab.getLabId();
-				String LabName = userLab.getInstanceName();
-
-				Long labIdLong = userLab.getLabId();
-				int laabId = labIdLong.intValue();
-				System.out.println("LabId ::" + laabId);
-
-				List<CommandHistory> commandHistoryList = CommandHistoryRepository.findByContainerName(LabName,
-						labcommand);
-
-				boolean commandMatched = false;
-				for (CommandHistory ch : commandHistoryList) {
-					if (ch.getCommand().equalsIgnoreCase(labcommand)) {
-						commandMatched = true;
-						break;
-					}
-				}
-
-				if (commandMatched) {
-					// Case 1: Command found in history
-					System.out.println("Inside: command matched in history");
-
-					int updatedRows = instructionTemplateRepository.modifyCommandByLabId(laabId, labcommand);
-
-					if (updatedRows > 0) {
-
-						UserWiseChatBoatInstructionTemplate instructionCommand = instructionTemplateRepository
-								.findNextUnexecutedByLabId(laabId);
-						System.out.println("Lab Updatedd.");
-						if (instructionCommand != null) {
-							byte[] htmlBytes = instructionCommand.getInstructionDetails();
-							String decodedHtml = new String(htmlBytes, StandardCharsets.UTF_8);
-
-							response.put("success", true);
-							response.put("instruction", decodedHtml);
-							response.put("command", instructionCommand.getInstructionCommand());
-							response.put("isLast", false);
-							System.out.println("Lab Next Command.");
-						} else {
-							// No more instructions → Lab completed
-							System.out.println("Lab not completed.");
-							response.put("success", true);
-							response.put("instruction", "Lab is completed.");
-							response.put("command", "");
-							response.put("isLast", true);
-						}
-					} else {
-						System.out.println("Execute this command first.");
-						response.put("success", true);
-						response.put("instruction", "Execute this command first.");
-						response.put("command", labcommand);
-						response.put("isLast", false);
-					}
-
-				} else {
-					response.put("success", true);
-					response.put("instruction", "Execute this command first.");
-					response.put("command", labcommand);
-					response.put("isLast", false);
-				}
-
-			} else {
-				System.out.println("Lab not found.");
-				response.put("success", false);
-				response.put("error", "Lab not found.");
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Failed to load process Lab not found.");
-			response.put("success", false);
-			response.put("error", "Failed to process command.");
-		}
-		System.out.println("response Lab " + response);
-		return response;
-	}
+//	
+//	private boolean isMandatoryCommand(String osType, String labName) {
+//	    if ("windows".equalsIgnoreCase(osType)) {
+//	        // Windows environment setup command
+//	        return "SetEnvironmentVariable('container','" + labName + "', 'Machine')";
+//	    } else {
+//	        // Linux / Kali Linux environment setup command
+//	        return "source /etc/bash.bashrc";
+//	    }
+//	}
 
 	@PostMapping("/InstructionCompleted")
 	@ResponseBody
@@ -972,6 +1066,254 @@ public class GuacamoleController {
 //	    
 //	    return response;
 //	}
+	
+	
+	@PostMapping("/chatloadInitialInstruction")
+	@ResponseBody
+	public Map<String, Object> chatloadInitialInstruction(@RequestParam String labId) {
+	    Map<String, Object> response = new HashMap<>();
+
+	    try {
+	        System.out.println("chatlabId ::" + labId);
+	        int temp = Integer.parseInt(labId);
+
+	        List<UserLab> labDetails = UserLabRepository.findByguacamoleId(temp);
+
+	        if (!labDetails.isEmpty()) {
+	            UserLab userLab = labDetails.get(0);
+	            String LabName = userLab.getInstanceName();
+	            String TemplateName = userLab.getTemplateName();
+	            Long labIdLong = userLab.getLabId();
+	            int laabId = labIdLong.intValue();
+	            System.out.println("laabId ::" + laabId);
+
+	            // Check if mandatory command has been executed for this lab FROM DATABASE
+	            boolean mandatoryExecuted = userLab.getMandatoryCommandExecuted();
+	            System.out.println("Mandatory command executed status from DB: " + mandatoryExecuted);
+	            
+	            String instanceName = userLab.getTemplateName();
+	            List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
+	            String os = "";
+	            if (!cloudInstances.isEmpty()) {
+	                CloudInstance instance = cloudInstances.get(0);
+	                os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+	            } 
+	            
+	            // Determine OS and set mandatory command
+	            String osType = determineOS(TemplateName, os);
+	            String mandatoryCommand = getMandatoryCommand(osType, LabName);
+	            String mandatoryInstruction = getMandatoryInstruction(osType);
+
+	            // If mandatory command not executed yet, return it
+	            if (!mandatoryExecuted) {
+	                response.put("success", true);
+	                response.put("instructionText", mandatoryInstruction);
+	                response.put("command", mandatoryCommand);
+	                response.put("isMandatory", true);
+	                response.put("isLast", false);
+	                return response;
+	            }
+
+	            // If mandatory command already executed, proceed with normal instructions
+	            UserWiseChatBoatInstructionTemplate instructionCommand = instructionTemplateRepository
+	                    .findNextUnexecutedByLabId(laabId);
+
+	            if (instructionCommand != null) {
+	                System.out.println("LabName_if ::" + LabName);
+	                String newCommand = instructionCommand.getInstructionCommand();
+
+	                byte[] htmlBytes = instructionCommand.getInstructionDetails();
+	                String decodedHtml = new String(htmlBytes, StandardCharsets.UTF_8);
+
+	                response.put("success", true);
+	                response.put("instructionText", decodedHtml);
+	                response.put("command", newCommand);
+	                response.put("isMandatory", false);
+	                response.put("isLast", false);
+
+	            } else {
+	                response.put("success", false);
+	                response.put("error", "No unexecuted instructions found.");
+	            }
+
+	        } else {
+	            response.put("success", false);
+	            response.put("error", "Lab not found.");
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        response.put("success", false);
+	        response.put("error", "Failed to load instruction.");
+	    }
+	    
+	    return response;
+	}
+
+	@PostMapping("/continueActionInstruction")
+	@ResponseBody
+	public Map<String, Object> continueActionInstruction(@RequestParam String labId, @RequestParam String labcommand) {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    try {
+	        int gucamleid = Integer.parseInt(labId);
+
+	        List<UserLab> labDetails = UserLabRepository.findByguacamoleId(gucamleid);
+
+	        if (!labDetails.isEmpty()) {
+	            UserLab userLab = labDetails.get(0);
+	            String LabName = userLab.getInstanceName();
+	            Long labIdLong = userLab.getLabId();
+	            int laabId = labIdLong.intValue();
+	            System.out.println("LabId ::" + laabId);
+	            System.out.println("LabName ::" + LabName);
+	            System.out.println("Received command: " + labcommand);
+
+	            // Check if this is a mandatory command
+	            boolean isMandatoryCommand = isMandatoryCommand(labcommand);
+	            
+	            System.out.println("Is mandatory command: " + isMandatoryCommand);
+	            String os = "";
+	            if (isMandatoryCommand) {
+	                System.out.println("Mandatory command detected: " + labcommand);
+	                
+	                String instanceName = userLab.getTemplateName();
+	    			List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
+	    			
+	    			if (!cloudInstances.isEmpty()) {
+	    				CloudInstance instance = cloudInstances.get(0); // ✅ first match
+
+	    				
+	    				 os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+
+	    			
+	    			}
+	    			 List<CommandHistory> mandatoryCommandHistory;
+	               if(os.equalsIgnoreCase("Windows")) {
+	            	   System.out.println("Mandatory command Windows: " + labcommand);
+	            	   mandatoryCommandHistory = CommandHistoryRepository.findByCommand(labcommand);
+	            	 
+	               }else {
+	            	   System.out.println("Mandatory command Linux: " + labcommand);
+	            	   mandatoryCommandHistory = CommandHistoryRepository.findByContainerNameAndCommand(LabName,labcommand);
+	               }
+	               
+	                boolean mandatoryCommandExecuted = false;
+	                
+	                for (CommandHistory ch : mandatoryCommandHistory) {
+	                    if (isCommandMatch(ch.getCommand(), labcommand)) {
+	                        mandatoryCommandExecuted = true;
+	                        break;
+	                    }
+	                }
+	                
+	                if (mandatoryCommandExecuted) {
+	                    // Mandatory command found in history - update database status
+	                    System.out.println("Mandatory command found in command history");
+	                    
+	                    // UPDATE DATABASE STATUS
+	                    UserLabRepository.updateMandatoryCommandStatus(gucamleid, true);
+	                    
+	                    // Reload userLab to get updated status
+	                    labDetails = UserLabRepository.findByguacamoleId(gucamleid);
+	                    userLab = labDetails.get(0);
+
+	                    // Get the first actual instruction after mandatory command
+	                    UserWiseChatBoatInstructionTemplate instructionCommand = instructionTemplateRepository
+	                            .findNextUnexecutedByLabId(laabId);
+
+	                    if (instructionCommand != null) {
+	                        byte[] htmlBytes = instructionCommand.getInstructionDetails();
+	                        String decodedHtml = new String(htmlBytes, StandardCharsets.UTF_8);
+
+	                        response.put("success", true);
+	                        response.put("instruction", decodedHtml);
+	                        response.put("command", instructionCommand.getInstructionCommand());
+	                        response.put("isLast", false);
+	                        System.out.println("First instruction after mandatory command loaded.");
+	                    } else {
+	                        response.put("success", true);
+	                        response.put("instruction", "Lab setup completed. No further instructions found.");
+	                        response.put("command", "");
+	                        response.put("isLast", true);
+	                    }
+	                } else {
+	                    System.out.println("Mandatory command not found in command history. Please execute it first.");
+	                    response.put("success", true);
+	                    response.put("instruction", "Please execute the mandatory setup command first before proceeding.");
+	                    response.put("command", labcommand);
+	                    response.put("isLast", false);
+	                }
+
+	            } else {
+	                // Normal command flow
+	                System.out.println("Processing as normal command...");
+	                
+	                List<CommandHistory> commandHistoryList = CommandHistoryRepository.findByContainerName(LabName, labcommand);
+
+	                boolean commandMatched = false;
+	                for (CommandHistory ch : commandHistoryList) {
+	                    if (isCommandMatch(ch.getCommand(), labcommand)) {
+	                        commandMatched = true;
+	                        break;
+	                    }
+	                }
+
+	                if (commandMatched) {
+	                    System.out.println("Inside: command matched in history");
+
+	                    int updatedRows = instructionTemplateRepository.modifyCommandByLabId(laabId, labcommand);
+
+	                    if (updatedRows > 0) {
+	                        UserWiseChatBoatInstructionTemplate instructionCommand = instructionTemplateRepository
+	                                .findNextUnexecutedByLabId(laabId);
+	                        
+	                        if (instructionCommand != null) {
+	                            byte[] htmlBytes = instructionCommand.getInstructionDetails();
+	                            String decodedHtml = new String(htmlBytes, StandardCharsets.UTF_8);
+
+	                            response.put("success", true);
+	                            response.put("instruction", decodedHtml);
+	                            response.put("command", instructionCommand.getInstructionCommand());
+	                            response.put("isLast", false);
+	                        } else {
+	                            response.put("success", true);
+	                            response.put("instruction", "Lab is completed.");
+	                            response.put("command", "");
+	                            response.put("isLast", true);
+	                        }
+	                    } else {
+	                        response.put("success", true);
+	                        response.put("instruction", "Execute this command first.");
+	                        response.put("command", labcommand);
+	                        response.put("isLast", false);
+	                    }
+
+	                } else {
+	                    response.put("success", true);
+	                    response.put("instruction", "Execute this command first.");
+	                    response.put("command", labcommand);
+	                    response.put("isLast", false);
+	                }
+	            }
+
+	        } else {
+	            response.put("success", false);
+	            response.put("error", "Lab not found.");
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        response.put("success", false);
+	        response.put("error", "Failed to process command.");
+	    }
+	    
+	    return response;
+	}
+
+	// Remove the in-memory map since we're using database now
+	// private final ConcurrentHashMap<String, String> lastCommandMap = new ConcurrentHashMap<>();
 
 	@PostMapping("/getCompletedLabInstructions")
 	@ResponseBody
@@ -1039,7 +1381,7 @@ public class GuacamoleController {
 		model.addAttribute("playlist", playlist);
 
 		model.addAttribute("pageTitle", (id != null) ? "Edit Playlist" : "Create Playlist");
-		return "Add_Playlist"; 
+		return "Add_Playlist";
 	}
 
 //	@GetMapping("/Add_Sub_Playlist")
@@ -2005,121 +2347,117 @@ public class GuacamoleController {
 		return mav;
 	}
 
-
-	
 	@PostMapping("/saveScenarioData")
 	public String saveScenarioData(@ModelAttribute("scenario") Add_Scenario scenarioObj,
-	                               RedirectAttributes redirectAttributes,
-	                               @RequestParam(required = false) MultipartFile cover_image,
-	                               Principal principal) {
+			RedirectAttributes redirectAttributes, @RequestParam(required = false) MultipartFile cover_image,
+			Principal principal) {
 
-	    try {
-	        boolean isNew = (scenarioObj.getId() == 0);
+		try {
+			boolean isNew = (scenarioObj.getId() == 0);
 
-	        // Set creator if needed
-	        if (principal != null) {
-	            // scenarioObj.setCreatedBy(principal.getName());
-	        }
+			// Set creator if needed
+			if (principal != null) {
+				// scenarioObj.setCreatedBy(principal.getName());
+			}
 
-	        // Step 1: Parse Labs - format: "101~Lab A,102~Lab B"
-	        String labsString = scenarioObj.getLabs();
-	        String[] labsArray = labsString.split(",");
-	        List<String> labIds = new ArrayList<String>();
-	        List<String> labNames = new ArrayList<String>();
+			// Step 1: Parse Labs - format: "101~Lab A,102~Lab B"
+			String labsString = scenarioObj.getLabs();
+			String[] labsArray = labsString.split(",");
+			List<String> labIds = new ArrayList<String>();
+			List<String> labNames = new ArrayList<String>();
 
-	        for (String lab : labsArray) {
-	            String[] parts = lab.split("~");
-	            if (parts.length == 2) {
-	                String labId = parts[0].trim();
-	                String labName = parts[1].trim();
+			for (String lab : labsArray) {
+				String[] parts = lab.split("~");
+				if (parts.length == 2) {
+					String labId = parts[0].trim();
+					String labName = parts[1].trim();
 
-	                labIds.add(labId);
-	                labNames.add(labName);
+					labIds.add(labId);
+					labNames.add(labName);
 
-	                try {
-	                    repository.updateInstanceNameAssigned(Integer.parseInt(labId));
-	                } catch (Exception e) {
-	                    e.printStackTrace();
-	                }
-	            }
-	        }
+					try {
+						repository.updateInstanceNameAssigned(Integer.parseInt(labId));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
 
-	        // For saving readable lab names in scenarioObj
-	        StringBuilder sb = new StringBuilder();
-	        for (int i = 0; i < labNames.size(); i++) {
-	            sb.append(labNames.get(i));
-	            if (i < labNames.size() - 1) {
-	                sb.append(",");
-	            }
-	        }
-	        scenarioObj.setLabs(sb.toString());
-	        scenarioObj.setComments("");
+			// For saving readable lab names in scenarioObj
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < labNames.size(); i++) {
+				sb.append(labNames.get(i));
+				if (i < labNames.size() - 1) {
+					sb.append(",");
+				}
+			}
+			scenarioObj.setLabs(sb.toString());
+			scenarioObj.setComments("");
 
-	        // Handle cover image
-	        if (cover_image != null && !cover_image.isEmpty()) {
-	            String contentType = cover_image.getContentType();
-	            if (contentType != null && contentType.startsWith("image/")) {
-	                scenarioObj.setCoverImage(cover_image.getBytes());
-	            } else {
-	                redirectAttributes.addFlashAttribute("message", "Invalid file type. Please upload an image file.");
-	                redirectAttributes.addFlashAttribute("status", "error");
-	            }
-	        } else if (isNew) {
-	            // Use default image for new scenario
-	            String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
-	            try {
-	                byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
-	                scenarioObj.setCoverImage(defaultImageBytes);
-	            } catch (IOException e) {
-	                scenarioObj.setCoverImage(createPlaceholderImage());
-	            }
-	        } else {
-	            // Use existing image for edit
-	            Optional<Add_Scenario> existing = ScenarioRepository.findById(scenarioObj.getId());
-	            existing.ifPresent(existingScenario -> {
-	                scenarioObj.setCoverImage(existingScenario.getCoverImage());
-	            });
-	        }
+			// Handle cover image
+			if (cover_image != null && !cover_image.isEmpty()) {
+				String contentType = cover_image.getContentType();
+				if (contentType != null && contentType.startsWith("image/")) {
+					scenarioObj.setCoverImage(cover_image.getBytes());
+				} else {
+					redirectAttributes.addFlashAttribute("message", "Invalid file type. Please upload an image file.");
+					redirectAttributes.addFlashAttribute("status", "error");
+				}
+			} else if (isNew) {
+				// Use default image for new scenario
+				String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
+				try {
+					byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
+					scenarioObj.setCoverImage(defaultImageBytes);
+				} catch (IOException e) {
+					scenarioObj.setCoverImage(createPlaceholderImage());
+				}
+			} else {
+				// Use existing image for edit
+				Optional<Add_Scenario> existing = ScenarioRepository.findById(scenarioObj.getId());
+				existing.ifPresent(existingScenario -> {
+					scenarioObj.setCoverImage(existingScenario.getCoverImage());
+				});
+			}
 
-	        // Save scenario and get saved entity with ID
-	        Add_Scenario savedScenario = ScenarioRepository.save(scenarioObj);
+			// Save scenario and get saved entity with ID
+			Add_Scenario savedScenario = ScenarioRepository.save(scenarioObj);
 
-	        // 🔥 Delete existing labs for this scenario before inserting new ones
-	        ScenarioLabTemplateRepository.deleteByScenarioId(savedScenario.getId());
+			// 🔥 Delete existing labs for this scenario before inserting new ones
+			ScenarioLabTemplateRepository.deleteByScenarioId(savedScenario.getId());
 
-	        // Save lab templates into ScenarioLabTemplate table
-	        for (String lab : labsArray) {
-	            String[] parts = lab.split("~");
-	            if (parts.length == 2) {
-	                ScenarioLabTemplate labTemplate = new ScenarioLabTemplate();
-	                labTemplate.setScenarioId(savedScenario.getId());
-	                labTemplate.setScenarioName(savedScenario.getScenarioName());
-	                labTemplate.setTemplateId(Integer.parseInt(parts[0].trim()));
-	                labTemplate.setTemplateName(parts[1].trim());
+			// Save lab templates into ScenarioLabTemplate table
+			for (String lab : labsArray) {
+				String[] parts = lab.split("~");
+				if (parts.length == 2) {
+					ScenarioLabTemplate labTemplate = new ScenarioLabTemplate();
+					labTemplate.setScenarioId(savedScenario.getId());
+					labTemplate.setScenarioName(savedScenario.getScenarioName());
+					labTemplate.setTemplateId(Integer.parseInt(parts[0].trim()));
+					labTemplate.setTemplateName(parts[1].trim());
 
-	                ScenarioLabTemplateRepository.save(labTemplate);
-	            }
-	        }
+					ScenarioLabTemplateRepository.save(labTemplate);
+				}
+			}
 
-	        redirectAttributes.addFlashAttribute("message", "Scenario saved successfully!");
-	        redirectAttributes.addFlashAttribute("status", "success");
-	        redirectAttributes.addFlashAttribute("result", "success");
+			redirectAttributes.addFlashAttribute("message", "Scenario saved successfully!");
+			redirectAttributes.addFlashAttribute("status", "success");
+			redirectAttributes.addFlashAttribute("result", "success");
 
-	        // Redirect based on whether it's new or edit
-	        if (isNew) {
-	            return "redirect:/guac/Scenario_Details";
-	        } else {
-	            return "redirect:/guac/View_Particular_Scenerio?Id=" + savedScenario.getId();
-	        }
+			// Redirect based on whether it's new or edit
+			if (isNew) {
+				return "redirect:/guac/Scenario_Details";
+			} else {
+				return "redirect:/guac/View_Particular_Scenerio?Id=" + savedScenario.getId();
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        redirectAttributes.addFlashAttribute("message", "Error while saving scenario: " + e.getMessage());
-	        redirectAttributes.addFlashAttribute("status", "error");
-	        return "redirect:/guac/Scenario_Details";
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("message", "Error while saving scenario: " + e.getMessage());
+			redirectAttributes.addFlashAttribute("status", "error");
+			return "redirect:/guac/Scenario_Details";
+		}
 	}
-
 
 //	@GetMapping("/editsceneriolist/{id}")
 //	public ModelAndView editsceneriolist(@PathVariable("id") Integer id) {
@@ -2213,51 +2551,48 @@ public class GuacamoleController {
 //	        return mav;
 //	    }
 //	}
-	
-	
+
 	@GetMapping("/editsceneriolist/{id}")
 	public ModelAndView editsceneriolist(@PathVariable("id") Integer id) {
-	    try {
-	        List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
+		try {
+			List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
 
-	        ModelAndView mav = new ModelAndView("Add_Scenario");
-	        Add_Scenario scenario = ScenarioRepository.findByCheckId(id);
-	        if (scenario == null) {
-	            throw new IllegalArgumentException("Invalid scenario ID: " + id);
-	        }
+			ModelAndView mav = new ModelAndView("Add_Scenario");
+			Add_Scenario scenario = ScenarioRepository.findByCheckId(id);
+			if (scenario == null) {
+				throw new IllegalArgumentException("Invalid scenario ID: " + id);
+			}
 
-	        // Convert lab names back into "id~name" format for dropdown pre-selection
-	        List<ScenarioLabTemplate> assignedLabs = ScenarioLabTemplateRepository.findByScenarioId(id);
-	        List<String> assignedLabPairs = new ArrayList<String>();
+			// Convert lab names back into "id~name" format for dropdown pre-selection
+			List<ScenarioLabTemplate> assignedLabs = ScenarioLabTemplateRepository.findByScenarioId(id);
+			List<String> assignedLabPairs = new ArrayList<String>();
 
-	        for (ScenarioLabTemplate l : assignedLabs) {
-	            assignedLabPairs.add(l.getTemplateId() + "~" + l.getTemplateName());
-	        }
+			for (ScenarioLabTemplate l : assignedLabs) {
+				assignedLabPairs.add(l.getTemplateId() + "~" + l.getTemplateName());
+			}
 
-	        // Manual join (since String.join is Java 8+)
-	        StringBuilder sb = new StringBuilder();
-	        for (int i = 0; i < assignedLabPairs.size(); i++) {
-	            sb.append(assignedLabPairs.get(i));
-	            if (i < assignedLabPairs.size() - 1) {
-	                sb.append(",");
-	            }
-	        }
-	        scenario.setLabs(sb.toString());
+			// Manual join (since String.join is Java 8+)
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < assignedLabPairs.size(); i++) {
+				sb.append(assignedLabPairs.get(i));
+				if (i < assignedLabPairs.size() - 1) {
+					sb.append(",");
+				}
+			}
+			scenario.setLabs(sb.toString());
 
-	        mav.addObject("scenario", scenario);
-	        mav.addObject("instanceNameList", instances);
-	        mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
-	        mav.addObject("isEdit", true);
-	        return mav;
-	    } catch (Exception e) {
-	        ModelAndView mav = new ModelAndView("Add_Scenario");
-	        mav.addObject("message", e.getMessage());
-	        mav.addObject("isEdit", false);
-	        return mav;
-	    }
+			mav.addObject("scenario", scenario);
+			mav.addObject("instanceNameList", instances);
+			mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
+			mav.addObject("isEdit", true);
+			return mav;
+		} catch (Exception e) {
+			ModelAndView mav = new ModelAndView("Add_Scenario");
+			mav.addObject("message", e.getMessage());
+			mav.addObject("isEdit", false);
+			return mav;
+		}
 	}
-
-
 
 	@GetMapping("/deletsceneriolist/{id}")
 	public String deletsceneriolist(@PathVariable("id") Integer id) {
@@ -2918,7 +3253,8 @@ public class GuacamoleController {
 			System.out.println("Container reset_lab successfully: " + containerName);
 
 			CommandHistoryRepository.deleteByContainerName(containerName);
-			instructionTemplateRepository.UpdateresetByLabName(containerName);
+			int updatedRows = instructionTemplateRepository.UpdateresetByLabName(containerName);
+			System.out.println("Rows updated instrion : " + updatedRows);
 			UserLabRepository.UpdateresetByLabName(containerName);
 
 			return "success";
@@ -3414,66 +3750,64 @@ public class GuacamoleController {
 	}
 
 	@PostMapping("/save_UserWisePlaylist")
-	public String saveUserWisePlaylist(
-	        @RequestParam(required = false) String groupId,
-	        @RequestParam(value = "userIds", required = false) List<Long> userIds,
-	        @RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
-	        @RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
-	        @RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds) {
+	public String saveUserWisePlaylist(@RequestParam(required = false) String groupId,
+			@RequestParam(value = "userIds", required = false) List<Long> userIds,
+			@RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
+			@RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
+			@RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds) {
 
-	    try {
-	        // Check if userIds exist
-	        if (userIds != null && !userIds.isEmpty()) {
-	            for (Long userId : userIds) {
-	                String userName = AppUserRepository.getUserNameById(userId);
-	                System.out.println("Processing userId: " + userId + " -> userName: " + userName);
+		try {
+			// Check if userIds exist
+			if (userIds != null && !userIds.isEmpty()) {
+				for (Long userId : userIds) {
+					String userName = AppUserRepository.getUserNameById(userId);
+					System.out.println("Processing userId: " + userId + " -> userName: " + userName);
 
-	                if (userName == null) {
-	                    System.err.println("⚠ No username found for userId=" + userId);
-	                    continue; // Skip if no username found
-	                }
+					if (userName == null) {
+						System.err.println("⚠ No username found for userId=" + userId);
+						continue; // Skip if no username found
+					}
 
-	                // Save playlists
-	                if (playlistIds != null && !playlistIds.isEmpty()) {
-	                    for (Integer playlistId : playlistIds) {
-	                        UserPlaylistMapping userPlaylistEntity = new UserPlaylistMapping();
-	                        userPlaylistEntity.setPlaylistId(playlistId);
-	                        userPlaylistEntity.setUserName(userName);
-	                        UserPlaylistMappingRepository.save(userPlaylistEntity);
-	                    }
-	                }
+					// Save playlists
+					if (playlistIds != null && !playlistIds.isEmpty()) {
+						for (Integer playlistId : playlistIds) {
+							UserPlaylistMapping userPlaylistEntity = new UserPlaylistMapping();
+							userPlaylistEntity.setPlaylistId(playlistId);
+							userPlaylistEntity.setUserName(userName);
+							UserPlaylistMappingRepository.save(userPlaylistEntity);
+						}
+					}
 
-	                // Save subplaylists
-	                if (subplaylistIds != null && !subplaylistIds.isEmpty()) {
-	                    for (Integer subplaylistId : subplaylistIds) {
-	                        UserSubplaylistMapping userSubplaylistEntity = new UserSubplaylistMapping();
-	                        userSubplaylistEntity.setSubPlaylistId(subplaylistId);
-	                        userSubplaylistEntity.setUserName(userName);
-	                        UserSubplaylistMappingRepository.save(userSubplaylistEntity);
-	                    }
-	                }
+					// Save subplaylists
+					if (subplaylistIds != null && !subplaylistIds.isEmpty()) {
+						for (Integer subplaylistId : subplaylistIds) {
+							UserSubplaylistMapping userSubplaylistEntity = new UserSubplaylistMapping();
+							userSubplaylistEntity.setSubPlaylistId(subplaylistId);
+							userSubplaylistEntity.setUserName(userName);
+							UserSubplaylistMappingRepository.save(userSubplaylistEntity);
+						}
+					}
 
-	                // Save scenarios
-	                if (scenarioIds != null && !scenarioIds.isEmpty()) {
-	                    for (Integer scenarioId : scenarioIds) {
-	                        UserScenarioMapping userScenarioEntity = new UserScenarioMapping();
-	                        userScenarioEntity.setScenarioId(scenarioId);
-	                        userScenarioEntity.setUserName(userName);
-	                        UserScenarioMappingRepository.save(userScenarioEntity);
-	                    }
-	                }
-	            }
-	        } else {
-	            System.err.println("⚠ No userIds provided, skipping save.");
-	        }
+					// Save scenarios
+					if (scenarioIds != null && !scenarioIds.isEmpty()) {
+						for (Integer scenarioId : scenarioIds) {
+							UserScenarioMapping userScenarioEntity = new UserScenarioMapping();
+							userScenarioEntity.setScenarioId(scenarioId);
+							userScenarioEntity.setUserName(userName);
+							UserScenarioMappingRepository.save(userScenarioEntity);
+						}
+					}
+				}
+			} else {
+				System.err.println("⚠ No userIds provided, skipping save.");
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	    return "redirect:/guac/Add_UserWisePlaylist";
+		return "redirect:/guac/Add_UserWisePlaylist";
 	}
-
 
 	@GetMapping("/user_playlist_summary")
 	public ModelAndView showUserPlaylistSummary() {
@@ -3981,72 +4315,70 @@ public class GuacamoleController {
 	@GetMapping("/getScenarioByUsername")
 	@ResponseBody
 	public JSONArray getScenarioByUsername(@RequestParam("username") String username) {
-	    JSONArray response = new JSONArray();
+		JSONArray response = new JSONArray();
 
-	    try {
-	        List<UserLab> labs = UserLabRepository.findByusername(username);
+		try {
+			List<UserLab> labs = UserLabRepository.findByusername(username);
 
-	        int srno = 0;
-	        for (UserLab lab : labs) {
-	            srno++;
-	            JSONArray row = new JSONArray();
+			int srno = 0;
+			for (UserLab lab : labs) {
+				srno++;
+				JSONArray row = new JSONArray();
 
-	            // Serial No
-	            row.put(srno);
+				// Serial No
+				row.put(srno);
 
-	            // Scenario
-	            String scenarioName = "";
-	            Integer scenarioId = lab.getScenarioId();
-	            if (scenarioId != null) {
-	                Optional<Add_Scenario> scenarioOpt = ScenarioRepository.findById(scenarioId);
-	                if (scenarioOpt.isPresent()) {
-	                    scenarioName = scenarioOpt.get().getScenarioName();
-	                }
-	            }
-	            row.put(scenarioName);
+				// Scenario
+				String scenarioName = "";
+				Integer scenarioId = lab.getScenarioId();
+				if (scenarioId != null) {
+					Optional<Add_Scenario> scenarioOpt = ScenarioRepository.findById(scenarioId);
+					if (scenarioOpt.isPresent()) {
+						scenarioName = scenarioOpt.get().getScenarioName();
+					}
+				}
+				row.put(scenarioName);
 
-	            // CloudInstance details
-	            String instanceName = lab.getTemplateName();
-	            List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
+				// CloudInstance details
+				String instanceName = lab.getTemplateName();
+				List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
 
-	            if (!cloudInstances.isEmpty()) {
-	                CloudInstance instance = cloudInstances.get(0);
+				if (!cloudInstances.isEmpty()) {
+					CloudInstance instance = cloudInstances.get(0);
 
-	                String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
-	                String physicalServerIP = instance.getPhysicalServerIP();
+					String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+					String physicalServerIP = instance.getPhysicalServerIP();
 
-	                row.put( os);
-	                row.put(physicalServerIP);
-	                row.put(instance.getInstance_name());
-	            }
+					row.put(os);
+					row.put(physicalServerIP);
+					row.put(instance.getInstance_name());
+				}
 
-	            // Get true/false completion counts
-	            Integer falseCountObj = instructionTemplateRepository
-	                    .getFalseCompletionCountsByusernameandscenarioId(username, scenarioId);
-	            Integer trueCountObj = instructionTemplateRepository
-	                    .getTrueCompletionCountsByusernameandscenarioId(username, scenarioId);
+				// Get true/false completion counts
+				Integer falseCountObj = instructionTemplateRepository
+						.getFalseCompletionCountsByusernameandscenarioId(username, scenarioId);
+				Integer trueCountObj = instructionTemplateRepository
+						.getTrueCompletionCountsByusernameandscenarioId(username, scenarioId);
 
-	            int falseCount = (falseCountObj != null) ? falseCountObj : 0;
-	            int trueCount = (trueCountObj != null) ? trueCountObj : 0;
+				int falseCount = (falseCountObj != null) ? falseCountObj : 0;
+				int trueCount = (trueCountObj != null) ? trueCountObj : 0;
 
-	            int total = trueCount + falseCount;
-	            int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
+				int total = trueCount + falseCount;
+				int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
 
-	            row.put(percentage + "%");
+				row.put(percentage + "%");
 
-	            // Add row to response
-	            response.put(row);
-	        }
+				// Add row to response
+				response.put(row);
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	    System.out.println("Final response JSON :: " + response);
-	    return response;
+		System.out.println("Final response JSON :: " + response);
+		return response;
 	}
-
-
 
 	@PostMapping("/update_last_session")
 	@ResponseBody
@@ -4066,5 +4398,9 @@ public class GuacamoleController {
 					.body("Error updating session: " + e.getMessage());
 		}
 	}
+
+
+
+	
 
 }

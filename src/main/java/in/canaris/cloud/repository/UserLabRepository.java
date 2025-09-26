@@ -70,7 +70,11 @@ public interface UserLabRepository extends JpaRepository<UserLab, Integer> {
 	int updateLastActiveConnection(@Param("scenarioId") Integer scenarioId, @Param("username") String username);
 
 	
-
+	
+	@Modifying
+	@Transactional
+	@Query("UPDATE UserLab u SET u.mandatoryCommandExecuted = :status WHERE u.guacamoleId = :guacamoleId")
+	void updateMandatoryCommandStatus(@Param("guacamoleId") Integer guacamoleId, @Param("status") Boolean status);
 
 
 }
