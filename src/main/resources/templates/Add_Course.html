@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:include="template :: headFragment(${pageTitle})">
+<title>Create Playlist | Cyber Ranges</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Summernote CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css"
+	rel="stylesheet">
+<style>
+/* Your existing CSS remains the same */
+:root {
+	--primary: #3498db;
+	--secondary: #2c3e50;
+	--light: #ecf0f1;
+	--dark: #1a252f;
+	--success: #2ecc71;
+	--danger: #e74c3c;
+	--warning: #f39c12;
+	--info: #1abc9c;
+}
+
+/* ... rest of your CSS remains unchanged ... */
+</style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<!-- Show correct title -->
+							<h1
+								th:text="${course.courseId == 0 ? 'Create Course' : 'Edit Course'}">Course
+								Form</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#"><i
+										class="fas fa-home"></i> Home</a></li>
+								<li class="breadcrumb-item"><a th:href="@{/courses}">Courses</a></li>
+								<li class="breadcrumb-item active"
+									th:text="${course.courseId == 0 ? 'Create' : 'Edit'}">Action</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="card">
+						<div class="card-header">
+							<h3 class="card-title">
+								<i class="fas fa-book"></i> <span
+									th:text="${course.courseId == 0 ? 'Add New Course' : 'Edit Course'}">Course</span>
+							</h3>
+						</div>
+						<!-- Change this line in your HTML -->
+						<form th:action="@{/guac/saveCourse}" method="post"
+							th:object="${course}" onsubmit="return validateCourseForm()">
+							<!-- Hidden ID field -->
+							<input type="hidden" th:field="*{courseId}" />
+
+							<div class="card-body">
+								<div class="form-group">
+									<label for="department">Department</label> 
+										
+<!-- 										<select id="department" name="department" class="form-control"> -->
+<!-- 											<option th:each="dept : ${departments}" -->
+<!-- 												th:value="${dept.departmentId}" -->
+<!-- 												th:text="${dept.departmentName}"></option> -->
+<!-- 									</select> -->
+
+<select id="department" name="department.departmentId" class="form-control" required>
+    <option value="" disabled th:selected="${course.department == null}">-- Select Department --</option>
+    <option th:each="dept : ${departments}"
+            th:value="${dept.departmentId}"
+            th:text="${dept.departmentName}"
+            th:selected="${course.department != null} ? ${dept.departmentId} == ${course.department.departmentId} : false">
+    </option>
+</select>
+
+
+									
+									<div class="invalid-feedback d-none">Please select a
+										department.</div>
+								</div>
+
+								<div class="form-group">
+									<label for="courseName">Course Name</label> <input type="text"
+										th:field="*{courseName}" id="courseName" class="form-control"
+										placeholder="Enter course name" required />
+									<div class="invalid-feedback d-none">Please enter a
+										course name.</div>
+								</div>
+							</div>
+
+							<div class="card-footer text-right">
+								<a th:href="@{/guac/Add_Course}" class="btn btn-secondary">Cancel</a>
+								<button type="reset" class="btn btn-outline-secondary">Reset</button>
+								<button type="submit" class="btn btn-primary">
+									<i class="fas fa-save"></i> Save
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</section>
+		</div>
+		>
+
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+
+	<script>
+		function validateDepartmentForm() {
+			const name = document.getElementById('departmentName');
+			if (!name.value.trim()) {
+				name.classList.add('is-invalid');
+				name.nextElementSibling.classList.remove('d-none');
+				name.focus();
+				return false;
+			}
+			return true;
+		}
+
+		document.addEventListener("DOMContentLoaded", function() {
+			const input = document.getElementById('departmentName');
+			input.addEventListener('input', function() {
+				input.classList.remove('is-invalid');
+				input.nextElementSibling.classList.add('d-none');
+			});
+		});
+	</script>
+</body>
+</html>

@@ -501,24 +501,23 @@ label {
 											</div>
 
 											<div class="row mt-4">
-												<div class="col-md-12">
-													<div class="form-group">
-														<label for="Labs" class="form-label fw-bold">
-															Select Lab Template <span class="text-danger">*</span>
-														</label> <select id="Labs" name="Labs" class="form-control"
-															th:field="*{Labs}" multiple="multiple" disabled>
-															<option th:each="instance : ${instanceNameList}"
-																th:value="${instance.id + '~' + instance.instance_name}"
-																th:text="${instance.instance_name}"></option>
-														</select> 
-
-														<div class="selection-limit" id="selectionLimit">
-															You can select up to <span id="maxSelections">0</span>
-															lab templates
-														</div>
-													</div>
-												</div>
-											</div>
+    <div class="col-md-12">
+        <div class="form-group">
+            <label for="Labs" class="form-label fw-bold">
+                Select Lab Template <span class="text-danger">*</span>
+            </label> 
+            <select id="Labs" name="Labs" class="form-control" th:field="*{Labs}" multiple="multiple">
+                <option th:each="instance : ${instanceNameList}"
+                    th:value="${instance.id + '~' + instance.instance_name}"
+                    th:text="${instance.instance_name}"></option>
+            </select> 
+            
+            <div class="selection-limit" id="selectionLimit">
+                You can select up to <span id="maxSelections">0</span> lab templates
+            </div>
+        </div>
+    </div>
+</div>
 
 										</div>
 
@@ -569,257 +568,256 @@ label {
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 	<script type="text/javascript">
-		$(document).ready(function() {
-			// Initialize custom file input
-			bsCustomFileInput.init();
+	$(document).ready(function() {
+	    // Initialize custom file input
+	    bsCustomFileInput.init();
 
-			// Get edit mode flag from Thymeleaf
-			const isEdit = /*[[${isEdit}]]*/ false;
-			const existingDescription = /*[[${scenario.Description}]]*/ '';
-			const existingLabs = /*[[${scenario.Labs}]]*/ '';
+	    // Get edit mode flag from Thymeleaf
+	    const isEdit = /*[[${isEdit}]]*/ false;
+	    const existingDescription = /*[[${scenario.Description}]]*/ '';
+	    const existingLabs = /*[[${scenario.Labs}]]*/ '';
+	    const existingInstanceCount = /*[[${scenario.NumberofInstance}]]*/ 0;
 
-			// Initialize Summernote with existing content for edit mode
-			$('.summernote').summernote({
-                height: 150,
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['fontsize', ['fontsize']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['insert', ['picture', 'link']],
-                    ['view', ['fullscreen', 'codeview']]
-                ]
-            });
+	    // Initialize Summernote
+	    $('.summernote').summernote({
+	        height: 150,
+	        toolbar: [
+	            ['style', ['bold', 'italic', 'underline', 'clear']],
+	            ['fontsize', ['fontsize']],
+	            ['para', ['ul', 'ol', 'paragraph']],
+	            ['insert', ['picture', 'link']],
+	            ['view', ['fullscreen', 'codeview']]
+	        ],
+	        callbacks: {
+	            onPaste: function (e) {
+	                e.preventDefault();
+	                let text = (e.originalEvent || e).clipboardData.getData('text/plain');
+	                document.execCommand('insertText', false, text);
+	            }
+	        }
+	    });
 
-			// Set existing description content for edit mode
-			if (isEdit && existingDescription) {
-				$('#Description').summernote('code', existingDescription);
-			}
+	    // Set existing description content for edit mode
+	    if (isEdit && existingDescription) {
+	        $('#Description').summernote('code', existingDescription);
+	    }
 
-			// Initialize Select2 for multi-select
-			$('#Labs').select2({
-				placeholder: "Select lab templates (max: 0)",
-				allowClear: true,
-				width: '100%',
-				closeOnSelect: false
-			});
+	    // Initialize Select2 for multi-select
+	    $('#Labs').select2({
+	        placeholder: "Select lab templates",
+	        allowClear: true,
+	        width: '100%',
+	        closeOnSelect: false
+	    });
 
-			// Handle edit mode initialization
-			if (isEdit) {
-				// Enable Labs dropdown based on existing NumberofInstance value
-				const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
-				if (instanceCount > 0) {
-					$('#Labs').prop('disabled', false);
-					$('#instanceWarning').hide();
-					$('#maxSelections').text(instanceCount);
-					$('#selectionLimit').removeClass('error');
-					
-					// Update placeholder text
-					if ($('#Labs').data('select2')) {
-						$('#Labs').data('select2').$container.find('.select2-selection__placeholder').text(`Select lab templates (max: ${instanceCount})`);
-					}
-				}
+	    // Initialize form based on edit mode
+	    function initializeForm() {
+	        const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
+	        
+	        if (isEdit) {
+	            // For edit mode, always enable Labs dropdown
+	            $('#Labs').prop('disabled', false);
+	            $('#instanceWarning').hide();
+	            
+	            // Set existing instance count
+	            if (existingInstanceCount > 0) {
+	                $('#maxSelections').text(existingInstanceCount);
+	                $('#selectionLimit').removeClass('error');
+	                
+	                // Update placeholder text
+	                if ($('#Labs').data('select2')) {
+	                    $('#Labs').data('select2').$container.find('.select2-selection__placeholder')
+	                        .text(`Select lab templates (max: ${existingInstanceCount})`);
+	                }
+	            }
+	            
+	            // Set pre-selected labs
+	            setTimeout(function() {
+	                if (existingLabs) {
+	                    const labArray = existingLabs.split(',');
+	                    $('#Labs').val(labArray).trigger('change');
+	                    
+	                    // Update selection count
+	                    const currentSelections = $('#Labs').val() ? $('#Labs').val().length : 0;
+	                    if (existingInstanceCount > 0 && currentSelections > 0) {
+	                        $('#selectionLimit').html(`You have selected ${currentSelections} of ${existingInstanceCount} allowed lab templates`);
+	                    }
+	                }
+	            }, 500);
+	        } else {
+	            // For create mode, use the original logic
+	            if (instanceCount > 0) {
+	                $('#Labs').prop('disabled', false);
+	                $('#instanceWarning').hide();
+	                $('#maxSelections').text(instanceCount);
+	                $('#selectionLimit').removeClass('error');
+	            } else {
+	                $('#Labs').prop('disabled', true);
+	                $('#instanceWarning').show();
+	            }
+	        }
+	    }
 
-				// Set pre-selected labs after a short delay to ensure Select2 is initialized
-				setTimeout(function() {
-					if (existingLabs) {
-						const labArray = existingLabs.split(',');
-						$('#Labs').val(labArray).trigger('change');
-						
-						// Update selection count
-						const currentSelections = $('#Labs').val() ? $('#Labs').val().length : 0;
-						if (instanceCount > 0 && currentSelections > 0) {
-							$('#selectionLimit').html(`You have selected ${currentSelections} of ${instanceCount} allowed lab templates`);
-						}
-					}
-				}, 500);
-			}
+	    // Initialize the form
+	    initializeForm();
 
-			// Handle instance number change
-			$('#NumberofInstance').on('input', function() {
-				const instanceCount = parseInt($(this).val()) || 0;
-				
-				if (instanceCount > 0) {
-					$('#Labs').prop('disabled', false);
-					$('#instanceWarning').hide();
-					$('#maxSelections').text(instanceCount);
-					$('#selectionLimit').removeClass('error');
-					
-					// Update placeholder text
-					if ($('#Labs').data('select2')) {
-						$('#Labs').data('select2').$container.find('.select2-selection__placeholder').text(`Select lab templates (max: ${instanceCount})`);
-					}
-					
-					// If current selections exceed the new limit, remove the extra ones
-					const selectedOptions = $('#Labs').val() || [];
-					if (selectedOptions.length > instanceCount) {
-						$('#Labs').val(selectedOptions.slice(0, instanceCount)).trigger('change');
-						$('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>Selection limit exceeded! Only ${instanceCount} lab templates allowed.`);
-					} else if (selectedOptions.length > 0) {
-						$('#selectionLimit').html(`You have selected ${selectedOptions.length} of ${instanceCount} allowed lab templates`);
-					} else {
-						$('#selectionLimit').html(`You can select up to <span id="maxSelections">${instanceCount}</span> lab templates`);
-					}
-				} else {
-					$('#Labs').prop('disabled', true);
-					$('#Labs').val(null).trigger('change');
-					$('#instanceWarning').show();
-					$('#maxSelections').text('0');
-					$('#selectionLimit').html(`You can select up to <span id="maxSelections">0</span> lab templates`);
-				}
-			});
+	    // Handle instance number change (for both create and edit)
+	    $('#NumberofInstance').on('input', function() {
+	        const instanceCount = parseInt($(this).val()) || 0;
+	        
+	        if (instanceCount > 0) {
+	            $('#Labs').prop('disabled', false);
+	            $('#instanceWarning').hide();
+	            $('#maxSelections').text(instanceCount);
+	            $('#selectionLimit').removeClass('error');
+	            
+	            // Update placeholder text
+	            if ($('#Labs').data('select2')) {
+	                $('#Labs').data('select2').$container.find('.select2-selection__placeholder')
+	                    .text(`Select lab templates (max: ${instanceCount})`);
+	            }
+	            
+	            // If current selections exceed the new limit, remove the extra ones
+	            const selectedOptions = $('#Labs').val() || [];
+	            if (selectedOptions.length > instanceCount) {
+	                $('#Labs').val(selectedOptions.slice(0, instanceCount)).trigger('change');
+	                $('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>Selection limit exceeded! Only ${instanceCount} lab templates allowed.`);
+	            } else if (selectedOptions.length > 0) {
+	                $('#selectionLimit').html(`You have selected ${selectedOptions.length} of ${instanceCount} allowed lab templates`);
+	            } else {
+	                $('#selectionLimit').html(`You can select up to <span id="maxSelections">${instanceCount}</span> lab templates`);
+	            }
+	        } else {
+	            $('#Labs').prop('disabled', true);
+	            $('#Labs').val(null).trigger('change');
+	            $('#instanceWarning').show();
+	            $('#maxSelections').text('0');
+	            $('#selectionLimit').html(`You can select up to <span id="maxSelections">0</span> lab templates`);
+	        }
+	    });
 
-			// Handle lab template selection with limit validation
-			$('#Labs').on('select2:selecting', function(e) {
-				const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
-				const currentSelections = $('#Labs').select2('data').length;
-				
-				if (instanceCount > 0 && currentSelections >= instanceCount) {
-					e.preventDefault();
-					$('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>You can only select up to ${instanceCount} lab templates.`);
-					
-					setTimeout(function() {
-						$('#selectionLimit').removeClass('error');
-						const updatedSelections = $('#Labs').select2('data').length;
-						$('#selectionLimit').html(`You have selected ${updatedSelections} of ${instanceCount} allowed lab templates`);
-					}, 2000);
-				}
-			});
+	    // Handle lab template selection with limit validation
+	    $('#Labs').on('select2:selecting', function(e) {
+	        const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
+	        const currentSelections = $('#Labs').select2('data').length;
+	        
+	        if (instanceCount > 0 && currentSelections >= instanceCount) {
+	            e.preventDefault();
+	            $('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>You can only select up to ${instanceCount} lab templates.`);
+	            
+	            setTimeout(function() {
+	                $('#selectionLimit').removeClass('error');
+	                const updatedSelections = $('#Labs').select2('data').length;
+	                $('#selectionLimit').html(`You have selected ${updatedSelections} of ${instanceCount} allowed lab templates`);
+	            }, 2000);
+	        }
+	    });
 
-			// Update selection count when changing labs
-			$('#Labs').on('change', function() {
-				const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
-				const currentSelections = $('#Labs').select2('data').length;
-				
-				if (instanceCount > 0) {
-					if (currentSelections > instanceCount) {
-						const selectedOptions = $('#Labs').val() || [];
-						$('#Labs').val(selectedOptions.slice(0, instanceCount)).trigger('change');
-					} else if (currentSelections > 0) {
-						$('#selectionLimit').html(`You have selected ${currentSelections} of ${instanceCount} allowed lab templates`);
-					} else {
-						$('#selectionLimit').html(`You can select up to <span id="maxSelections">${instanceCount}</span> lab templates`);
-					}
-				}
-			});
+	    // Update selection count when changing labs
+	    $('#Labs').on('change', function() {
+	        const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
+	        const currentSelections = $('#Labs').select2('data').length;
+	        
+	        if (instanceCount > 0) {
+	            if (currentSelections > instanceCount) {
+	                const selectedOptions = $('#Labs').val() || [];
+	                $('#Labs').val(selectedOptions.slice(0, instanceCount)).trigger('change');
+	            } else if (currentSelections > 0) {
+	                $('#selectionLimit').html(`You have selected ${currentSelections} of ${instanceCount} allowed lab templates`);
+	            } else {
+	                $('#selectionLimit').html(`You can select up to <span id="maxSelections">${instanceCount}</span> lab templates`);
+	            }
+	        }
+	    });
 
-			// Inline validation on input change
-			const requiredFields = [
-				'ScenarioTitle', 'ScenarioName', 'Category', 'ScenarioType', 
-				'Mode', 'DifficultyLevel', 'Duration', 'NumberofInstance'
-			];
+	    // Inline validation on input change
+	    const requiredFields = [
+	        'ScenarioTitle', 'ScenarioName', 'Category', 'ScenarioType', 
+	        'Mode', 'DifficultyLevel', 'Duration', 'NumberofInstance'
+	    ];
 
-			requiredFields.forEach(fieldId => {
-				$('#' + fieldId).on('input change', function() {
-					if ($(this).val().trim()) {
-						$(this).removeClass('is-invalid');
-					} else {
-						$(this).addClass('is-invalid');
-					}
-				});
-			});
+	    requiredFields.forEach(fieldId => {
+	        $('#' + fieldId).on('input change', function() {
+	            if ($(this).val().trim()) {
+	                $(this).removeClass('is-invalid');
+	            } else {
+	                $(this).addClass('is-invalid');
+	            }
+	        });
+	    });
 
-			// Summernote inline validation
-			$('#Description').on('summernote.change', function() {
-				const content = $(this).summernote('code').replace(/<[^>]*>/g, '').trim();
-				if (content) {
-					$(this).closest('.form-group').find('.note-editor').removeClass('is-invalid');
-				} else {
-					$(this).closest('.form-group').find('.note-editor').addClass('is-invalid');
-				}
-			});
+	    // Summernote inline validation
+	    $('#Description').on('summernote.change', function() {
+	        const content = $(this).summernote('code').replace(/<[^>]*>/g, '').trim();
+	        if (content) {
+	            $(this).closest('.form-group').find('.note-editor').removeClass('is-invalid');
+	        } else {
+	            $(this).closest('.form-group').find('.note-editor').addClass('is-invalid');
+	        }
+	    });
 
-			// Handle file input change
-			$('#cover_image').on('change', function() {
-				const fileName = $(this).val().split('\\').pop();
-				$('#coverImageLabel').text(fileName || 'Choose file');
-			});
-		});
+	    // Handle file input change
+	    $('#cover_image').on('change', function() {
+	        const fileName = $(this).val().split('\\').pop();
+	        $('#coverImageLabel').text(fileName || 'Choose file');
+	    });
+	});
 
-		function validateScenarioForm() {
-			let isValid = true;
+	function validateScenarioForm() {
+	    let isValid = true;
 
-			// Validate required fields
-			const requiredFields = [
-				'ScenarioTitle', 'ScenarioName', 'Category', 'ScenarioType', 
-				'Mode', 'DifficultyLevel', 'Duration', 'NumberofInstance'
-			];
+	    // Validate required fields
+	    const requiredFields = [
+	        'ScenarioTitle', 'ScenarioName', 'Category', 'ScenarioType', 
+	        'Mode', 'DifficultyLevel', 'Duration', 'NumberofInstance'
+	    ];
 
-			requiredFields.forEach(fieldId => {
-				const field = $('#' + fieldId);
-				if (!field.val().trim()) {
-					field.addClass('is-invalid');
-					isValid = false;
-				} else {
-					field.removeClass('is-invalid');
-				}
-			});
+	    requiredFields.forEach(fieldId => {
+	        const field = $('#' + fieldId);
+	        if (!field.val().trim()) {
+	            field.addClass('is-invalid');
+	            isValid = false;
+	        } else {
+	            field.removeClass('is-invalid');
+	        }
+	    });
 
-			// Validate Labs selection
-			const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
-			const selectedLabs = $('#Labs').val();
-			
-			if (!selectedLabs || selectedLabs.length === 0) {
-				$('#Labs').closest('.form-group').find('.select2-selection').addClass('is-invalid');
-				isValid = false;
-			} else if (selectedLabs.length > instanceCount) {
-				$('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>You can only select up to ${instanceCount} lab templates.`);
-				isValid = false;
-			} else {
-				$('#Labs').closest('.form-group').find('.select2-selection').removeClass('is-invalid');
-			}
+	    // Validate Labs selection
+	    const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
+	    const selectedLabs = $('#Labs').val();
+	    
+	    if (!selectedLabs || selectedLabs.length === 0) {
+	        $('#Labs').closest('.form-group').find('.select2-selection').addClass('is-invalid');
+	        isValid = false;
+	    } else if (selectedLabs.length > instanceCount) {
+	        $('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>You can only select up to ${instanceCount} lab templates.`);
+	        isValid = false;
+	    } else {
+	        $('#Labs').closest('.form-group').find('.select2-selection').removeClass('is-invalid');
+	    }
 
-			// Validate Summernote
-			const summernoteContent = $('#Description').summernote('code').replace(/<[^>]*>/g, '').trim();
-			if (!summernoteContent) {
-				$('#Description').closest('.form-group').find('.note-editor').addClass('is-invalid');
-				isValid = false;
-			} else {
-				$('#Description').closest('.form-group').find('.note-editor').removeClass('is-invalid');
-			}
+	    // Validate Summernote
+	    const summernoteContent = $('#Description').summernote('code').replace(/<[^>]*>/g, '').trim();
+	    if (!summernoteContent) {
+	        $('#Description').closest('.form-group').find('.note-editor').addClass('is-invalid');
+	        isValid = false;
+	    } else {
+	        $('#Description').closest('.form-group').find('.note-editor').removeClass('is-invalid');
+	    }
 
-			if (!isValid) {
-				$('html, body').animate({
-					scrollTop: $('.is-invalid:first').offset().top - 100
-				}, 500);
-				return false;
-			}
+	    if (!isValid) {
+	        $('html, body').animate({
+	            scrollTop: $('.is-invalid:first').offset().top - 100
+	        }, 500);
+	        return false;
+	    }
 
-			$('#scenarioSpinner').removeClass('d-none');
-			$('#saveScenarioBtn').prop('disabled', true);
-			return true;
-		}
-	</script>
+	    $('#scenarioSpinner').removeClass('d-none');
+	    $('#saveScenarioBtn').prop('disabled', true);
+	    return true;
+	}
+</script>
 
-	<script th:inline="javascript">
-		/*<![CDATA[*/
-		var result = [[${result}]];
-		var isEdit = [[${isEdit}]];
-
-		if (result === 'success') {
-			Swal.fire({
-				title: isEdit ? 'Scenario Updated!' : 'Scenario Saved!',
-				text: isEdit ? 'The scenario has been updated successfully.' : 'The scenario has been saved successfully.',
-				icon: 'success',
-				confirmButtonText: 'OK',
-				confirmButtonColor: '#3498db'
-			}).then((result) => {
-				if (result.isConfirmed) {
-					window.location.href = '/guac/Scenario_Details';
-				}
-			});
-		} else if (result && result !== '') {
-			Swal.fire({
-				title: 'Error',
-				text: result,
-				icon: 'error',
-				confirmButtonText: 'OK',
-				confirmButtonColor: '#e74c3c'
-			});
-		}
-		/*]]>*/
-	</script>
-	
-	
 	<script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function () {
         // Get labs from Thymeleaf (already "id~name" format)

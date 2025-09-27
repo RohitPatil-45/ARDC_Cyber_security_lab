@@ -61,12 +61,15 @@ import in.canaris.cloud.openstack.entity.Add_Scenario;
 import in.canaris.cloud.openstack.entity.ChartBoatInstructionTemplate;
 import in.canaris.cloud.openstack.entity.CommandHistory;
 import in.canaris.cloud.openstack.entity.ContainerUserLabDTO;
+import in.canaris.cloud.openstack.entity.CourseMaster;
+import in.canaris.cloud.openstack.entity.DepartmentMaster;
 import in.canaris.cloud.openstack.entity.Discover_Docker_Network;
 import in.canaris.cloud.openstack.entity.InstructionCommand;
 import in.canaris.cloud.openstack.entity.Playlist;
 import in.canaris.cloud.openstack.entity.PlaylistItem;
 import in.canaris.cloud.openstack.entity.ScenarioComments;
 import in.canaris.cloud.openstack.entity.ScenarioLabTemplate;
+import in.canaris.cloud.openstack.entity.SemesterMaster;
 import in.canaris.cloud.openstack.entity.SubPlaylist;
 import in.canaris.cloud.openstack.entity.SubPlaylistScenario;
 import in.canaris.cloud.openstack.entity.UserLab;
@@ -96,6 +99,11 @@ import in.canaris.cloud.repository.UserPlaylistMappingRepository;
 import in.canaris.cloud.repository.UserSubplaylistMappingRepository;
 import in.canaris.cloud.repository.UserScenarioMappingRepository;
 import in.canaris.cloud.repository.DiscoverContainerRepository;
+import in.canaris.cloud.repository.DepartmentMasterRepository;
+import in.canaris.cloud.repository.CourseMasterRepository;
+import in.canaris.cloud.repository.SemesterMasterRepository;
+import in.canaris.cloud.repository.SubjectMasterRepository;
+
 
 import in.canaris.cloud.repository.SubPlaylistRepository;
 import in.canaris.cloud.repository.UserLabRepository;
@@ -188,6 +196,19 @@ public class GuacamoleController {
 
 	@Autowired
 	DiscoverContainerRepository DiscoverContainerRepository;
+	
+	@Autowired
+	DepartmentMasterRepository DepartmentMasterRepository;
+	
+	@Autowired
+	CourseMasterRepository CourseMasterRepository;
+	
+	@Autowired
+	SemesterMasterRepository SemesterMasterRepository;
+	
+	
+	@Autowired
+	SubjectMasterRepository SubjectMasterRepository;
 
 	@GetMapping("/")
 	public String home() {
@@ -1383,7 +1404,198 @@ System.out.println("check_value ::: "+value);
 		model.addAttribute("pageTitle", (id != null) ? "Edit Playlist" : "Create Playlist");
 		return "Add_Playlist";
 	}
+	
+	
+	@GetMapping("/Add_Department")
+	public String showAddDepartmentForm(@RequestParam(value = "Id", required = false) Integer id, Model model) {
+	    DepartmentMaster department = null;
 
+	    if (id != null) {
+	        Optional<DepartmentMaster> optionalDepartment = DepartmentMasterRepository.findById(id);
+	        if (optionalDepartment.isPresent()) {
+	            department = optionalDepartment.get();
+	        }
+	    }
+
+	    if (department == null) {
+	        department = new DepartmentMaster();
+	    }
+
+	    model.addAttribute("department", department);
+	    model.addAttribute("pageTitle", (id != null) ? "Edit Department" : "Create Department");
+
+	    return "Add_Department";
+	}
+
+
+	
+	@PostMapping("/saveDepartment")
+	public String saveDepartment(@ModelAttribute("department") DepartmentMaster department) {
+	    System.out.println("Inside_saveDepartment :: " + department);
+
+	    DepartmentMaster savedDepartment = DepartmentMasterRepository.save(department);
+
+	    if (savedDepartment.getDepartmentId() == 0) {
+	        // This case normally shouldn't happen after save, but just in case
+	        return "redirect:/guac/Add_Department";
+	    } else {
+	        // If departmentId exists (updated or newly created), redirect to view page
+	        return "redirect:/guac/View_Department?Id=" + savedDepartment.getDepartmentId();
+	    }
+	}
+
+	
+
+	@GetMapping("/View_Department")
+	public String listDepartments(Model model) {
+	    List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+	    model.addAttribute("departments", departments);
+	    model.addAttribute("pageTitle", "Department List");
+	    return "View_Department";  // new Thymeleaf template for listing
+	}
+	
+	@GetMapping("/deleteDepartment")
+	public String deleteDepartment(@RequestParam("Id") Integer id) {
+		DepartmentMasterRepository.deleteById(id);
+	    return "redirect:/departments"; // redirect to listing after delete
+	}
+
+
+	
+	@GetMapping("/Add_Course")
+	public String showAddCourseForm(@RequestParam(value = "Id", required = false) Integer id, Model model) {
+	    CourseMaster course = null;
+
+	    if (id != null) {
+	        Optional<CourseMaster> optionalCourse = CourseMasterRepository.findBycourseId(id);
+	        if (optionalCourse.isPresent()) {
+	            course = optionalCourse.get();
+	            if (course.getDepartment() != null) {
+//	                course.setDepartmentId(course.getDepartment().getDepartmentId());
+	                
+	            }
+	        }
+	    }
+
+	    if (course == null) {
+	        course = new CourseMaster();
+	    }
+
+	    List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+
+	    model.addAttribute("course", course);
+	    model.addAttribute("departments", departments);
+	    model.addAttribute("pageTitle", (id != null) ? "Edit Course" : "Create Course");
+
+	    return "Add_Course";
+	}
+
+	@PostMapping("/saveCourse")
+	public String saveCourse(@ModelAttribute("course") CourseMaster course) {
+	    Integer deptId = (course.getDepartment() != null) ? course.getDepartment().getDepartmentId() : null;
+
+	    if (deptId != null) {
+	        DepartmentMaster department = DepartmentMasterRepository.findById(deptId).orElse(null);
+	        if (department != null) {
+	            course.setDepartment(department);
+	           
+	            CourseMasterRepository.save(course);
+	          
+	            return "redirect:/guac/View_Course";
+	        }
+	    }
+	   
+	    return "redirect:/guac/Add_Course";
+	}
+
+
+	
+	@GetMapping("/View_Course")
+	public String listCourses(Model model) {
+	    List<CourseMaster> courses = CourseMasterRepository.findAll();  // get courses
+	    model.addAttribute("courses", courses);
+	    model.addAttribute("pageTitle", "Course List");
+	    return "View_Course";  
+	}
+	
+	@GetMapping("/deleteCourse")
+	public String deleteCourse(@RequestParam("Id") int courseId) {
+	    if (CourseMasterRepository.existsById(courseId)) {
+	        CourseMasterRepository.deleteById(courseId);
+	    }
+	    return "redirect:/guac/View_Course";
+	}
+
+
+	
+	@GetMapping("/Add_Semester")
+	public String showAddSemesterForm(@RequestParam(value = "Id", required = false) Integer id, Model model) {
+	    SemesterMaster semester = new SemesterMaster();
+
+	    if (id != null) {
+	        Optional<SemesterMaster> optionalSemester = SemesterMasterRepository.findById(id);
+	        if (optionalSemester.isPresent()) {
+	            semester = optionalSemester.get();
+	        }
+	    }
+
+	    // Load all departments for dropdown
+	    List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+
+	    // Load courses for the selected department (or empty list if none)
+	    List<CourseMaster> courses = new ArrayList<>();
+	    if (semester.getCourse() != null && semester.getCourse().getDepartment() != null) {
+	        int deptId = semester.getCourse().getDepartment().getDepartmentId();
+	        courses = CourseMasterRepository.findByDepartment_DepartmentId(deptId);
+	        
+//	        Integer deptId = (course.getDepartment() != null) ? course.getDepartment().getDepartmentId() : null;
+	    }
+
+	    model.addAttribute("semester", semester);
+	    model.addAttribute("departments", departments);
+	    model.addAttribute("courses", courses);
+
+	    return "Add_Semester";  // Thymeleaf template
+	}
+
+	@PostMapping("/saveSemester")
+	public String saveSemester(@ModelAttribute("semester") SemesterMaster semester) {
+	    // If course is selected, fetch the full entity
+	    if (semester.getCourse() != null && semester.getCourse().getCourseId() != 0) {
+	        CourseMaster course = CourseMasterRepository.findById(semester.getCourse().getCourseId()).orElse(null);
+	        semester.setCourse(course);
+	    }
+	    SemesterMasterRepository.save(semester);
+	    return "redirect:/guac/View_Semester";
+	}
+
+	
+	@GetMapping("/courses")
+	@ResponseBody
+	public List<CourseMaster> getCoursesByDepartment(@RequestParam int departmentId) {
+	    return CourseMasterRepository.findByDepartment_DepartmentId(departmentId);
+	}
+
+
+	
+	@GetMapping("/View_Semester")
+	public String listSemester(Model model) {
+	    List<CourseMaster> courses = CourseMasterRepository.findAll();  // get courses
+	    model.addAttribute("courses", courses);
+	    model.addAttribute("pageTitle", "Course List");
+	    return "View_Course";  
+	}
+	
+	@GetMapping("/deleteSemester")
+	public String deleteSemester(@RequestParam("Id") int courseId) {
+	    if (CourseMasterRepository.existsById(courseId)) {
+	        CourseMasterRepository.deleteById(courseId);
+	    }
+	    return "redirect:/guac/View_Semester";
+	}
+	
+//	SubjectMasterRepository
+//	View_Semester
 //	@GetMapping("/Add_Sub_Playlist")
 //	public ModelAndView showAdd_Sub_PlaylistForm() {
 //		ModelAndView mav = new ModelAndView("Add_Sub_Playlist");
@@ -2347,116 +2559,257 @@ System.out.println("check_value ::: "+value);
 		return mav;
 	}
 
+//	@PostMapping("/saveScenarioData")
+//	public String saveScenarioData(@ModelAttribute("scenario") Add_Scenario scenarioObj,
+//			RedirectAttributes redirectAttributes, @RequestParam(required = false) MultipartFile cover_image,
+//			Principal principal) {
+//
+//		try {
+//			boolean isNew = (scenarioObj.getId() == 0);
+//
+//			// Set creator if needed
+//			if (principal != null) {
+//				// scenarioObj.setCreatedBy(principal.getName());
+//			}
+//
+//			// Step 1: Parse Labs - format: "101~Lab A,102~Lab B"
+//			String labsString = scenarioObj.getLabs();
+//			
+//			System.out.println("labsString ::"+labsString);
+//			String[] labsArray = labsString.split(",");
+//			List<String> labIds = new ArrayList<String>();
+//			List<String> labNames = new ArrayList<String>();
+//
+//			for (String lab : labsArray) {
+//				String[] parts = lab.split("~");
+//				if (parts.length == 2) {
+//					String labId = parts[0].trim();
+//					String labName = parts[1].trim();
+//
+//					labIds.add(labId);
+//					labNames.add(labName);
+//
+//					try {
+//						repository.updateInstanceNameAssigned(Integer.parseInt(labId));
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//
+//			// For saving readable lab names in scenarioObj
+//			StringBuilder sb = new StringBuilder();
+//			for (int i = 0; i < labNames.size(); i++) {
+//				sb.append(labNames.get(i));
+//				if (i < labNames.size() - 1) {
+//					sb.append(",");
+//				}
+//			}
+//			scenarioObj.setLabs(sb.toString());
+//			scenarioObj.setComments("");
+//
+//			// Handle cover image
+//			if (cover_image != null && !cover_image.isEmpty()) {
+//				String contentType = cover_image.getContentType();
+//				if (contentType != null && contentType.startsWith("image/")) {
+//					scenarioObj.setCoverImage(cover_image.getBytes());
+//				} else {
+//					redirectAttributes.addFlashAttribute("message", "Invalid file type. Please upload an image file.");
+//					redirectAttributes.addFlashAttribute("status", "error");
+//				}
+//			} else if (isNew) {
+//				// Use default image for new scenario
+//				String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
+//				try {
+//					byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
+//					scenarioObj.setCoverImage(defaultImageBytes);
+//				} catch (IOException e) {
+//					scenarioObj.setCoverImage(createPlaceholderImage());
+//				}
+//			} else {
+//				// Use existing image for edit
+//				Optional<Add_Scenario> existing = ScenarioRepository.findById(scenarioObj.getId());
+//				existing.ifPresent(existingScenario -> {
+//					scenarioObj.setCoverImage(existingScenario.getCoverImage());
+//				});
+//			}
+//
+//			// Save scenario and get saved entity with ID
+//			Add_Scenario savedScenario = ScenarioRepository.save(scenarioObj);
+//
+//			// 🔥 Delete existing labs for this scenario before inserting new ones
+//			ScenarioLabTemplateRepository.deleteByScenarioId(savedScenario.getId());
+//
+//			// Save lab templates into ScenarioLabTemplate table
+//			for (String lab : labsArray) {
+//				String[] parts = lab.split("~");
+//				if (parts.length == 2) {
+//					ScenarioLabTemplate labTemplate = new ScenarioLabTemplate();
+//					labTemplate.setScenarioId(savedScenario.getId());
+//					labTemplate.setScenarioName(savedScenario.getScenarioName());
+//					labTemplate.setTemplateId(Integer.parseInt(parts[0].trim()));
+//					labTemplate.setTemplateName(parts[1].trim());
+//
+//					ScenarioLabTemplateRepository.save(labTemplate);
+//				}
+//			}
+//
+//			redirectAttributes.addFlashAttribute("message", "Scenario saved successfully!");
+//			redirectAttributes.addFlashAttribute("status", "success");
+//			redirectAttributes.addFlashAttribute("result", "success");
+//
+//			// Redirect based on whether it's new or edit
+//			if (isNew) {
+//				return "redirect:/guac/Scenario_Details";
+//			} else {
+//				return "redirect:/guac/View_Particular_Scenerio?Id=" + savedScenario.getId();
+//			}
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			redirectAttributes.addFlashAttribute("message", "Error while saving scenario: " + e.getMessage());
+//			redirectAttributes.addFlashAttribute("status", "error");
+//			return "redirect:/guac/Scenario_Details";
+//		}
+//	}
+	
+	
 	@PostMapping("/saveScenarioData")
 	public String saveScenarioData(@ModelAttribute("scenario") Add_Scenario scenarioObj,
-			RedirectAttributes redirectAttributes, @RequestParam(required = false) MultipartFile cover_image,
-			Principal principal) {
+	        RedirectAttributes redirectAttributes, @RequestParam(required = false) MultipartFile cover_image,
+	        Principal principal) {
 
-		try {
-			boolean isNew = (scenarioObj.getId() == 0);
+	    try {
+	        boolean isNew = (scenarioObj.getId() == 0);
 
-			// Set creator if needed
-			if (principal != null) {
-				// scenarioObj.setCreatedBy(principal.getName());
-			}
+	        // Set creator if needed
+	        if (principal != null) {
+	            // scenarioObj.setCreatedBy(principal.getName());
+	        }
 
-			// Step 1: Parse Labs - format: "101~Lab A,102~Lab B"
-			String labsString = scenarioObj.getLabs();
-			String[] labsArray = labsString.split(",");
-			List<String> labIds = new ArrayList<String>();
-			List<String> labNames = new ArrayList<String>();
+	        // Step 1: Parse Labs - format: "101~Lab A,102~Lab B"
+	        String labsString = scenarioObj.getLabs();
+	        
+	        String description = scenarioObj.getDescription();
 
-			for (String lab : labsArray) {
-				String[] parts = lab.split("~");
-				if (parts.length == 2) {
-					String labId = parts[0].trim();
-					String labName = parts[1].trim();
+	     // 1. Remove all carriage returns and newlines
+	     description = description.replaceAll("\\r|\\n", "");
 
-					labIds.add(labId);
-					labNames.add(labName);
+	     // 2. Remove extra spaces between tags
+	     description = description.replaceAll(">\\s+<", "><");
 
-					try {
-						repository.updateInstanceNameAssigned(Integer.parseInt(labId));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
+	     // 3. Optional: trim the whole string
+	     description = description.trim();
 
-			// For saving readable lab names in scenarioObj
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < labNames.size(); i++) {
-				sb.append(labNames.get(i));
-				if (i < labNames.size() - 1) {
-					sb.append(",");
-				}
-			}
-			scenarioObj.setLabs(sb.toString());
-			scenarioObj.setComments("");
+//	     System.out.println(description);
 
-			// Handle cover image
-			if (cover_image != null && !cover_image.isEmpty()) {
-				String contentType = cover_image.getContentType();
-				if (contentType != null && contentType.startsWith("image/")) {
-					scenarioObj.setCoverImage(cover_image.getBytes());
-				} else {
-					redirectAttributes.addFlashAttribute("message", "Invalid file type. Please upload an image file.");
-					redirectAttributes.addFlashAttribute("status", "error");
-				}
-			} else if (isNew) {
-				// Use default image for new scenario
-				String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
-				try {
-					byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
-					scenarioObj.setCoverImage(defaultImageBytes);
-				} catch (IOException e) {
-					scenarioObj.setCoverImage(createPlaceholderImage());
-				}
-			} else {
-				// Use existing image for edit
-				Optional<Add_Scenario> existing = ScenarioRepository.findById(scenarioObj.getId());
-				existing.ifPresent(existingScenario -> {
-					scenarioObj.setCoverImage(existingScenario.getCoverImage());
-				});
-			}
+	     scenarioObj.setDescription(description);
 
-			// Save scenario and get saved entity with ID
-			Add_Scenario savedScenario = ScenarioRepository.save(scenarioObj);
+	        System.out.println("labsString ::" + labsString);
+	        
+	        // Check if labs string is not empty
+	        if (labsString != null && !labsString.trim().isEmpty()) {
+	            String[] labsArray = labsString.split(",");
+	            List<String> labIds = new ArrayList<String>();
+	            List<String> labNames = new ArrayList<String>();
 
-			// 🔥 Delete existing labs for this scenario before inserting new ones
-			ScenarioLabTemplateRepository.deleteByScenarioId(savedScenario.getId());
+	            for (String lab : labsArray) {
+	                String[] parts = lab.split("~");
+	                if (parts.length == 2) {
+	                    String labId = parts[0].trim();
+	                    String labName = parts[1].trim();
 
-			// Save lab templates into ScenarioLabTemplate table
-			for (String lab : labsArray) {
-				String[] parts = lab.split("~");
-				if (parts.length == 2) {
-					ScenarioLabTemplate labTemplate = new ScenarioLabTemplate();
-					labTemplate.setScenarioId(savedScenario.getId());
-					labTemplate.setScenarioName(savedScenario.getScenarioName());
-					labTemplate.setTemplateId(Integer.parseInt(parts[0].trim()));
-					labTemplate.setTemplateName(parts[1].trim());
+	                    labIds.add(labId);
+	                    labNames.add(labName);
 
-					ScenarioLabTemplateRepository.save(labTemplate);
-				}
-			}
+	                    try {
+	                        repository.updateInstanceNameAssigned(Integer.parseInt(labId));
+	                    } catch (Exception e) {
+	                        e.printStackTrace();
+	                    }
+	                }
+	            }
 
-			redirectAttributes.addFlashAttribute("message", "Scenario saved successfully!");
-			redirectAttributes.addFlashAttribute("status", "success");
-			redirectAttributes.addFlashAttribute("result", "success");
+	            // For saving readable lab names in scenarioObj
+	            StringBuilder sb = new StringBuilder();
+	            for (int i = 0; i < labNames.size(); i++) {
+	                sb.append(labNames.get(i));
+	                if (i < labNames.size() - 1) {
+	                    sb.append(",");
+	                }
+	            }
+	            scenarioObj.setLabs(sb.toString());
+	        }
+	        
+	        scenarioObj.setComments("");
 
-			// Redirect based on whether it's new or edit
-			if (isNew) {
-				return "redirect:/guac/Scenario_Details";
-			} else {
-				return "redirect:/guac/View_Particular_Scenerio?Id=" + savedScenario.getId();
-			}
+	        // Handle cover image
+	        if (cover_image != null && !cover_image.isEmpty()) {
+	            String contentType = cover_image.getContentType();
+	            if (contentType != null && contentType.startsWith("image/")) {
+	                scenarioObj.setCoverImage(cover_image.getBytes());
+	            } else {
+	                redirectAttributes.addFlashAttribute("message", "Invalid file type. Please upload an image file.");
+	                redirectAttributes.addFlashAttribute("status", "error");
+	            }
+	        } else if (isNew) {
+	            // Use default image for new scenario
+	            String defaultImagePath = "C:\\Users\\vijay\\Desktop\\18825\\New folder\\default.jpg";
+	            try {
+	                byte[] defaultImageBytes = Files.readAllBytes(Paths.get(defaultImagePath));
+	                scenarioObj.setCoverImage(defaultImageBytes);
+	            } catch (IOException e) {
+	                scenarioObj.setCoverImage(createPlaceholderImage());
+	            }
+	        } else {
+	            // Use existing image for edit
+	            Optional<Add_Scenario> existing = ScenarioRepository.findById(scenarioObj.getId());
+	            existing.ifPresent(existingScenario -> {
+	                scenarioObj.setCoverImage(existingScenario.getCoverImage());
+	            });
+	        }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			redirectAttributes.addFlashAttribute("message", "Error while saving scenario: " + e.getMessage());
-			redirectAttributes.addFlashAttribute("status", "error");
-			return "redirect:/guac/Scenario_Details";
-		}
+	        // Save scenario and get saved entity with ID
+	        Add_Scenario savedScenario = ScenarioRepository.save(scenarioObj);
+
+	        // Only update lab templates if labs were provided
+	        if (labsString != null && !labsString.trim().isEmpty()) {
+	            // 🔥 Delete existing labs for this scenario before inserting new ones
+	            ScenarioLabTemplateRepository.deleteByScenarioId(savedScenario.getId());
+
+	            // Save lab templates into ScenarioLabTemplate table
+	            String[] labsArray = labsString.split(",");
+	            for (String lab : labsArray) {
+	                String[] parts = lab.split("~");
+	                if (parts.length == 2) {
+	                    ScenarioLabTemplate labTemplate = new ScenarioLabTemplate();
+	                    labTemplate.setScenarioId(savedScenario.getId());
+	                    labTemplate.setScenarioName(savedScenario.getScenarioName());
+	                    labTemplate.setTemplateId(Integer.parseInt(parts[0].trim()));
+	                    labTemplate.setTemplateName(parts[1].trim());
+
+	                    ScenarioLabTemplateRepository.save(labTemplate);
+	                }
+	            }
+	        }
+
+	        redirectAttributes.addFlashAttribute("message", "Scenario saved successfully!");
+	        redirectAttributes.addFlashAttribute("status", "success");
+	        redirectAttributes.addFlashAttribute("result", "success");
+
+	        // Redirect based on whether it's new or edit
+	        if (isNew) {
+	            return "redirect:/guac/Scenario_Details";
+	        } else {
+	            return "redirect:/guac/View_Particular_Scenerio?Id=" + savedScenario.getId();
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("message", "Error while saving scenario: " + e.getMessage());
+	        redirectAttributes.addFlashAttribute("status", "error");
+	        return "redirect:/guac/Scenario_Details";
+	    }
 	}
 
 //	@GetMapping("/editsceneriolist/{id}")

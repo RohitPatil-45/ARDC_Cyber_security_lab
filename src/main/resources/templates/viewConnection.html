@@ -707,10 +707,28 @@ background-color
 		<div class="main-content">
 			<!-- RDP Frame -->
 
+<button style="display: none" class="copy-button"><i class="fas fa-copy"></i></button>
 
-			<div class="rdp-frame-container">
-				<iframe th:src="${embedUrl}" class="rdp-frame" id="rdp-frame"></iframe>
-			</div>
+<div class="rdp-frame-container">
+  <iframe th:src="${embedUrl}" class="rdp-frame" id="rdp-frame" allow="clipboard-read; clipboard-write"></iframe>
+</div>
+
+<script>
+  const iframe1 = document.getElementById("rdp-frame");
+
+  document.querySelector(".copy-button").addEventListener("click", async () => {
+    try {
+     
+      setTimeout(async () => {
+        const text = await navigator.clipboard.readText();
+        iframe1.contentWindow.postMessage({ type: "pasteClipboard", text: text }, "*");
+        console.log("Clipboard text sent to iframe:", text);
+      }, 100); 
+    } catch (e) {
+      console.error("Failed to read clipboard:", e);
+    }
+  });
+</script>
 
 
 			<!-- Sidebar with instructions and chat -->
@@ -1102,13 +1120,7 @@ $('#chat-tab-button').on('click', function() {
 			$('#loading-indicator').fadeOut();
 		});
 		
-		// Simulate resource usage updates
-		setInterval(() => {
-			$('#cpu-usage').text(Math.floor(Math.random() * 30 + 5) + '%');
-			$('#memory-usage').text(Math.floor(Math.random() * 30 + 50) + '%');
-			$('#network-in').text((Math.random() * 5 + 1).toFixed(1) + ' Mbps');
-			$('#network-out').text((Math.random() * 3 + 0.5).toFixed(1) + ' Mbps');
-		}, 5000);
+	
 		
 		// Tab switching functionality
 		document.querySelectorAll('.sidebar-tab').forEach(button => {
@@ -1140,66 +1152,7 @@ $('#chat-tab-button').on('click', function() {
 		setupImageModal();
 	});
 	
-// 	function ActionforLAbOnload(id) {
-// 	    $.ajax({
-// 	        type: "POST",
-// 	        url: "/guac/ActionloadInitialInstruction",
-// 	        data: { labId: id },
-// 	        success: function(response) {
-// 	            if (response.success) {
-// 	                const instructions = response.instructions || [];
 
-// 	                // Clear previous messages
-// 	                $('#Lab_Instructions').empty();
-
-// 	                instructions.forEach(instr => {
-// 	                    const command = instr.command || '';
-// 	                    const details = instr.instructionDetails || '';
-
-// 	                    // Parse the instruction details to separate text and images
-// 	                    const $content = $('<div>').html(details);
-// 	                    const textContent = $content.text().trim();
-// 	                    const images = $content.find('img');
-	                    
-// 	                    // Create instruction container
-// 	                    const instructionHtml = $(`
-// 	                        <div class="instruction-item">
-// 	                            <div class="instruction-text">${textContent}</div>
-// 	                            <div class="message-command"><strong>${command}</strong></div>
-// 	                        </div>
-// 	                    `);
-	                    
-// 	                    // Add images if any
-// 	                    if (images.length > 0) {
-// 	                        images.each(function() {
-// 	                            const src = $(this).attr('src');
-// 	                            const alt = $(this).attr('alt') || '';
-// 	                            const imageContainer = $(`
-// 	                                <div class="image-container">
-// 	                                    <img src="${src}" alt="${alt}">
-// 	                                    ${alt ? `<div class="image-caption">${alt}</div>` : ''}
-// 	                                </div>
-// 	                            `);
-// 	                            instructionHtml.append(imageContainer);
-// 	                        });
-// 	                    }
-	                    
-// 	                    $('#Lab_Instructions').append(instructionHtml);
-// 	                });
-
-// 	            } else {
-// 	                console.error('Failed to load instructions:', response.error);
-// 	            }
-// 	        },
-// 	        error: function() {
-// 	            Swal.fire({
-// 	                icon: 'error',
-// 	                title: 'Error',
-// 	                text: 'An error occurred while fetching data.'
-// 	            });
-// 	        }
-// 	    });
-// 	}
 
 function ActionforLAbOnload(id) {
     $.ajax({
@@ -1653,6 +1606,26 @@ function ActionforLAbOnload(id) {
 
 	// Ensure iframe can actually be focused
 	iframe.setAttribute("tabindex", "0");	
+	
+	
+	  // Button to read clipboard and send to iframe
+// 	  document.getElementById("pasteBtn").addEventListener("click", async () => {
+// 	    try {
+// 	      const text = await navigator.clipboard.readText();
+// 	      console.log("Clipboard text:", text);
+
+// 	      // Send clipboard text to iframe using postMessage
+// 	      iframe.contentWindow.postMessage(
+// 	        { type: "pasteClipboard", text: text },
+// 	        "*" // Replace * with iframe origin if known for security
+// 	      );
+
+// 	      alert("Clipboard text sent to Guacamole iframe.");
+// 	    } catch (err) {
+// 	      alert("Failed to read clipboard: " + err);
+// 	    }
+// 	  });
+	  
 	</script>
 </body>
 </html>
