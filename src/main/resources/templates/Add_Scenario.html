@@ -380,18 +380,17 @@ label {
 											<div class="row">
 												<div class="col-md-4">
 													<div class="form-group">
-														<label for="Category">Category <span
-															class="text-danger">*</span></label> <select required
-															th:field="*{Category}" id="Category" name="Category"
-															class="form-control">
-															<option value="">-- Select Category --</option>
-															<option value="Mobile Security">Mobile Security</option>
-															<option value="Forensic">Forensic</option>
-															<option value="Networking">Networking</option>
-															<option value="Cloud Security">Cloud Security</option>
-															<option value="Web Application">Web Application</option>
+														<label for="category">Category</label> <select
+															id="category" class="form-control"
+															th:field="*{category}" required>
+															<option value=""  selected>Select a
+																category</option>
+															<option th:each="cat : ${CategoryList}"
+																th:value="${cat.category}"
+																th:text="${cat.category}"></option>
 														</select>
 													</div>
+
 												</div>
 												<div class="col-md-4">
 													<div class="form-group">
@@ -501,23 +500,24 @@ label {
 											</div>
 
 											<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="form-group">
-            <label for="Labs" class="form-label fw-bold">
-                Select Lab Template <span class="text-danger">*</span>
-            </label> 
-            <select id="Labs" name="Labs" class="form-control" th:field="*{Labs}" multiple="multiple">
-                <option th:each="instance : ${instanceNameList}"
-                    th:value="${instance.id + '~' + instance.instance_name}"
-                    th:text="${instance.instance_name}"></option>
-            </select> 
-            
-            <div class="selection-limit" id="selectionLimit">
-                You can select up to <span id="maxSelections">0</span> lab templates
-            </div>
-        </div>
-    </div>
-</div>
+												<div class="col-md-12">
+													<div class="form-group">
+														<label for="Labs" class="form-label fw-bold">
+															Select Lab Template <span class="text-danger">*</span>
+														</label> <select id="Labs" name="Labs" class="form-control"
+															th:field="*{Labs}" multiple="multiple">
+															<option th:each="instance : ${instanceNameList}"
+																th:value="${instance.id + '~' + instance.instance_name}"
+																th:text="${instance.instance_name}"></option>
+														</select>
+
+														<div class="selection-limit" id="selectionLimit">
+															You can select up to <span id="maxSelections">0</span>
+															lab templates
+														</div>
+													</div>
+												</div>
+											</div>
 
 										</div>
 
@@ -585,7 +585,6 @@ label {
 	            ['style', ['bold', 'italic', 'underline', 'clear']],
 	            ['fontsize', ['fontsize']],
 	            ['para', ['ul', 'ol', 'paragraph']],
-	            ['insert', ['picture', 'link']],
 	            ['view', ['fullscreen', 'codeview']]
 	        ],
 	        callbacks: {
@@ -831,6 +830,6 @@ label {
         }
     });
 </script>
-	
+
 </body>
 </html>

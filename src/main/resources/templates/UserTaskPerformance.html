@@ -91,12 +91,12 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>User Wise Performance</h1>
+							<h1>User Wise Task Performance</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
 								<li class="breadcrumb-item"><a href="#">Home</a></li>
-								<li class="breadcrumb-item active">User Wise Performance</li>
+								<li class="breadcrumb-item active">User Wise Task Performance</li>
 							</ol>
 						</div>
 					</div>
@@ -110,7 +110,7 @@
 							<div class="card card-secondary">
 								<div class="card-header">
 									<h3 class="card-title" style="padding-top: 10px">User
-										Performance Details</h3>
+										Task Performance Details</h3>
 								</div>
 								<div class="card-body">
 									<table id="userPerformanceTable"
@@ -119,8 +119,9 @@
 											<tr>
 												<th>Sr No.</th>
 												<th>User Name</th>
+												<th>Scenario Name</th>
 												<th>Performance %</th>
-												<th>Action</th>
+<!-- 												<th>Action</th> -->
 											</tr>
 										</thead>
 									</table>
@@ -137,40 +138,7 @@
 
 
 
-	<div class="modal fade" id="performanceModal" tabindex="-1"
-		aria-labelledby="performanceModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered modal-lg">
-			<!-- Added modal-lg -->
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="performanceModalLabel">
-						Scenario Performance for <span id="modalUsername"></span>
-					</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close"></button>
-				</div>
-				<div class="modal-body" id="modalBodyContent">
-					<!-- Table will be inserted here -->
-					<table id="modalScenarioTable"
-						class="table table-bordered table-striped w-100">
-						<thead>
-							<tr>
-								<th>Sr No.</th>
-								<th>Scenario Name</th>
-								<th>Progress %</th>
-							</tr>
-						</thead>
-						<tbody></tbody>
-					</table>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary"
-						data-bs-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
+	
 
 	<div th:replace="templateListing :: jsscript"></div>
 
@@ -271,15 +239,41 @@
 	
 
 	function getuserPerformance(username) {
-	  
-	    const url = `/guac/UserNameTaskPerformance?username=${encodeURIComponent(username)}`;
-	    
-	  
-	    window.open(url, '_blank');
+	    const modal = $("#performanceModal");
+	    modal.find("#modalUsername").text(username);
+
+	    // Show the modal (Bootstrap 5)
+	    const bsModal = new bootstrap.Modal(document.getElementById('performanceModal'));
+	    bsModal.show();
+
+	    // Destroy existing DataTable before reinitializing
+	    if ($.fn.DataTable.isDataTable("#modalScenarioTable")) {
+	        $('#modalScenarioTable').DataTable().clear().destroy();
+	    }
+
+	    // Show loading
+	    $("#modalScenarioTable tbody").html("<tr><td colspan='3'>Loading...</td></tr>");
+
+	    $.ajax({
+	        url: '/guac/getScenarioByUsername',
+	        type: 'GET',
+	        dataType: "json",
+	        data: { username: username },
+	        success: function (data) {
+	        	alert("data : "+data)
+	            $('#modalScenarioTable').DataTable({
+	                data: data,
+	                responsive: true,
+	                lengthChange: false,
+	                autoWidth: false,
+	                buttons: ["csv", "excel", "print", "colvis"]
+	            }).buttons().container().appendTo('#modalScenarioTable_wrapper .col-md-6:eq(0)');
+	        },
+	        error: function () {
+	            $("#modalScenarioTable tbody").html("<tr><td colspan='3' class='text-danger'>Failed to load scenario data.</td></tr>");
+	        }
+	    });
 	}
-
-
-
 
 </script>
 

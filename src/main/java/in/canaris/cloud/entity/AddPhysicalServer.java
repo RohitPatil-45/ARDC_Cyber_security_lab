@@ -38,7 +38,11 @@ public class AddPhysicalServer implements Serializable {
 
 	@Column(name = "ssh_password")
 	private String ssh_password;
+	
+	@Column(name = "status")
+	private String status;
 
+	 
 	public String getSsh_host() {
 		return ssh_host;
 	}
@@ -94,5 +98,19 @@ public class AddPhysicalServer implements Serializable {
 	public void setLastSyncTime(Timestamp lastSyncTime) {
 		this.lastSyncTime = lastSyncTime;
 	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	
+	
 
 }

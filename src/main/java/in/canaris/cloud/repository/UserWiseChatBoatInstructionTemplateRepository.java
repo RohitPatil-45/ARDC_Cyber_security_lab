@@ -98,7 +98,18 @@ public interface UserWiseChatBoatInstructionTemplateRepository
 	@Query("SELECT COUNT(u) FROM UserWiseChatBoatInstructionTemplate u WHERE u.username = :userName AND u.ScenarioId = :scenarioId AND u.isCommandExecuted = 'true'")
 	Integer getTrueCompletionCountsByusernameandscenarioId(@Param("userName") String userName,@Param("scenarioId") int scenarioId);
 
-	List<UserWiseChatBoatInstructionTemplate> findByUsername(String username);
+	
+	
+	@Query(value = "SELECT DISTINCT scenarioId FROM userwise_chatboat_instruction_template WHERE username = :userName", nativeQuery = true)
+	List<Object> findByScenarioIdAndUserName(@Param("userName") String userName);
+
+
+
+	
+
+
+
+	
 
 //	@Query(value = "SELECT COUNT(*) FROM userwise_chatboat_instruction_template "
 //			+ "WHERE isCommandExecuted='false' and username=:username", nativeQuery = true)

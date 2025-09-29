@@ -16,6 +16,9 @@ public class SemesterMaster {
 
     @Column(name = "semester_name", nullable = false, length = 50)
     private String semesterName;
+    
+    @Column(name = "semester_code", nullable = false, length = 50)
+    private String semesterCode;
 
     // Foreign Key → CourseMaster
     @ManyToOne(fetch = FetchType.LAZY)
@@ -51,8 +54,18 @@ public class SemesterMaster {
     public void setSemesterName(String semesterName) {
         this.semesterName = semesterName;
     }
+    
+    
 
-    public CourseMaster getCourse() {
+    public String getSemesterCode() {
+		return semesterCode;
+	}
+
+	public void setSemesterCode(String semesterCode) {
+		this.semesterCode = semesterCode;
+	}
+
+	public CourseMaster getCourse() {
         return course;
     }
 

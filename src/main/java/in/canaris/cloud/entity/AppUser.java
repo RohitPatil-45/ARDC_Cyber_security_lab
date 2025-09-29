@@ -74,6 +74,9 @@ public class AppUser implements Serializable {
 
 	@Column(nullable = false)
 	private Boolean isFirstTimeLogin = true;
+	
+	@Column(name = "status")
+	private String status;
 
 	@Column(name = "password_changed_time")
 	private Date passwordChangedTime;
@@ -191,5 +194,15 @@ public class AppUser implements Serializable {
 	public void setPasswordChangedTime(Date passwordChangedTime) {
 		this.passwordChangedTime = passwordChangedTime;
 	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	
 	
 }

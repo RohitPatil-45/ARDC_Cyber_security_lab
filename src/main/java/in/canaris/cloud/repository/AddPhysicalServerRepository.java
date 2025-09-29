@@ -24,5 +24,12 @@ public interface AddPhysicalServerRepository extends JpaRepository<AddPhysicalSe
 	
 	@Query("SELECT s.serverIP FROM AddPhysicalServer s WHERE s.virtualization_type=:virtualizationType")
 	List<Object[]> getPhysicalServerIpByVirtualizationType(String virtualizationType);
+	
+    @Query("SELECT a.virtualization_type, a.status, COUNT(a) FROM AddPhysicalServer a GROUP BY a.virtualization_type, a.status")
+    List<Object[]> findVirtualizationTypeCounts();
+    
+    // Or use native query (alternative)
+    @Query(value = "SELECT virtualization_type, status, COUNT(*) as count FROM add_physical_server GROUP BY virtualization_type, status", nativeQuery = true)
+    List<Object[]> getVirtualizationStatusCounts();
 
 }

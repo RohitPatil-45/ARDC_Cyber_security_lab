@@ -71,7 +71,15 @@
                                 <input type="text" th:field="*{departmentName}" id="departmentName" class="form-control" placeholder="Enter department name" required />
                                 <div class="invalid-feedback d-none">Please enter a department name.</div>
                             </div>
+                            
+                            <div class="form-group">
+                                <label for="departmentCode">Department Code</label>
+                                <input type="text" th:field="*{departmentCode}" id="departmentCode" class="form-control" placeholder="Enter department code" required />
+                                <div class="invalid-feedback d-none">Please enter a department code.</div>
+                            </div>
                         </div>
+                        
+                        
 
                         <div class="card-footer text-right">
                             <a th:href="@{/departments}" class="btn btn-secondary">Cancel</a>

@@ -49,6 +49,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import in.canaris.cloud.entity.AddPhysicalServer;
 import in.canaris.cloud.entity.AppUser;
 import in.canaris.cloud.entity.CloudInstance;
 import in.canaris.cloud.entity.Discount;
@@ -58,6 +59,7 @@ import in.canaris.cloud.entity.PlaylistScenarioId;
 import in.canaris.cloud.entity.SubProduct;
 import in.canaris.cloud.openstack.entity.UserPlaylistMapping;
 import in.canaris.cloud.openstack.entity.Add_Scenario;
+import in.canaris.cloud.openstack.entity.CategoryMaster;
 import in.canaris.cloud.openstack.entity.ChartBoatInstructionTemplate;
 import in.canaris.cloud.openstack.entity.CommandHistory;
 import in.canaris.cloud.openstack.entity.ContainerUserLabDTO;
@@ -72,8 +74,10 @@ import in.canaris.cloud.openstack.entity.ScenarioLabTemplate;
 import in.canaris.cloud.openstack.entity.SemesterMaster;
 import in.canaris.cloud.openstack.entity.SubPlaylist;
 import in.canaris.cloud.openstack.entity.SubPlaylistScenario;
+import in.canaris.cloud.openstack.entity.SubjectMaster;
 import in.canaris.cloud.openstack.entity.UserLab;
 import in.canaris.cloud.openstack.entity.UserMappingsResponse;
+import in.canaris.cloud.openstack.entity.UserPerformanceDTO;
 import in.canaris.cloud.openstack.entity.UserScenario;
 import in.canaris.cloud.openstack.entity.UserScenarioMapping;
 import in.canaris.cloud.openstack.entity.UserSubplaylistMapping;
@@ -103,6 +107,8 @@ import in.canaris.cloud.repository.DepartmentMasterRepository;
 import in.canaris.cloud.repository.CourseMasterRepository;
 import in.canaris.cloud.repository.SemesterMasterRepository;
 import in.canaris.cloud.repository.SubjectMasterRepository;
+import in.canaris.cloud.repository.AddPhysicalServerRepository;
+import in.canaris.cloud.repository.CategoryMasterRepository;
 
 
 import in.canaris.cloud.repository.SubPlaylistRepository;
@@ -209,6 +215,12 @@ public class GuacamoleController {
 	
 	@Autowired
 	SubjectMasterRepository SubjectMasterRepository;
+	
+	@Autowired
+	AddPhysicalServerRepository AddPhysicalServerRepository;
+	
+	@Autowired
+	CategoryMasterRepository CategoryMasterRepository;
 
 	@GetMapping("/")
 	public String home() {
@@ -367,6 +379,139 @@ public class GuacamoleController {
 		model.addAttribute("listObj", dockerNetworks);
 		return "View_DockerListing";
 	}
+	
+	
+
+	
+//	@GetMapping("/SuperAdmin_Dashboard")
+//	public String dashboard(Model model) {
+//	    List<Object[]> results = AddPhysicalServerRepository.findVirtualizationTypeCounts();
+//
+//	    Map<String, Map<String, Long>> typeStats = new HashMap<>();
+//	    Map<String, Long> totalCountByType = new HashMap<>();
+//
+//	    for (Object[] result : results) {
+//	        String type = (String) result[0];
+//	        String rawStatus = (String) result[1];
+//	        Long count = ((Number) result[2]).longValue();
+//
+//	        String status = (rawStatus != null) ? rawStatus.toLowerCase() : "unknown";
+//
+//	        typeStats.putIfAbsent(type, new HashMap<>());
+//	        totalCountByType.putIfAbsent(type, 0L);
+//
+//	        typeStats.get(type).put(status, count);
+//	        totalCountByType.put(type, totalCountByType.get(type) + count);
+//	    }
+//
+//	    for (Map<String, Long> statusMap : typeStats.values()) {
+//	        statusMap.putIfAbsent("up", 0L);
+//	        statusMap.putIfAbsent("down", 0L);
+//	        statusMap.putIfAbsent("warning", 0L);
+//	        statusMap.putIfAbsent("unknown", 0L);
+//	    }
+//	    AppUserRepository.findStaus
+//	    want online and offine count on this plot pie chart in html
+//	    // ✅ Get additional counts
+//	    long playlistCount = PlaylistRepository.count();
+//	    long subPlaylistCount = SubPlaylistRepository.count();
+//	    long scenarioCount = ScenarioRepository.count();
+//	    long templateCount = repository.count();
+//
+//	    model.addAttribute("typeStats", typeStats);
+//	    model.addAttribute("totalCountByType", totalCountByType);
+//	    model.addAttribute("playlistCount", playlistCount);
+//	    model.addAttribute("subPlaylistCount", subPlaylistCount);
+//	    model.addAttribute("scenarioCount", scenarioCount);
+//	    model.addAttribute("templateCount", templateCount);
+//	    model.addAttribute("pageTitle", "Super Admin Dashboard");
+//
+//	    return "SuperAdmin_Dashboard";
+//	}
+	
+	
+	 @GetMapping("/SuperAdmin_Dashboard")
+	    public String dashboard(Model model) {
+	        // 1. Fetch virtualization type + status counts (as before)
+	        List<Object[]> results = AddPhysicalServerRepository.findVirtualizationTypeCounts();
+
+	        Map<String, Map<String, Long>> typeStats = new HashMap<>();
+	        Map<String, Long> totalCountByType = new HashMap<>();
+
+	        long overallUp = 0;
+	        long overallDown = 0;
+
+	        for (Object[] row : results) {
+	            String type = (String) row[0];
+	            String rawStatus = (String) row[1];
+	            Long count = ((Number) row[2]).longValue();
+
+	            String status = (rawStatus != null) ? rawStatus.toLowerCase() : "unknown";
+
+	            typeStats.putIfAbsent(type, new HashMap<>());
+	            totalCountByType.putIfAbsent(type, 0L);
+
+	            typeStats.get(type).put(status, count);
+	            totalCountByType.put(type, totalCountByType.get(type) + count);
+
+	            if ("up".equals(status)) {
+	                overallUp += count;
+	            } else if ("down".equals(status)) {
+	                overallDown += count;
+	            }
+	        }
+
+	        // ensure default keys for each type
+	        for (Map<String, Long> map : typeStats.values()) {
+	            map.putIfAbsent("up", 0L);
+	            map.putIfAbsent("down", 0L);
+	            map.putIfAbsent("unknown", 0L);
+	        }
+
+	        // 2. Fetch online / offline counts for users from AppUser
+	        // You can write a repository method to return counts grouped by status,
+	        // e.g. SELECT status, COUNT(*) FROM app_user GROUP BY status
+	        List<Object[]> userStatusCounts = AppUserRepository.countByStatus();
+	        long userOnline = 0;
+	        long userOffline = 0;
+	        for (Object[] ur : userStatusCounts) {
+	            String st = (String) ur[0];
+	            Long c = ((Number) ur[1]).longValue();
+	            String lower = (st != null) ? st.toLowerCase() : "unknown";
+	            if ("online".equals(lower) || "up".equals(lower)) {
+	                userOnline += c;
+	            } else if ("offline".equals(lower) || "down".equals(lower)) {
+	                userOffline += c;
+	            }
+	        }
+
+	        // 3. Other counts
+	        long playlistCount = PlaylistRepository.count();
+	        long subPlaylistCount = SubPlaylistRepository.count();
+	        long scenarioCount = ScenarioRepository.count();
+	        long templateCount = repository.count();
+
+	        // 4. Add to model
+	        model.addAttribute("typeStats", typeStats);
+	        model.addAttribute("totalCountByType", totalCountByType);
+
+	        model.addAttribute("overallUp", overallUp);
+	        model.addAttribute("overallDown", overallDown);
+
+	        model.addAttribute("userOnline", userOnline);
+	        model.addAttribute("userOffline", userOffline);
+
+	        model.addAttribute("playlistCount", playlistCount);
+	        model.addAttribute("subPlaylistCount", subPlaylistCount);
+	        model.addAttribute("scenarioCount", scenarioCount);
+	        model.addAttribute("templateCount", templateCount);
+
+	        model.addAttribute("pageTitle", "Super Admin Dashboard");
+
+	        return "SuperAdmin_Dashboard";
+	    }
+
+	
 
 	@GetMapping("/View_DiscoverContainerListing")
 	public String viewDiscoverContainerListing(Model model) {
@@ -1406,6 +1551,64 @@ System.out.println("check_value ::: "+value);
 	}
 	
 	
+	@GetMapping("/Add_Category")
+	public String showAddCategoryForm(@RequestParam(value = "Id", required = false) Integer id, Model model) {
+	    CategoryMaster category = null;
+
+	    if (id != null) {
+	        Optional<CategoryMaster> optionalCategory = CategoryMasterRepository.findById(id);
+	        if (optionalCategory.isPresent()) {
+	            category = optionalCategory.get();
+	            System.out.println("Editing category: " + category.getCategory());
+	        } else {
+	            System.out.println("Category not found with id: " + id);
+	        }
+	    }
+
+	    if (category == null) {
+	        category = new CategoryMaster();
+	        System.out.println("Creating new category.");
+	    }
+
+	    model.addAttribute("categoryObj", category);
+	    model.addAttribute("pageTitle", (id != null) ? "Edit Category" : "Create Category");
+
+	    return "Add_Category";
+	}
+	
+	@PostMapping("/categorysave")
+	public String saveCategory(@ModelAttribute("categoryObj") CategoryMaster category, RedirectAttributes redirectAttributes) {
+	    try {
+	        boolean isNew = (category.getCategoryId() == 0);
+	        CategoryMasterRepository.save(category);
+	        String message = isNew ? "Category created successfully." : "Category updated successfully.";
+	        redirectAttributes.addFlashAttribute("successMessage", message);
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("errorMessage", "Failed to save category: " + e.getMessage());
+	        return "redirect:/guac/Add_Category";
+	    }
+
+	    return "redirect:/guac/View_Category";
+	}
+
+
+
+	@GetMapping("/View_Category")
+	public String listCategories(Model model) {
+	    List<CategoryMaster> categories = CategoryMasterRepository.findAll();
+	    model.addAttribute("categories", categories);
+	    model.addAttribute("pageTitle", "Category List");
+	    return "View_Category"; 
+	}
+
+	@GetMapping("/deleteCategory")
+	public String deleteCategory(@RequestParam("Id") Integer id) {
+	    CategoryMasterRepository.deleteById(id);
+	    return "redirect:/guac/View_Category";
+	}
+
+	
+	
 	@GetMapping("/Add_Department")
 	public String showAddDepartmentForm(@RequestParam(value = "Id", required = false) Integer id, Model model) {
 	    DepartmentMaster department = null;
@@ -1527,84 +1730,223 @@ System.out.println("check_value ::: "+value);
 	}
 
 
+
 	
 	@GetMapping("/Add_Semester")
 	public String showAddSemesterForm(@RequestParam(value = "Id", required = false) Integer id, Model model) {
-	    SemesterMaster semester = new SemesterMaster();
+	    SemesterMaster semester = new SemesterMaster();  // default (for create)
+	    Integer selectedDepartmentId = null;             // for pre-selecting department
 
 	    if (id != null) {
 	        Optional<SemesterMaster> optionalSemester = SemesterMasterRepository.findById(id);
 	        if (optionalSemester.isPresent()) {
 	            semester = optionalSemester.get();
+
+	            // Access the department from the course
+	            CourseMaster course = semester.getCourse();
+	            if (course != null && course.getDepartment() != null) {
+	                selectedDepartmentId = course.getDepartment().getDepartmentId();
+	            }
 	        }
 	    }
 
-	    // Load all departments for dropdown
+	    // Load departments to populate the dropdown
 	    List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
 
-	    // Load courses for the selected department (or empty list if none)
-	    List<CourseMaster> courses = new ArrayList<>();
-	    if (semester.getCourse() != null && semester.getCourse().getDepartment() != null) {
-	        int deptId = semester.getCourse().getDepartment().getDepartmentId();
-	        courses = CourseMasterRepository.findByDepartment_DepartmentId(deptId);
-	        
-//	        Integer deptId = (course.getDepartment() != null) ? course.getDepartment().getDepartmentId() : null;
-	    }
+	    // Send data to the view
+	    model.addAttribute("semester", semester); // contains course
+	    model.addAttribute("departments", departments); // for department dropdown
+	    model.addAttribute("selectedDepartmentId", selectedDepartmentId); // for JS preselection
+	    model.addAttribute("pageTitle", (id != null) ? "Edit Semester" : "Create Semester");
 
-	    model.addAttribute("semester", semester);
-	    model.addAttribute("departments", departments);
-	    model.addAttribute("courses", courses);
-
-	    return "Add_Semester";  // Thymeleaf template
+	    return "Add_Semester";
 	}
+
+	
+	
+
+
 
 	@PostMapping("/saveSemester")
 	public String saveSemester(@ModelAttribute("semester") SemesterMaster semester) {
-	    // If course is selected, fetch the full entity
+	  
+	    boolean isNew = (semester.getSemesterId() == 0);
+
+	    // Fetch full Course entity if course is selected
 	    if (semester.getCourse() != null && semester.getCourse().getCourseId() != 0) {
 	        CourseMaster course = CourseMasterRepository.findById(semester.getCourse().getCourseId()).orElse(null);
 	        semester.setCourse(course);
 	    }
+
+	  
 	    SemesterMasterRepository.save(semester);
-	    return "redirect:/guac/View_Semester";
+
+	 
+	    if (isNew) {
+	        return "redirect:/guac/Add_Semester";
+	    } else {
+	    	return "redirect:/guac/View_Semester";
+	    }
 	}
+
 
 	
 	@GetMapping("/courses")
 	@ResponseBody
-	public List<CourseMaster> getCoursesByDepartment(@RequestParam int departmentId) {
-	    return CourseMasterRepository.findByDepartment_DepartmentId(departmentId);
+	public List<Map<String, Object>> getCoursesByDepartment(@RequestParam("departmentId") Integer departmentId) {
+	    List<CourseMaster> courses = CourseMasterRepository.findByDepartment_DepartmentId(departmentId);
+
+	    return courses.stream().map(course -> {
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("courseId", course.getCourseId());
+	        map.put("courseName", course.getCourseName());
+	        return map;
+	    }).collect(Collectors.toList());
 	}
 
 
+	  @GetMapping("/View_Semester")
+	    public String listSemesters(Model model) {
+	        model.addAttribute("pageTitle", "Semester List");
+	        model.addAttribute("semesters", SemesterMasterRepository.findAll());
+	        return "View_Semester"; // path to your list HTML
+	    }
 	
-	@GetMapping("/View_Semester")
-	public String listSemester(Model model) {
-	    List<CourseMaster> courses = CourseMasterRepository.findAll();  // get courses
-	    model.addAttribute("courses", courses);
-	    model.addAttribute("pageTitle", "Course List");
-	    return "View_Course";  
-	}
+
 	
 	@GetMapping("/deleteSemester")
 	public String deleteSemester(@RequestParam("Id") int courseId) {
-	    if (CourseMasterRepository.existsById(courseId)) {
-	        CourseMasterRepository.deleteById(courseId);
+	    if (SemesterMasterRepository.existsById(courseId)) {
+	    	SemesterMasterRepository.deleteById(courseId);
 	    }
 	    return "redirect:/guac/View_Semester";
 	}
 	
-//	SubjectMasterRepository
-//	View_Semester
-//	@GetMapping("/Add_Sub_Playlist")
-//	public ModelAndView showAdd_Sub_PlaylistForm() {
-//		ModelAndView mav = new ModelAndView("Add_Sub_Playlist");
-////		pageTitle
-//		mav.addObject("pageTitle", "Create New Sub Playlist");
-//
-//		mav.addObject("playlist", new SubPlaylist());
-//		return mav;
-//	}
+	@GetMapping("/semesters")
+	@ResponseBody
+	public List<Map<String, Object>> getSemestersByCourse(@RequestParam("courseId") Integer courseId) {
+	    List<SemesterMaster> semesters = SemesterMasterRepository.findByCourse_CourseId(courseId);
+
+	    return semesters.stream().map(sem -> {
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("semesterId", sem.getSemesterId());
+	        map.put("semesterName", sem.getSemesterName());
+	        return map;
+	    }).collect(Collectors.toList());
+	}
+
+	
+	@GetMapping("/Add_Subject")
+	public String showAddSubjectForm(@RequestParam(value = "Id", required = false) Integer id, Model model) {
+	    SubjectMaster subject = new SubjectMaster();
+	    Integer selectedDepartmentId = null;
+	    Integer selectedCourseId = null;
+	    Integer selectedSemesterId = null;
+	    
+	 
+	    if (id != null) {
+	        Optional<SubjectMaster> optionalSubject = SubjectMasterRepository.findById(id);
+	        if (optionalSubject.isPresent()) {
+	            subject = optionalSubject.get();
+	            SemesterMaster sem = subject.getSemester();
+
+	            if (sem != null && sem.getCourse() != null && sem.getCourse().getDepartment() != null) {
+	                selectedDepartmentId = sem.getCourse().getDepartment().getDepartmentId();
+	                selectedCourseId = sem.getCourse().getCourseId();
+	                selectedSemesterId = sem.getSemesterId();
+	            }
+	        }
+	    } else {
+	        subject.setSemester(new SemesterMaster());
+	    }
+
+	    List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+
+	    model.addAttribute("subject", subject);
+	    model.addAttribute("departments", departments);
+	    model.addAttribute("selectedDepartmentId", selectedDepartmentId);
+	    model.addAttribute("selectedCourseId", selectedCourseId);
+	    model.addAttribute("selectedSemesterId", selectedSemesterId);
+	    model.addAttribute("pageTitle", (id != null) ? "Edit Subject" : "Create Subject");
+
+	    return "Add_Subject";
+	}
+
+
+	
+	@PostMapping("/saveSubject")
+	public String saveSubject(@ModelAttribute("subject") SubjectMaster subject, BindingResult result, Model model) {
+	    
+	 
+	    if (result.hasErrors()) {
+	        List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+	        model.addAttribute("departments", departments);
+	        model.addAttribute("pageTitle", (subject.getSubjectId() == 0) ? "Create Subject" : "Edit Subject");
+	        return "Add_Subject"; 
+	    }
+
+	    // 2. Validate semester
+	    if (subject.getSemester() == null || subject.getSemester().getSemesterId() == 0) {
+	        result.rejectValue("semester", "error.subject", "Semester is required");
+	        List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+	        model.addAttribute("departments", departments);
+	        model.addAttribute("pageTitle", (subject.getSubjectId() == 0) ? "Create Subject" : "Edit Subject");
+	        return "Add_Subject";
+	    }
+
+	    // 3. Ensure semester exists
+	    Optional<SemesterMaster> semesterOpt = SemesterMasterRepository.findById(subject.getSemester().getSemesterId());
+	    if (!semesterOpt.isPresent()) {
+	        result.rejectValue("semester", "error.subject", "Selected semester does not exist");
+	        List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+	        model.addAttribute("departments", departments);
+	        model.addAttribute("pageTitle", (subject.getSubjectId() == 0) ? "Create Subject" : "Edit Subject");
+	        return "Add_Subject";
+	    }
+
+	    subject.setSemester(semesterOpt.get());
+
+	   
+	    SubjectMasterRepository.save(subject);
+
+	    
+	    if (subject.getSubjectId() != 0) {
+	       
+	        return "redirect:/guac/View_Subject";
+	    } else {
+	        
+	        return "redirect:/guac/Add_Subject";
+	    }
+	}
+
+
+	@GetMapping("/View_Subject")
+    public String showSubjects(Model model) {
+        List<SubjectMaster> subjects = SubjectMasterRepository.findAll();
+
+        model.addAttribute("subjects", subjects);
+        model.addAttribute("pageTitle", "Subject List");
+
+        return "View_Subject";
+    }
+
+	  
+	  @GetMapping("/deleteSubject")
+	  public String deleteSubject(@RequestParam("Id") Integer subjectId, RedirectAttributes redirectAttrs) {
+	      try {
+	          SubjectMasterRepository.deleteById(subjectId);
+	          redirectAttrs.addFlashAttribute("message", "Subject deleted successfully.");
+	          redirectAttrs.addFlashAttribute("alertClass", "alert-success");
+	      } catch (Exception e) {
+	          redirectAttrs.addFlashAttribute("message", "Error deleting subject.");
+	          redirectAttrs.addFlashAttribute("alertClass", "alert-danger");
+	      }
+	      return "redirect:/guac/View_Subject";
+	  }
+
+
+	
+	
 
 	@GetMapping("/Add_Sub_Playlist")
 	public String showCreateForm(Model model) {
@@ -2547,17 +2889,35 @@ System.out.println("check_value ::: "+value);
 		return mav;
 	}
 
-	@GetMapping("/Scenario_Details")
-	public ModelAndView showScenario_Details(RedirectAttributes redirectAttributes) {
-		ModelAndView mav = new ModelAndView("Add_Scenario");
-		List<CloudInstance> instances = null;
-		instances = repository.getInstanceNameNotAssigned();
-		mav.addObject("pageTitle", "Create New Scenario");
-		mav.addObject("instanceNameList", instances);
-		mav.addObject("scenario", new Add_Scenario());
+//	@GetMapping("/Scenario_Details")
+//	public ModelAndView showScenario_Details(RedirectAttributes redirectAttributes) {
+//		ModelAndView mav = new ModelAndView("Add_Scenario");
+//		List<CloudInstance> instances = null;
+//		instances = repository.getInstanceNameNotAssigned();
+//		mav.addObject("pageTitle", "Create New Scenario");
+//		mav.addObject("instanceNameList", instances);
+//		
+//		mav.addObject("CategoryList", category);
+//		mav.addObject("scenario", new Add_Scenario());
+//
+//		return mav;
+//	}
+	
 
-		return mav;
-	}
+@GetMapping("/Scenario_Details")
+public ModelAndView showScenarioDetails() {
+    ModelAndView mav = new ModelAndView("Add_Scenario");
+
+    List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
+    List<CategoryMaster> categoryList = CategoryMasterRepository.findAll();
+
+    mav.addObject("pageTitle", "Create New Scenario");
+    mav.addObject("instanceNameList", instances);
+    mav.addObject("CategoryList", categoryList);
+    mav.addObject("scenario", new Add_Scenario());
+
+    return mav;
+}
 
 //	@PostMapping("/saveScenarioData")
 //	public String saveScenarioData(@ModelAttribute("scenario") Add_Scenario scenarioObj,
@@ -2812,140 +3172,91 @@ System.out.println("check_value ::: "+value);
 	    }
 	}
 
+
 //	@GetMapping("/editsceneriolist/{id}")
 //	public ModelAndView editsceneriolist(@PathVariable("id") Integer id) {
-//
 //		try {
-//			List<CloudInstance> instances = null;
-//			instances = repository.getInstanceNameNotAssigned();
+//			List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
 //
 //			ModelAndView mav = new ModelAndView("Add_Scenario");
-////			mav.addObject("action_name", var_function_name);
-//			mav.addObject("scenario", ScenarioRepository.findById(id).get());
+//			Add_Scenario scenario = ScenarioRepository.findByCheckId(id);
+//			if (scenario == null) {
+//				throw new IllegalArgumentException("Invalid scenario ID: " + id);
+//			}
+//
+//			// Convert lab names back into "id~name" format for dropdown pre-selection
+//			List<ScenarioLabTemplate> assignedLabs = ScenarioLabTemplateRepository.findByScenarioId(id);
+//			List<String> assignedLabPairs = new ArrayList<String>();
+//
+//			for (ScenarioLabTemplate l : assignedLabs) {
+//				assignedLabPairs.add(l.getTemplateId() + "~" + l.getTemplateName());
+//			}
+//
+//			// Manual join (since String.join is Java 8+)
+//			StringBuilder sb = new StringBuilder();
+//			for (int i = 0; i < assignedLabPairs.size(); i++) {
+//				sb.append(assignedLabPairs.get(i));
+//				if (i < assignedLabPairs.size() - 1) {
+//					sb.append(",");
+//				}
+//			}
+//			scenario.setLabs(sb.toString());
+//
+//			mav.addObject("scenario", scenario);
 //			mav.addObject("instanceNameList", instances);
 //			mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
-////			mav.addObject("pageTitle",  "Edit " + disp_function_name + " (ID: " + id + ")");
+//			mav.addObject("isEdit", true);
 //			return mav;
 //		} catch (Exception e) {
 //			ModelAndView mav = new ModelAndView("Add_Scenario");
-////			mav.addObject("action_name", var_function_name);
 //			mav.addObject("message", e.getMessage());
+//			mav.addObject("isEdit", false);
 //			return mav;
 //		}
 //	}
-
-//	  @GetMapping("/editsceneriolist/{id}")
-//	    public ModelAndView editScenario(@PathVariable("id") Integer id) {
-//	        try {
-//	            List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
-//	            Optional<Add_Scenario> scenario = ScenarioRepository.findById(id);
-//
-//	            ModelAndView mav = new ModelAndView("Add_Scenario");
-//	            mav.addObject("scenario", scenario.orElse(new Add_Scenario()));
-//	            mav.addObject("instanceNameList", instances);
-//	            mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
-//	            return mav;
-//	        } catch (Exception e) {
-//	            ModelAndView mav = new ModelAndView("Add_Scenario");
-//	            mav.addObject("message", e.getMessage());
-//	            return mav;
-//	        }
-//	    }
-
-//	@GetMapping("/editsceneriolist/{id}")
-//	public ModelAndView editsceneriolist(@PathVariable("id") Integer id) {
-//	    try {
-//	        List<CloudInstance> instances = null;
-//	        instances = repository.getInstanceNameNotAssigned();
-//
-//	        ModelAndView mav = new ModelAndView("Add_Scenario");
-//	        Add_Scenario scenario = ScenarioRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid scenario ID: " + id));
-//	        
-//	        mav.addObject("scenario", scenario);
-//	        mav.addObject("instanceNameList", instances);
-//	        mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
-//	        mav.addObject("isEdit", true); // Add this flag
-//	        return mav;
-//	    } catch (Exception e) {
-//	        ModelAndView mav = new ModelAndView("Add_Scenario");
-//	        mav.addObject("message", e.getMessage());
-//	        mav.addObject("isEdit", false);
-//	        return mav;
-//	    }
-//	}
-//	@GetMapping("/editsceneriolist/{id}")
-//	public ModelAndView editsceneriolist(@PathVariable("id") Integer id) {
-//	    try {
-//	        List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
-//
-//	        ModelAndView mav = new ModelAndView("Add_Scenario");
-//	        Add_Scenario scenario = ScenarioRepository.findById(id)
-//	                .orElseThrow(() -> new IllegalArgumentException("Invalid scenario ID: " + id));
-//
-//	        // Convert lab names back into "id~name" format for dropdown pre-selection
-//	        List<ScenarioLabTemplate> assignedLabs = ScenarioLabTemplateRepository.findByScenarioId(id);
-//	        List<String> assignedLabPairs = assignedLabs.stream()
-//	                .map(l -> l.getTemplateId() + "~" + l.getTemplateName())
-//	                .collect(Collectors.toList()); // ✅ works in Java 8+
-//
-//	        System.out.println("assignedLabPairs :" + assignedLabPairs);
-//
-//	        scenario.setLabs(String.join(",", assignedLabPairs));
-//
-//	        mav.addObject("scenario", scenario);
-//	        mav.addObject("instanceNameList", instances);
-//	        mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
-//	        mav.addObject("isEdit", true);
-//	        return mav;
-//	    } catch (Exception e) {
-//	        ModelAndView mav = new ModelAndView("Add_Scenario");
-//	        mav.addObject("message", e.getMessage());
-//	        mav.addObject("isEdit", false);
-//	        return mav;
-//	    }
-//	}
-
+	
 	@GetMapping("/editsceneriolist/{id}")
 	public ModelAndView editsceneriolist(@PathVariable("id") Integer id) {
-		try {
-			List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
+	    ModelAndView mav = new ModelAndView("Add_Scenario");
+	    try {
+	        List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
+	        List<CategoryMaster> categories = CategoryMasterRepository.findAll();  // get categories for dropdown
 
-			ModelAndView mav = new ModelAndView("Add_Scenario");
-			Add_Scenario scenario = ScenarioRepository.findByCheckId(id);
-			if (scenario == null) {
-				throw new IllegalArgumentException("Invalid scenario ID: " + id);
-			}
+	        Add_Scenario scenario = ScenarioRepository.findByCheckId(id);
+	        if (scenario == null) {
+	            throw new IllegalArgumentException("Invalid scenario ID: " + id);
+	        }
 
-			// Convert lab names back into "id~name" format for dropdown pre-selection
-			List<ScenarioLabTemplate> assignedLabs = ScenarioLabTemplateRepository.findByScenarioId(id);
-			List<String> assignedLabPairs = new ArrayList<String>();
+	      
+	        List<ScenarioLabTemplate> assignedLabs = ScenarioLabTemplateRepository.findByScenarioId(id);
+	        List<String> assignedLabPairs = new ArrayList<>();
 
-			for (ScenarioLabTemplate l : assignedLabs) {
-				assignedLabPairs.add(l.getTemplateId() + "~" + l.getTemplateName());
-			}
+	        for (ScenarioLabTemplate l : assignedLabs) {
+	            assignedLabPairs.add(l.getTemplateId() + "~" + l.getTemplateName());
+	        }
 
-			// Manual join (since String.join is Java 8+)
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < assignedLabPairs.size(); i++) {
-				sb.append(assignedLabPairs.get(i));
-				if (i < assignedLabPairs.size() - 1) {
-					sb.append(",");
-				}
-			}
-			scenario.setLabs(sb.toString());
+	        StringBuilder sb = new StringBuilder();
+	        for (int i = 0; i < assignedLabPairs.size(); i++) {
+	            sb.append(assignedLabPairs.get(i));
+	            if (i < assignedLabPairs.size() - 1) {
+	                sb.append(",");
+	            }
+	        }
+	        scenario.setLabs(sb.toString());
 
-			mav.addObject("scenario", scenario);
-			mav.addObject("instanceNameList", instances);
-			mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
-			mav.addObject("isEdit", true);
-			return mav;
-		} catch (Exception e) {
-			ModelAndView mav = new ModelAndView("Add_Scenario");
-			mav.addObject("message", e.getMessage());
-			mav.addObject("isEdit", false);
-			return mav;
-		}
+	        mav.addObject("scenario", scenario);
+	        mav.addObject("instanceNameList", instances);
+	        mav.addObject("CategoryList", categories);  // add category list here
+	        mav.addObject("pageTitle", "Edit Scenario (ID: " + id + ")");
+	        mav.addObject("isEdit", true);
+	        return mav;
+	    } catch (Exception e) {
+	        mav.addObject("message", e.getMessage());
+	        mav.addObject("isEdit", false);
+	        return mav;
+	    }
 	}
+
 
 	@GetMapping("/deletsceneriolist/{id}")
 	public String deletsceneriolist(@PathVariable("id") Integer id) {
@@ -4330,12 +4641,12 @@ System.out.println("check_value ::: "+value);
 				array.put(percentage + "%");
 
 				// 4th column: action button
-//				String actionBtn = "<button class='btn btn-info action-btn' " + "onclick=\"getuserPerformance('"
-//						+ userName + "')\" " + "data-bs-toggle='modal' data-bs-target='#performanceModal' "
-//						+ "data-username='" + userName + "'>"
-//						+ "<i class='fas fa-chart-line'></i> View Scenarios</button>";
+				String actionBtn = "<button class='btn btn-info action-btn' " + "onclick=\"getuserPerformance('"
+						+ userName + "')\" " + "data-bs-toggle='modal' data-bs-target='#performanceModal' "
+						+ "data-username='" + userName + "'>"
+						+ "<i class='fas fa-chart-line'></i> View Scenarios</button>";
 //
-//				array.put(actionBtn);
+				array.put(actionBtn);
 
 				Finalarray.put(array);
 			}
@@ -4353,6 +4664,109 @@ System.out.println("check_value ::: "+value);
 		return mav;
 	}
 
+	
+	
+	@GetMapping("/UserNameTaskPerformance")
+	public ModelAndView getUserTaskPerformance(Model model, Principal principal,@RequestParam String username) {
+	    ModelAndView mav = new ModelAndView("UserTaskPerformance");
+	    JSONArray finalArray = new JSONArray();
+
+	    try {
+//	        Authentication auth = (Authentication) principal;
+//	        String username = auth.getName();
+
+	        // Return List<Integer> now
+	        List<Object> scenarioIdList = instructionTemplateRepository.findByScenarioIdAndUserName(username);
+
+	        int srno = 0;
+	        for (Object scenarioId : scenarioIdList) {
+	            srno++;
+	            JSONArray array = new JSONArray();
+
+	            String scenarioName = "Unknown";
+
+	            Optional<Add_Scenario> scenarioOpt = ScenarioRepository.findById(Integer.parseInt(scenarioId.toString()));
+	            if (scenarioOpt.isPresent()) {
+	                scenarioName = scenarioOpt.get().getScenarioName();
+	            }
+
+	            Integer falseCount = instructionTemplateRepository.getFalseCompletionCountsByusernameandscenarioId(username, Integer.parseInt(scenarioId.toString()));
+	            Integer trueCount = instructionTemplateRepository.getTrueCompletionCountsByusernameandscenarioId(username, Integer.parseInt(scenarioId.toString()));
+
+	            int total = (falseCount != null ? falseCount : 0) + (trueCount != null ? trueCount : 0);
+	            int percentage = (total == 0) ? 0 : ((trueCount != null ? trueCount : 0) * 100 / total);
+
+	            array.put(srno);
+	            array.put(username);
+	            array.put(scenarioName);
+	            array.put(percentage + "%");
+
+	            finalArray.put(array);
+	        }
+
+	        mav.addObject("listObj", finalArray.toString());
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("performanceList", new ArrayList<>());
+	    }
+
+	    return mav;
+	}
+	
+	
+	@GetMapping("/UserTaskPerformance")
+	public ModelAndView getUserTaskPerformance(Model model, Principal principal) {
+	    ModelAndView mav = new ModelAndView("UserTaskPerformance");
+	    JSONArray finalArray = new JSONArray();
+
+	    try {
+	        Authentication auth = (Authentication) principal;
+	        String username = auth.getName();
+
+	        // Return List<Integer> now
+	        List<Object> scenarioIdList = instructionTemplateRepository.findByScenarioIdAndUserName(username);
+
+	        int srno = 0;
+	        for (Object scenarioId : scenarioIdList) {
+	            srno++;
+	            JSONArray array = new JSONArray();
+
+	            String scenarioName = "Unknown";
+
+	            Optional<Add_Scenario> scenarioOpt = ScenarioRepository.findById(Integer.parseInt(scenarioId.toString()));
+	            if (scenarioOpt.isPresent()) {
+	                scenarioName = scenarioOpt.get().getScenarioName();
+	            }
+
+	            Integer falseCount = instructionTemplateRepository.getFalseCompletionCountsByusernameandscenarioId(username, Integer.parseInt(scenarioId.toString()));
+	            Integer trueCount = instructionTemplateRepository.getTrueCompletionCountsByusernameandscenarioId(username, Integer.parseInt(scenarioId.toString()));
+
+	            int total = (falseCount != null ? falseCount : 0) + (trueCount != null ? trueCount : 0);
+	            int percentage = (total == 0) ? 0 : ((trueCount != null ? trueCount : 0) * 100 / total);
+
+	            array.put(srno);
+	            array.put(username);
+	            array.put(scenarioName);
+	            array.put(percentage + "%");
+
+	            finalArray.put(array);
+	        }
+
+	        mav.addObject("listObj", finalArray.toString());
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("performanceList", new ArrayList<>());
+	    }
+
+	    return mav;
+	}
+
+
+
+
+	
 	@GetMapping("/UserWiseChartBoarView")
 	public ModelAndView getUserWiseChartBoarView(Principal principal) {
 		ModelAndView mav = new ModelAndView("UserWiseChartBoarView");

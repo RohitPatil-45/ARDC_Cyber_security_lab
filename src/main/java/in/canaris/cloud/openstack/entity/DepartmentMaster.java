@@ -28,6 +28,9 @@ public class DepartmentMaster {
 	@Column(name = "department_name", nullable = false, length = 255)
 	private String departmentName;
 	
+	@Column(name = "department_code", nullable = false, length = 255)
+	private String departmentCode;
+	
 	@Column(name = "isEnabled", nullable = false, length = 255)
 	private boolean is_enabled;
 	
@@ -60,6 +63,18 @@ public class DepartmentMaster {
 
 	public void setDepartmentName(String departmentName) {
 		this.departmentName = departmentName;
+	}
+	
+	
+
+
+	public String getDepartmentCode() {
+		return departmentCode;
+	}
+
+
+	public void setDepartmentCode(String departmentCode) {
+		this.departmentCode = departmentCode;
 	}
 
 

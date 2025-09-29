@@ -35,8 +35,8 @@ public class Add_Scenario {
 	@Column(name = "Description", nullable = true)
 	private String Description;
 
-	@Column(name = "Category", nullable = false, length = 255)
-	private String Category;
+	@Column(name = "category", nullable = false, length = 255)
+	private String category;
 
 	@Column(name = "ScenarioType", nullable = false, length = 255)
 	private String ScenarioType;
@@ -75,6 +75,7 @@ public class Add_Scenario {
 
 	@Column(name = "Comments", nullable = false, length = 255)
 	private String Comments;
+	
 
 	@ManyToMany(mappedBy = "scenarios")
 	private Set<Playlist> playlists = new HashSet<>();
@@ -122,12 +123,14 @@ public class Add_Scenario {
 		Description = description;
 	}
 
+	
+
 	public String getCategory() {
-		return Category;
+		return category;
 	}
 
 	public void setCategory(String category) {
-		Category = category;
+		this.category = category;
 	}
 
 	public String getScenarioType() {
@@ -221,6 +224,8 @@ public class Add_Scenario {
 	public void setNumberofInstance(String numberofInstance) {
 		NumberofInstance = numberofInstance;
 	}
+
+
 
 
 

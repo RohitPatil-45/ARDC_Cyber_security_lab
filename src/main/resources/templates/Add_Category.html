@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:include="template :: headFragment(${pageTitle})">
+<title th:text="${pageTitle} + ' | Cyber Ranges'">Add Category |
+	Cyber Ranges</title>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+			<!-- Page Header -->
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1 th:text="${pageTitle}">Add Category</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#"><i
+										class="fas fa-home"></i> Home</a></li>
+								<li class="breadcrumb-item active">Add Category</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Form Section -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px"
+												th:text="${pageTitle}">Add Category</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{/guac/View_Category}"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+
+								<form th:action="@{/guac/categorysave}" method="post"
+									th:object="${categoryObj}">
+									
+						
+									
+									<input type="hidden" th:field="*{categoryId}" />
+
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+												<!-- Category Name -->
+												<div class="form-group">
+													<label for="category">Category Name</label> <input
+														type="text" th:field="*{category}" id="category"
+														name="category" class="form-control"
+														placeholder="Enter Category Name" required />
+												</div>
+
+												<!-- (Optional) Description or Additional Fields -->
+												<!--
+                                            <div class="form-group">
+                                                <label for="description">Description</label>
+                                                <input type="text" id="description" name="description" class="form-control" placeholder="Enter description">
+                                            </div>
+                                            -->
+											</div>
+										</div>
+									</div>
+
+									<!-- Footer Buttons -->
+									<div class="card-footer">
+										<button type="submit" class="btn btn-primary"
+											id="categorySave">
+											<i class="fas fa-save"></i> Save
+										</button>
+										<button type="reset" class="btn btn-outline-secondary">Reset</button>
+										<a th:href="@{/categories}" class="btn btn-secondary">Cancel</a>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<!-- JS Includes -->
+	<div th:replace="template :: jsscript"></div>
+	<script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+
+</body>
+</html>

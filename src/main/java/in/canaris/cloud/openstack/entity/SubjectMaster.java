@@ -7,74 +7,85 @@ import javax.persistence.*;
 @Table(name = "subject_master")
 public class SubjectMaster {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "subject_id", updatable = false, nullable = false)
-    private int subjectId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "subject_id", updatable = false, nullable = false)
+	private int subjectId;
 
-    @Column(name = "subject_name", nullable = false, length = 100)
-    private String subjectName;
+	@Column(name = "subject_name", nullable = false, length = 100)
+	private String subjectName;
 
-    // Foreign Key → SemesterMaster
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "semester_id", nullable = false, referencedColumnName = "semester_id")
-    private SemesterMaster semester;
+	// Foreign Key → SemesterMaster
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "semester_id", nullable = false, referencedColumnName = "semester_id")
+	private SemesterMaster semester;
 
-    @Column(name = "is_enabled", nullable = false)
-    private boolean isEnabled = true;
+	@Column(name = "is_enabled", nullable = false)
+	private boolean isEnabled = true;
 
-    @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp createdAt;
+	@Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	private Timestamp createdAt;
 
-    @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private Timestamp updatedAt;
+	@Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+	private Timestamp updatedAt;
 
-    // Getters & Setters
-    public int getSubjectId() {
-        return subjectId;
-    }
+	@Column(name = "subject_code", nullable = false, length = 50)
+	private String subjectCode;
 
-    public void setSubjectId(int subjectId) {
-        this.subjectId = subjectId;
-    }
+	// Getters & Setters
+	public int getSubjectId() {
+		return subjectId;
+	}
 
-    public String getSubjectName() {
-        return subjectName;
-    }
+	public void setSubjectId(int subjectId) {
+		this.subjectId = subjectId;
+	}
 
-    public void setSubjectName(String subjectName) {
-        this.subjectName = subjectName;
-    }
+	public String getSubjectName() {
+		return subjectName;
+	}
 
-    public SemesterMaster getSemester() {
-        return semester;
-    }
+	public void setSubjectName(String subjectName) {
+		this.subjectName = subjectName;
+	}
 
-    public void setSemester(SemesterMaster semester) {
-        this.semester = semester;
-    }
+	public SemesterMaster getSemester() {
+		return semester;
+	}
 
-    public boolean isEnabled() {
-        return isEnabled;
-    }
+	public void setSemester(SemesterMaster semester) {
+		this.semester = semester;
+	}
 
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
+	public boolean isEnabled() {
+		return isEnabled;
+	}
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
+	public void setEnabled(boolean enabled) {
+		isEnabled = enabled;
+	}
 
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
+	public Timestamp getCreatedAt() {
+		return createdAt;
+	}
 
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
+	public void setCreatedAt(Timestamp createdAt) {
+		this.createdAt = createdAt;
+	}
 
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+	public Timestamp getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(Timestamp updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	public String getSubjectCode() {
+		return subjectCode;
+	}
+
+	public void setSubjectCode(String subjectCode) {
+		this.subjectCode = subjectCode;
+	}
 }

@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 
-<head th:replace="template :: headFragment('Add/Edit Semester')">
-    <!-- Removed duplicate title and moved to fragment -->
+<head th:replace="template :: headFragment(${pageTitle})">
+    <title th:text="${pageTitle}">Subject Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
 
         <div th:replace="fragments/header :: header"></div>
-
         <div th:replace="fragments/sidebar :: aside"></div>
 
         <div class="content-wrapper">
@@ -17,13 +17,13 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 th:text="${semester.semesterId == 0} ? 'Create Semester' : 'Edit Semester'">Semester Form</h1>
+                            <h1 th:text="${subject.subjectId == 0} ? 'Create Subject' : 'Edit Subject'">Subject Form</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a th:href="@{/}"><i class="fas fa-home"></i> Home</a></li>
-                                <li class="breadcrumb-item"><a th:href="@{/semesters}">Semesters</a></li>
-                                <li class="breadcrumb-item active" th:text="${semester.semesterId == 0} ? 'Create' : 'Edit'">Action</li>
+                                <li class="breadcrumb-item"><a th:href="@{/subjects}">Subjects</a></li>
+                                <li class="breadcrumb-item active" th:text="${subject.subjectId == 0} ? 'Create' : 'Edit'">Action</li>
                             </ol>
                         </div>
                     </div>
@@ -35,49 +35,71 @@
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-calendar-alt"></i>
-                                <span th:text="${semester.semesterId == 0} ? 'Add New Semester' : 'Edit Semester'">Semester</span>
+                                <i class="fas fa-book"></i>
+                                <span th:text="${subject.subjectId == 0} ? 'Add New Subject' : 'Edit Subject'">Subject</span>
                             </h3>
                         </div>
 
-                        <form th:action="@{/saveSemester}" th:object="${semester}" method="post" class="p-3">
-                            <!-- Hidden field for semesterId -->
-                            <input type="hidden" th:field="*{semesterId}" />
+                        <form th:action="@{/guac/saveSubject}" method="post" th:object="${subject}">
+                            <div class="card-body">
+                                <input type="hidden" th:field="*{subjectId}" />
 
-                            <!-- Department Dropdown -->
-                            <div class="form-group">
-                                <label for="department">Department</label>
-                                <select id="department" th:field="*{course.department.departmentId}" class="form-control" required>
-                                    <option value="">-- Select Department --</option>
-                                    <option th:each="dept : ${departments}" 
-                                            th:value="${dept.departmentId}" 
+                                <!-- Department -->
+                                <div class="form-group">
+                                    <label for="department">Department</label>
+                                    <select id="department" name="semester.course.department.departmentId" class="form-control" required>
+                                        <option value="" disabled th:selected="${selectedDepartmentId == null}">-- Select Department --</option>
+                                        <option th:each="dept : ${departments}"
+                                            th:value="${dept.departmentId}"
                                             th:text="${dept.departmentName}"
-                                            th:selected="${dept.departmentId == semester.course?.department?.departmentId}">
-                                    </option>
-                                </select>
+                                            th:selected="${selectedDepartmentId != null and dept.departmentId == selectedDepartmentId}">
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- Course -->
+                                <div class="form-group">
+                                    <label for="course">Course</label>
+                                    <select id="course" name="semester.course.courseId" class="form-control" required
+                                            th:data-selected="${selectedCourseId != null ? selectedCourseId : 0}">
+                                        <option value="">-- Select Course --</option>
+                                    </select>
+                                </div>
+
+                                <!-- Semester -->
+                                <div class="form-group">
+                                    <label for="semester">Semester</label>
+                                    <select id="semester" name="semester.semesterId" class="form-control" required
+                                            th:data-selected="${selectedSemesterId != null ? selectedSemesterId : 0}">
+                                        <option value="">-- Select Semester --</option>
+                                    </select>
+                                </div>
+
+                                <!-- Subject Name -->
+                                <div class="form-group">
+                                    <label for="subjectName">Subject Name</label>
+                                    <input type="text" th:field="*{subjectName}" id="subjectName" class="form-control" placeholder="Enter subject name" required />
+                                </div>
+                                
+                                 <div class="form-group">
+                                    <label for="subjectCode">Subject Code</label>
+                                    <input type="text" th:field="*{subjectCode}" id="subjectCode" class="form-control" placeholder="Enter subject code" required />
+                                </div>
+
+                                <!-- Enable checkbox -->
+<!--                                 <div class="form-group form-check"> -->
+<!--                                     <input type="checkbox" th:field="*{enabled}" class="form-check-input" id="isEnabled" /> -->
+<!--                                     <label class="form-check-label" for="isEnabled">Enabled</label> -->
+<!--                                 </div> -->
                             </div>
 
-                            <!-- Course Dropdown -->
-                            <div class="form-group">
-                                <label for="course">Course</label>
-                                <select id="course" th:field="*{course.courseId}" class="form-control" required>
-                                    <option value="">-- Select Course --</option>
-                                    <option th:each="course : ${courses}" 
-                                            th:value="${course.courseId}" 
-                                            th:text="${course.courseName}"
-                                            th:selected="${course.courseId == semester.course?.courseId}">
-                                    </option>
-                                </select>
+                            <div class="card-footer text-right">
+                                <a th:href="@{/guac/subjects}" class="btn btn-secondary">Cancel</a>
+                                <button type="reset" class="btn btn-outline-secondary">Reset</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
                             </div>
-
-                            <!-- Semester Name Input -->
-                            <div class="form-group">
-                                <label for="semesterName">Semester Name</label>
-                                <input type="text" id="semesterName" th:field="*{semesterName}" class="form-control" placeholder="Enter semester name" required />
-                            </div>
-
-                            <button type="submit" class="btn btn-primary">Save Semester</button>
-                            <a th:href="@{/semesters}" class="btn btn-secondary ml-2">Cancel</a>
                         </form>
                     </div>
                 </div>
@@ -89,56 +111,98 @@
 
     <div th:replace="template :: jsscript"></div>
 
-    <!-- jQuery (required for fetch or AJAX) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+
     <script>
-        $(document).ready(function() {
-            // Department change event
-            $('#department').change(function() {
-                var deptId = $(this).val();
-                fetchCourses(deptId);
-            });
-            
-            // Initialize courses if department is already selected
-            var initialDeptId = $('#department').val();
-            if (initialDeptId) {
-                fetchCourses(initialDeptId);
-            }
-        });
+        $(document).ready(function () {
+            const departmentSelect = $('#department');
+            const courseSelect = $('#course');
+            const semesterSelect = $('#semester');
 
-        function fetchCourses(deptId) {
-            if (!deptId) {
-                $('#course').html('<option value="">-- Select Course --</option>');
-                return;
-            }
+            const selectedCourseId = courseSelect.data('selected');
+            const selectedSemesterId = semesterSelect.data('selected');
 
-            fetch('/guac/courses?departmentId=' + deptId)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const courseSelect = $('#course');
+            function fetchCourses(departmentId, selectedId = 0) {
+                if (!departmentId) {
                     courseSelect.html('<option value="">-- Select Course --</option>');
-                    
-                    data.forEach(course => {
-                        courseSelect.append(new Option(course.courseName, course.courseId));
-                    });
-                    
-                    // Set the selected course if editing
-                    var selectedCourseId = $('#course').data('selected');
-                    if (selectedCourseId) {
-                        courseSelect.val(selectedCourseId);
+                    semesterSelect.html('<option value="">-- Select Semester --</option>');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/guac/courses',
+                    type: 'GET',
+                    data: { departmentId: departmentId },
+                    success: function (data) {
+                        courseSelect.empty();
+                        courseSelect.append('<option value="">-- Select Course --</option>');
+                        semesterSelect.html('<option value="">-- Select Semester --</option>');
+
+                        data.forEach(function (course) {
+                            const isSelected = course.courseId == selectedId ? 'selected' : '';
+                            courseSelect.append(`<option value="${course.courseId}" ${isSelected}>${course.courseName}</option>`);
+                        });
+
+                        if(selectedId) {
+                            fetchSemesters(selectedId, selectedSemesterId);
+                        }
+                    },
+                    error: function () {
+                        courseSelect.html('<option value="">Error loading courses</option>');
+                        semesterSelect.html('<option value="">-- Select Semester --</option>');
                     }
-                })
-                .catch(err => {
-                    console.error('Error fetching courses:', err);
-                    $('#course').html('<option value="">Error loading courses</option>');
                 });
-        }
+            }
+
+            function fetchSemesters(courseId, selectedId = 0) {
+                if (!courseId) {
+                    semesterSelect.html('<option value="">-- Select Semester --</option>');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/guac/semesters',  // or adjust according to your mapping
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { courseId: courseId },
+                    success: function (data) {
+                        console.log(data);
+                        semesterSelect.empty();
+                        semesterSelect.append('<option value="">-- Select Semester --</option>');
+
+                        data.forEach(function (sem) {
+                            const isSelected = sem.semesterId == selectedId ? 'selected' : '';
+                            semesterSelect.append(`<option value="${sem.semesterId}" ${isSelected}>${sem.semesterName}</option>`);
+                        });
+                    },
+                    error: function () {
+                        semesterSelect.html('<option value="">Error loading semesters</option>');
+                    }
+                });
+            }
+
+
+            // Initial load: fetch courses and semesters if department & course are preselected
+            const initialDeptId = departmentSelect.val();
+            if (initialDeptId) {
+                fetchCourses(initialDeptId, selectedCourseId);
+            }
+
+            // When department changes, load courses & reset semesters
+            departmentSelect.change(function () {
+                const deptId = $(this).val();
+                fetchCourses(deptId);
+                semesterSelect.html('<option value="">-- Select Semester --</option>');
+            });
+
+            // When course changes, load semesters
+            courseSelect.change(function () {
+                const courseId = $(this).val();
+                fetchSemesters(courseId);
+            });
+        });
     </script>
+
 </body>
+
 </html>

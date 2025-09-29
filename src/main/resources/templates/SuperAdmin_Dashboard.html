@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:include="template :: headFragment(${pageTitle})">
+<title th:text="${pageTitle}">Dashboard</title>
+<link rel="icon" type="image/png"
+	href="/webtemplate/dist/img/magicboxEye3.png">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<style>
+:root {
+	--primary: #4361ee;
+	--secondary: #3f37c9;
+	--success: #4cc9f0;
+	--danger: #f72585;
+	--warning: #f8961e;
+	--info: #4895ef;
+	--dark: #2b2d42;
+	--light: #f8f9fa;
+	--gray: #6c757d;
+	--white: #ffffff;
+	--card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+	background: linear-gradient(135deg, #f5f7fa 0%, #e4e7ec 100%);
+	color: var(--dark);
+	line-height: 1.6;
+	min-height: 100vh;
+}
+
+/* Modern Card Design */
+.dashboard-card {
+	border: none;
+	border-radius: 16px;
+	box-shadow: var(--card-shadow);
+	background: var(--white);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	overflow: hidden;
+	position: relative;
+	backdrop-filter: blur(10px);
+}
+
+.dashboard-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 4px;
+	background: linear-gradient(90deg, var(--primary), var(--success));
+}
+
+.dashboard-card .card-header {
+	background: transparent;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+	padding: 1.5rem;
+	position: relative;
+}
+
+.dashboard-card .card-body {
+	padding: 1.5rem;
+	flex: 1;
+}
+
+/* Enhanced Status Items */
+.status-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1rem;
+}
+
+.status-item {
+	background: linear-gradient(135deg, var(--white) 0%, #f8f9fa 100%);
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	border-radius: 12px;
+	padding: 1.25rem;
+	display: flex;
+	align-items: center;
+	transition: all 0.3s ease;
+	position: relative;
+	overflow: hidden;
+}
+
+.status-item::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 4px;
+	height: 100%;
+}
+
+.status-up::before {
+	background: var(--success);
+}
+
+.status-down::before {
+	background: var(--danger);
+}
+
+.status-warning::before {
+	background: var(--warning);
+}
+
+.status-unknown::before {
+	background: var(--gray);
+}
+
+.status-icon {
+	width: 48px;
+	height: 48px;
+	border-radius: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 1rem;
+	font-size: 1.25rem;
+	transition: all 0.3s ease;
+}
+
+.status-up .status-icon {
+	background: rgba(76, 201, 240, 0.15);
+	color: var(--success);
+}
+
+.status-down .status-icon {
+	background: rgba(247, 37, 133, 0.15);
+	color: var(--danger);
+}
+
+.status-info {
+	flex: 1;
+}
+
+.status-name {
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: var(--gray);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 0.25rem;
+}
+
+.status-count {
+	font-weight: 700;
+	font-size: 2rem;
+	color: var(--dark);
+	line-height: 1;
+}
+
+/* Enhanced Total Section */
+.total-section {
+	text-align: center;
+	padding: 2rem 1rem;
+	background: linear-gradient(135deg, var(--primary) 0%, var(--secondary)
+		100%);
+	border-radius: 12px;
+	color: white;
+	margin-bottom: 1.5rem;
+	position: relative;
+	overflow: hidden;
+}
+
+.total-section::before {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -50%;
+	width: 200%;
+	height: 200%;
+	background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1%,
+		transparent 1%);
+	background-size: 20px 20px;
+	animation: float 6s ease-in-out infinite;
+}
+
+.total-count {
+	font-size: 3.5rem;
+	font-weight: 800;
+	line-height: 1;
+	margin-bottom: 0.5rem;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.total-label {
+	font-size: 0.9rem;
+	opacity: 0.9;
+	font-weight: 500;
+	letter-spacing: 1px;
+}
+
+/* Modern Header */
+.content-header {
+	background: transparent;
+	padding: 2rem 0 1rem;
+	border-bottom: none;
+}
+
+.content-header h1 {
+	font-weight: 700;
+	color: var(--dark);
+	font-size: 2.25rem;
+	background: linear-gradient(135deg, var(--primary), var(--success));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+/* Chart Styling */
+.chart-container {
+	background: var(--white);
+	border-radius: 16px;
+	padding: 2rem;
+	box-shadow: var(--card-shadow);
+	margin-bottom: 2rem;
+	border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.chart-title {
+	font-weight: 600;
+	color: var(--dark);
+	margin-bottom: 1.5rem;
+	font-size: 1.25rem;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.chart-title i {
+	color: var(--primary);
+}
+
+/* Summary Cards */
+.summary-card {
+	text-align: center;
+	padding: 2rem 1rem;
+	border-radius: 16px;
+	background: linear-gradient(135deg, var(--white) 0%, #f8f9fa 100%);
+	box-shadow: var(--card-shadow);
+	transition: all 0.3s ease;
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	position: relative;
+	overflow: hidden;
+}
+
+.summary-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 4px;
+	background: linear-gradient(90deg, var(--primary), var(--success));
+}
+
+.summary-card .icon-wrapper {
+	width: 80px;
+	height: 80px;
+	border-radius: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto 1.5rem;
+	font-size: 2rem;
+	background: rgba(67, 97, 238, 0.1);
+	color: var(--primary);
+}
+
+.summary-card .count {
+	font-size: 2.5rem;
+	font-weight: 800;
+	color: var(--dark);
+	line-height: 1;
+	margin-bottom: 0.5rem;
+}
+
+.summary-card .label {
+	font-size: 0.9rem;
+	color: var(--gray);
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+/* Server Type Cards */
+.server-type-header {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.server-type-icon {
+	width: 40px;
+	height: 40px;
+	border-radius: 10px;
+	background: linear-gradient(135deg, var(--primary), var(--success));
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	font-size: 1.1rem;
+}
+
+.server-type {
+	font-weight: 600;
+	color: var(--dark);
+	font-size: 1.1rem;
+	margin: 0;
+}
+
+/* Responsive Design */
+@media ( max-width : 768px) {
+	.content-header h1 {
+		font-size: 1.75rem;
+	}
+	.status-grid {
+		grid-template-columns: 1fr;
+	}
+	.total-count {
+		font-size: 2.5rem;
+	}
+	.chart-container {
+		padding: 1.5rem;
+	}
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+	width: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--primary);
+	border-radius: 3px;
+}
+
+/* Breadcrumb Modernization */
+.breadcrumb {
+	background: transparent;
+	padding: 0;
+}
+
+.breadcrumb-item a {
+	color: var(--gray);
+	text-decoration: none;
+	transition: color 0.3s ease;
+	font-weight: 500;
+}
+
+.breadcrumb-item.active {
+	color: var(--primary);
+	font-weight: 600;
+}
+
+/* Alert Styling */
+.alert-info {
+	border-radius: 12px;
+	border: none;
+	background: linear-gradient(135deg, #e7f3ff 0%, #d4e7ff 100%);
+	color: var(--dark);
+	border-left: 4px solid var(--info);
+}
+
+/* Enhanced Chart Widget Styling */
+.chart-widget {
+	background: var(--white);
+	border-radius: 16px;
+	box-shadow: var(--card-shadow);
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	transition: all 0.3s ease;
+	height: 100%;
+	min-height: 280px;
+}
+
+.chart-header {
+	padding: 1.5rem 1.5rem 1rem;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	font-weight: 600;
+	color: var(--dark);
+	font-size: 1.2rem;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+	margin-bottom: 0.5rem;
+}
+
+.chart-header i {
+	color: var(--primary);
+	font-size: 1.3rem;
+	background: linear-gradient(135deg, var(--primary), var(--success));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.chart-content {
+	padding: 1rem 1.5rem 1.5rem;
+	display: flex;
+	align-items: center;
+	gap: 2rem;
+	height: 200px;
+	justify-content: space-between;
+}
+
+.chart-container {
+	flex: 1;
+	height: 100%;
+	position: relative;
+	min-height: 180px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Specific styles for Pie Chart container */
+.pie-chart-container {
+	flex: 1;
+	height: 100%;
+	position: relative;
+	min-height: 180px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+}
+
+.pie-chart-container canvas {
+	width: 100% !important;
+	height: 100% !important;
+	max-height: 160px !important;
+	min-height: 140px !important;
+	max-width: 160px !important;
+	margin: 0 auto;
+}
+
+/* Bar chart specific styles */
+.bar-chart-container {
+	flex: 1;
+	height: 100%;
+	position: relative;
+	min-height: 180px;
+}
+
+.bar-chart-container canvas {
+	width: 100% !important;
+	height: 100% !important;
+	max-height: 180px;
+	min-height: 160px;
+}
+
+.chart-legends {
+	flex: 0 0 160px;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.legend-item {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 1rem;
+	border-radius: 12px;
+	background: rgba(0, 0, 0, 0.03);
+	transition: all 0.3s ease;
+	border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.legend-color {
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	flex-shrink: 0;
+	border: 2px solid white;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.legend-color.operational {
+	background: #4cc9f0;
+	border-color: rgba(76, 201, 240, 0.3);
+}
+
+.legend-color.offline {
+	background: #f72585;
+	border-color: rgba(247, 37, 133, 0.3);
+}
+
+.legend-color.online {
+	background: #4361ee;
+	border-color: rgba(67, 97, 238, 0.3);
+}
+
+.legend-color.offline-user {
+	background: #6c757d;
+	border-color: rgba(108, 117, 125, 0.3);
+}
+
+.legend-label {
+	font-size: 0.95rem;
+	color: var(--dark);
+	font-weight: 600;
+	flex: 1;
+}
+
+.legend-value {
+	font-size: 1.4rem;
+	font-weight: 800;
+	color: var(--dark);
+	min-width: 40px;
+	text-align: right;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced Vertical Layout */
+.chart-widget.vertical {
+	padding: 1.5rem;
+	min-height: 320px;
+}
+
+.chart-widget.vertical .chart-content {
+	flex-direction: column;
+	height: auto;
+	gap: 1.5rem;
+	padding: 0;
+}
+
+.chart-widget.vertical .pie-chart-container {
+	height: 160px;
+	width: 100%;
+	min-height: 140px;
+}
+
+.chart-widget.vertical .bar-chart-container {
+	height: 180px;
+	width: 100%;
+	min-height: 160px;
+}
+
+.chart-widget.vertical .chart-legends {
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	gap: 1rem;
+	flex: 0 0 auto;
+	width: 100%;
+}
+
+.chart-widget.vertical .legend-item {
+	flex: 1;
+	min-width: 140px;
+	justify-content: center;
+	text-align: center;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 1.25rem 0.75rem;
+}
+
+.chart-widget.vertical .legend-label {
+	font-size: 0.9rem;
+	font-weight: 600;
+}
+
+.chart-widget.vertical .legend-value {
+	font-size: 1.5rem;
+	font-weight: 800;
+}
+
+/* Responsive adjustments */
+@media ( max-width : 768px) {
+	.chart-widget {
+		min-height: 320px;
+	}
+	.chart-content {
+		flex-direction: column;
+		height: auto;
+		gap: 1.5rem;
+		padding: 1rem;
+	}
+	.chart-legends {
+		flex: 0 0 auto;
+		width: 100%;
+		flex-direction: row;
+		justify-content: space-around;
+		gap: 1rem;
+	}
+	.pie-chart-container {
+		height: 160px;
+		min-height: 140px;
+	}
+	.bar-chart-container {
+		height: 180px;
+		min-height: 160px;
+	}
+	.legend-item {
+		padding: 0.75rem;
+		min-width: 120px;
+	}
+	.legend-value {
+		font-size: 1.3rem;
+	}
+}
+</style>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+			<!-- Enhanced Header -->
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row align-items-center mb-4">
+						<div class="col-sm-6">
+							<h1 class="animate-fade-in">
+								<i class="fas fa-tachometer-alt mr-3"></i> <span
+									th:text="${pageTitle}">Dashboard</span>
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#"
+									class="text-decoration-none"> <i class="fas fa-home mr-2"></i>Home
+								</a></li>
+								<li class="breadcrumb-item active" th:text="${pageTitle}">Dashboard</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Charts Section -->
+			<section class="content animate-slide-up">
+				<div class="container-fluid">
+					<div class="row mb-4">
+						<!-- Device Status Chart -->
+						<div class="col-md-6 mb-4">
+							<div class="chart-widget">
+								<div class="chart-header">
+									<i class="fas fa-server"></i> <span>Server Status</span>
+								</div>
+								<div class="chart-content">
+									<div class="bar-chart-container">
+										<canvas id="barChart"></canvas>
+									</div>
+									<div class="chart-legends">
+										<div class="legend-item">
+											<span class="legend-color operational"></span> <span
+												class="legend-label">Operational</span> <span
+												class="legend-value" th:text="${overallUp}">0</span>
+										</div>
+										<div class="legend-item">
+											<span class="legend-color offline"></span> <span
+												class="legend-label">Offline</span> <span
+												class="legend-value" th:text="${overallDown}">0</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- User Status Chart -->
+						<div class="col-md-6 mb-4">
+							<div class="chart-widget">
+								<div class="chart-header">
+									<i class="fas fa-users"></i> <span>User Status</span>
+								</div>
+								<div class="chart-content">
+									<div class="pie-chart-container">
+										<canvas id="pieChart"></canvas>
+									</div>
+									<div class="chart-legends">
+										<div class="legend-item">
+											<span class="legend-color online"></span> <span
+												class="legend-label">Online Users</span> <span
+												class="legend-value" th:text="${userOnline}">0</span>
+										</div>
+										<div class="legend-item">
+											<span class="legend-color offline-user"></span> <span
+												class="legend-label">Offline Users</span> <span
+												class="legend-value" th:text="${userOffline}">0</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+					<!-- Server Status Cards -->
+					<div class="row mb-5">
+						<div class="col-12 mb-4">
+							<h3 class="mb-4" style="color: var(--dark);">
+								<i class="fas fa-server mr-3"></i>Server Status by
+								Virtualization Type
+							</h3>
+						</div>
+
+						<div th:each="entry : ${typeStats}"
+							class="col-lg-4 col-md-6 col-sm-12 mb-4 animate-slide-up">
+							<div class="card dashboard-card h-100">
+								<div class="card-header">
+									<div class="server-type-header">
+										<div class="server-type-icon">
+											<i class="fas fa-server"></i>
+										</div>
+										<h5 class="server-type" th:text="${entry.key}">
+											Virtualization Type</h5>
+									</div>
+								</div>
+								<div class="card-body">
+									<div class="row align-items-center h-100">
+										<!-- Total Count -->
+										<div class="col-md-5 col-sm-12 mb-3 mb-md-0">
+											<div class="total-section">
+												<div class="total-count"
+													th:text="${totalCountByType[entry.key] != null ? totalCountByType[entry.key] : 0}">
+													0</div>
+												<div class="total-label">Total Servers</div>
+											</div>
+										</div>
+
+										<!-- Status Grid -->
+										<div class="col-md-7 col-sm-12">
+											<div class="status-section">
+												<div class="status-grid">
+													<div class="status-item status-up">
+														<div class="status-icon">
+															<i class="fas fa-check-circle"></i>
+														</div>
+														<div class="status-info">
+															<div class="status-name">Up</div>
+															<div class="status-count"
+																th:text="${entry.value.get('up') != null ? entry.value.get('up') : 
+                                                                 (entry.value.get('UP') != null ? entry.value.get('UP') : 0)}">
+																0</div>
+														</div>
+													</div>
+
+													<div class="status-item status-down">
+														<div class="status-icon">
+															<i class="fas fa-times-circle"></i>
+														</div>
+														<div class="status-info">
+															<div class="status-name">Down</div>
+															<div class="status-count"
+																th:text="${entry.value.get('down') != null ? entry.value.get('down') : 
+                                                                 (entry.value.get('DOWN') != null ? entry.value.get('DOWN') : 0)}">
+																0</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- No Data Alert -->
+					<div th:if="${typeStats == null or typeStats.empty}"
+						class="alert alert-info text-center animate-fade-in">
+						<h4 class="mb-3">
+							<i class="fas fa-info-circle mr-2"></i> No Server Data Available
+						</h4>
+						<p class="mb-2">There are no servers configured in the system
+							yet.</p>
+						<small>Configure servers to see analytics and status
+							information.</small>
+					</div>
+
+					<!-- Summary Statistics -->
+					<div class="row mt-2">
+						<div class="col-12 mb-4">
+							<h3 class="mb-4" style="color: var(--dark);">
+								<i class="fas fa-chart-line mr-3"></i>System Overview
+							</h3>
+						</div>
+
+						<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+							<a th:href="@{/guac/View_Playlist}"
+								style="text-decoration: none; color: inherit;" target="_blank">
+								<div class="summary-card" style="cursor: pointer;">
+									<div class="icon-wrapper">
+										<i class="fas fa-list"></i>
+									</div>
+									<div class="count" th:text="${playlistCount}">0</div>
+									<div class="label">Playlists</div>
+								</div>
+							</a>
+						</div>
+
+
+						<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+							<a th:href="@{/guac/View_SubPalylist}"
+								style="text-decoration: none; color: inherit;" target="_blank">
+							<div class="summary-card" style="cursor: pointer;">
+								<div class="icon-wrapper">
+									<i class="fas fa-layer-group"></i>
+								</div>
+								<div class="count" th:text="${subPlaylistCount}">0</div>
+								<div class="label">SubPlaylists</div>
+							</div>
+							</a>
+						</div>
+
+						<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+						<a th:href="@{/guac/View_Scenario}"
+								style="text-decoration: none; color: inherit;" target="_blank">
+							<div class="summary-card" style="cursor: pointer;">
+								<div class="icon-wrapper">
+									<i class="fas fa-cubes"></i>
+								</div>
+								<div class="count" th:text="${scenarioCount}">0</div>
+								<div class="label">Scenarios</div>
+							</div>
+							</a>
+						</div>
+
+						<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+							<a th:href="@{/cloud_instance/view}"
+								style="text-decoration: none; color: inherit;" target="_blank">
+							<div class="summary-card" style="cursor: pointer;">
+								<div class="icon-wrapper">
+									<i class="fas fa-file-alt"></i>
+								</div>
+								<div class="count" th:text="${templateCount}">0</div>
+								<div class="label">Templates</div>
+							</div>
+							</a>
+							
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+	<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const upCount = [[${overallUp}]] || 0;
+        const downCount = [[${overallDown}]] || 0;
+        const onlineCount = [[${userOnline}]] || 0;
+        const offlineCount = [[${userOffline}]] || 0;
+
+        // Bar Chart - Device Status
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Operational', 'Offline'],
+                datasets: [{
+                    data: [upCount, downCount],
+                    backgroundColor: ['#4cc9f0', '#f72585'],
+                    borderColor: ['#4cc9f0', '#f72585'],
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    barPercentage: 0.6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(43, 45, 66, 0.95)',
+                        padding: 10,
+                        cornerRadius: 6,
+                        bodyFont: { size: 12 },
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { 
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            precision: 0,
+                            font: { size: 11 },
+                            padding: 8
+                        },
+                        border: { display: false }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { 
+                            font: { size: 12 },
+                            padding: 5
+                        },
+                        border: { display: false }
+                    }
+                },
+                layout: {
+                    padding: { top: 10, bottom: 10, left: 10, right: 10 }
+                }
+            }
+        });
+
+        // Pie Chart - User Status (Fixed Configuration)
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Online', 'Offline'],
+                datasets: [{
+                    data: [onlineCount, offlineCount],
+                    backgroundColor: ['#4361ee', '#6c757d'],
+                    borderColor: ['#4361ee', '#6c757d'],
+                    borderWidth: 3,
+                    borderAlign: 'inner',
+                    hoverOffset: 12,
+                    spacing: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { 
+                        display: false 
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(43, 45, 66, 0.95)',
+                        padding: 12,
+                        cornerRadius: 8,
+                        bodyFont: { size: 13 },
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                cutout: '55%', // Proper doughnut hole size
+                rotation: -90, // Start from top
+                circumference: 360, // Full circle
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

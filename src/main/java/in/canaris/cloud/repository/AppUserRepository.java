@@ -27,4 +27,7 @@ public interface AppUserRepository extends JpaRepository<AppUser, Integer> {
 	@Query(value = "SELECT group_name FROM app_user", nativeQuery = true)
 	List<AppUser> findByAllGroupName();
 
+	@Query("SELECT u.status, COUNT(u) FROM AppUser u GROUP BY u.status")
+    List<Object[]> countByStatus();
+
 }
