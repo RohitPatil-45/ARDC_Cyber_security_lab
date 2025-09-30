@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:include="template :: headFragment(${pageTitle})">
+<title th:text="${pageTitle}">Dashboard</title>
+<link rel="icon" type="image/png"
+	href="/webtemplate/dist/img/magicboxEye3.png">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<style>
+:root {
+	--primary: #4361ee;
+	--secondary: #3f37c9;
+	--success: #4cc9f0;
+	--danger: #f72585;
+	--warning: #f8961e;
+	--info: #4895ef;
+	--dark: #2b2d42;
+	--light: #f8f9fa;
+	--gray: #6c757d;
+	--white: #ffffff;
+	--card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+	background: linear-gradient(135deg, #f5f7fa 0%, #e4e7ec 100%);
+	color: var(--dark);
+	line-height: 1.6;
+	min-height: 100vh;
+}
+
+/* Modern Card Design */
+.dashboard-card {
+	border: none;
+	border-radius: 16px;
+	box-shadow: var(--card-shadow);
+	background: var(--white);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	overflow: hidden;
+	position: relative;
+	backdrop-filter: blur(10px);
+}
+
+.dashboard-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 4px;
+	background: linear-gradient(90deg, var(--primary), var(--success));
+}
+
+.dashboard-card .card-header {
+	background: transparent;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+	padding: 1.5rem;
+	position: relative;
+}
+
+.dashboard-card .card-body {
+	padding: 1.5rem;
+	flex: 1;
+}
+
+/* Enhanced Status Items */
+.status-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1rem;
+}
+
+.status-item {
+	background: linear-gradient(135deg, var(--white) 0%, #f8f9fa 100%);
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	border-radius: 12px;
+	padding: 1.25rem;
+	display: flex;
+	align-items: center;
+	transition: all 0.3s ease;
+	position: relative;
+	overflow: hidden;
+}
+
+.status-item::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 4px;
+	height: 100%;
+}
+
+.status-success::before {
+	background: var(--success);
+}
+
+.status-warning::before {
+	background: var(--warning);
+}
+
+.status-info::before {
+	background: var(--info);
+}
+
+.status-primary::before {
+	background: var(--primary);
+}
+
+.status-icon {
+	width: 48px;
+	height: 48px;
+	border-radius: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 1rem;
+	font-size: 1.25rem;
+	transition: all 0.3s ease;
+}
+
+.status-success .status-icon {
+	background: rgba(76, 201, 240, 0.15);
+	color: var(--success);
+}
+
+.status-warning .status-icon {
+	background: rgba(248, 150, 30, 0.15);
+	color: var(--warning);
+}
+
+.status-info .status-icon {
+	background: rgba(72, 149, 239, 0.15);
+	color: var(--info);
+}
+
+.status-primary .status-icon {
+	background: rgba(67, 97, 238, 0.15);
+	color: var(--primary);
+}
+
+.status-info {
+	flex: 1;
+}
+
+.status-name {
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: var(--gray);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 0.25rem;
+}
+
+.status-count {
+	font-weight: 700;
+	font-size: 2rem;
+	color: var(--dark);
+	line-height: 1;
+}
+
+/* Enhanced Total Section */
+.total-section {
+	text-align: center;
+	padding: 2rem 1rem;
+	background: linear-gradient(135deg, var(--primary) 0%, var(--secondary)
+		100%);
+	border-radius: 12px;
+	color: white;
+	margin-bottom: 1.5rem;
+	position: relative;
+	overflow: hidden;
+}
+
+.total-section::before {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -50%;
+	width: 200%;
+	height: 200%;
+	background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1%,
+		transparent 1%);
+	background-size: 20px 20px;
+	animation: float 6s ease-in-out infinite;
+}
+
+.total-count {
+	font-size: 3.5rem;
+	font-weight: 800;
+	line-height: 1;
+	margin-bottom: 0.5rem;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.total-label {
+	font-size: 0.9rem;
+	opacity: 0.9;
+	font-weight: 500;
+	letter-spacing: 1px;
+}
+
+/* Modern Header */
+.content-header {
+	background: transparent;
+	padding: 2rem 0 1rem;
+	border-bottom: none;
+}
+
+.content-header h1 {
+	font-weight: 700;
+	color: var(--dark);
+	font-size: 2.25rem;
+	background: linear-gradient(135deg, var(--primary), var(--success));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+/* Progress Bar Styling */
+.progress-container {
+	background: var(--white);
+	border-radius: 16px;
+	padding: 2rem;
+	box-shadow: var(--card-shadow);
+	margin-bottom: 2rem;
+	border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.progress-title {
+	font-weight: 600;
+	color: var(--dark);
+	margin-bottom: 1.5rem;
+	font-size: 1.25rem;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.progress-title i {
+	color: var(--primary);
+}
+
+.progress-wrapper {
+	display: flex;
+	align-items: center;
+	gap: 2rem;
+}
+
+.progress-chart {
+	flex: 0 0 200px;
+	position: relative;
+}
+
+.progress-stats {
+	flex: 1;
+}
+
+.progress-info {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1rem;
+}
+
+.progress-item {
+	background: linear-gradient(135deg, var(--white) 0%, #f8f9fa 100%);
+	border-radius: 12px;
+	padding: 1.5rem;
+	text-align: center;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.progress-value {
+	font-size: 2.5rem;
+	font-weight: 800;
+	color: var(--dark);
+	line-height: 1;
+	margin-bottom: 0.5rem;
+}
+
+.progress-label {
+	font-size: 0.9rem;
+	color: var(--gray);
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+/* Summary Cards */
+.summary-card {
+	text-align: center;
+	padding: 2rem 1rem;
+	border-radius: 16px;
+	background: linear-gradient(135deg, var(--white) 0%, #f8f9fa 100%);
+	box-shadow: var(--card-shadow);
+	transition: all 0.3s ease;
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	position: relative;
+	overflow: hidden;
+	cursor: pointer;
+}
+
+.summary-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.summary-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 4px;
+	background: linear-gradient(90deg, var(--primary), var(--success));
+}
+
+.summary-card .icon-wrapper {
+	width: 80px;
+	height: 80px;
+	border-radius: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto 1.5rem;
+	font-size: 2rem;
+	background: rgba(67, 97, 238, 0.1);
+	color: var(--primary);
+	transition: all 0.3s ease;
+}
+
+.summary-card:hover .icon-wrapper {
+	transform: scale(1.1);
+	background: rgba(67, 97, 238, 0.2);
+}
+
+.summary-card .count {
+	font-size: 2.5rem;
+	font-weight: 800;
+	color: var(--dark);
+	line-height: 1;
+	margin-bottom: 0.5rem;
+}
+
+.summary-card .label {
+	font-size: 0.9rem;
+	color: var(--gray);
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+/* Responsive Design */
+@media ( max-width : 768px) {
+	.content-header h1 {
+		font-size: 1.75rem;
+	}
+	.status-grid {
+		grid-template-columns: 1fr;
+	}
+	.total-count {
+		font-size: 2.5rem;
+	}
+	.progress-container {
+		padding: 1.5rem;
+	}
+	.progress-wrapper {
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+	.progress-chart {
+		flex: 0 0 auto;
+	}
+	.progress-info {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+	width: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--primary);
+	border-radius: 3px;
+}
+
+/* Breadcrumb Modernization */
+.breadcrumb {
+	background: transparent;
+	padding: 0;
+}
+
+.breadcrumb-item a {
+	color: var(--gray);
+	text-decoration: none;
+	transition: color 0.3s ease;
+	font-weight: 500;
+}
+
+.breadcrumb-item.active {
+	color: var(--primary);
+	font-weight: 600;
+}
+
+/* Animation */
+@keyframes float {
+	0%, 100% { transform: translateY(0px); }
+	50% { transform: translateY(-10px); }
+}
+
+.animate-fade-in {
+	animation: fadeIn 0.8s ease-in;
+}
+
+.animate-slide-up {
+	animation: slideUp 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes slideUp {
+	from { 
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to { 
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+</style>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+			<!-- Enhanced Header -->
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row align-items-center mb-4">
+						<div class="col-sm-6">
+							<h1 class="animate-fade-in">
+								<i class="fas fa-tachometer-alt mr-3"></i> <span
+									th:text="${pageTitle}">Dashboard</span>
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#"
+									class="text-decoration-none"> <i class="fas fa-home mr-2"></i>Home
+								</a></li>
+								<li class="breadcrumb-item active" th:text="${pageTitle}">Dashboard</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Main Content -->
+			<section class="content animate-slide-up">
+				<div class="container-fluid">
+					
+					<!-- Task Completion Progress -->
+					<div class="row mb-4">
+						<div class="col-12">
+							<div class="progress-container">
+								<div class="progress-title">
+									<i class="fas fa-tasks"></i> <span>Task Completion Progress</span>
+								</div>
+								<div class="progress-wrapper">
+									<div class="progress-chart">
+										<canvas id="completionChart" width="200" height="200"></canvas>
+									</div>
+									<div class="progress-stats">
+										<div class="progress-info">
+											<div class="progress-item">
+												<div class="progress-value" th:text="${completionPercentage} + '%'">0%</div>
+												<div class="progress-label">Completion Rate</div>
+											</div>
+											<div class="progress-item">
+												<div class="progress-value" th:text="${completedTasks}">0</div>
+												<div class="progress-label">Completed Tasks</div>
+											</div>
+											<div class="progress-item">
+												<div class="progress-value" th:text="${totalTasks}">0</div>
+												<div class="progress-label">Total Tasks</div>
+											</div>
+											<div class="progress-item">
+												<div class="progress-value" th:text="${totalTasks - completedTasks}">0</div>
+												<div class="progress-label">Pending Tasks</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- User Statistics -->
+					<div class="row mb-5">
+						<div class="col-12 mb-4">
+							<h3 class="mb-4" style="color: var(--dark);">
+								<i class="fas fa-chart-bar mr-3"></i>Your Learning Statistics
+							</h3>
+						</div>
+
+							<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+							<a th:href="@{/guac/View_Playlist}"
+								style="text-decoration: none; color: inherit;">
+								<div class="summary-card">
+									<div class="icon-wrapper">
+										<i class="fas fa-list"></i>
+									</div>
+									<div class="count" th:text="${playlistCount}">0</div>
+									<div class="label">Playlists</div>
+								</div>
+							</a>
+						</div>
+
+						<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+							<a th:href="@{/guac/View_SubPalylist}"
+								style="text-decoration: none; color: inherit;">
+								<div class="summary-card">
+									<div class="icon-wrapper">
+										<i class="fas fa-layer-group"></i>
+									</div>
+									<div class="count" th:text="${subPlaylistCount}">0</div>
+									<div class="label">SubPlaylists</div>
+								</div>
+							</a>
+						</div>
+
+						<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+							<a th:href="@{/guac/View_Scenario}"
+								style="text-decoration: none; color: inherit;">
+								<div class="summary-card">
+									<div class="icon-wrapper">
+										<i class="fas fa-cubes"></i>
+									</div>
+									<div class="count" th:text="${scenarioCount}">0</div>
+									<div class="label">Scenarios</div>
+								</div>
+							</a>
+						</div>
+
+						<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+							
+								<div class="summary-card">
+									<div class="icon-wrapper">
+										<i class="fas fa-tasks"></i>
+									</div>
+									<div class="count" th:text="${totalTasks}">0</div>
+									<div class="label">My Tasks</div>
+								</div>
+							
+						</div>
+						
+					</div>
+
+					
+				</div>
+			</section>
+		</div>
+
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+	<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const completionPercentage = [[${completionPercentage}]] || 0;
+        const completedTasks = [[${completedTasks}]] || 0;
+        const totalTasks = [[${totalTasks}]] || 0;
+        const pendingTasks = totalTasks - completedTasks;
+
+        // Completion Chart - Doughnut
+        const completionCtx = document.getElementById('completionChart').getContext('2d');
+        new Chart(completionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'Pending'],
+                datasets: [{
+                    data: [completedTasks, pendingTasks],
+                    backgroundColor: ['#4cc9f0', '#e9ecef'],
+                    borderColor: ['#4cc9f0', '#e9ecef'],
+                    borderWidth: 3,
+                    borderAlign: 'inner',
+                    hoverOffset: 12,
+                    spacing: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { 
+                        display: false 
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(43, 45, 66, 0.95)',
+                        padding: 12,
+                        cornerRadius: 8,
+                        bodyFont: { size: 13 },
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                cutout: '65%',
+                rotation: -90,
+                circumference: 360,
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

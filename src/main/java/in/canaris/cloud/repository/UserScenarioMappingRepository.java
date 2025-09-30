@@ -28,6 +28,10 @@ public interface UserScenarioMappingRepository extends JpaRepository<UserScenari
 	@Query("DELETE FROM UserScenarioMapping u WHERE u.UserName = :userName")
 	void deleteByUserName(@Param("userName") String userName);
 
+
+	@Query(value = "SELECT count(scenarioid) FROM user_scenario_mapping WHERE user_name = :userName", nativeQuery = true)
+	long countByUserName(@Param("userName") String userName);
+
 //	List<UserScenarioMapping> findByUserName(String userName);
 
 }

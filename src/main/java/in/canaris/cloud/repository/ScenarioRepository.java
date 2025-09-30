@@ -23,6 +23,8 @@ public interface ScenarioRepository extends JpaRepository<Add_Scenario, Integer>
 	@Query("SELECT d FROM Add_Scenario d WHERE d.Id = :id")
 	Add_Scenario findByCheckId(@Param("id") Integer id);
 
+	
+
 
 
 }

@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import in.canaris.cloud.entity.CloudInstance;
@@ -158,6 +159,19 @@ public interface CloudInstanceRepository extends JpaRepository<CloudInstance, In
 	
 	@Query("SELECT  c FROM CloudInstance c WHERE instance_name=:instance_name")
 	CloudInstance findByInstance(String instance_name);
+
+
+//	@Query("SELECT Count( c.subProductId) FROM CloudInstance c WHERE c.subProductId IS NOT NULL")
+//	List<Integer> findDistinctSubProductIds();
+
+
+
+	
+
+
+
+	
+	
 
 	
 	

@@ -36,6 +36,11 @@ public interface UserPlaylistMappingRepository extends JpaRepository<UserPlaylis
 	@Query("DELETE FROM UserPlaylistMapping u WHERE u.UserName = :userName")
 	void deleteByUserName(@Param("userName") String userName);
 
+	
+
+	@Query(value = "SELECT count(playlist) FROM user_playlist_maping WHERE user_name = :userName", nativeQuery = true)
+	long countByUserName(@Param("userName") String userName);
+
 //	List<UserPlaylistMapping> findByUserName(String userName);
 
 }

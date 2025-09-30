@@ -201,14 +201,14 @@
 									<i class="far fa-circle nav-icon"></i>
 									<p>User Master</p>
 							</a></li>
-							
-							<li class="nav-item"><a href="/guac/View_Category" class="nav-link">
-									<i class="far fa-circle nav-icon"></i>
+
+							<li class="nav-item"><a href="/guac/View_Category"
+								class="nav-link"> <i class="far fa-circle nav-icon"></i>
 									<p>Category</p>
 							</a></li>
-							
-							
-							
+
+
+
 							<li class="nav-item"><a href="/discount/view"
 								class="nav-link"> <i class="far fa-circle nav-icon"></i>
 									<p>Discount Master</p>
@@ -257,11 +257,11 @@
 							</p>
 					</a>
 						<ul class="nav nav-treeview">
-						
-						
-						
-						<li class="nav-item"><a href="/guac/SuperAdmin_Dashboard" class="nav-link">
-									<i class="far fa-circle nav-icon"></i>
+
+
+
+							<li class="nav-item"><a href="/guac/SuperAdmin_Dashboard"
+								class="nav-link"> <i class="far fa-circle nav-icon"></i>
 									<p>Dashboard</p>
 							</a></li>
 
@@ -394,10 +394,10 @@
 											<p>User Wise Performance</p>
 									</a></li>
 
-<!-- 									<li class="nav-item"><a href="/guac/UserWiseChartBoarView" -->
-<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-<!-- 											<p>User Wise Chart Boart View</p> -->
-<!-- 									</a></li> -->
+									<!-- 									<li class="nav-item"><a href="/guac/UserWiseChartBoarView" -->
+									<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+									<!-- 											<p>User Wise Chart Boart View</p> -->
+									<!-- 									</a></li> -->
 
 									<li class="nav-item"><a href="/guac/View_All_Vm_Listing"
 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
@@ -439,52 +439,49 @@
 
 
 								</ul></li>
-								
-									<li class="nav-item has-treeview"><a href="#"
+
+							<li class="nav-item has-treeview"><a href="#"
 								class="nav-link"> <i class="far fa-circle nav-icon"></i>
 									<p>
 										University <i class="right fas fa-angle-left"></i>
 									</p>
 							</a>
 								<ul class="nav nav-treeview">
-<!-- 									<li class="nav-item"><a href="/guac/Add_Department" -->
-<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-<!-- 											<p>Add Department</p> -->
-<!-- 									</a></li> -->
+									<!-- 									<li class="nav-item"><a href="/guac/Add_Department" -->
+									<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+									<!-- 											<p>Add Department</p> -->
+									<!-- 									</a></li> -->
 									<li class="nav-item"><a href="/guac/View_Department"
 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 											<p>View Department</p>
 									</a></li>
-<!-- 									<li class="nav-item"><a href="/guac/Add_Course" -->
-<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-<!-- 											<p>Add Course</p> -->
-<!-- 									</a></li> -->
+									<!-- 									<li class="nav-item"><a href="/guac/Add_Course" -->
+									<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+									<!-- 											<p>Add Course</p> -->
+									<!-- 									</a></li> -->
 
-									<li class="nav-item"><a
-										href="/guac/View_Course" class="nav-link">
-											<i class="far fa-dot-circle nav-icon"></i>
+									<li class="nav-item"><a href="/guac/View_Course"
+										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 											<p>View Course</p>
 									</a></li>
-									
-<!-- 									<li class="nav-item"><a href="/guac/Add_Semester" -->
-<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-<!-- 											<p>Add Semester</p> -->
-<!-- 									</a></li> -->
 
-									<li class="nav-item"><a
-										href="/guac/View_Semester" class="nav-link">
-											<i class="far fa-dot-circle nav-icon"></i>
+									<!-- 									<li class="nav-item"><a href="/guac/Add_Semester" -->
+									<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+									<!-- 											<p>Add Semester</p> -->
+									<!-- 									</a></li> -->
+
+									<li class="nav-item"><a href="/guac/View_Semester"
+										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 											<p>View Semester</p>
 									</a></li>
-									
-<!-- 									<li class="nav-item"><a href="/guac/Add_Subject" -->
-<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-<!-- 											<p>Add_Subject</p> -->
-<!-- 									</a></li> -->
 
-									<li class="nav-item"><a
-										href="/guac/View_Subject" class="nav-link">
-											<i class="far fa-dot-circle nav-icon"></i>
+									<!-- 									<li class="nav-item"><a href="/guac/Add_Subject" -->
+									<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+									<!-- 											<p>Add_Subject</p> -->
+									<!-- 									</a></li> -->
+
+									<li class="nav-item"><a href="/guac/View_Subject"
+										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 											<p>View Subject</p>
 									</a></li>
 
@@ -492,9 +489,9 @@
 
 
 								</ul></li>
-								
-								
-								
+
+
+
 
 							<!-- Connections -->
 							<li class="nav-item"><a href="/guac/" class="nav-link">
@@ -513,34 +510,48 @@
 							</p>
 					</a>
 						<ul class="nav nav-treeview">
-
-							<li
-								sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_USER','ROLE_SUPERADMIN')"
-								class="nav-item"><a href="/guac/View_Playlist"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>View Playlist</p>
-							</a></li>
-
-							<li class="nav-item"><a href="/guac/View_SubPalylist"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>View Sub Playlist</p>
-							</a></li>
-
-							<li class="nav-item"><a href="/guac/View_Scenario"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>View Scenario</p>
-							</a></li>
-							
-							<li class="nav-item"><a href="/guac/UserTaskPerformance"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Task Performance</p>
+						
+						<li class="nav-item"><a href="/guac/UserWise_Dashboard" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Dashboard</p>
 							</a></li>
 
 
 							<li class="nav-item has-treeview"><a href="#"
 								class="nav-link"> <i class="far fa-circle nav-icon"></i>
 									<p>
-										In Progress Task <i class="right fas fa-angle-left"></i>
+										My Programs <i class="right fas fa-angle-left"></i>
+									</p>
+							</a>
+								<ul class="nav nav-treeview">
+
+									<li class="nav-item"><a href="/guac/View_Playlist"
+										class="nav-link"> <i class="far fa-circle nav-icon"></i>
+											<p>View Playlist</p>
+									</a></li>
+
+									<li class="nav-item"><a href="/guac/View_SubPalylist"
+										class="nav-link"> <i class="far fa-circle nav-icon"></i>
+											<p>View Sub Playlist</p>
+									</a></li>
+
+									<li class="nav-item"><a href="/guac/View_Scenario"
+										class="nav-link"> <i class="far fa-circle nav-icon"></i>
+											<p>View Scenario</p>
+									</a></li>
+
+
+								</ul></li>
+
+
+
+
+
+
+							<li class="nav-item has-treeview"><a href="#"
+								class="nav-link"> <i class="far fa-circle nav-icon"></i>
+									<p>
+										My performance <i class="right fas fa-angle-left"></i>
 									</p>
 							</a>
 								<ul class="nav nav-treeview">
@@ -553,6 +564,17 @@
 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 											<p>My Scenario Completed</p>
 									</a></li>
+
+									<li class="nav-item"><a href="/guac/UserTaskPerformance"
+										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+											<p>Task Performance</p>
+									</a></li>
+									
+									<li class="nav-item"><a href="/guac/View_UserWise_Vm_Listing"
+										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+											<p>View Vm Performance</p>
+									</a></li>
+
 
 								</ul></li>
 

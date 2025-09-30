@@ -13,8 +13,8 @@ public class PhysicalServerHealthMonitoring {
 	@Column(name = "Id", updatable = false, nullable = false)
 	private int Id;
   
-    @Column(name = "physical_server_ip", nullable = false, unique = true)
-    private int physicalServerIp;
+    @Column(name = "physical_server_ip")
+    private String  physicalServerIp;
 
     @Column(name = "free_ram")
     private double freeRam;
@@ -53,11 +53,13 @@ public class PhysicalServerHealthMonitoring {
 		Id = id;
 	}
 
-	public int getPhysicalServerIp() {
+
+
+	public String getPhysicalServerIp() {
 		return physicalServerIp;
 	}
 
-	public void setPhysicalServerIp(int physicalServerIp) {
+	public void setPhysicalServerIp(String physicalServerIp) {
 		this.physicalServerIp = physicalServerIp;
 	}
 

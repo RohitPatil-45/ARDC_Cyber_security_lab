@@ -52,4 +52,6 @@ public class UserPlaylistMapping {
 		return serialVersionUID;
 	}
 
+	
+
 }

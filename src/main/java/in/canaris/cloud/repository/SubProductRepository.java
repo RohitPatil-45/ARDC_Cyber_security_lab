@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 
@@ -31,5 +32,9 @@ public interface SubProductRepository extends JpaRepository<SubProduct, Integer>
 	@Transactional
 	@Query("UPDATE SubProduct c SET c.isSourceCreated = 'created' WHERE c.id = :labId")
 	int updateSourceImage(int labId);
+	
+	
+//	@Query("SELECT COUNT(sp) FROM SubProductMaster sp WHERE sp.productId = :productId")
+//	Long countByProductId(@Param("productId") Long productId);
 
 }
