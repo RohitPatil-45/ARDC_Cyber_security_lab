@@ -393,6 +393,96 @@ public class GuacamoleController {
 		return "View_DockerListing";
 	}
 
+//	@GetMapping("/SuperAdmin_Dashboard")
+//	public String dashboard(Model model, Principal principal) {
+//
+//		Authentication auth = (Authentication) principal;
+//		String username = auth.getName();
+//		try {
+//
+//			List<Object[]> results = AddPhysicalServerRepository.findVirtualizationTypeCounts();
+//
+//			Map<String, Map<String, Long>> typeStats = new HashMap<>();
+//			Map<String, Long> totalCountByType = new HashMap<>();
+//
+//			long overallUp = 0;
+//			long overallDown = 0;
+//
+//			for (Object[] row : results) {
+//				String type = (String) row[0];
+//				String rawStatus = (String) row[1];
+//				Long count = ((Number) row[2]).longValue();
+//
+//				String status = (rawStatus != null) ? rawStatus.toLowerCase() : "unknown";
+//
+//				typeStats.putIfAbsent(type, new HashMap<>());
+//				totalCountByType.putIfAbsent(type, 0L);
+//
+//				typeStats.get(type).put(status, count);
+//				totalCountByType.put(type, totalCountByType.get(type) + count);
+//
+//				if ("up".equals(status)) {
+//					overallUp += count;
+//				} else if ("down".equals(status)) {
+//					overallDown += count;
+//				}
+//			}
+//
+//			
+//			for (Map<String, Long> map : typeStats.values()) {
+//				map.putIfAbsent("up", 0L);
+//				map.putIfAbsent("down", 0L);
+//				map.putIfAbsent("unknown", 0L);
+//			}
+//
+//
+//			List<Object[]> userStatusCounts = AppUserRepository.countByStatus();
+//			long userOnline = 0;
+//			long userOffline = 0;
+//			for (Object[] ur : userStatusCounts) {
+//				String st = (String) ur[0];
+//				Long c = ((Number) ur[1]).longValue();
+//				String lower = (st != null) ? st.toLowerCase() : "unknown";
+//				if ("online".equals(lower) || "up".equals(lower)) {
+//					userOnline += c;
+//				} else if ("offline".equals(lower) || "down".equals(lower)) {
+//					userOffline += c;
+//				}
+//			}
+//
+//			// 3. Other counts
+//			long playlistCount = PlaylistRepository.count();
+//			long subPlaylistCount = SubPlaylistRepository.count();
+//			long scenarioCount = ScenarioRepository.count();
+//			long templateCount = repository.count();
+//
+//			// 4. Add to model
+//			model.addAttribute("typeStats", typeStats);
+//			model.addAttribute("totalCountByType", totalCountByType);
+//
+//			model.addAttribute("overallUp", overallUp);
+//			model.addAttribute("overallDown", overallDown);
+//
+//			model.addAttribute("userOnline", userOnline);
+//			model.addAttribute("userOffline", userOffline);
+//
+//			model.addAttribute("playlistCount", playlistCount);
+//			model.addAttribute("subPlaylistCount", subPlaylistCount);
+//			model.addAttribute("scenarioCount", scenarioCount);
+//			model.addAttribute("templateCount", templateCount);
+//
+//			model.addAttribute("pageTitle", "Super Admin Dashboard");
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			System.err.println("Exption_UserWise_Dshboard");
+//			// TODO: handle exception
+//		}
+//
+//		return "SuperAdmin_Dashboard";
+//	}
+//	
+
 	@GetMapping("/SuperAdmin_Dashboard")
 	public String dashboard(Model model, Principal principal) {
 
@@ -428,16 +518,14 @@ public class GuacamoleController {
 				}
 			}
 
-			// ensure default keys for each type
+			
 			for (Map<String, Long> map : typeStats.values()) {
 				map.putIfAbsent("up", 0L);
 				map.putIfAbsent("down", 0L);
 				map.putIfAbsent("unknown", 0L);
 			}
 
-			// 2. Fetch online / offline counts for users from AppUser
-			// You can write a repository method to return counts grouped by status,
-			// e.g. SELECT status, COUNT(*) FROM app_user GROUP BY status
+
 			List<Object[]> userStatusCounts = AppUserRepository.countByStatus();
 			long userOnline = 0;
 			long userOffline = 0;
@@ -451,6 +539,38 @@ public class GuacamoleController {
 					userOffline += c;
 				}
 			}
+			
+	        // NEW: Add health monitoring data
+	        List<Object[]> healthResults = AddPhysicalServerRepository.findHealthDataByVirtualizationType();
+	        
+	        Map<String, Map<String, Double>> healthStats = new HashMap<>();
+	        
+	        for (Object[] row : healthResults) {
+	            String type = (String) row[0];
+	            Double usedCpu = ((Number) row[1]).doubleValue();
+	            Double totalCpu = ((Number) row[2]).doubleValue();
+	            Double usedRam = ((Number) row[3]).doubleValue();
+	            Double totalRam = ((Number) row[4]).doubleValue();
+	            Double usedDisk = ((Number) row[5]).doubleValue();
+	            Double totalDisk = ((Number) row[6]).doubleValue();
+	            
+	            healthStats.putIfAbsent(type, new HashMap<>());
+	            
+	            // Calculate usage percentages
+	            double cpuUsage = totalCpu > 0 ? (usedCpu / totalCpu) * 100 : 0;
+	            double ramUsage = totalRam > 0 ? (usedRam / totalRam) * 100 : 0;
+	            double diskUsage = totalDisk > 0 ? (usedDisk / totalDisk) * 100 : 0;
+	            
+	            healthStats.get(type).put("cpuUsage", cpuUsage);
+	            healthStats.get(type).put("ramUsage", ramUsage);
+	            healthStats.get(type).put("diskUsage", diskUsage);
+	            healthStats.get(type).put("cpuFree", 100 - cpuUsage);
+	            healthStats.get(type).put("ramFree", 100 - ramUsage);
+	            healthStats.get(type).put("diskFree", 100 - diskUsage);
+	        }
+	        model.addAttribute("healthStats", healthStats);
+	        // Add to model
+	      
 
 			// 3. Other counts
 			long playlistCount = PlaylistRepository.count();
@@ -459,6 +579,7 @@ public class GuacamoleController {
 			long templateCount = repository.count();
 
 			// 4. Add to model
+			
 			model.addAttribute("typeStats", typeStats);
 			model.addAttribute("totalCountByType", totalCountByType);
 
@@ -484,152 +605,6 @@ public class GuacamoleController {
 		return "SuperAdmin_Dashboard";
 	}
 	
-
-//	@GetMapping("/SuperAdmin_Dashboard")
-//	public String dashboard(Model model, Principal principal) {
-//
-//		Authentication auth = (Authentication) principal;
-//		String username = auth.getName();
-//		try {
-//
-//			List<Object[]> results = AddPhysicalServerRepository.findVirtualizationTypeCounts();
-//			
-//			
-//			
-//			
-//
-//			Map<String, Map<String, Long>> typeStats = new HashMap<>();
-//			Map<String, Long> totalCountByType = new HashMap<>();
-//
-//			long overallUp = 0;
-//			long overallDown = 0;
-//
-//			for (Object[] row : results) {
-//				String type = (String) row[0];
-//				String rawStatus = (String) row[1];
-//				Long count = ((Number) row[2]).longValue();
-//
-//				String status = (rawStatus != null) ? rawStatus.toLowerCase() : "unknown";
-//
-//				typeStats.putIfAbsent(type, new HashMap<>());
-//				totalCountByType.putIfAbsent(type, 0L);
-//
-//				typeStats.get(type).put(status, count);
-//				totalCountByType.put(type, totalCountByType.get(type) + count);
-//
-//				if ("up".equals(status)) {
-//					overallUp += count;
-//				} else if ("down".equals(status)) {
-//					overallDown += count;
-//				}
-//			}
-//
-//			// ensure default keys for each type
-//			for (Map<String, Long> map : typeStats.values()) {
-//				map.putIfAbsent("up", 0L);
-//				map.putIfAbsent("down", 0L);
-//				map.putIfAbsent("unknown", 0L);
-//			}
-//
-//			// 2. Fetch online / offline counts for users from AppUser
-//			// You can write a repository method to return counts grouped by status,
-//			// e.g. SELECT status, COUNT(*) FROM app_user GROUP BY status
-//			List<Object[]> userStatusCounts = AppUserRepository.countByStatus();
-//			long userOnline = 0;
-//			long userOffline = 0;
-//			for (Object[] ur : userStatusCounts) {
-//				String st = (String) ur[0];
-//				Long c = ((Number) ur[1]).longValue();
-//				String lower = (st != null) ? st.toLowerCase() : "unknown";
-//				if ("online".equals(lower) || "up".equals(lower)) {
-//					userOnline += c;
-//				} else if ("offline".equals(lower) || "down".equals(lower)) {
-//					userOffline += c;
-//				}
-//			}
-//			
-//			List<Object[]> resourceStats = PhysicalServerHealthMonitoringRepository.fetchResourceStatsGroupedByVirtualizationType();
-//
-//			Map<String, Map<String, Double>> virtualizationResourceStats = new HashMap<>();
-//
-//			for (Object[] row : resourceStats) {
-//			    String virtualizationType = (String) row[0];
-//
-//			    Double totalCpu = getDoubleValue(row[1]);
-//			    Double usedCpu = getDoubleValue(row[2]);
-//			    Double freeCpu = getDoubleValue(row[3]);
-//
-//			    Double totalRam = getDoubleValue(row[4]);
-//			    Double usedRam = getDoubleValue(row[5]);
-//			    Double freeRam = getDoubleValue(row[6]);
-//
-//			    Double totalDisk = getDoubleValue(row[7]);
-//			    Double usedDisk = getDoubleValue(row[8]);
-//			    Double freeDisk = getDoubleValue(row[9]);
-//
-//			    Map<String, Double> statMap = new HashMap<>();
-//			    statMap.put("totalCpu", totalCpu);
-//			    statMap.put("usedCpu", usedCpu);
-//			    statMap.put("freeCpu", freeCpu);
-//
-//			    statMap.put("totalRam", totalRam);
-//			    statMap.put("usedRam", usedRam);
-//			    statMap.put("freeRam", freeRam);
-//
-//			    statMap.put("totalDisk", totalDisk);
-//			    statMap.put("usedDisk", usedDisk);
-//			    statMap.put("freeDisk", freeDisk);
-//
-//			    virtualizationResourceStats.put(virtualizationType, statMap);
-//			}
-//
-//			
-////			model.addAttribute("virtualizationResourceStats", virtualizationResourceStats);
-//
-//			
-//		
-//			
-//			
-//
-//			
-//			long playlistCount = PlaylistRepository.count();
-//			long subPlaylistCount = SubPlaylistRepository.count();
-//			long scenarioCount = ScenarioRepository.count();
-//			long templateCount = repository.count();
-//
-////			List<Integer> subProductIds = repository.findDistinctSubProductIds();
-////			//
-////			Map<String, Long> subProductCountMap = new HashMap<>();
-////			//
-////			for (Integer subProductId : subProductIds) {
-////
-////			}
-//
-//			// 4. Add to model
-//			model.addAttribute("typeStats", typeStats);
-//			model.addAttribute("totalCountByType", totalCountByType);
-//
-//			model.addAttribute("overallUp", overallUp);
-//			model.addAttribute("overallDown", overallDown);
-//
-//			model.addAttribute("userOnline", userOnline);
-//			model.addAttribute("userOffline", userOffline);
-//
-//			model.addAttribute("playlistCount", playlistCount);
-//			model.addAttribute("subPlaylistCount", subPlaylistCount);
-//			model.addAttribute("scenarioCount", scenarioCount);
-//			model.addAttribute("templateCount", templateCount);
-//
-//			model.addAttribute("pageTitle", "Super Admin Dashboard");
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			System.err.println("Exption_UserWise_Dshboard");
-//			// TODO: handle exception
-//		}
-//
-//		return "SuperAdmin_Dashboard";
-//	}
 	
 	private Double getDoubleValue(Object obj) {
 	    return (obj != null) ? ((Number) obj).doubleValue() : 0.0;

@@ -28,8 +28,23 @@ public interface AddPhysicalServerRepository extends JpaRepository<AddPhysicalSe
     @Query("SELECT a.virtualization_type, a.status, COUNT(a) FROM AddPhysicalServer a GROUP BY a.virtualization_type, a.status")
     List<Object[]> findVirtualizationTypeCounts();
     
-    // Or use native query (alternative)
-    @Query(value = "SELECT virtualization_type, status, COUNT(*) as count FROM add_physical_server GROUP BY virtualization_type, status", nativeQuery = true)
-    List<Object[]> getVirtualizationStatusCounts();
+ // Add this to your repository
+//    @Query("SELECT a.virtualization_type, h.used_cpu, h.total_cpu, h.used_ram, h.total_ram, h.used_disk, h.total_disk " +
+//           "FROM AddPhysicalServer a " +
+//           "JOIN PhysicalServerHealthMonitoring h ON a.ipAddress = h.physicalServerIp " +
+//           "WHERE a.ipAddress IS NOT NULL AND h.physicalServerIp IS NOT NULL")
+//    List<Object[]> findHealthDataByVirtualizationType();
+    
+    @Query(value = "SELECT a.virtualization_type, " +
+            "h.used_cpu, h.total_cpu, " +
+            "h.used_ram, h.total_ram, " +
+            "h.used_disk, h.total_disk " +
+            "FROM add_physical_server a " +
+            "INNER JOIN physical_server_health_monitoring h ON a.server_ip = h.physical_server_ip " +
+            "WHERE a.server_ip IS NOT NULL AND h.physical_server_ip IS NOT NULL", 
+    nativeQuery = true)
+List<Object[]> findHealthDataByVirtualizationType();
+    
+
 
 }

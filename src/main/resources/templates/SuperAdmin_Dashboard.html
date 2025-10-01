@@ -582,6 +582,155 @@ body {
 	font-weight: 800;
 }
 
+/* Health Monitoring Section Styles */
+.health-card {
+	border: none;
+	border-radius: 16px;
+	box-shadow: var(--card-shadow);
+	background: var(--white);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	overflow: hidden;
+	position: relative;
+	backdrop-filter: blur(10px);
+}
+
+.health-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 4px;
+	background: linear-gradient(90deg, #ff6b6b, #4361ee);
+}
+
+.health-card .card-header {
+	background: transparent;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+	padding: 1.5rem;
+	position: relative;
+}
+
+.health-card .card-body {
+	padding: 1.5rem;
+	flex: 1;
+}
+
+.health-metrics-container {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.health-metric-item {
+	flex: 1;
+	text-align: center;
+	padding: 1rem;
+	border-radius: 12px;
+	background: linear-gradient(135deg, var(--white) 0%, #f8f9fa 100%);
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	transition: all 0.3s ease;
+}
+
+.health-metric-item:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.health-metric-icon {
+	width: 50px;
+	height: 50px;
+	border-radius: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto 1rem;
+	font-size: 1.5rem;
+}
+
+.health-metric-icon.cpu {
+	background: rgba(255, 107, 107, 0.15);
+	color: #ff6b6b;
+}
+
+.health-metric-icon.ram {
+	background: rgba(76, 201, 240, 0.15);
+	color: #4cc9f0;
+}
+
+.health-metric-icon.disk {
+	background: rgba(67, 97, 238, 0.15);
+	color: #4361ee;
+}
+
+.health-metric-value {
+	font-size: 1.75rem;
+	font-weight: 800;
+	line-height: 1;
+	margin-bottom: 0.25rem;
+}
+
+.health-metric-label {
+	font-size: 0.8rem;
+	color: var(--gray);
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.health-progress-container {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.health-progress-item {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+.health-progress-label {
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--dark);
+	min-width: 50px;
+}
+
+.health-progress-bar-container {
+	flex: 1;
+	height: 8px;
+	background: rgba(0, 0, 0, 0.05);
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.health-progress-bar {
+	height: 100%;
+	border-radius: 4px;
+	transition: width 0.5s ease;
+}
+
+.health-progress-bar.cpu {
+	background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+}
+
+.health-progress-bar.ram {
+	background: linear-gradient(90deg, #4cc9f0, #6bd4ff);
+}
+
+.health-progress-bar.disk {
+	background: linear-gradient(90deg, #4361ee, #5a75ff);
+}
+
+.health-progress-value {
+	font-size: 0.85rem;
+	font-weight: 700;
+	min-width: 45px;
+	text-align: right;
+}
+
 /* Responsive adjustments */
 @media ( max-width : 768px) {
 	.chart-widget {
@@ -614,6 +763,9 @@ body {
 	}
 	.legend-value {
 		font-size: 1.3rem;
+	}
+	.health-metrics-container {
+		flex-direction: column;
 	}
 }
 </style>
@@ -728,8 +880,13 @@ body {
 								<div class="card-body">
 									<div class="row align-items-center h-100">
 										<!-- Total Count -->
+										<!-- Total Count -->
 										<div class="col-md-5 col-sm-12 mb-3 mb-md-0">
-											<div class="total-section">
+											<div class="total-section clickable-status"
+     th:data-type="${entry.key}"
+     data-status="total">
+
+
 												<div class="total-count"
 													th:text="${totalCountByType[entry.key] != null ? totalCountByType[entry.key] : 0}">
 													0</div>
@@ -741,7 +898,10 @@ body {
 										<div class="col-md-7 col-sm-12">
 											<div class="status-section">
 												<div class="status-grid">
-													<div class="status-item status-up">
+													<!-- Up -->
+													<div class="status-item status-up clickable-status"
+														th:attr="data-type=${entry.key}, data-status='up'">
+
 														<div class="status-icon">
 															<i class="fas fa-check-circle"></i>
 														</div>
@@ -749,12 +909,14 @@ body {
 															<div class="status-name">Up</div>
 															<div class="status-count"
 																th:text="${entry.value.get('up') != null ? entry.value.get('up') : 
-                                                                 (entry.value.get('UP') != null ? entry.value.get('UP') : 0)}">
-																0</div>
+									  (entry.value.get('UP') != null ? entry.value.get('UP') : 0)}">0</div>
 														</div>
 													</div>
 
-													<div class="status-item status-down">
+													<!-- Down -->
+													<div class="status-item status-down clickable-status"
+														th:attr="data-type=${entry.key}, data-status='down'">
+
 														<div class="status-icon">
 															<i class="fas fa-times-circle"></i>
 														</div>
@@ -762,13 +924,13 @@ body {
 															<div class="status-name">Down</div>
 															<div class="status-count"
 																th:text="${entry.value.get('down') != null ? entry.value.get('down') : 
-                                                                 (entry.value.get('DOWN') != null ? entry.value.get('DOWN') : 0)}">
-																0</div>
+									  (entry.value.get('DOWN') != null ? entry.value.get('DOWN') : 0)}">0</div>
 														</div>
 													</div>
 												</div>
 											</div>
 										</div>
+
 									</div>
 								</div>
 							</div>
@@ -785,6 +947,108 @@ body {
 							yet.</p>
 						<small>Configure servers to see analytics and status
 							information.</small>
+					</div>
+
+					<!-- Health Monitoring Section -->
+					<div class="row mb-5">
+						<div class="col-12 mb-4">
+							<h3 class="mb-4" style="color: var(--dark);">
+								<i class="fas fa-heartbeat mr-3"></i>Resource Usage by
+								Virtualization Type
+							</h3>
+						</div>
+
+						<div th:each="entry : ${healthStats}"
+							class="col-lg-4 col-md-6 col-sm-12 mb-4 animate-slide-up">
+							<div class="card health-card h-100">
+								<div class="card-header">
+									<div class="server-type-header">
+										<div class="server-type-icon"
+											style="background: linear-gradient(135deg, #ff6b6b, #4361ee);">
+											<i class="fas fa-chart-pie"></i>
+										</div>
+										<h5 class="server-type" th:text="${entry.key}">Virtualization
+											Type</h5>
+									</div>
+								</div>
+								<div class="card-body">
+									<!-- Resource Metrics in a single row -->
+									<div class="health-metrics-container">
+										<div class="health-metric-item">
+											<div class="health-metric-icon cpu">
+												<i class="fas fa-microchip"></i>
+											</div>
+											<div class="health-metric-value"
+												th:text="${#numbers.formatDecimal(entry.value.get('cpuUsage'), 1, 1)} + '%'">0%</div>
+											<div class="health-metric-label">CPU Usage</div>
+										</div>
+
+										<div class="health-metric-item">
+											<div class="health-metric-icon ram">
+												<i class="fas fa-memory"></i>
+											</div>
+											<div class="health-metric-value"
+												th:text="${#numbers.formatDecimal(entry.value.get('ramUsage'), 1, 1)} + '%'">0%</div>
+											<div class="health-metric-label">RAM Usage</div>
+										</div>
+
+										<div class="health-metric-item">
+											<div class="health-metric-icon disk">
+												<i class="fas fa-hdd"></i>
+											</div>
+											<div class="health-metric-value"
+												th:text="${#numbers.formatDecimal(entry.value.get('diskUsage'), 1, 1)} + '%'">0%</div>
+											<div class="health-metric-label">Disk Usage</div>
+										</div>
+									</div>
+
+									<!-- Progress Bars -->
+									<div class="health-progress-container">
+										<div class="health-progress-item">
+											<div class="health-progress-label">CPU</div>
+											<div class="health-progress-bar-container">
+												<div class="health-progress-bar cpu"
+													th:style="'width: ' + ${entry.value.get('cpuUsage')} + '%;'"></div>
+											</div>
+											<div class="health-progress-value"
+												th:text="${#numbers.formatDecimal(entry.value.get('cpuUsage'), 1, 1)} + '%'">0%</div>
+										</div>
+
+										<div class="health-progress-item">
+											<div class="health-progress-label">RAM</div>
+											<div class="health-progress-bar-container">
+												<div class="health-progress-bar ram"
+													th:style="'width: ' + ${entry.value.get('ramUsage')} + '%;'"></div>
+											</div>
+											<div class="health-progress-value"
+												th:text="${#numbers.formatDecimal(entry.value.get('ramUsage'), 1, 1)} + '%'">0%</div>
+										</div>
+
+										<div class="health-progress-item">
+											<div class="health-progress-label">DISK</div>
+											<div class="health-progress-bar-container">
+												<div class="health-progress-bar disk"
+													th:style="'width: ' + ${entry.value.get('diskUsage')} + '%;'"></div>
+											</div>
+											<div class="health-progress-value"
+												th:text="${#numbers.formatDecimal(entry.value.get('diskUsage'), 1, 1)} + '%'">0%</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- No Health Data Alert -->
+					<div th:if="${healthStats == null or healthStats.empty}"
+						class="alert alert-info text-center animate-fade-in">
+						<h4 class="mb-3">
+							<i class="fas fa-heartbeat mr-2"></i> No Health Data Available
+						</h4>
+						<p class="mb-2">Health monitoring data is not available for
+							configured servers.</p>
+						<small>Ensure servers have health monitoring configured to
+							see resource usage.</small>
 					</div>
 
 					<!-- Summary Statistics -->
@@ -812,41 +1076,41 @@ body {
 						<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
 							<a th:href="@{/guac/View_SubPalylist}"
 								style="text-decoration: none; color: inherit;" target="_blank">
-							<div class="summary-card" style="cursor: pointer;">
-								<div class="icon-wrapper">
-									<i class="fas fa-layer-group"></i>
+								<div class="summary-card" style="cursor: pointer;">
+									<div class="icon-wrapper">
+										<i class="fas fa-layer-group"></i>
+									</div>
+									<div class="count" th:text="${subPlaylistCount}">0</div>
+									<div class="label">SubPlaylists</div>
 								</div>
-								<div class="count" th:text="${subPlaylistCount}">0</div>
-								<div class="label">SubPlaylists</div>
-							</div>
 							</a>
 						</div>
 
 						<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-						<a th:href="@{/guac/View_Scenario}"
+							<a th:href="@{/guac/View_Scenario}"
 								style="text-decoration: none; color: inherit;" target="_blank">
-							<div class="summary-card" style="cursor: pointer;">
-								<div class="icon-wrapper">
-									<i class="fas fa-cubes"></i>
+								<div class="summary-card" style="cursor: pointer;">
+									<div class="icon-wrapper">
+										<i class="fas fa-cubes"></i>
+									</div>
+									<div class="count" th:text="${scenarioCount}">0</div>
+									<div class="label">Scenarios</div>
 								</div>
-								<div class="count" th:text="${scenarioCount}">0</div>
-								<div class="label">Scenarios</div>
-							</div>
 							</a>
 						</div>
 
 						<div class="col-lg-3 col-md-6 col-sm-12 mb-4">
 							<a th:href="@{/cloud_instance/view}"
 								style="text-decoration: none; color: inherit;" target="_blank">
-							<div class="summary-card" style="cursor: pointer;">
-								<div class="icon-wrapper">
-									<i class="fas fa-file-alt"></i>
+								<div class="summary-card" style="cursor: pointer;">
+									<div class="icon-wrapper">
+										<i class="fas fa-file-alt"></i>
+									</div>
+									<div class="count" th:text="${templateCount}">0</div>
+									<div class="label">Templates</div>
 								</div>
-								<div class="count" th:text="${templateCount}">0</div>
-								<div class="label">Templates</div>
-							</div>
 							</a>
-							
+
 						</div>
 					</div>
 				</div>
@@ -974,7 +1238,32 @@ body {
             }
         });
     });
+    
+  
 </script>
+
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		document.querySelectorAll('.clickable-status').forEach(function (el) {
+			el.addEventListener('click', function () {
+				const type = this.getAttribute('data-type');
+				const status = this.getAttribute('data-status');
+
+				handleClick(type, status);
+			});
+		});
+	});
+
+	function handleClick(type, status) {
+		alert("Clicked:", type, status);
+
+		// You can customize the behavior:
+		// window.location.href = `/servers?type=${type}&status=${status}`;
+		// or open a modal with details
+	}
+</script>
+
 
 </body>
 </html>
