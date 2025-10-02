@@ -10,4 +10,8 @@ public interface SubjectMasterRepository extends JpaRepository<SubjectMaster, In
 
 	
 
+	List<SubjectMaster> findBysemester_SemesterId(Integer semesterId);
+
+	
+
 }

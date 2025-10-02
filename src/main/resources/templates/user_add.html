@@ -51,7 +51,8 @@
 									</div>
 								</div>
 								<form th:action="@{/users/save}" method="post"
-									enctype="multipart/form-data" th:object="${objEnt}" onsubmit="return validateForm()">
+									enctype="multipart/form-data" th:object="${objEnt}"
+									onsubmit="return validateForm()">
 									<input type="hidden" id="userId" th:field="*{appUser.userId}" />
 									<div class="card-body">
 										<div class="row">
@@ -120,7 +121,7 @@
 														<!-- <option value="">Please Select</option> -->
 														<option value="2" selected>User</option>
 														<option value="1">Admin</option>
-														
+
 														<option value="3">Super Admin</option>
 
 													</select>
@@ -169,6 +170,54 @@
 														<!-- <option value=''>SELECT</option> -->
 														<option value='1'>Generation 1</option>
 														<option value='2'>Generation 2</option>
+													</select>
+												</div>
+
+
+											</div>
+
+
+
+											<!-- Department dropdown -->
+											<div class="col-md-6">
+												<div class="form-group">
+													<label>Department</label> <select id="departmentSelect"
+														class="form-control" name="departmentId"
+														th:field="*{appUser.departmentName}" required>
+														<option value="">-- Select Department --</option>
+														<option th:each="d : ${departments}"
+															th:value="${d.departmentId}"
+															th:text="${d.departmentName}"></option>
+													</select>
+												</div>
+												<!-- Semester dropdown -->
+												<div class="form-group">
+													<label>Semester</label> <select id="semesterSelect"
+														class="form-control" name="semesterId"
+														th:field="*{appUser.semesterName}" required>
+														<option value="">-- Select Semester --</option>
+													</select>
+												</div>
+
+											</div>
+											<div class="col-md-6">
+
+												<!-- Course dropdown -->
+												<div class="form-group">
+													<label>Course</label> <select id="courseSelect"
+														class="form-control" name="courseId"
+														th:field="*{appUser.courseName}" required>
+														<option value="">-- Select Course --</option>
+													</select>
+												</div>
+
+
+												<!-- Subject dropdown -->
+												<div class="form-group">
+													<label>Subject</label> <select id="subjectSelect"
+														class="form-control" name="subjectId"
+														th:field="*{appUser.subjectName}" required>
+														<option value="">-- Select Subject --</option>
 													</select>
 												</div>
 
@@ -249,5 +298,77 @@
 			$('.select2').select2()
 		}
 	})
+	
+	
+	$(document).ready(function() {
+    const deptSel = $('#departmentSelect');
+    const courseSel = $('#courseSelect');
+    const semSel = $('#semesterSelect');
+    const subjectSel = $('#subjectSelect');
+
+    deptSel.change(function() {
+        const deptId = $(this).val();
+        if (!deptId) {
+            courseSel.html('<option value="">-- Select Course --</option>');
+            semSel.html('<option value="">-- Select Semester --</option>');
+            subjectSel.html('<option value="">-- Select Subject --</option>');
+            return;
+        }
+        $.ajax({
+            url: '/guac/courses',
+            type: 'GET',
+            data: { departmentId: deptId },
+            success: function(data) {
+                courseSel.empty().append('<option value="">-- Select Course --</option>');
+                semSel.html('<option value="">-- Select Semester --</option>');
+                subjectSel.html('<option value="">-- Select Subject --</option>');
+                data.forEach(c => {
+                    courseSel.append(`<option value="${c.courseId}">${c.courseName}</option>`);
+                });
+            }
+        });
+    });
+
+    courseSel.change(function() {
+        const cId = $(this).val();
+        if (!cId) {
+            semSel.html('<option value="">-- Select Semester --</option>');
+            subjectSel.html('<option value="">-- Select Subject --</option>');
+            return;
+        }
+        $.ajax({
+            url: '/guac/semesters',
+            type: 'GET',
+            data: { courseId: cId },
+            success: function(data) {
+                semSel.empty().append('<option value="">-- Select Semester --</option>');
+                subjectSel.html('<option value="">-- Select Subject --</option>');
+                data.forEach(s => {
+                    semSel.append(`<option value="${s.semesterId}">${s.semesterName}</option>`);
+                });
+            }
+        });
+    });
+
+    semSel.change(function() {
+        const sId = $(this).val();
+        if (!sId) {
+            subjectSel.html('<option value="">-- Select Subject --</option>');
+            return;
+        }
+        $.ajax({
+            url: '/guac/subjects',
+            type: 'GET',
+            data: { semesterId: sId },
+            success: function(data) {
+                subjectSel.empty().append('<option value="">-- Select Subject --</option>');
+                data.forEach(sub => {
+                    subjectSel.append(`<option value="${sub.subjectId}">${sub.subjectName}</option>`);
+                });
+            }
+        });
+    });
+});
+
 </script>
 </html>

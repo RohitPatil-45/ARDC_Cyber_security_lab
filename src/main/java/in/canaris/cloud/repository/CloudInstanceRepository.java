@@ -156,25 +156,24 @@ public interface CloudInstanceRepository extends JpaRepository<CloudInstance, In
 	int updateInstanceNameAssigned(int labId);
 
 	List<CloudInstance> findByGuacamoleId(String guacamoleId);
-	
+
 	@Query("SELECT  c FROM CloudInstance c WHERE instance_name=:instance_name")
 	CloudInstance findByInstance(String instance_name);
 
+	@Query(value = "SELECT " +
+	        "pm.product_name, " +
+	        "spm.sub_product_name, " +
+	        "COUNT(ci.ID) AS instance_count " +
+	        "FROM cloud_instance ci " +
+	        "JOIN sub_product_master spm ON ci.subproduct_id = spm.ID " +
+	        "JOIN product_master pm ON spm.product_id = pm.ID " +
+	        "GROUP BY pm.product_name, spm.sub_product_name",
+	        nativeQuery = true)
+	List<Object[]> getSubProductDetails();
+
+	
 
 //	@Query("SELECT Count( c.subProductId) FROM CloudInstance c WHERE c.subProductId IS NOT NULL")
 //	List<Integer> findDistinctSubProductIds();
 
-
-
-	
-
-
-
-	
-	
-
-	
-	
-
-	
 }

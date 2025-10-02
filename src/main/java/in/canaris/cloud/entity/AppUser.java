@@ -77,6 +77,20 @@ public class AppUser implements Serializable {
 	
 	@Column(name = "status")
 	private String status;
+	
+	@Column(name = "department_name")
+	private String departmentName;
+	
+	@Column(name = "course_name")
+	private String courseName;
+	
+	
+	@Column(name = "semester_name")
+	private String semesterName;
+	
+	@Column(name = "subject_name")
+	private String subjectName;
+	
 
 	@Column(name = "password_changed_time")
 	private Date passwordChangedTime;
@@ -201,6 +215,38 @@ public class AppUser implements Serializable {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getDepartmentName() {
+		return departmentName;
+	}
+
+	public void setDepartmentName(String departmentName) {
+		this.departmentName = departmentName;
+	}
+
+	public String getCourseName() {
+		return courseName;
+	}
+
+	public void setCourseName(String courseName) {
+		this.courseName = courseName;
+	}
+
+	public String getSemesterName() {
+		return semesterName;
+	}
+
+	public void setSemesterName(String semesterName) {
+		this.semesterName = semesterName;
+	}
+
+	public String getSubjectName() {
+		return subjectName;
+	}
+
+	public void setSubjectName(String subjectName) {
+		this.subjectName = subjectName;
 	}
 	
 	

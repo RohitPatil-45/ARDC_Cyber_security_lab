@@ -113,7 +113,6 @@ import in.canaris.cloud.repository.SubProductRepository;
 import in.canaris.cloud.repository.ProductRepository;
 import in.canaris.cloud.repository.PhysicalServerHealthMonitoringRepository;
 
-
 import in.canaris.cloud.repository.SubPlaylistRepository;
 import in.canaris.cloud.repository.UserLabRepository;
 import in.canaris.cloud.service.DockerService;
@@ -229,9 +228,7 @@ public class GuacamoleController {
 
 	@Autowired
 	ProductRepository ProductRepository;
-	
-	
-	
+
 	@Autowired
 	PhysicalServerHealthMonitoringRepository PhysicalServerHealthMonitoringRepository;
 
@@ -518,13 +515,11 @@ public class GuacamoleController {
 				}
 			}
 
-			
 			for (Map<String, Long> map : typeStats.values()) {
 				map.putIfAbsent("up", 0L);
 				map.putIfAbsent("down", 0L);
 				map.putIfAbsent("unknown", 0L);
 			}
-
 
 			List<Object[]> userStatusCounts = AppUserRepository.countByStatus();
 			long userOnline = 0;
@@ -539,38 +534,48 @@ public class GuacamoleController {
 					userOffline += c;
 				}
 			}
-			
-	        // NEW: Add health monitoring data
-	        List<Object[]> healthResults = AddPhysicalServerRepository.findHealthDataByVirtualizationType();
-	        
-	        Map<String, Map<String, Double>> healthStats = new HashMap<>();
-	        
-	        for (Object[] row : healthResults) {
-	            String type = (String) row[0];
-	            Double usedCpu = ((Number) row[1]).doubleValue();
-	            Double totalCpu = ((Number) row[2]).doubleValue();
-	            Double usedRam = ((Number) row[3]).doubleValue();
-	            Double totalRam = ((Number) row[4]).doubleValue();
-	            Double usedDisk = ((Number) row[5]).doubleValue();
-	            Double totalDisk = ((Number) row[6]).doubleValue();
-	            
-	            healthStats.putIfAbsent(type, new HashMap<>());
-	            
-	            // Calculate usage percentages
-	            double cpuUsage = totalCpu > 0 ? (usedCpu / totalCpu) * 100 : 0;
-	            double ramUsage = totalRam > 0 ? (usedRam / totalRam) * 100 : 0;
-	            double diskUsage = totalDisk > 0 ? (usedDisk / totalDisk) * 100 : 0;
-	            
-	            healthStats.get(type).put("cpuUsage", cpuUsage);
-	            healthStats.get(type).put("ramUsage", ramUsage);
-	            healthStats.get(type).put("diskUsage", diskUsage);
-	            healthStats.get(type).put("cpuFree", 100 - cpuUsage);
-	            healthStats.get(type).put("ramFree", 100 - ramUsage);
-	            healthStats.get(type).put("diskFree", 100 - diskUsage);
-	        }
-	        model.addAttribute("healthStats", healthStats);
-	        // Add to model
-	      
+
+			// NEW: Add health monitoring data
+			List<Object[]> healthResults = AddPhysicalServerRepository.findHealthDataByVirtualizationType();
+
+			Map<String, Map<String, Double>> healthStats = new HashMap<>();
+
+			for (Object[] row : healthResults) {
+				String type = (String) row[0];
+				Double usedCpu = ((Number) row[1]).doubleValue();
+				Double totalCpu = ((Number) row[2]).doubleValue();
+				Double usedRam = ((Number) row[3]).doubleValue();
+				Double totalRam = ((Number) row[4]).doubleValue();
+				Double usedDisk = ((Number) row[5]).doubleValue();
+				Double totalDisk = ((Number) row[6]).doubleValue();
+
+				healthStats.putIfAbsent(type, new HashMap<>());
+
+				// Calculate usage percentages
+				double cpuUsage = totalCpu > 0 ? (usedCpu / totalCpu) * 100 : 0;
+				double ramUsage = totalRam > 0 ? (usedRam / totalRam) * 100 : 0;
+				double diskUsage = totalDisk > 0 ? (usedDisk / totalDisk) * 100 : 0;
+
+				healthStats.get(type).put("cpuUsage", cpuUsage);
+				healthStats.get(type).put("ramUsage", ramUsage);
+				healthStats.get(type).put("diskUsage", diskUsage);
+				healthStats.get(type).put("cpuFree", 100 - cpuUsage);
+				healthStats.get(type).put("ramFree", 100 - ramUsage);
+				healthStats.get(type).put("diskFree", 100 - diskUsage);
+			}
+
+			List<Object[]> subProductDetails = repository.getSubProductDetails();
+
+			List<Map<String, Object>> subProductList = new ArrayList<>();
+			for (Object[] row : subProductDetails) {
+				Map<String, Object> map = new HashMap<>();
+				map.put("productName", row[0]);
+				map.put("subProductName", row[1]);
+				map.put("instanceCount", row[2]);
+				subProductList.add(map);
+			}
+			model.addAttribute("subProductList", subProductList);
+			// Add to model
 
 			// 3. Other counts
 			long playlistCount = PlaylistRepository.count();
@@ -579,7 +584,8 @@ public class GuacamoleController {
 			long templateCount = repository.count();
 
 			// 4. Add to model
-			
+
+			model.addAttribute("healthStats", healthStats);
 			model.addAttribute("typeStats", typeStats);
 			model.addAttribute("totalCountByType", totalCountByType);
 
@@ -604,12 +610,10 @@ public class GuacamoleController {
 
 		return "SuperAdmin_Dashboard";
 	}
-	
-	
-	private Double getDoubleValue(Object obj) {
-	    return (obj != null) ? ((Number) obj).doubleValue() : 0.0;
-	}
 
+	private Double getDoubleValue(Object obj) {
+		return (obj != null) ? ((Number) obj).doubleValue() : 0.0;
+	}
 
 //	@GetMapping("/SuperAdmin_Dashboard")
 //	public String dashboard(Model model, Principal principal) {
@@ -2084,6 +2088,20 @@ public class GuacamoleController {
 			return map;
 		}).collect(Collectors.toList());
 	}
+	
+	@GetMapping("/subjects")
+	@ResponseBody
+	public List<Map<String, Object>> getSubjectsBySemester(@RequestParam("semesterId") Integer semesterId) {
+	    List<SubjectMaster> subjects = SubjectMasterRepository.findBysemester_SemesterId(semesterId);
+
+	    return subjects.stream().map(sub -> {
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("subjectId", sub.getSubjectId());
+	        map.put("subjectName", sub.getSubjectName());
+	        return map;
+	    }).collect(Collectors.toList());
+	}
+
 
 	@GetMapping("/Add_Subject")
 	public String showAddSubjectForm(@RequestParam(value = "Id", required = false) Integer id, Model model) {
@@ -5477,5 +5495,114 @@ public class GuacamoleController {
 					.body("Error updating session: " + e.getMessage());
 		}
 	}
+
+	@PostMapping("/getserverdetails")
+	@ResponseBody
+	public List<Map<String, Object>> getServerDetails(@RequestParam("type") String type,
+			@RequestParam("status") String status, Principal principal) {
+		List<Object[]> results;
+		try {
+			String username = principal.getName();
+
+			if (type.equalsIgnoreCase("all")) {
+				if (status.equalsIgnoreCase("operational")) {
+					status = "up";
+				} else {
+					status = "down";
+				}
+				results = AddPhysicalServerRepository.findServerDetailsByAllStatus(status);
+			}
+
+			else if (status.equalsIgnoreCase("total")) {
+				results = AddPhysicalServerRepository.findServerDetailsByTypeAndAllStatus(type);
+			} else {
+				if (status.equalsIgnoreCase("Up")) {
+					status = "up";
+				} else {
+					status = "down";
+				}
+
+				results = AddPhysicalServerRepository.findServerDetailsByTypeAndStatus(type, status);
+			}
+
+			List<Map<String, Object>> serverList = new ArrayList<>();
+
+			for (Object[] row : results) {
+				Map<String, Object> server = new HashMap<>();
+				server.put("serverName", row[0]);
+				server.put("ip", row[1]);
+				server.put("status", row[2]);
+				serverList.add(server);
+			}
+
+			return serverList;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Collections.emptyList();
+		}
+	}
+
+	@PostMapping("/gethealthdetails")
+	@ResponseBody
+	public List<Map<String, Object>> getHealthDetails(@RequestParam String type, @RequestParam String resource) {
+		List<Map<String, Object>> data = new ArrayList<>();
+		List<Object[]> results = new ArrayList<>();
+
+		// Call specific query based on resource
+		if ("cpu".equalsIgnoreCase(resource)) {
+			results = PhysicalServerHealthMonitoringRepository.findCpuHealthByVirtualizationType(type);
+		} else if ("ram".equalsIgnoreCase(resource)) {
+			results = PhysicalServerHealthMonitoringRepository.findRamHealthByVirtualizationType(type);
+		} else if ("disk".equalsIgnoreCase(resource)) {
+			results = PhysicalServerHealthMonitoringRepository.findDiskHealthByVirtualizationType(type);
+		} else {
+			return data; // Empty list if resource is invalid
+		}
+
+		for (Object[] row : results) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("serverName", row[0]);
+			map.put("ip", row[1]);
+
+			double used = ((Number) row[2]).doubleValue();
+			double total = ((Number) row[3]).doubleValue();
+			double free = ((Number) row[4]).doubleValue();
+			double usage = total > 0 ? (used / total) * 100 : 0;
+
+			map.put("used", used);
+			map.put("total", total);
+			map.put("free", free);
+			map.put("usagePercent", usage);
+
+			data.add(map);
+		}
+
+		return data;
+	}
+	
+	
+	@PostMapping("/getuserdetails")
+	@ResponseBody
+	public List<Map<String, Object>> getUserDetails(@RequestParam("status") String status) {
+	    if (status.equalsIgnoreCase("online")) {
+	        status = "online";
+	    } else {
+	        status = "offline";
+	    }
+
+	    List<Object[]> users = AppUserRepository.findUserNameAndStatusByStatus(status);
+	    List<Map<String, Object>> result = new ArrayList<>();
+
+	    for (Object[] user : users) {
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("username", user[0].toString());
+	        map.put("status", user[1].toString());
+	        result.add(map);
+	    }
+
+	    return result;
+	}
+
 
 }

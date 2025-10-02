@@ -30,8 +30,9 @@ import in.canaris.cloud.entity.AppUser;
 import in.canaris.cloud.entity.Switch;
 import in.canaris.cloud.entity.UserMasterRole;
 import in.canaris.cloud.entity.UserRole;
-
+import in.canaris.cloud.openstack.entity.DepartmentMaster;
 import in.canaris.cloud.repository.AppRoleRepository;
+import in.canaris.cloud.repository.DepartmentMasterRepository;
 import in.canaris.cloud.repository.GroupRepository;
 import in.canaris.cloud.repository.SwitchRepository;
 import in.canaris.cloud.repository.UserRepository;
@@ -63,6 +64,10 @@ public class UserController {
 	
 	@Autowired
 	private UserDetailsServiceImpl userDetailsServiceImpl;
+	
+	
+	@Autowired
+	DepartmentMasterRepository DepartmentMasterRepository;
 
 //	@Autowired
 //	private SwitchRepository switchRepository;
@@ -110,15 +115,33 @@ public class UserController {
 		return "user_view";
 	}
 
+//	@GetMapping("/new")
+//	public String addUser(Model model) {
+//		UserMasterRole user = new UserMasterRole();
+//		model.addAttribute("objEnt", user);
+//		model.addAttribute("pageTitle", "Create new User");
+//		model.addAttribute("groupList", groupRepository.getAllGroups());
+//		model.addAttribute("switchList", switchRepository.getAllSwitch());
+//		return "user_add";
+//	}
+	
+	
 	@GetMapping("/new")
 	public String addUser(Model model) {
-		UserMasterRole user = new UserMasterRole();
-		model.addAttribute("objEnt", user);
-		model.addAttribute("pageTitle", "Create new User");
-		model.addAttribute("groupList", groupRepository.getAllGroups());
-		model.addAttribute("switchList", switchRepository.getAllSwitch());
-		return "user_add";
+	    UserMasterRole user = new UserMasterRole();
+	    model.addAttribute("objEnt", user);
+	    model.addAttribute("pageTitle", "Create new User");
+
+	    model.addAttribute("groupList", groupRepository.getAllGroups());
+	    model.addAttribute("switchList", switchRepository.getAllSwitch());
+
+	    // Also send departments for the first dropdown
+	    List<DepartmentMaster> depts = DepartmentMasterRepository.findAll();
+	    model.addAttribute("departments", depts);
+
+	    return "user_add";
 	}
+
 
 	@PostMapping("/save")
 	public String saveUser(UserMasterRole userRole, RedirectAttributes redirectAttributes, BindingResult result,

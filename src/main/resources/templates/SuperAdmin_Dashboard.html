@@ -9,6 +9,12 @@
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+
+<!-- Add these to your head section -->
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 
@@ -92,6 +98,12 @@ body {
 	transition: all 0.3s ease;
 	position: relative;
 	overflow: hidden;
+	cursor: pointer;
+}
+
+.status-item:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 .status-item::before {
@@ -172,6 +184,13 @@ body {
 	margin-bottom: 1.5rem;
 	position: relative;
 	overflow: hidden;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.total-section:hover {
+	transform: scale(1.02);
+	box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3);
 }
 
 .total-section::before {
@@ -481,6 +500,12 @@ body {
 	background: rgba(0, 0, 0, 0.03);
 	transition: all 0.3s ease;
 	border: 1px solid rgba(0, 0, 0, 0.05);
+	cursor: pointer;
+}
+
+.legend-item:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .legend-color {
@@ -631,6 +656,7 @@ body {
 	background: linear-gradient(135deg, var(--white) 0%, #f8f9fa 100%);
 	border: 1px solid rgba(0, 0, 0, 0.05);
 	transition: all 0.3s ease;
+	cursor: pointer;
 }
 
 .health-metric-item:hover {
@@ -768,6 +794,63 @@ body {
 		flex-direction: column;
 	}
 }
+
+/* Animation for floating effect */
+@
+keyframes float { 0% {
+	transform: translate(0, 0);
+}
+50
+
+
+%
+{
+transform
+
+
+:
+
+
+translate
+(
+
+
+10px
+,
+10px
+
+
+)
+;
+
+
+}
+100
+
+
+%
+{
+transform
+
+
+:
+
+
+translate
+(
+
+
+0
+,
+0
+
+
+)
+;
+
+
+}
+}
 </style>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -813,12 +896,14 @@ body {
 										<canvas id="barChart"></canvas>
 									</div>
 									<div class="chart-legends">
-										<div class="legend-item">
+										<div class="legend-item clickable-legend"
+											data-status="operational">
 											<span class="legend-color operational"></span> <span
 												class="legend-label">Operational</span> <span
 												class="legend-value" th:text="${overallUp}">0</span>
 										</div>
-										<div class="legend-item">
+										<div class="legend-item clickable-legend"
+											data-status="offline">
 											<span class="legend-color offline"></span> <span
 												class="legend-label">Offline</span> <span
 												class="legend-value" th:text="${overallDown}">0</span>
@@ -839,12 +924,13 @@ body {
 										<canvas id="pieChart"></canvas>
 									</div>
 									<div class="chart-legends">
-										<div class="legend-item">
+										<div class="legend-item clickable-legend" data-status="online">
 											<span class="legend-color online"></span> <span
 												class="legend-label">Online Users</span> <span
 												class="legend-value" th:text="${userOnline}">0</span>
 										</div>
-										<div class="legend-item">
+										<div class="legend-item clickable-legend"
+											data-status="offline-user">
 											<span class="legend-color offline-user"></span> <span
 												class="legend-label">Offline Users</span> <span
 												class="legend-value" th:text="${userOffline}">0</span>
@@ -880,13 +966,9 @@ body {
 								<div class="card-body">
 									<div class="row align-items-center h-100">
 										<!-- Total Count -->
-										<!-- Total Count -->
 										<div class="col-md-5 col-sm-12 mb-3 mb-md-0">
 											<div class="total-section clickable-status"
-     th:data-type="${entry.key}"
-     data-status="total">
-
-
+												th:data-type="${entry.key}" data-status="total">
 												<div class="total-count"
 													th:text="${totalCountByType[entry.key] != null ? totalCountByType[entry.key] : 0}">
 													0</div>
@@ -901,7 +983,6 @@ body {
 													<!-- Up -->
 													<div class="status-item status-up clickable-status"
 														th:attr="data-type=${entry.key}, data-status='up'">
-
 														<div class="status-icon">
 															<i class="fas fa-check-circle"></i>
 														</div>
@@ -916,7 +997,6 @@ body {
 													<!-- Down -->
 													<div class="status-item status-down clickable-status"
 														th:attr="data-type=${entry.key}, data-status='down'">
-
 														<div class="status-icon">
 															<i class="fas fa-times-circle"></i>
 														</div>
@@ -974,7 +1054,8 @@ body {
 								<div class="card-body">
 									<!-- Resource Metrics in a single row -->
 									<div class="health-metrics-container">
-										<div class="health-metric-item">
+										<div class="health-metric-item clickable-health"
+											th:attr="data-type=${entry.key}, data-resource='cpu'">
 											<div class="health-metric-icon cpu">
 												<i class="fas fa-microchip"></i>
 											</div>
@@ -983,7 +1064,8 @@ body {
 											<div class="health-metric-label">CPU Usage</div>
 										</div>
 
-										<div class="health-metric-item">
+										<div class="health-metric-item clickable-health"
+											th:attr="data-type=${entry.key}, data-resource='ram'">
 											<div class="health-metric-icon ram">
 												<i class="fas fa-memory"></i>
 											</div>
@@ -992,7 +1074,8 @@ body {
 											<div class="health-metric-label">RAM Usage</div>
 										</div>
 
-										<div class="health-metric-item">
+										<div class="health-metric-item clickable-health"
+											th:attr="data-type=${entry.key}, data-resource='disk'">
 											<div class="health-metric-icon disk">
 												<i class="fas fa-hdd"></i>
 											</div>
@@ -1114,10 +1197,168 @@ body {
 						</div>
 					</div>
 				</div>
-			</section>
+
+				<!-- Sub Product Details Section -->
+				<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 rounded">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0 text-dark">
+                    <i class="fas fa-cube me-2"></i>Product Details
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th><i class="fas fa-box me-2"></i>Product Name</th>
+                                <th><i class="fas fa-layer-group me-2"></i>Sub Product Name</th>
+                                <th class="text-center"><i class="fas fa-server me-2"></i>Instance Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="item, status : ${subProductList}">
+                                <td th:text="${item.productName}">Product Name</td>
+                                <td th:text="${item.subProductName}">Sub Product Name</td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary px-3 py-2" th:text="${item.instanceCount}">0</span>
+                                </td>
+                            </tr>
+
+                            <!-- Show message if no data -->
+                            <tr th:if="${subProductList.empty}">
+                                <td colspan="3" class="text-center py-5 text-muted">
+                                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                                    <div>
+                                        <strong>No Data Available</strong>
+                                        <p class="mb-0">No sub product details found in the system.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+				
+		</div>
+		</section>
+
+
+
+		<!-- Enhanced Bootstrap Modal - Fixed Version -->
+		<!-- MODAL -->
+		<div class="modal fade" id="serverModalstatus" tabindex="-1"
+			role="dialog" aria-hidden="true">
+			<div class="modal-dialog modal-xl" role="document">
+				<div class="modal-content">
+
+					<div class="modal-header">
+						<h5 class="modal-title">Server Details</h5>
+						<!--         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+						<button type="button" class="btn" data-bs-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+							<!-- this makes it clickable -->
+						</button>
+					</div>
+
+					<div class="modal-body">
+						<table id="serverDetailsTable"
+							class="table table-bordered table-striped" width="100%">
+							<thead>
+								<tr>
+									<th>Sr</th>
+									<th>Server Name</th>
+									<th>IP Address</th>
+									<th>Status</th>
+								</tr>
+							</thead>
+							<tbody></tbody>
+							<!-- Will be populated by JS -->
+						</table>
+					</div>
+
+				</div>
+			</div>
 		</div>
 
-		<div th:replace="fragments/footer :: footer"></div>
+
+
+		<div class="modal fade" id="healthModal" tabindex="-1" role="dialog"
+			aria-hidden="true">
+			<div class="modal-dialog modal-xl" role="document">
+				<div class="modal-content">
+
+					<div class="modal-header">
+						<h5 class="modal-title">Health Details</h5>
+						<button type="button" class="btn close" data-bs-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+
+					<div class="modal-body">
+						<table id="healthDetailsTable"
+							class="table table-bordered table-striped" width="100%">
+							<thead>
+								<tr>
+									<th>Sr</th>
+									<th>Server Name</th>
+									<th>IP Address</th>
+									<th>Total</th>
+									<th>Used</th>
+									<th>Free</th>
+									<th>Usage %</th>
+								</tr>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		
+		
+		
+		<!-- User Status Modal -->
+<div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Details</h5>
+                <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="userDetailsTable" class="table table-bordered table-striped" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Sr</th>
+                            <th>Username</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+	</div>
+
+
+
+	<div th:replace="fragments/footer :: footer"></div>
 	</div>
 
 	<div th:replace="template :: jsscript"></div>
@@ -1125,6 +1366,23 @@ body {
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 	<script th:inline="javascript">
+	
+	$(document).ready(function() {
+		  // Close modal when clicking outside modal-dialog (on backdrop) for all modals
+		  $('.modal').on('click', function(event) {
+		    if ($(event.target).hasClass('modal')) {
+		      $(this).modal('hide');
+		    }
+		  });
+
+		  // Prevent modal closing when clicking inside modal-dialog for all modals
+		  $('.modal .modal-dialog').on('click', function(event) {
+		    event.stopPropagation();
+		  });
+		});
+
+	
+	
     document.addEventListener('DOMContentLoaded', function() {
         const upCount = [[${overallUp}]] || 0;
         const downCount = [[${overallDown}]] || 0;
@@ -1237,33 +1495,363 @@ body {
                 }
             }
         });
+        
+        // Click handlers for status items
+        document.querySelectorAll('.clickable-status').forEach(function(el) {
+            el.addEventListener('click', function() {
+                const type = this.getAttribute('data-type');
+                const status = this.getAttribute('data-status');
+                handleStatusClick(type, status);
+            });
+        });
+        
+        // Click handlers for chart legends
+//         document.querySelectorAll('.clickable-legend').forEach(function(el) {
+//             el.addEventListener('click', function() {
+//                 const status = this.getAttribute('data-status');
+//                 handleLegendClick(status);
+//             });
+//         });
+        
+        // Click handlers for chart legends - Server status
+document.querySelectorAll('.clickable-legend[data-status="operational"], .clickable-legend[data-status="offline"]').forEach(function(el) {
+    el.addEventListener('click', function() {
+        const status = this.getAttribute('data-status');
+        handleServerLegendClick(status);
     });
+});
+
+// Click handlers for chart legends - User status
+document.querySelectorAll('.clickable-legend[data-status="online"], .clickable-legend[data-status="offline-user"]').forEach(function(el) {
+    el.addEventListener('click', function() {
+        const status = this.getAttribute('data-status');
+        handleUserLegendClick(status);
+    });
+});
+        
+        // Click handlers for health metrics
+        document.querySelectorAll('.clickable-health').forEach(function(el) {
+            el.addEventListener('click', function() {
+                const type = this.getAttribute('data-type');
+                const resource = this.getAttribute('data-resource');
+                handleHealthClick(type, resource);
+            });
+        });
+        
+       
+        function handleStatusClick(type, status) {
+        	
+       
+            $.ajax({
+                url: '/guac/getserverdetails',
+                method: 'POST',
+                data: {
+                    type: type,
+                    status: status
+                },
+                success: function (response) {
+                    // Update modal title
+                    $('#serverModalstatus .modal-title').text(`${type} Servers - ${status.toUpperCase()}`);
+
+                    // Show the modal
+                    $('#serverModalstatus').modal('show');
+
+                    // Delay to ensure modal/table is ready
+                    setTimeout(function () {
+                        // Initialize DataTable (or re-initialize)
+                        let table = $('#serverDetailsTable').DataTable({
+                            responsive: true,
+                            paging: true,
+                            searching: true,
+                            ordering: true,
+                            destroy: true,  
+                            autoWidth: false,
+                            pageLength: 10,
+                            lengthChange: true,
+                            language: {
+                                search: "Filter:",
+                                lengthMenu: "Show _MENU_ entries",
+                                info: "Showing _START_ to _END_ of _TOTAL_ servers",
+                            },
+                            columnDefs: [
+                                { targets: 0, className: 'text-center', width: "5%" }, // Sr No
+                                { targets: 3, className: 'text-center' } // Status
+                            ],
+
+                            // ADD Export Buttons here:
+                            dom: 'Bfrtip', // Needs Buttons extension to show buttons
+                            buttons: [
+                                'copy', 'csv', 'excel', 'pdf', 'print'
+                            ]
+                        });
+
+                        table.clear(); // clear previous data
+
+                        // Add rows from response
+                        response.forEach((server, index) => {
+                            const statusBadge = server.status.toLowerCase() === 'up'
+                                ? '<span class="badge badge-success">UP</span>'
+                                : '<span class="badge badge-danger">DOWN</span>';
+
+                            table.row.add([
+                                index + 1,                  // Sr No
+                                server.serverName || '-',  // Server Name
+                                server.ip || '-',          // IP
+                                statusBadge                // Status
+                            ]);
+                        });
+
+                        table.draw();
+                    }, 100);
+                },
+                error: function () {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Failed to fetch server details.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+
+
+
+        
+        // Function to handle legend clicks
+      // Function to handle server legend clicks
+function handleServerLegendClick(status) {
+    let title = '';
+    let modalTitle = '';
+
+    if (status === 'operational') {
+        title = 'Operational Servers';
+        modalTitle = 'Operational Servers';
+    } else if (status === 'offline') {
+        title = 'Offline Servers';
+        modalTitle = 'Offline Servers';
+    }
+
+    // Fetch and show server data in server modal
+    $.ajax({
+        url: '/guac/getserverdetails',
+        method: 'POST',
+        data: {
+            type: "all",
+            status: status
+        },
+        success: function (response) {
+            $('#serverModalstatus .modal-title').text(modalTitle);
+            $('#serverModalstatus').modal('show');
+
+            setTimeout(function () {
+                let table = $('#serverDetailsTable').DataTable({
+                    responsive: true,
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    destroy: true,
+                    autoWidth: false,
+                    pageLength: 10,
+                    lengthChange: true,
+                    language: {
+                        search: "Filter:",
+                        lengthMenu: "Show _MENU_ entries",
+                        info: "Showing _START_ to _END_ of _TOTAL_ servers",
+                    },
+                    columnDefs: [
+                        { targets: 0, className: 'text-center', width: "5%" },
+                        { targets: 3, className: 'text-center' }
+                    ],
+                    dom: 'Bfrtip',
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+                });
+
+                table.clear();
+
+                response.forEach((server, index) => {
+                    const statusBadge = server.status?.toLowerCase() === 'up'
+                        ? '<span class="badge badge-success">UP</span>'
+                        : '<span class="badge badge-danger">DOWN</span>';
+
+                    table.row.add([
+                        index + 1,
+                        server.serverName || '-',
+                        server.ip || '-',
+                        statusBadge
+                    ]);
+                });
+
+                table.draw();
+            }, 100);
+        },
+        error: function () {
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to fetch server details.',
+                icon: 'error'
+            });
+        }
+    });
+}
+
+// Function to handle user legend clicks
+function handleUserLegendClick(status) {
+    let modalTitle = '';
     
-  
+    if (status === 'online') {
+        modalTitle = 'Online Users';
+    } else if (status === 'offline-user') {
+        modalTitle = 'Offline Users';
+    }
+
+    // Fetch and show user data in user modal
+    $.ajax({
+        url: '/guac/getuserdetails', // You'll need to create this endpoint
+        method: 'POST',
+        data: {
+            status: status,
+        },
+        success: function (response) {
+            $('#userModal .modal-title').text(modalTitle);
+            $('#userModal').modal('show');
+
+            setTimeout(function () {
+                let table = $('#userDetailsTable').DataTable({
+                    responsive: true,
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    destroy: true,
+                    autoWidth: false,
+                    pageLength: 10,
+                    lengthChange: true,
+                    language: {
+                        search: "Filter:",
+                        lengthMenu: "Show _MENU_ entries",
+                        info: "Showing _START_ to _END_ of _TOTAL_ users",
+                    },
+                    columnDefs: [
+                        { targets: 0, className: 'text-center', width: "5%" },
+                        { targets: 2, className: 'text-center' }
+                    ],
+                    dom: 'Bfrtip',
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+                });
+
+                table.clear();
+
+                response.forEach((user, index) => {
+                    const statusBadge = user.status?.toLowerCase() === 'online'
+                        ? '<span class="badge badge-success">ONLINE</span>'
+                        : '<span class="badge badge-danger">OFFLINE</span>';
+
+                    table.row.add([
+                        index + 1,
+                        user.username || '-',
+                        statusBadge
+                    ]);
+                });
+
+                table.draw();
+            }, 100);
+        },
+        error: function () {
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to fetch user details.',
+                icon: 'error'
+            });
+        }
+    });
+}
+        
+        // Function to handle health metric clicks
+function handleHealthClick(type, resource) {
+    $.ajax({
+        url: '/guac/gethealthdetails',
+        method: 'POST',
+        data: {
+            type: type,
+            resource: resource
+        },
+        success: function (response) {
+            const resourceLabel = resource.toUpperCase(); // CPU / RAM / DISK
+            $('#healthModal .modal-title').text(`${type} - ${resourceLabel} Usage Details`);
+            $('#healthModal').modal('show');
+
+            setTimeout(function () {
+                let table = $('#healthDetailsTable').DataTable({
+                    responsive: true,
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    destroy: true,
+                    autoWidth: false,
+                    pageLength: 10,
+                    lengthChange: true,
+                    language: {
+                        search: "Filter:",
+                        lengthMenu: "Show _MENU_ entries",
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    },
+                    columnDefs: [
+                        { targets: 0, className: 'text-center', width: "5%" }, // Sr No
+                        { targets: 4, className: 'text-center' } // Usage %
+                    ],
+                    dom: 'Bfrtip',
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+                });
+
+                table.clear();
+
+                response.forEach((entry, index) => {
+                    const usage = `${entry.usagePercent.toFixed(2)}%`;
+                    table.row.add([
+                        index + 1,
+                        entry.serverName || '-',
+                        entry.ip || '-',
+                        entry.total || '-',
+                        entry.used || '-',
+                        entry.free || '-',
+                        
+                        usage
+                    ]);
+                });
+
+                table.draw();
+            }, 100);
+        },
+        error: function () {
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to fetch health details.',
+                icon: 'error'
+            });
+        }
+    });
+}
+    })
+
 </script>
 
 
-<script>
-	document.addEventListener('DOMContentLoaded', function () {
-		document.querySelectorAll('.clickable-status').forEach(function (el) {
-			el.addEventListener('click', function () {
-				const type = this.getAttribute('data-type');
-				const status = this.getAttribute('data-status');
 
-				handleClick(type, status);
-			});
-		});
-	});
-
-	function handleClick(type, status) {
-		alert("Clicked:", type, status);
-
-		// You can customize the behavior:
-		// window.location.href = `/servers?type=${type}&status=${status}`;
-		// or open a modal with details
-	}
-</script>
-
-
+	<!-- Add these before your existing script tag -->
+	<script
+		src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+	<script
+		src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+	<script
+		src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+	<script
+		src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+	<script
+		src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+	<script
+		src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
