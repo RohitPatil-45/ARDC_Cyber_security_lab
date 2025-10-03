@@ -97,7 +97,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 					Authentication authentication) throws IOException, ServletException {
 				String landingpageURl = "/cloud_instance/view"; // Default landing page
 				String user = authentication.getName();
-				AppUser userObj = appUserRepository.findByuserName(user);
+				AppUser userObj = appUserRepository.findOneByUserName(user);
 				Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
 				
 				if(userObj.getIsFirstTimeLogin())

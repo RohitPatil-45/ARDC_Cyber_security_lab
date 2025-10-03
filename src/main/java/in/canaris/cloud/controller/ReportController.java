@@ -1598,7 +1598,7 @@ public class ReportController {
 				mav.addObject("objEnt", objEnt);
 
 			} else {
-				AppUser obj = appRepository.findByuserName(username);
+				AppUser obj = appRepository.findOneByUserName(username);
 				String groupName = obj.getGroupName();
 
 				mav.addObject("groupList", groupRepository.getByGroups(groupName));
@@ -1660,7 +1660,7 @@ public class ReportController {
 				}
 
 			} else {
-				AppUser obj2 = appRepository.findByuserName(username);
+				AppUser obj2 = appRepository.findOneByUserName(username);
 				String groupName = obj2.getGroupName();
 				try {
 					mav.addObject("pageTitle", "Customer Wise Report");
@@ -1728,7 +1728,7 @@ public class ReportController {
 					System.out.println("Exception occured while fetching Status wise report = " + e);
 				}
 			} else {
-				AppUser obj2 = appRepository.findByuserName(username);
+				AppUser obj2 = appRepository.findOneByUserName(username);
 				String groupName = obj2.getGroupName();
 				System.out.println("group name :: " + groupName);
 				try {
@@ -1767,7 +1767,7 @@ public class ReportController {
 		User loginedUser = (User) ((Authentication) principal).getPrincipal();
 		String username = loginedUser.getUsername();
 		List<String> instancesalert = null;
-		AppUser obj = appRepository.findByuserName(username);
+		AppUser obj = appRepository.findOneByUserName(username);
 		List<String> groupName = new ArrayList<>();
 		StringTokenizer token2 = new StringTokenizer(obj.getGroupName(), ",");
 		while (token2.hasMoreTokens()) {

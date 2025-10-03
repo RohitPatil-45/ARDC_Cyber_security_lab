@@ -579,6 +579,97 @@ body {
 						</div>
 						
 					</div>
+					
+					
+							<!-- Users Table Section -->
+					<div class="row">
+						<div class="col-12">
+							<div class="user-table-container">
+								<div class="card-header">
+									<h3>
+										<i class="fas fa-users mr-2"></i>User List
+									</h3>
+								</div>
+								<div class="table-responsive">
+									<table id="usersTable" class="table table-hover">
+    <thead>
+        <tr>
+            <th>Sr No.</th>
+            <th>User Name</th>
+            <th>Full Name</th>
+            <th>Department</th>
+            <th>Course</th>
+            <th>Semester</th>
+            <th>Subjects</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user, stat : ${users}">
+        <td th:text="${stat.count}">1</td>
+        <td>
+            <strong th:text="${user.userName}">Username</strong>
+        </td>
+        <td th:text="${user.name} ?: 'N/A'">Full Name</td>
+        
+        <!-- Department -->
+        <td th:text="${user.departmentName?.departmentName ?: 'Not Assigned'}">Department</td>
+        
+        <!-- Course -->
+        <td th:text="${user.courseName?.courseName ?: 'Not Assigned'}">Course</td>
+        
+        <!-- Semester -->
+        <td th:text="${user.semesterName?.semesterName ?: 'Not Assigned'}">Semester</td>
+
+        <!-- Subjects -->
+        <td>
+            <div th:if="${userSubjectsMap.get(user.userId) != null and !userSubjectsMap.get(user.userId).empty}">
+                <span th:each="subject, iter : ${userSubjectsMap.get(user.userId)}">
+                    <span th:text="${subject.subjectName}"></span>
+                    <span th:if="${!iter.last}">, </span>
+                </span>
+            </div>
+            <span th:unless="${userSubjectsMap.get(user.userId) != null and !userSubjectsMap.get(user.userId).empty}">
+                No Subjects
+            </span>
+        </td>
+
+        <!-- Status -->
+        <td>
+            <span th:if="${user.enabled}" class="badge badge-success">Active</span>
+            <span th:unless="${user.enabled}" class="badge badge-secondary">Inactive</span>
+        </td>
+
+        <!-- Action - Dropdown for multiple subjects -->
+        <td>
+            <div th:if="${userSubjectsMap.get(user.userId) != null and !userSubjectsMap.get(user.userId).empty}">
+                <div class="dropdown">
+                    <button class="btn btn-primary btn-sm dropdown-toggle" type="button" 
+                            id="dropdownMenuButton${stat.count}" data-toggle="dropdown" 
+                            aria-haspopup="true" aria-expanded="false">
+                        View Tasks
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton${stat.count}">
+                        <a th:each="subject : ${userSubjectsMap.get(user.userId)}"
+                           th:href="@{/guac/viewsubjectTasks/{subjectId}(subjectId=${subject.subjectId})}" 
+                           class="dropdown-item">
+                            <span th:text="${subject.subjectName}"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <span th:unless="${userSubjectsMap.get(user.userId) != null and !userSubjectsMap.get(user.userId).empty}">
+                -
+            </span>
+        </td>
+    </tr>
+</tbody>
+</table>
+								</div>
+							</div>
+						</div>
+					</div>
 
 					
 				</div>

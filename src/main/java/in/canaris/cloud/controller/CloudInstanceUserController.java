@@ -117,7 +117,7 @@ public class CloudInstanceUserController {
 		Authentication authentication = (Authentication) principal;
 		User loginedUser = (User) ((Authentication) principal).getPrincipal();
 		String username = loginedUser.getUsername();
-		AppUser obj = appRepository.findByuserName(username);
+		AppUser obj = appRepository.findOneByUserName(username);
 		mav.addObject("action_name", var_function_name);
 		try {
 			boolean isAdmin = authentication.getAuthorities().stream()

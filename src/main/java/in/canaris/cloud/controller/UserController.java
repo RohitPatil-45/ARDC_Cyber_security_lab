@@ -209,33 +209,78 @@ public class UserController {
 		return "redirect:/users/view";
 	}
 
+//	@GetMapping("/edit/{id}")
+//	public String editTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+//		try {
+//			AppUser user = userRepository.findById(id).get();
+//
+//			UserMasterRole usermasterRole = new UserMasterRole();
+//			usermasterRole.setAppUser(user);
+//			// UserRole userRole = userRoleRepository.findRole(id);
+//			long roleID = userRoleRepository.findRole(id);
+//			System.out.println("role id = " + roleID);
+//			AppRole role = appRoleRepository.findByRoleId(roleID);
+//
+//			usermasterRole.setAppRole(role);
+//
+//			model.addAttribute("user", user);
+//			model.addAttribute("pageTitle", "Edit User (ID: " + id + ")");
+//			model.addAttribute("userID", id);
+//			// model.addAttribute("roleID",userRoleRepository.findRole(id));
+//			model.addAttribute("objEnt", usermasterRole);
+//			model.addAttribute("groupList", groupRepository.getAllGroups());
+//			model.addAttribute("switchList", switchRepository.getAllSwitch());
+//			
+//			List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+//
+//			model.addAttribute("subject", subject);
+//			model.addAttribute("departments", departments);
+//			model.addAttribute("selectedDepartmentId", selectedDepartmentId);
+//			model.addAttribute("selectedCourseId", selectedCourseId);
+//			model.addAttribute("selectedSemesterId", selectedSemesterId);
+//			
+//			return "user_add";
+//		} catch (Exception e) {
+//			redirectAttributes.addFlashAttribute("message", e.getMessage());
+//			return "redirect:/users/view";
+//		}
+//	}
+	
 	@GetMapping("/edit/{id}")
 	public String editTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-		try {
-			AppUser user = userRepository.findById(id).get();
+	    try {
+	        AppUser user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+	        
+	        UserMasterRole usermasterRole = new UserMasterRole();
+	        usermasterRole.setAppUser(user);
 
-			UserMasterRole usermasterRole = new UserMasterRole();
-			usermasterRole.setAppUser(user);
-			// UserRole userRole = userRoleRepository.findRole(id);
-			long roleID = userRoleRepository.findRole(id);
-			System.out.println("role id = " + roleID);
-			AppRole role = appRoleRepository.findByRoleId(roleID);
+	        long roleID = userRoleRepository.findRole(id);
+	        AppRole role = appRoleRepository.findByRoleId(roleID);
+	        usermasterRole.setAppRole(role);
 
-			usermasterRole.setAppRole(role);
+	        model.addAttribute("user", user);
+	        model.addAttribute("pageTitle", "Edit User (ID: " + id + ")");
+	        model.addAttribute("userID", id);
+	        model.addAttribute("objEnt", usermasterRole);
+	        model.addAttribute("groupList", groupRepository.getAllGroups());
+	        model.addAttribute("switchList", switchRepository.getAllSwitch());
 
-			model.addAttribute("user", user);
-			model.addAttribute("pageTitle", "Edit User (ID: " + id + ")");
-			model.addAttribute("userID", id);
-			// model.addAttribute("roleID",userRoleRepository.findRole(id));
-			model.addAttribute("objEnt", usermasterRole);
-			model.addAttribute("groupList", groupRepository.getAllGroups());
-			model.addAttribute("switchList", switchRepository.getAllSwitch());
-			return "user_add";
-		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("message", e.getMessage());
-			return "redirect:/users/view";
-		}
+	        // Add Departments
+	        List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+	        model.addAttribute("departments", departments);
+
+	        // ✅ Pass selected values for preselection in JS
+	        model.addAttribute("selectedDepartmentId", user.getDepartmentName());
+	        model.addAttribute("selectedCourseId", user.getCourseName());
+	        model.addAttribute("selectedSemesterId", user.getSemesterName());
+
+	        return "user_add";
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("message", e.getMessage());
+	        return "redirect:/users/view";
+	    }
 	}
+
 
 	@GetMapping("/delete/{id}")
 	public String deleteTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {

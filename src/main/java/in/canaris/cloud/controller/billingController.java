@@ -57,7 +57,7 @@ public class billingController {
 		Authentication authentication = (Authentication) principal;
 		User loginedUser = (User) ((Authentication) principal).getPrincipal();
 		String username = loginedUser.getUsername();
-		AppUser obj22 = appRepository.findByuserName(username);
+		AppUser obj22 = appRepository.findOneByUserName(username);
 		try {
 			boolean isSuperAdmin = authentication.getAuthorities().stream()
 					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));

@@ -147,7 +147,7 @@ public class MainDashboardController {
 		Authentication authentication = (Authentication) principal;
 		User loginedUser = (User) ((Authentication) principal).getPrincipal();
 		String username = loginedUser.getUsername();
-		AppUser obj = appRepository.findByuserName(username);
+		AppUser obj = appRepository.findOneByUserName(username);
 		List<CloudInstance> instances = null;
 //		mav.addObject("action_name", var_function_name);
 		mav.addObject("groupList", groupRepository.getAllGroups());
@@ -324,7 +324,7 @@ public class MainDashboardController {
 		Authentication authentication = (Authentication) principal;
 		User loginedUser = (User) ((Authentication) principal).getPrincipal();
 		String username = loginedUser.getUsername();
-		AppUser obj = appRepository.findByuserName(username);
+		AppUser obj = appRepository.findOneByUserName(username);
 		List<CloudInstance> instances = null;
 //		mav.addObject("action_name", var_function_name);
 		mav.addObject("groupList", groupRepository.getAllGroups());

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:include="template :: headFragment(${pageTitle})">
+    <title>[[${pageTitle}]]</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
+    
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --light: #ecf0f1;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --info: #17a2b8;
+        }
+        
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            border: none;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0 !important;
+        }
+        
+        .badge-playlist { background-color: var(--primary); }
+        .badge-subplaylist { background-color: var(--success); }
+        .badge-scenario { background-color: var(--warning); }
+        .badge-info { background-color: var(--info); }
+        
+        .action-buttons .btn {
+            margin: 2px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+        }
+        
+        .mapping-items {
+            max-height: 100px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+        }
+        
+        .mapping-items .badge {
+            margin: 1px;
+            font-size: 0.7rem;
+        }
+        
+        .dataTables_wrapper {
+            padding: 0;
+        }
+        
+        table.dataTable {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .dropdown-item {
+            cursor: pointer;
+        }
+        
+        /* Custom DataTable styling */
+        .dataTables_filter input {
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            padding: 4px 8px;
+        }
+        
+        .dataTables_length select {
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            padding: 4px;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div th:replace="fragments/header :: header"></div>
+        <div th:replace="fragments/sidebar :: aside"></div>
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>[[${pageTitle}]]</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i> Home</a></li>
+                                <li class="breadcrumb-item"><a th:href="@{/guac/SemesterWisePlaylist}">Add Playlist</a></li>
+                                <li class="breadcrumb-item active">View Playlists</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-table mr-2"></i>Subject Wise Playlist Mappings
+                                    </h3>
+                                    <div>
+                                        <a th:href="@{/guac/SemesterWisePlaylist}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-plus mr-1"></i> Add New Mapping
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="subjectPlaylistTable" class="table table-bordered table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Department</th>
+                                                    <th>Course</th>
+                                                    <th>Semester</th>
+                                                    <th>Subject</th>
+                                                    <th>Playlists <i class="fas fa-list text-primary ml-1"></i></th>
+                                                    <th>Sub Playlists <i class="fas fa-list-ol text-success ml-1"></i></th>
+                                                    <th>Scenarios <i class="fas fa-theater-masks text-warning ml-1"></i></th>
+                                                    <th>Total Items</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="swp, stat : ${subjectWisePlaylists}">
+                                                    <td th:text="${stat.count}">1</td>
+                                                    <td>
+                                                        <span th:text="${swp.departmentName}">Department</span>
+                                                    </td>
+                                                    <td>
+                                                        <span th:text="${swp.courseName}">Course</span>
+                                                    </td>
+                                                    <td>
+                                                        <span th:text="${swp.semesterName}">Semester</span>
+                                                    </td>
+                                                    <td>
+                                                        <strong th:text="${swp.subjectName}">Subject</strong>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <span class="badge badge-playlist" th:text="${swp.playlistCount}">0</span>
+                                                            <button th:if="${swp.playlistCount > 0}" 
+                                                                    class="btn btn-xs btn-outline-primary ml-2" 
+                                                                    data-toggle="popover" 
+                                                                    data-placement="left"
+                                                                    th:attr="data-content=${swp.playlistNames}">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div th:if="${swp.playlistCount == 0}" class="text-muted small">
+                                                            None
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <span class="badge badge-subplaylist" th:text="${swp.subplaylistCount}">0</span>
+                                                            <button th:if="${swp.subplaylistCount > 0}" 
+                                                                    class="btn btn-xs btn-outline-success ml-2" 
+                                                                    data-toggle="popover" 
+                                                                    data-placement="left"
+                                                                    th:attr="data-content=${swp.subplaylistNames}">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div th:if="${swp.subplaylistCount == 0}" class="text-muted small">
+                                                            None
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <span class="badge badge-scenario" th:text="${swp.scenarioCount}">0</span>
+                                                            <button th:if="${swp.scenarioCount > 0}" 
+                                                                    class="btn btn-xs btn-outline-warning ml-2" 
+                                                                    data-toggle="popover" 
+                                                                    data-placement="left"
+                                                                    th:attr="data-content=${swp.scenarioNames}">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div th:if="${swp.scenarioCount == 0}" class="text-muted small">
+                                                            None
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-info">
+                                                            [[${swp.playlistCount + swp.subplaylistCount + swp.scenarioCount}]]
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="action-buttons">
+                                                            <a th:href="@{/guac/editSubjectWisePlaylist/{id}(id=${swp.subjectId})}" 
+                                                               class="btn btn-warning btn-sm" 
+                                                               data-toggle="tooltip" 
+                                                               title="Edit Mapping">
+                                                                <i class="fas fa-edit"></i>
+                                                            </a>
+                                                            <a th:href="@{/guac/deleteSubjectWisePlaylist/{id}(id=${swp.subjectId})}" 
+                                                               class="btn btn-danger btn-sm" 
+                                                               data-toggle="tooltip" 
+                                                               title="Delete Mapping"
+                                                               onclick="return confirm('Are you sure you want to delete this mapping?')">
+                                                                <i class="fas fa-trash"></i>
+                                                            </a>
+                                                            <button class="btn btn-info btn-sm view-details" 
+                                                                    data-toggle="tooltip" 
+                                                                    title="View Details"
+                                                                    th:attr="data-id=${swp.subjectId}, 
+                                                                             data-department=${swp.departmentName},
+                                                                             data-course=${swp.courseName},
+                                                                             data-semester=${swp.semesterName},
+                                                                             data-subject=${swp.subjectName},
+                                                                             data-playlists=${swp.playlistNames},
+                                                                             data-subplaylists=${swp.subplaylistNames},
+                                                                             data-scenarios=${swp.scenarioNames}">
+                                                                <i class="fas fa-info-circle"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Department</th>
+                                                    <th>Course</th>
+                                                    <th>Semester</th>
+                                                    <th>Subject</th>
+                                                    <th>Playlists</th>
+                                                    <th>Sub Playlists</th>
+                                                    <th>Scenarios</th>
+                                                    <th>Total Items</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="detailsModalLabel">
+                        <i class="fas fa-info-circle mr-2"></i>Mapping Details
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="text-white">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Department:</strong></div>
+                        <div class="col-md-9" id="modalDepartment">-</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Course:</strong></div>
+                        <div class="col-md-9" id="modalCourse">-</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Semester:</strong></div>
+                        <div class="col-md-9" id="modalSemester">-</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Subject:</strong></div>
+                        <div class="col-md-9" id="modalSubject">-</div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6 class="text-primary">
+                                <i class="fas fa-list mr-1"></i> Playlists
+                            </h6>
+                            <div id="modalPlaylists" class="mapping-items">
+                                <!-- Playlists will be populated here -->
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-success">
+                                <i class="fas fa-list-ol mr-1"></i> Sub Playlists
+                            </h6>
+                            <div id="modalSubplaylists" class="mapping-items">
+                                <!-- Sub playlists will be populated here -->
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-warning">
+                                <i class="fas fa-theater-masks mr-1"></i> Scenarios
+                            </h6>
+                            <div id="modalScenarios" class="mapping-items">
+                                <!-- Scenarios will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="template :: jsscript"></div>
+    
+    <!-- DataTables Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            var table = $('#subjectPlaylistTable').DataTable({
+                "responsive": true,
+                "autoWidth": false,
+                "pageLength": 10,
+                "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                "order": [[0, 'asc']],
+                "dom": '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>' +
+                       '<"row"<"col-sm-12"tr>>' +
+                       '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        className: 'btn btn-sm btn-outline-secondary',
+                        text: '<i class="fas fa-copy mr-1"></i> Copy'
+                    },
+                    {
+                        extend: 'excel',
+                        className: 'btn btn-sm btn-outline-success',
+                        text: '<i class="fas fa-file-excel mr-1"></i> Excel'
+                    },
+                    {
+                        extend: 'pdf',
+                        className: 'btn btn-sm btn-outline-danger',
+                        text: '<i class="fas fa-file-pdf mr-1"></i> PDF'
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-sm btn-outline-info',
+                        text: '<i class="fas fa-print mr-1"></i> Print'
+                    }
+                ],
+                "language": {
+                    "search": "_INPUT_",
+                    "searchPlaceholder": "Search...",
+                    "lengthMenu": "Show _MENU_ entries",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                    "infoEmpty": "Showing 0 to 0 of 0 entries",
+                    "infoFiltered": "(filtered from _MAX_ total entries)",
+                    "zeroRecords": "No matching records found",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "Next",
+                        "previous": "Previous"
+                    }
+                }
+            });
+
+            // Initialize tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+
+            // Initialize popovers
+            $('[data-toggle="popover"]').popover({
+                trigger: 'hover',
+                container: 'body'
+            });
+
+            // View details modal
+            $('.view-details').on('click', function() {
+                const department = $(this).data('department');
+                const course = $(this).data('course');
+                const semester = $(this).data('semester');
+                const subject = $(this).data('subject');
+                const playlists = $(this).data('playlists');
+                const subplaylists = $(this).data('subplaylists');
+                const scenarios = $(this).data('scenarios');
+
+                $('#modalDepartment').text(department);
+                $('#modalCourse').text(course);
+                $('#modalSemester').text(semester);
+                $('#modalSubject').text(subject);
+
+                // Populate playlists
+                $('#modalPlaylists').empty();
+                if (playlists && playlists !== 'None') {
+                    playlists.split(', ').forEach(item => {
+                        $('#modalPlaylists').append('<span class="badge badge-primary badge-playlist d-block mb-1">' + item + '</span>');
+                    });
+                } else {
+                    $('#modalPlaylists').html('<span class="text-muted">No playlists assigned</span>');
+                }
+
+                // Populate subplaylists
+                $('#modalSubplaylists').empty();
+                if (subplaylists && subplaylists !== 'None') {
+                    subplaylists.split(', ').forEach(item => {
+                        $('#modalSubplaylists').append('<span class="badge badge-success badge-subplaylist d-block mb-1">' + item + '</span>');
+                    });
+                } else {
+                    $('#modalSubplaylists').html('<span class="text-muted">No sub playlists assigned</span>');
+                }
+
+                // Populate scenarios
+                $('#modalScenarios').empty();
+                if (scenarios && scenarios !== 'None') {
+                    scenarios.split(', ').forEach(item => {
+                        $('#modalScenarios').append('<span class="badge badge-warning badge-scenario d-block mb-1">' + item + '</span>');
+                    });
+                } else {
+                    $('#modalScenarios').html('<span class="text-muted">No scenarios assigned</span>');
+                }
+
+                $('#detailsModal').modal('show');
+            });
+
+            // Add row number on each page
+            table.on('order.dt search.dt', function() {
+                table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function(cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+            console.log('Subject Wise Playlist DataTable loaded');
+        });
+    </script>
+</body>
+</html>

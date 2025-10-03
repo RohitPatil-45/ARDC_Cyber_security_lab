@@ -17,7 +17,12 @@ import in.canaris.cloud.openstack.entity.Playlist;
 @Transactional
 public interface AppUserRepository extends JpaRepository<AppUser, Integer> {
 
-	AppUser findByuserName(String username);
+	
+	AppUser findOneByUserName(String username);
+//	findOneByUserName
+	@Query("SELECT u FROM AppUser u WHERE u.userName = :username")
+	List<AppUser> findByUserName(@Param("username") String username);
+
 
 	@Query(value = "SELECT user_name FROM app_user WHERE user_id = :userId", nativeQuery = true)
 	String getUserNameById(@Param("userId") Long userId);
@@ -28,12 +33,9 @@ public interface AppUserRepository extends JpaRepository<AppUser, Integer> {
 	List<AppUser> findByAllGroupName();
 
 	@Query("SELECT u.status, COUNT(u) FROM AppUser u GROUP BY u.status")
-    List<Object[]> countByStatus();
-    
-    @Query(value = "SELECT user_name, status FROM app_user WHERE status = :status", nativeQuery = true)
-    List<Object[]> findUserNameAndStatusByStatus(@Param("status") String status);
+	List<Object[]> countByStatus();
 
-
-
+	@Query(value = "SELECT user_name, status FROM app_user WHERE status = :status", nativeQuery = true)
+	List<Object[]> findUserNameAndStatusByStatus(@Param("status") String status);
 
 }

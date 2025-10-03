@@ -66,7 +66,7 @@ public class GroupController {
 				}
 
 			} else {
-				AppUser obj = appRepository.findByuserName(username);
+				AppUser obj = appRepository.findOneByUserName(username);
 				String groupName = obj.getGroupName();
 //				System.out.println("Group name ::" + groupName);
 

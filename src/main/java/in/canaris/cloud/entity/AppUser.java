@@ -19,6 +19,11 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import in.canaris.cloud.openstack.entity.CourseMaster;
+import in.canaris.cloud.openstack.entity.DepartmentMaster;
+import in.canaris.cloud.openstack.entity.SemesterMaster;
+import in.canaris.cloud.openstack.entity.SubjectMaster;
+
 @Entity
 @Table(name = "app_user")
 //@Table(name = "App_User", //
@@ -78,18 +83,39 @@ public class AppUser implements Serializable {
 	@Column(name = "status")
 	private String status;
 	
-	@Column(name = "department_name")
-	private String departmentName;
+//	@Column(name = "department_name")
+//	private String departmentName;
 	
-	@Column(name = "course_name")
-	private String courseName;
+//	@Column(name = "course_name")
+//	private String courseName;
+//	
+//	
+//	@Column(name = "semester_name")
+//	private String semesterName;
+//	
+//	@Column(name = "subject_name")
+//	private String subjectName;
+	
+	@Column(name = "batch_name")
+	private String batchName;
 	
 	
-	@Column(name = "semester_name")
-	private String semesterName;
+	   @ManyToOne(fetch = FetchType.LAZY)
+	    @JoinColumn(name = "department_name")
+	    private DepartmentMaster departmentName;
+	    
+	    @ManyToOne(fetch = FetchType.LAZY)
+	    @JoinColumn(name = "course_name")
+	    private CourseMaster courseName;
+	    
+	    @ManyToOne(fetch = FetchType.LAZY)
+	    @JoinColumn(name = "semester_name")
+	    private SemesterMaster semesterName;
+	    
+	    @ManyToOne(fetch = FetchType.LAZY)
+	    @JoinColumn(name = "subject_name")
+	    private SubjectMaster subjectName;
 	
-	@Column(name = "subject_name")
-	private String subjectName;
 	
 
 	@Column(name = "password_changed_time")
@@ -216,38 +242,55 @@ public class AppUser implements Serializable {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	
+	
 
-	public String getDepartmentName() {
+
+	public String getBatchName() {
+		return batchName;
+	}
+
+	public void setBatchName(String batchName) {
+		this.batchName = batchName;
+	}
+
+	public DepartmentMaster getDepartmentName() {
 		return departmentName;
 	}
 
-	public void setDepartmentName(String departmentName) {
+	public void setDepartmentName(DepartmentMaster departmentName) {
 		this.departmentName = departmentName;
 	}
 
-	public String getCourseName() {
+	public CourseMaster getCourseName() {
 		return courseName;
 	}
 
-	public void setCourseName(String courseName) {
+	public void setCourseName(CourseMaster courseName) {
 		this.courseName = courseName;
 	}
 
-	public String getSemesterName() {
+	public SemesterMaster getSemesterName() {
 		return semesterName;
 	}
 
-	public void setSemesterName(String semesterName) {
+	public void setSemesterName(SemesterMaster semesterName) {
 		this.semesterName = semesterName;
 	}
 
-	public String getSubjectName() {
+	public SubjectMaster getSubjectName() {
 		return subjectName;
 	}
 
-	public void setSubjectName(String subjectName) {
+	public void setSubjectName(SubjectMaster subjectName) {
 		this.subjectName = subjectName;
 	}
+	
+	
+
+
+
+	
 	
 	
 	

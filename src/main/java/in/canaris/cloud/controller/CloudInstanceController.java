@@ -400,7 +400,7 @@ public class CloudInstanceController {
 		Authentication authentication = (Authentication) principal;
 		User loginedUser = (User) ((Authentication) principal).getPrincipal();
 		String username = loginedUser.getUsername();
-		AppUser obj = appRepository.findByuserName(username);
+		AppUser obj = appRepository.findOneByUserName(username);
 		List<CloudInstance> instances = null;
 		mav.addObject("action_name", var_function_name);
 		mav.addObject("groupList", groupRepository.getAllGroups());
@@ -3413,7 +3413,7 @@ public class CloudInstanceController {
 		String username = loginedUser.getUsername();
 		List<String> instances = null;
 
-		AppUser obj = appRepository.findByuserName(username);
+		AppUser obj = appRepository.findOneByUserName(username);
 		List<String> groupName = new ArrayList<>();
 		StringTokenizer token = new StringTokenizer(obj.getGroupName(), ",");
 		while (token.hasMoreTokens()) {

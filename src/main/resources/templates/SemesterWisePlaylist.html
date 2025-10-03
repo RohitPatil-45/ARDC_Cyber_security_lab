@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:include="template :: headFragment(${pageTitle})">
+<title>[[${pageTitle}]]</title>
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/css/bootstrap-multiselect.css">
+
+<style>
+:root {
+	--primary: #3498db;
+	--secondary: #2c3e50;
+	--light: #ecf0f1;
+	--danger: #e74c3c;
+}
+
+body {
+	background-color: #f5f7fa;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+	border-radius: 8px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+	border: none;
+}
+
+.card-header {
+	background-color: white;
+	padding: 20px;
+	border-radius: 8px 8px 0 0 !important;
+}
+
+.card-title {
+	font-weight: 600;
+	color: var(--secondary);
+}
+
+.form-control {
+	border-radius: 6px;
+	border: 1px solid #ddd;
+	padding: 10px 15px;
+}
+
+.btn-primary {
+	background-color: var(--primary);
+	border-color: var(--primary);
+	border-radius: 6px;
+	padding: 10px 20px;
+	font-weight: 500;
+}
+
+.required-field::after {
+	content: "*";
+	color: var(--danger);
+	margin-left: 4px;
+}
+
+.option-all {
+	font-weight: bold;
+	background-color: #f8f9fa;
+}
+/* Fix for multiselect dropdowns */
+.multiselect-container {
+	z-index: 1050 !important;
+}
+
+.btn-group {
+	width: 100%;
+}
+
+.multiselect {
+	text-align: left;
+	width: 100%;
+}
+</style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>[[${pageTitle}]]</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#"><i
+										class="fas fa-home"></i> Home</a></li>
+								<li class="breadcrumb-item active">Playlist</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row justify-content-center">
+						<div class="col-md-12">
+							<div class="card">
+								<div class="card-header">
+									<h3 class="card-title">
+										<i class="fas fa-list"></i> Add User Wise Playlist
+									</h3>
+								</div>
+								<form th:action="@{/guac/save_SubjectWisePlaylist}" method="post">
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label class="required-field">Department</label> 
+													<select id="departmentSelect" name="departmentId" class="form-control" required>
+														<option value="">-- Select Department --</option>
+														<option th:each="d : ${departments}"
+															th:value="${d.departmentId}"
+															th:text="${d.departmentName}"></option>
+													</select>
+												</div>
+												<div class="form-group">
+													<label class="required-field">Semester</label> 
+													<select id="semesterSelect" name="semesterId" class="form-control" required>
+														<option value="">-- Select Semester --</option>
+													</select>
+												</div>
+											</div>
+
+											<div class="col-md-6">
+												<div class="form-group">
+													<label class="required-field">Course</label> 
+													<select id="courseSelect" name="courseId" class="form-control" required>
+														<option value="">-- Select Course --</option>
+													</select>
+												</div>
+												<div class="form-group">
+													<label>Subject</label> 
+													<select id="subjectSelect" name="subjectId" class="form-control">
+														<option value="">-- Select Subject --</option>
+													</select>
+												</div>
+											</div>
+
+											<!-- Multiselect sections -->
+											<div class="col-md-12">
+												<div class="row">
+													<div class="col-md-4">
+														<div class="form-group">
+															<label for="playlistIds">Select Playlists</label> 
+															<select id="playlistIds" name="playlistIds" class="form-control" multiple>
+																<option th:each="pl : ${playlists}" th:value="${pl.id}"
+																	th:text="${pl.playlistName}"></option>
+															</select>
+														</div>
+													</div>
+
+													<div class="col-md-4">
+														<div class="form-group">
+															<label for="subplaylistIds">Select Sub Playlists</label>
+															<select id="subplaylistIds" name="subplaylistIds" class="form-control" multiple>
+																<option th:each="subpl : ${subplaylists}"
+																	th:value="${subpl.id}" th:text="${subpl.playlistName}"></option>
+															</select>
+														</div>
+													</div>
+
+													<div class="col-md-4">
+														<div class="form-group">
+															<label for="scenarioIds">Select Scenario</label> 
+															<select id="scenarioIds" name="scenarioIds" class="form-control" multiple>
+																<option th:each="scenario : ${scenarios}"
+																	th:value="${scenario.id}"
+																	th:text="${scenario.scenarioName}"></option>
+															</select>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="card-footer text-right">
+										<a th:href="@{/}" class="btn btn-outline-secondary mr-2">
+											<i class="fas fa-times mr-1"></i> Cancel
+										</a>
+										<button type="reset" class="btn btn-outline-secondary mr-2"
+											onclick="resetForm()">
+											<i class="fas fa-undo mr-1"></i> Reset
+										</button>
+										<button type="submit" class="btn btn-primary">
+											<i class="fas fa-save mr-1"></i> Save 
+											<span id="spinner" class="spinner-border spinner-border-sm ml-2 d-none"></span>
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+
+	<!-- Load jQuery first -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<!-- Then load Bootstrap Multiselect -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/js/bootstrap-multiselect.min.js"></script>
+
+	<script type="text/javascript">
+    function resetForm() {
+        $('#departmentSelect').val('');
+        $('#courseSelect').html('<option value="">-- Select Course --</option>');
+        $('#semesterSelect').html('<option value="">-- Select Semester --</option>');
+        $('#subjectSelect').html('<option value="">-- Select Subject --</option>');
+        
+        // Reset multiselects
+        $('#playlistIds').multiselect('deselectAll', false);
+        $('#subplaylistIds').multiselect('deselectAll', false);
+        $('#scenarioIds').multiselect('deselectAll', false);
+        
+        // Refresh multiselects
+        $('#playlistIds').multiselect('refresh');
+        $('#subplaylistIds').multiselect('refresh');
+        $('#scenarioIds').multiselect('refresh');
+    }
+    
+    $(document).ready(function() {
+        // Initialize multiselects
+        $('#playlistIds').multiselect({
+            includeSelectAllOption: true,
+            enableFiltering: true,
+            maxHeight: 250,
+            buttonWidth: '100%',
+            nonSelectedText: 'Select Playlists',
+            numberDisplayed: 1
+        });
+
+        $('#subplaylistIds').multiselect({
+            includeSelectAllOption: true,
+            enableFiltering: true,
+            maxHeight: 250,
+            buttonWidth: '100%',
+            nonSelectedText: 'Select Sub Playlists',
+            numberDisplayed: 1
+        });
+
+        $('#scenarioIds').multiselect({
+            includeSelectAllOption: true,
+            enableFiltering: true,
+            maxHeight: 250,
+            buttonWidth: '100%',
+            nonSelectedText: 'Select Scenarios',
+            numberDisplayed: 1
+        });
+
+        const deptSel = $('#departmentSelect');
+        const courseSel = $('#courseSelect');
+        const semSel = $('#semesterSelect');
+        const subjectSel = $('#subjectSelect');
+
+        deptSel.change(function() {
+            const deptId = $(this).val();
+            if (!deptId) {
+                courseSel.html('<option value="">-- Select Course --</option>');
+                semSel.html('<option value="">-- Select Semester --</option>');
+                subjectSel.html('<option value="">-- Select Subject --</option>');
+                return;
+            }
+            $.ajax({
+                url: '/guac/courses',
+                type: 'GET',
+                data: { departmentId: deptId },
+                success: function(data) {
+                    courseSel.empty().append('<option value="">-- Select Course --</option>');
+                    semSel.html('<option value="">-- Select Semester --</option>');
+                    subjectSel.html('<option value="">-- Select Subject --</option>');
+                    data.forEach(c => {
+                        courseSel.append(`<option value="${c.courseId}">${c.courseName}</option>`);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching courses:', error);
+                }
+            });
+        });
+
+        courseSel.change(function() {
+            const cId = $(this).val();
+            if (!cId) {
+                semSel.html('<option value="">-- Select Semester --</option>');
+                subjectSel.html('<option value="">-- Select Subject --</option>');
+                return;
+            }
+            $.ajax({
+                url: '/guac/semesters',
+                type: 'GET',
+                data: { courseId: cId },
+                success: function(data) {
+                    semSel.empty().append('<option value="">-- Select Semester --</option>');
+                    subjectSel.html('<option value="">-- Select Subject --</option>');
+                    data.forEach(s => {
+                        semSel.append(`<option value="${s.semesterId}">${s.semesterName}</option>`);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching semesters:', error);
+                }
+            });
+        });
+
+        semSel.change(function() {
+            const sId = $(this).val();
+            if (!sId) {
+                subjectSel.html('<option value="">-- Select Subject --</option>');
+                return;
+            }
+            $.ajax({
+                url: '/guac/subjects',
+                type: 'GET',
+                data: { semesterId: sId },
+                success: function(data) {
+                    subjectSel.empty().append('<option value="">-- Select Subject --</option>');
+                    data.forEach(sub => {
+                        subjectSel.append(`<option value="${sub.subjectId}">${sub.subjectName}</option>`);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching subjects:', error);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
