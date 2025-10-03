@@ -496,135 +496,282 @@ public class GuacamoleController {
 //	}
 //	
 
+//	@GetMapping("/SuperAdmin_Dashboard")
+//	public String dashboard(Model model, Principal principal) {
+//
+//		Authentication auth = (Authentication) principal;
+//		String username = auth.getName();
+//		try {
+//
+//			List<Object[]> results = AddPhysicalServerRepository.findVirtualizationTypeCounts();
+//
+//			Map<String, Map<String, Long>> typeStats = new HashMap<>();
+//			Map<String, Long> totalCountByType = new HashMap<>();
+//
+//			long overallUp = 0;
+//			long overallDown = 0;
+//
+//			for (Object[] row : results) {
+//				String type = (String) row[0];
+//				String rawStatus = (String) row[1];
+//				Long count = ((Number) row[2]).longValue();
+//
+//				String status = (rawStatus != null) ? rawStatus.toLowerCase() : "unknown";
+//
+//				typeStats.putIfAbsent(type, new HashMap<>());
+//				totalCountByType.putIfAbsent(type, 0L);
+//
+//				typeStats.get(type).put(status, count);
+//				totalCountByType.put(type, totalCountByType.get(type) + count);
+//
+//				if ("up".equals(status)) {
+//					overallUp += count;
+//				} else if ("down".equals(status)) {
+//					overallDown += count;
+//				}
+//			}
+//
+//			for (Map<String, Long> map : typeStats.values()) {
+//				map.putIfAbsent("up", 0L);
+//				map.putIfAbsent("down", 0L);
+//				map.putIfAbsent("unknown", 0L);
+//			}
+//
+//			List<Object[]> userStatusCounts = AppUserRepository.countByStatus();
+//			long userOnline = 0;
+//			long userOffline = 0;
+//			for (Object[] ur : userStatusCounts) {
+//				String st = (String) ur[0];
+//				Long c = ((Number) ur[1]).longValue();
+//				String lower = (st != null) ? st.toLowerCase() : "unknown";
+//				if ("online".equals(lower) || "up".equals(lower)) {
+//					userOnline += c;
+//				} else if ("offline".equals(lower) || "down".equals(lower)) {
+//					userOffline += c;
+//				}
+//			}
+//
+//			// NEW: Add health monitoring data
+//			List<Object[]> healthResults = AddPhysicalServerRepository.findHealthDataByVirtualizationType();
+//
+//			Map<String, Map<String, Double>> healthStats = new HashMap<>();
+//
+//			for (Object[] row : healthResults) {
+//				String type = (String) row[0];
+//				Double usedCpu = ((Number) row[1]).doubleValue();
+//				Double totalCpu = ((Number) row[2]).doubleValue();
+//				Double usedRam = ((Number) row[3]).doubleValue();
+//				Double totalRam = ((Number) row[4]).doubleValue();
+//				Double usedDisk = ((Number) row[5]).doubleValue();
+//				Double totalDisk = ((Number) row[6]).doubleValue();
+//
+//				healthStats.putIfAbsent(type, new HashMap<>());
+//
+//				// Calculate usage percentages
+//				double cpuUsage = totalCpu > 0 ? (usedCpu / totalCpu) * 100 : 0;
+//				double ramUsage = totalRam > 0 ? (usedRam / totalRam) * 100 : 0;
+//				double diskUsage = totalDisk > 0 ? (usedDisk / totalDisk) * 100 : 0;
+//
+//				healthStats.get(type).put("cpuUsage", cpuUsage);
+//				healthStats.get(type).put("ramUsage", ramUsage);
+//				healthStats.get(type).put("diskUsage", diskUsage);
+//				healthStats.get(type).put("cpuFree", 100 - cpuUsage);
+//				healthStats.get(type).put("ramFree", 100 - ramUsage);
+//				healthStats.get(type).put("diskFree", 100 - diskUsage);
+//			}
+//
+//			List<Object[]> subProductDetails = repository.getSubProductDetails();
+//
+//			List<Map<String, Object>> subProductList = new ArrayList<>();
+//			for (Object[] row : subProductDetails) {
+//				Map<String, Object> map = new HashMap<>();
+//				map.put("productName", row[0]);
+//				map.put("subProductName", row[1]);
+//				map.put("instanceCount", row[2]);
+//				subProductList.add(map);
+//			}
+//			model.addAttribute("subProductList", subProductList);
+//			// Add to model
+//
+//			// 3. Other counts
+//			long playlistCount = PlaylistRepository.count();
+//			long subPlaylistCount = SubPlaylistRepository.count();
+//			long scenarioCount = ScenarioRepository.count();
+//			long templateCount = repository.count();
+//
+//			// 4. Add to model
+//
+//			model.addAttribute("healthStats", healthStats);
+//			model.addAttribute("typeStats", typeStats);
+//			model.addAttribute("totalCountByType", totalCountByType);
+//
+//			model.addAttribute("overallUp", overallUp);
+//			model.addAttribute("overallDown", overallDown);
+//
+//			model.addAttribute("userOnline", userOnline);
+//			model.addAttribute("userOffline", userOffline);
+//
+//			model.addAttribute("playlistCount", playlistCount);
+//			model.addAttribute("subPlaylistCount", subPlaylistCount);
+//			model.addAttribute("scenarioCount", scenarioCount);
+//			model.addAttribute("templateCount", templateCount);
+//
+//			model.addAttribute("pageTitle", "Super Admin Dashboard");
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			System.err.println("Exption_UserWise_Dshboard");
+//			// TODO: handle exception
+//		}
+//
+//		return "SuperAdmin_Dashboard";
+//	}
+	
 	@GetMapping("/SuperAdmin_Dashboard")
 	public String dashboard(Model model, Principal principal) {
+	    Authentication auth = (Authentication) principal;
+	    String username = auth.getName();
+	    try {
+	        // Your existing virtualization and health monitoring code
+	        List<Object[]> results = AddPhysicalServerRepository.findVirtualizationTypeCounts();
+	        Map<String, Map<String, Long>> typeStats = new HashMap<>();
+	        Map<String, Long> totalCountByType = new HashMap<>();
 
-		Authentication auth = (Authentication) principal;
-		String username = auth.getName();
-		try {
+	        long overallUp = 0;
+	        long overallDown = 0;
 
-			List<Object[]> results = AddPhysicalServerRepository.findVirtualizationTypeCounts();
+	        for (Object[] row : results) {
+	            String type = (String) row[0];
+	            String rawStatus = (String) row[1];
+	            Long count = ((Number) row[2]).longValue();
 
-			Map<String, Map<String, Long>> typeStats = new HashMap<>();
-			Map<String, Long> totalCountByType = new HashMap<>();
+	            String status = (rawStatus != null) ? rawStatus.toLowerCase() : "unknown";
 
-			long overallUp = 0;
-			long overallDown = 0;
+	            typeStats.putIfAbsent(type, new HashMap<>());
+	            totalCountByType.putIfAbsent(type, 0L);
 
-			for (Object[] row : results) {
-				String type = (String) row[0];
-				String rawStatus = (String) row[1];
-				Long count = ((Number) row[2]).longValue();
+	            typeStats.get(type).put(status, count);
+	            totalCountByType.put(type, totalCountByType.get(type) + count);
 
-				String status = (rawStatus != null) ? rawStatus.toLowerCase() : "unknown";
+	            if ("up".equals(status)) {
+	                overallUp += count;
+	            } else if ("down".equals(status)) {
+	                overallDown += count;
+	            }
+	        }
 
-				typeStats.putIfAbsent(type, new HashMap<>());
-				totalCountByType.putIfAbsent(type, 0L);
+	        for (Map<String, Long> map : typeStats.values()) {
+	            map.putIfAbsent("up", 0L);
+	            map.putIfAbsent("down", 0L);
+	            map.putIfAbsent("unknown", 0L);
+	        }
 
-				typeStats.get(type).put(status, count);
-				totalCountByType.put(type, totalCountByType.get(type) + count);
+	        List<Object[]> userStatusCounts = AppUserRepository.countByStatus();
+	        long userOnline = 0;
+	        long userOffline = 0;
+	        for (Object[] ur : userStatusCounts) {
+	            String st = (String) ur[0];
+	            Long c = ((Number) ur[1]).longValue();
+	            String lower = (st != null) ? st.toLowerCase() : "unknown";
+	            if ("online".equals(lower) || "up".equals(lower)) {
+	                userOnline += c;
+	            } else if ("offline".equals(lower) || "down".equals(lower)) {
+	                userOffline += c;
+	            }
+	        }
 
-				if ("up".equals(status)) {
-					overallUp += count;
-				} else if ("down".equals(status)) {
-					overallDown += count;
-				}
-			}
+	        // NEW: Add health monitoring data
+	        List<Object[]> healthResults = AddPhysicalServerRepository.findHealthDataByVirtualizationType();
+	        Map<String, Map<String, Double>> healthStats = new HashMap<>();
 
-			for (Map<String, Long> map : typeStats.values()) {
-				map.putIfAbsent("up", 0L);
-				map.putIfAbsent("down", 0L);
-				map.putIfAbsent("unknown", 0L);
-			}
+	        for (Object[] row : healthResults) {
+	            String type = (String) row[0];
+	            Double usedCpu = ((Number) row[1]).doubleValue();
+	            Double totalCpu = ((Number) row[2]).doubleValue();
+	            Double usedRam = ((Number) row[3]).doubleValue();
+	            Double totalRam = ((Number) row[4]).doubleValue();
+	            Double usedDisk = ((Number) row[5]).doubleValue();
+	            Double totalDisk = ((Number) row[6]).doubleValue();
 
-			List<Object[]> userStatusCounts = AppUserRepository.countByStatus();
-			long userOnline = 0;
-			long userOffline = 0;
-			for (Object[] ur : userStatusCounts) {
-				String st = (String) ur[0];
-				Long c = ((Number) ur[1]).longValue();
-				String lower = (st != null) ? st.toLowerCase() : "unknown";
-				if ("online".equals(lower) || "up".equals(lower)) {
-					userOnline += c;
-				} else if ("offline".equals(lower) || "down".equals(lower)) {
-					userOffline += c;
-				}
-			}
+	            healthStats.putIfAbsent(type, new HashMap<>());
 
-			// NEW: Add health monitoring data
-			List<Object[]> healthResults = AddPhysicalServerRepository.findHealthDataByVirtualizationType();
+	            // Calculate usage percentages
+	            double cpuUsage = totalCpu > 0 ? (usedCpu / totalCpu) * 100 : 0;
+	            double ramUsage = totalRam > 0 ? (usedRam / totalRam) * 100 : 0;
+	            double diskUsage = totalDisk > 0 ? (usedDisk / totalDisk) * 100 : 0;
 
-			Map<String, Map<String, Double>> healthStats = new HashMap<>();
+	            healthStats.get(type).put("cpuUsage", cpuUsage);
+	            healthStats.get(type).put("ramUsage", ramUsage);
+	            healthStats.get(type).put("diskUsage", diskUsage);
+	            healthStats.get(type).put("cpuFree", 100 - cpuUsage);
+	            healthStats.get(type).put("ramFree", 100 - ramUsage);
+	            healthStats.get(type).put("diskFree", 100 - diskUsage);
+	        }
 
-			for (Object[] row : healthResults) {
-				String type = (String) row[0];
-				Double usedCpu = ((Number) row[1]).doubleValue();
-				Double totalCpu = ((Number) row[2]).doubleValue();
-				Double usedRam = ((Number) row[3]).doubleValue();
-				Double totalRam = ((Number) row[4]).doubleValue();
-				Double usedDisk = ((Number) row[5]).doubleValue();
-				Double totalDisk = ((Number) row[6]).doubleValue();
+	        List<Object[]> subProductDetails = repository.getSubProductDetails();
+	        List<Map<String, Object>> subProductList = new ArrayList<>();
+	        for (Object[] row : subProductDetails) {
+	            Map<String, Object> map = new HashMap<>();
+	            map.put("productName", row[0]);
+	            map.put("subProductName", row[1]);
+	            map.put("instanceCount", row[2]);
+	            subProductList.add(map);
+	        }
+	        model.addAttribute("subProductList", subProductList);
 
-				healthStats.putIfAbsent(type, new HashMap<>());
+	        // NEW: Get all users for SuperAdmin with their subjects
+	        List<AppUser> allUsers = AppUserRepository.findAll();
+	        
+	        // Create a map to store user subjects (key: userId, value: list of subjects)
+	        Map<Long, List<SubjectMaster>> userSubjectsMap = new HashMap<>();
+	        
+	        // For each user, find their subjects based on semester ID
+	        for (AppUser user : allUsers) {
+	            if (user.getSemesterName() != null) {
+	                Integer semesterId = user.getSemesterName().getSemesterId();
+	                List<SubjectMaster> userSubjects = SubjectMasterRepository.findBysemester_SemesterId(semesterId);
+	                userSubjectsMap.put(user.getUserId(), userSubjects);
+	                
+	                System.out.println("User: " + user.getUserName() + 
+	                                 ", Semester ID: " + semesterId + 
+	                                 ", Subjects: " + userSubjects.size());
+	            }
+	        }
 
-				// Calculate usage percentages
-				double cpuUsage = totalCpu > 0 ? (usedCpu / totalCpu) * 100 : 0;
-				double ramUsage = totalRam > 0 ? (usedRam / totalRam) * 100 : 0;
-				double diskUsage = totalDisk > 0 ? (usedDisk / totalDisk) * 100 : 0;
+	        // Other counts
+	        long playlistCount = PlaylistRepository.count();
+	        long subPlaylistCount = SubPlaylistRepository.count();
+	        long scenarioCount = ScenarioRepository.count();
+	        long templateCount = repository.count();
 
-				healthStats.get(type).put("cpuUsage", cpuUsage);
-				healthStats.get(type).put("ramUsage", ramUsage);
-				healthStats.get(type).put("diskUsage", diskUsage);
-				healthStats.get(type).put("cpuFree", 100 - cpuUsage);
-				healthStats.get(type).put("ramFree", 100 - ramUsage);
-				healthStats.get(type).put("diskFree", 100 - diskUsage);
-			}
+	        // Add all attributes to model
+	        model.addAttribute("healthStats", healthStats);
+	        model.addAttribute("typeStats", typeStats);
+	        model.addAttribute("totalCountByType", totalCountByType);
 
-			List<Object[]> subProductDetails = repository.getSubProductDetails();
+	        model.addAttribute("overallUp", overallUp);
+	        model.addAttribute("overallDown", overallDown);
 
-			List<Map<String, Object>> subProductList = new ArrayList<>();
-			for (Object[] row : subProductDetails) {
-				Map<String, Object> map = new HashMap<>();
-				map.put("productName", row[0]);
-				map.put("subProductName", row[1]);
-				map.put("instanceCount", row[2]);
-				subProductList.add(map);
-			}
-			model.addAttribute("subProductList", subProductList);
-			// Add to model
+	        model.addAttribute("userOnline", userOnline);
+	        model.addAttribute("userOffline", userOffline);
 
-			// 3. Other counts
-			long playlistCount = PlaylistRepository.count();
-			long subPlaylistCount = SubPlaylistRepository.count();
-			long scenarioCount = ScenarioRepository.count();
-			long templateCount = repository.count();
+	        model.addAttribute("playlistCount", playlistCount);
+	        model.addAttribute("subPlaylistCount", subPlaylistCount);
+	        model.addAttribute("scenarioCount", scenarioCount);
+	        model.addAttribute("templateCount", templateCount);
 
-			// 4. Add to model
+	        // NEW: Add users and userSubjectsMap for the table
+	        model.addAttribute("users", allUsers);
+	        model.addAttribute("userSubjectsMap", userSubjectsMap);
 
-			model.addAttribute("healthStats", healthStats);
-			model.addAttribute("typeStats", typeStats);
-			model.addAttribute("totalCountByType", totalCountByType);
+	        model.addAttribute("pageTitle", "Super Admin Dashboard");
 
-			model.addAttribute("overallUp", overallUp);
-			model.addAttribute("overallDown", overallDown);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        System.err.println("Exception_SuperAdmin_Dashboard");
+	    }
 
-			model.addAttribute("userOnline", userOnline);
-			model.addAttribute("userOffline", userOffline);
-
-			model.addAttribute("playlistCount", playlistCount);
-			model.addAttribute("subPlaylistCount", subPlaylistCount);
-			model.addAttribute("scenarioCount", scenarioCount);
-			model.addAttribute("templateCount", templateCount);
-
-			model.addAttribute("pageTitle", "Super Admin Dashboard");
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("Exption_UserWise_Dshboard");
-			// TODO: handle exception
-		}
-
-		return "SuperAdmin_Dashboard";
+	    return "SuperAdmin_Dashboard";
 	}
 
 	private Double getDoubleValue(Object obj) {
@@ -893,15 +1040,91 @@ public class GuacamoleController {
 //	}
 	
 	
+//	@GetMapping("/UserWise_Dashboard")
+//	public String UserWise_Dashboard(Model model, Principal principal) {
+//	    Authentication auth = (Authentication) principal;
+//	    String username = auth.getName();
+//	    try {
+//	        long playlistCount = UserPlaylistMappingRepository.countByUserName(username);
+//	        long subPlaylistCount = UserSubplaylistMappingRepository.countByUserName(username);
+//	        long scenarioCount = UserScenarioMappingRepository.countByUserName(username);
+//
+//	        Integer falseCountObj = instructionTemplateRepository.getFalseCompletionCountsByTemplateId(username);
+//	        Integer trueCountObj = instructionTemplateRepository.getTrueCompletionCountsByTemplateId(username);
+//
+//	        int falseCount = (falseCountObj != null) ? falseCountObj : 0;
+//	        int trueCount = (trueCountObj != null) ? trueCountObj : 0;
+//
+//	        int total = trueCount + falseCount;
+//	        int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
+//
+//	        // Get all users with related entities
+//	        List<AppUser> users = AppUserRepository.findByUserName(username);
+//	        
+//	        // Create a map to store user subjects (key: userId, value: list of subjects)
+//	        Map<Long, List<SubjectMaster>> userSubjectsMap = new HashMap<>();
+//	        
+//	        // For each user, find their subjects based on semester ID
+//	        for (AppUser user : users) {
+//	            if (user.getSemesterName() != null) {
+//	                Integer semesterId = user.getSemesterName().getSemesterId();
+//	                List<SubjectMaster> userSubjects = SubjectMasterRepository.findBysemester_SemesterId(semesterId);
+//	                userSubjectsMap.put(user.getUserId(), userSubjects);
+//	                
+//	                System.out.println("User: " + user.getUserName() + 
+//	                                 ", Semester ID: " + semesterId + 
+//	                                 ", Subjects: " + userSubjects.size());
+//	            }
+//	        }
+//	        
+//	        model.addAttribute("playlistCount", playlistCount);
+//	        model.addAttribute("subPlaylistCount", subPlaylistCount);
+//	        model.addAttribute("scenarioCount", scenarioCount);
+//	        model.addAttribute("completionPercentage", percentage);
+//	        model.addAttribute("completedTasks", trueCount);
+//	        model.addAttribute("totalTasks", total);
+//	        model.addAttribute("users", users);
+//	        model.addAttribute("userSubjectsMap", userSubjectsMap); // Pass the map to view
+//	        model.addAttribute("pageTitle", "User Dashboard");
+//
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	        System.err.println("Exception_UserWise_Dashboard");
+//	    }
+//
+//	    return "UserWise_Dashboard";
+//	}
+	
+	
 	@GetMapping("/UserWise_Dashboard")
 	public String UserWise_Dashboard(Model model, Principal principal) {
 	    Authentication auth = (Authentication) principal;
 	    String username = auth.getName();
 	    try {
-	        long playlistCount = UserPlaylistMappingRepository.countByUserName(username);
-	        long subPlaylistCount = UserSubplaylistMappingRepository.countByUserName(username);
-	        long scenarioCount = UserScenarioMappingRepository.countByUserName(username);
+	        // Get current user
+	        List<AppUser> users = AppUserRepository.findByUserName(username);
+	        if (users.isEmpty()) {
+	            model.addAttribute("error", "User not found");
+	            return "UserWise_Dashboard";
+	        }
+	        
+	        AppUser currentUser = users.get(0);
+	        
+	        // Get user's semester and subjects
+	        Integer semesterId = null;
+	        List<SubjectMaster> userSubjects = new ArrayList<>();
+	        
+	        if (currentUser.getSemesterName() != null) {
+	            semesterId = currentUser.getSemesterName().getSemesterId();
+	            userSubjects = SubjectMasterRepository.findBysemester_SemesterId(semesterId);
+	        }
+	        
+	        // Count playlists, sub-playlists, and scenarios based on user's subjects
+	        long playlistCount = getPlaylistCountForUser(userSubjects);
+	        long subPlaylistCount = getSubPlaylistCountForUser(userSubjects);
+	        long scenarioCount = getScenarioCountForUser(userSubjects);
 
+	        // Your existing completion count logic
 	        Integer falseCountObj = instructionTemplateRepository.getFalseCompletionCountsByTemplateId(username);
 	        Integer trueCountObj = instructionTemplateRepository.getTrueCompletionCountsByTemplateId(username);
 
@@ -911,22 +1134,19 @@ public class GuacamoleController {
 	        int total = trueCount + falseCount;
 	        int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
 
-	        // Get all users with related entities
-	        List<AppUser> users = AppUserRepository.findByUserName(username);
-	        
 	        // Create a map to store user subjects (key: userId, value: list of subjects)
 	        Map<Long, List<SubjectMaster>> userSubjectsMap = new HashMap<>();
 	        
 	        // For each user, find their subjects based on semester ID
 	        for (AppUser user : users) {
 	            if (user.getSemesterName() != null) {
-	                Integer semesterId = user.getSemesterName().getSemesterId();
-	                List<SubjectMaster> userSubjects = SubjectMasterRepository.findBysemester_SemesterId(semesterId);
-	                userSubjectsMap.put(user.getUserId(), userSubjects);
+	                Integer userSemesterId = user.getSemesterName().getSemesterId();
+	                List<SubjectMaster> subjectsForUser = SubjectMasterRepository.findBysemester_SemesterId(userSemesterId);
+	                userSubjectsMap.put(user.getUserId(), subjectsForUser);
 	                
 	                System.out.println("User: " + user.getUserName() + 
-	                                 ", Semester ID: " + semesterId + 
-	                                 ", Subjects: " + userSubjects.size());
+	                                 ", Semester ID: " + userSemesterId + 
+	                                 ", Subjects: " + subjectsForUser.size());
 	            }
 	        }
 	        
@@ -937,7 +1157,7 @@ public class GuacamoleController {
 	        model.addAttribute("completedTasks", trueCount);
 	        model.addAttribute("totalTasks", total);
 	        model.addAttribute("users", users);
-	        model.addAttribute("userSubjectsMap", userSubjectsMap); // Pass the map to view
+	        model.addAttribute("userSubjectsMap", userSubjectsMap);
 	        model.addAttribute("pageTitle", "User Dashboard");
 
 	    } catch (Exception e) {
@@ -946,6 +1166,57 @@ public class GuacamoleController {
 	    }
 
 	    return "UserWise_Dashboard";
+	}
+
+	// Count playlists based on user's subjects
+	private long getPlaylistCountForUser(List<SubjectMaster> userSubjects) {
+	    if (userSubjects == null || userSubjects.isEmpty()) {
+	        return 0;
+	    }
+	    
+	    // Get subject IDs
+	    List<Integer> subjectIds = userSubjects.stream()
+	            .map(SubjectMaster::getSubjectId)
+	            .collect(Collectors.toList());
+	    
+	    // Get playlist IDs from mapping table
+	    List<Integer> playlistIds = SubjectPlaylistMappingRepository.findPlaylistIdsBySubjectIds(subjectIds);
+	    
+	    return playlistIds != null ? playlistIds.size() : 0;
+	}
+
+	// Count sub-playlists based on user's subjects
+	private long getSubPlaylistCountForUser(List<SubjectMaster> userSubjects) {
+	    if (userSubjects == null || userSubjects.isEmpty()) {
+	        return 0;
+	    }
+	    
+	    // Get subject IDs
+	    List<Integer> subjectIds = userSubjects.stream()
+	            .map(SubjectMaster::getSubjectId)
+	            .collect(Collectors.toList());
+	    
+	    // Get sub-playlist IDs from mapping table
+	    List<Integer> subPlaylistIds = SubjectSubplaylistMappingRepository.findSubPlaylistIdsBySubjectIds(subjectIds);
+	    
+	    return subPlaylistIds != null ? subPlaylistIds.size() : 0;
+	}
+
+	// Count scenarios based on user's subjects
+	private long getScenarioCountForUser(List<SubjectMaster> userSubjects) {
+	    if (userSubjects == null || userSubjects.isEmpty()) {
+	        return 0;
+	    }
+	    
+	    // Get subject IDs
+	    List<Integer> subjectIds = userSubjects.stream()
+	            .map(SubjectMaster::getSubjectId)
+	            .collect(Collectors.toList());
+	    
+	    // Get scenario IDs from mapping table
+	    List<Integer> scenarioIds = SubjectScenarioMappingRepository.findScenarioIdsBySubjectIds(subjectIds);
+	    
+	    return scenarioIds != null ? scenarioIds.size() : 0;
 	}
 
 //	@GetMapping("/UserWise_Dashboard")
@@ -6434,5 +6705,74 @@ public class GuacamoleController {
 	        return scenarios;
 	    }
 	    return new ArrayList<>();
+	}
+	
+	
+//	@GetMapping("/subjectView")
+//	public String subjectView(Model model, Principal principal) {
+//	    Authentication auth = (Authentication) principal;
+//	    String username = auth.getName();
+//	    try {
+//	        // Get current user
+//	        List<AppUser> users = AppUserRepository.findByUserName(username);
+//	        if (users.isEmpty()) {
+//	            model.addAttribute("error", "User not found");
+//	            return "subjectView";
+//	        }
+//	        
+//	        AppUser currentUser = users.get(0);
+//	        
+//	        // Get user's subjects based on semester (same logic as your dashboard)
+//	        List<SubjectMaster> userSubjects = new ArrayList<>();
+//	        if (currentUser.getSemesterName() != null) {
+//	            Integer semesterId = currentUser.getSemesterName().getSemesterId();
+//	            userSubjects = SubjectMasterRepository.findBysemester_SemesterId(semesterId);
+//	            
+//	            System.out.println("User: " + currentUser.getUserName() + 
+//	                             ", Semester ID: " + semesterId + 
+//	                             ", Subjects: " + userSubjects.size());
+//	        }
+//	        
+//	        model.addAttribute("user", currentUser);
+//	        model.addAttribute("userSubjects", userSubjects);
+//	        model.addAttribute("pageTitle", "My Subjects");
+//	        
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	        model.addAttribute("error", "Error loading subjects: " + e.getMessage());
+//	    }
+//	    
+//	    return "subjectView";
+//	}
+	
+	
+	@GetMapping("/subjectView/{userId}")
+	public String subjectView(@PathVariable("userId") Long userId, Model model, Principal principal) {
+	    try {
+	        // Verify user exists
+	        AppUser user = AppUserRepository.findByuserId(userId);
+	        
+	        // Get user's subjects based on semester
+	        List<SubjectMaster> userSubjects = new ArrayList<>();
+	        if (user.getSemesterName() != null) {
+	            Integer semesterId = user.getSemesterName().getSemesterId();
+	            userSubjects = SubjectMasterRepository.findBysemester_SemesterId(semesterId);
+	            
+	            System.out.println("User: " + user.getUserName() + 
+	                             ", User ID: " + userId +
+	                             ", Semester ID: " + semesterId + 
+	                             ", Subjects: " + userSubjects.size());
+	        }
+	        
+	        model.addAttribute("user", user);
+	        model.addAttribute("userSubjects", userSubjects);
+	        model.addAttribute("pageTitle", user.getName() + "'s Subjects");
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("error", "Error loading subjects: " + e.getMessage());
+	    }
+	    
+	    return "subjectView";
 	}
 }

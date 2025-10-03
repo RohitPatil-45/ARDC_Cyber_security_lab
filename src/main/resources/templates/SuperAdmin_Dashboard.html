@@ -1243,6 +1243,83 @@ translate
         </div>
     </div>
 </div>
+
+
+
+<!-- Users Table Section -->
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h3 class="card-title mb-0">
+            <i class="fas fa-users"></i> All Users
+        </h3>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="usersTable" class="table table-hover">
+    <thead>
+        <tr>
+            <th>Sr No.</th>
+            <th>User Name</th>
+            <th>Full Name</th>
+            <th>Department</th>
+            <th>Course</th>
+            <th>Semester</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="user, stat : ${users}">
+            <td th:text="${stat.count}">1</td>
+            <td>
+                <strong th:text="${user.userName}">Username</strong>
+            </td>
+            <td th:text="${user.name} ?: 'N/A'">Full Name</td>
+            
+            <!-- Department -->
+            <td>
+                <span th:if="${user.departmentName != null}" th:text="${user.departmentName.departmentName}"></span>
+                <span th:if="${user.departmentName == null}" class="text-muted">Not Assigned</span>
+            </td>
+            
+            <!-- Course -->
+            <td>
+                <span th:if="${user.courseName != null}" th:text="${user.courseName.courseName}"></span>
+                <span th:if="${user.courseName == null}" class="text-muted">Not Assigned</span>
+            </td>
+            
+            <!-- Semester -->
+            <td>
+                <span th:if="${user.semesterName != null}" th:text="${user.semesterName.semesterName}"></span>
+                <span th:if="${user.semesterName == null}" class="text-muted">Not Assigned</span>
+            </td>
+
+            <!-- Status -->
+            <td>
+                <span th:if="${user.enabled}">Active</span>
+                <span th:unless="${user.enabled}">Inactive</span>
+            </td>
+
+            <!-- Action - View Tasks Button -->
+            <td>
+                <div th:if="${userSubjectsMap != null and userSubjectsMap.get(user.userId) != null and !userSubjectsMap.get(user.userId).empty}">
+                    <a th:href="@{/guac/subjectView/{userId}(userId=${user.userId})}" 
+                       class="btn btn-primary btn-sm" 
+                       target="_blank">
+                        <i class="fas fa-tasks"></i> View Tasks
+                    </a>
+                </div>
+                <span th:if="${userSubjectsMap == null or userSubjectsMap.get(user.userId) == null or userSubjectsMap.get(user.userId).empty}">
+                    <span class="text-muted">-</span>
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+            
+        </div>
+    </div>
+</div>
 				
 		</div>
 		</section>

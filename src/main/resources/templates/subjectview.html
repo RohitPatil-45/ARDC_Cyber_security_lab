@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:include="template :: headFragment(${pageTitle})">
+    <title>My Subjects | Cyber Ranges</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<style>
+body {
+    background-color: #f8f9fa;
+    font-family: 'Roboto', sans-serif;
+}
+
+.content-wrapper {
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+.header-section {
+    background: linear-gradient(135deg, #2d4fa6, #1e3a8a);
+    color: white;
+    padding: 30px 0;
+    margin-bottom: 30px;
+    border-radius: 0 0 20px 20px;
+}
+
+.header-content h1 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.user-info-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    border: none;
+}
+
+.user-info-card .card-header {
+    background: linear-gradient(135deg, #2d4fa6, #1e3a8a);
+    color: white;
+    border-radius: 15px 15px 0 0 !important;
+    border: none;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+/* Subject Card Styling */
+.subject-card {
+    background: white;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    margin-bottom: 25px;
+    overflow: hidden;
+}
+
+
+
+.subject-card .card-header {
+    background: linear-gradient(135deg, #2d4fa6, #1e3a8a);
+    color: white;
+    border: none;
+    padding: 20px;
+    text-align: center;
+}
+
+.subject-card .card-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.card-body {
+    padding: 25px;
+    text-align: center;
+}
+
+.subject-icon {
+    margin-bottom: 20px;
+}
+
+.subject-icon i {
+    color: #2d4fa6;
+    font-size: 3rem;
+}
+
+.subject-code {
+    background: #f1f5f9;
+    color: #2d4fa6;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.subject-info {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #666;
+}
+
+.info-value {
+    color: #333;
+    font-weight: 500;
+}
+
+.start-btn {
+    background: linear-gradient(90deg, #16a34a, #22c55e);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.start-btn:hover {
+    background: linear-gradient(90deg, #15803d, #16a34a);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(22, 163, 74, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #ccc;
+    margin-bottom: 20px;
+}
+
+.empty-state h4 {
+    color: #666;
+    margin-bottom: 15px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .subject-card {
+        margin-bottom: 20px;
+    }
+    
+    .header-section {
+        padding: 20px 0;
+        margin-bottom: 20px;
+    }
+}
+</style>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div th:replace="fragments/header :: header"></div>
+        <div th:replace="fragments/sidebar :: aside"></div>
+
+        <div class="content-wrapper">
+            <!-- Header Section -->
+            
+            <section class="content-header">
+				<div class="container-fluid">
+					<div class="row align-items-center mb-4">
+						<div class="col-sm-6">
+							<h1 class="animate-fade-in">
+								<i class="fas fa-tachometer-alt mr-3"></i> <span>Subject List</span>
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#" class="text-decoration-none"> <i class="fas fa-home mr-2"></i>Home
+								</a></li>
+								<li class="breadcrumb-item active">Subject List</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Error Message -->
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span th:text="${error}"></span>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <!-- User Information Card -->
+                    <div class="card user-info-card">
+                        <div class="card-header">
+                            <h3 class="card-title mb-0"><i class="fas fa-user-graduate"></i> Student Information</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <strong><i class="fas fa-user"></i> Username:</strong> 
+                                    <span th:text="${user.userName}"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <strong><i class="fas fa-id-card"></i> Full Name:</strong> 
+                                    <span th:text="${user.name}"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <strong><i class="fas fa-layer-group"></i> Semester:</strong> 
+                                    <span th:if="${user.semesterName != null}" 
+                                          th:text="${user.semesterName.semesterName}" 
+                                          class="badge badge-success"></span>
+                                    <span th:if="${user.semesterName == null}" 
+                                          class="text-muted">Not Assigned</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subjects Grid -->
+                    <div class="row">
+                        <div th:each="subject : ${userSubjects}" class="col-lg-4 col-md-6">
+                            <div class="card subject-card">
+                                <div class="card-header">
+                                    <h5 class="card-title" th:text="${subject.subjectName}">Subject Name</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="subject-icon">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    
+                                    <div class="subject-code" th:text="${subject.subjectCode}">SUB001</div>
+                                    
+                                    <div class="subject-info">
+                                        <div class="info-item">
+                                            <span class="info-label">Subject Code:</span>
+                                            <span class="info-value" th:text="${subject.subjectCode}">CODE</span>
+                                        </div>
+                                        <div th:if="${subject.semester != null}" class="info-item">
+                                            <span class="info-label">Semester:</span>
+                                            <span class="info-value" th:text="${subject.semester.semesterName}">Semester</span>
+                                        </div>
+                                        <div th:if="${subject.semester != null and subject.semester.course != null}" class="info-item">
+                                            <span class="info-label">Course:</span>
+                                            <span class="info-value" th:text="${subject.semester.course.courseName}">Course</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <a th:href="@{/guac/viewsubjectTasks/{subjectId}(subjectId=${subject.subjectId})}" 
+                                       class="start-btn">
+                                        <i class="fas fa-play"></i> Start Learning
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div th:if="${userSubjects == null or userSubjects.empty}" class="empty-state">
+                        <i class="fas fa-book"></i>
+                        <h4>No Subjects Available</h4>
+                        <p>You don't have any subjects assigned to your semester.</p>
+                        <p class="text-muted">Please contact your administrator if you believe this is an error.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
+
+    <div th:replace="template :: jsscript"></div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log("Subject View page loaded successfully");
+        
+        // Add any additional JavaScript functionality here
+        const subjectCards = document.querySelectorAll('.subject-card');
+        subjectCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Prevent navigation if clicking on the start button (it has its own link)
+                if (!e.target.closest('.start-btn')) {
+                    const startBtn = this.querySelector('.start-btn');
+                    if (startBtn) {
+                        startBtn.click();
+                    }
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>

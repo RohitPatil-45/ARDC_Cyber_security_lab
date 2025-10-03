@@ -37,5 +37,9 @@ public interface AppUserRepository extends JpaRepository<AppUser, Integer> {
 
 	@Query(value = "SELECT user_name, status FROM app_user WHERE status = :status", nativeQuery = true)
 	List<Object[]> findUserNameAndStatusByStatus(@Param("status") String status);
+	
+	AppUser findByuserId(Long userId);
+	
+	
 
 }

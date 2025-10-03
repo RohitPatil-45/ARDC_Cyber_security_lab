@@ -4,404 +4,417 @@
 <head th:include="template :: headFragment(${pageTitle})">
 <title>Subject Tasks | Cyber Ranges</title>
 <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap"
-    rel="stylesheet">
+	href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap"
+	rel="stylesheet">
 </head>
 
 <style>
 body {
-    background-color: #ffffff;
-    color: #333333;
-    font-family: 'Roboto', sans-serif;
+	background-color: #ffffff;
+	color: #333333;
+	font-family: 'Roboto', sans-serif;
 }
 
 .content-wrapper {
-    background-color: #f8f9fa;
-    padding: 20px;
+	background-color: #f8f9fa;
+	padding: 20px;
 }
 
 /* Card Styling */
 .task-card {
-    background-color: #ffffff;
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
-    overflow: hidden;
-    color: #333333;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s, box-shadow 0.2s;
-    margin-bottom: 20px;
+	background-color: #ffffff;
+	border: 2px solid #e0e0e0;
+	border-radius: 12px;
+	overflow: hidden;
+	color: #333333;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+	transition: transform 0.2s, box-shadow 0.2s;
+	margin-bottom: 20px;
 }
 
 .task-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
 
 .card-image img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    display: block;
-    border-bottom: 2px solid #e9ecef;
+	width: 100%;
+	height: 200px;
+	object-fit: cover;
+	display: block;
+	border-bottom: 2px solid #e9ecef;
 }
 
 .card-content {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
 }
 
 .card-title {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #2d4fa6;
-    margin: 0;
+	font-family: 'Poppins', sans-serif;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: #2d4fa6;
+	margin: 0;
 }
 
 .card-subtitle {
-    font-size: 1.1rem;
-    color: #666666;
-    margin: 0;
-    font-weight: 500;
+	font-size: 1.1rem;
+	color: #666666;
+	margin: 0;
+	font-weight: 500;
 }
 
 .card-description {
-    font-size: 1rem;
-    color: #666666;
-    margin: 0;
-    line-height: 1.5;
+	font-size: 1rem;
+	color: #666666;
+	margin: 0;
+	line-height: 1.5;
 }
 
 .card-tags {
-    margin-top: 12px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+	margin-top: 12px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
 }
 
 .card-tags .tag {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #f1f5f9;
-    color: #2d4fa6;
-    font-size: 0.85rem;
-    font-weight: 500;
-    padding: 6px 12px;
-    border-radius: 12px;
-    text-transform: uppercase;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	background: #f1f5f9;
+	color: #2d4fa6;
+	font-size: 0.85rem;
+	font-weight: 500;
+	padding: 6px 12px;
+	border-radius: 12px;
+	text-transform: uppercase;
 }
 
 .card-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #e9ecef;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 15px;
+	padding-top: 15px;
+	border-top: 1px solid #e9ecef;
 }
 
 .start-btn {
-    background: linear-gradient(90deg, #16a34a, #22c55e);
-    color: #fff;
-    padding: 8px 20px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
+	background: linear-gradient(90deg, #16a34a, #22c55e);
+	color: #fff;
+	padding: 8px 20px;
+	border-radius: 20px;
+	font-size: 0.9rem;
+	font-weight: 600;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	transition: all 0.3s ease;
+	border: none;
+	cursor: pointer;
 }
 
 .start-btn:hover {
-    background: linear-gradient(90deg, #15803d, #16a34a);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    color: #fff;
-    text-decoration: none;
+	background: linear-gradient(90deg, #15803d, #16a34a);
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	color: #fff;
+	text-decoration: none;
 }
 
 .start-btn i {
-    font-size: 0.9rem;
+	font-size: 0.9rem;
 }
 
 .section-header {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #2d4fa6;
-    margin: 30px 0 20px 0;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e9ecef;
+	font-family: 'Poppins', sans-serif;
+	font-size: 1.8rem;
+	font-weight: 700;
+	color: #2d4fa6;
+	margin: 30px 0 20px 0;
+	padding-bottom: 10px;
+	border-bottom: 2px solid #e9ecef;
 }
 
 .section-header:first-child {
-    margin-top: 0;
+	margin-top: 0;
 }
 
 /* Empty state styling */
 .empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #666;
+	text-align: center;
+	padding: 40px 20px;
+	color: #666;
 }
 
 .empty-state i {
-    font-size: 3rem;
-    color: #ccc;
-    margin-bottom: 15px;
+	font-size: 3rem;
+	color: #ccc;
+	margin-bottom: 15px;
 }
 
 .empty-state h4 {
-    color: #666;
-    margin-bottom: 10px;
+	color: #666;
+	margin-bottom: 10px;
 }
 
 /* Content header */
 .content-header h1 {
-    color: #2d4fa6;
-    font-family: 'Poppins', sans-serif;
+	color: #2d4fa6;
+	font-family: 'Poppins', sans-serif;
 }
 
 /* Breadcrumb styling */
 .breadcrumb {
-    background-color: transparent;
+	background-color: transparent;
 }
 
 .breadcrumb-item a {
-    color: #2d4fa6;
-    text-decoration: none;
+	color: #2d4fa6;
+	text-decoration: none;
 }
 
 .breadcrumb-item a:hover {
-    color: #1e3a8a;
-    text-decoration: underline;
+	color: #1e3a8a;
+	text-decoration: underline;
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
-    .card-actions {
-        flex-direction: column;
-        gap: 10px;
-        align-items: flex-start;
-    }
-    
-    .start-btn {
-        align-self: stretch;
-        text-align: center;
-        justify-content: center;
-    }
+@media ( max-width : 768px) {
+	.card-actions {
+		flex-direction: column;
+		gap: 10px;
+		align-items: flex-start;
+	}
+	.start-btn {
+		align-self: stretch;
+		text-align: center;
+		justify-content: center;
+	}
 }
 
 /* Badge for type */
 .type-badge {
-    background: #2d4fa6;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
+	background: #2d4fa6;
+	color: white;
+	padding: 4px 8px;
+	border-radius: 6px;
+	font-size: 0.75rem;
+	font-weight: 600;
 }
 </style>
 
 <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
-        <div th:replace="fragments/header :: header"></div>
-        <div th:replace="fragments/sidebar :: aside"></div>
+	<div class="wrapper">
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
 
-        <div class="content-wrapper">
-            <section class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1>
-                                <i class="fas fa-tasks"></i> Subject Tasks
-                            </h1>
-                        </div>
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="#"><i
-                                        class="fas fa-home"></i> Home</a></li>
-                                <li class="breadcrumb-item active">Subject Tasks</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-            </section>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>
+								<i class="fas fa-tasks"></i> Subject Tasks
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#"><i
+										class="fas fa-home"></i> Home</a></li>
+								<li class="breadcrumb-item active">Subject Tasks</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
 
-            <section class="content">
-                <div class="container-fluid">
-                    
-                    <!-- Playlists Section -->
-                    <h3 class="section-header">
-                        <i class="fas fa-list-ol"></i> Playlists
-                        <span class="type-badge" th:text="${playlists.size()} + ' items'"></span>
-                    </h3>
-                    
-                    <div th:if="${playlists != null and !playlists.empty}">
-                        <div class="row">
-                            <div th:each="playlist : ${playlists}" class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                                <div class="task-card">
-                                    <div class="card-image">
-                                        <img th:src="@{/guac/Playlistimage/{id}(id=${playlist.id})}" 
-                                        
-                                             th:alt="${playlist.playlistTitle}" 
-                                             loading="lazy"
-                                             onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
-                                    </div>
-                                    <div class="card-content">
-                                        <h3 class="card-title" th:text="${playlist.playlistTitle}">Playlist Title</h3>
-                                        <h5 class="card-subtitle" th:text="${playlist.playlistName}">Playlist Name</h5>
-                                        <p class="card-description" th:text="${playlist.description} ?: 'No description available'">Description</p>
-                                        
-                                        <div class="card-tags">
-                                            <span th:if="${playlist.tag}" class="tag">
-                                                <i class="fas fa-tag"></i> 
-                                                <span th:text="${playlist.tag}">Tag</span>
-                                            </span>
-                                        </div>
-                                        
-                                        <div class="card-actions">
-                                            <span class="text-muted">Playlist</span>
-                                         <a th:href="@{/guac/View_Particular_Playlist(Id=${playlist.id})}" class="start-btn">
-    <i class="fas fa-play"></i> Start Playlist
-</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div th:if="${playlists == null or playlists.empty}" class="empty-state">
-                        <i class="fas fa-list-ol"></i>
-                        <h4>No Playlists Available</h4>
-                        <p>There are no playlists assigned to your subjects.</p>
-                    </div>
+			<section class="content">
+				<div class="container-fluid">
 
-                    <!-- Sub-Playlists Section -->
-                    <h3 class="section-header">
-                        <i class="fas fa-layer-group"></i> Sub-Playlists
-                        <span class="type-badge" th:text="${subPlaylists.size()} + ' items'"></span>
-                    </h3>
-                    
-                    <div th:if="${subPlaylists != null and !subPlaylists.empty}">
-                        <div class="row">
-                            <div th:each="subplaylist : ${subPlaylists}" class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                                <div class="task-card">
-                                    <div class="card-image">
-                                        <img th:src="@{/report/image/{id}(id=${subplaylist.id})}" 
-                                             th:alt="${subplaylist.playlistTitle}" 
-                                             loading="lazy"
-                                             onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
-                                    </div>
-                                    <div class="card-content">
-                                        <h3 class="card-title" th:text="${subplaylist.playlistTitle}">Sub-Playlist Title</h3>
-                                        <h5 class="card-subtitle" th:text="${subplaylist.playlistName}">Sub-Playlist Name</h5>
-                                        <p class="card-description" th:text="${subplaylist.description} ?: 'No description available'">Description</p>
-                                        
-                                        <div class="card-tags">
-                                            <span th:if="${subplaylist.tag}" class="tag">
-                                                <i class="fas fa-tag"></i> 
-                                                <span th:text="${subplaylist.tag}">Tag</span>
-                                            </span>
-                                        </div>
-                                        
-                                        <div class="card-actions">
-                                            <span class="text-muted">Sub-Playlist</span>
-                                            <a th:href="@{/guac/View_SubPalylist}" class="start-btn">
-                                                <i class="fas fa-play"></i> Start Sub-Playlist
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div th:if="${subPlaylists == null or subPlaylists.empty}" class="empty-state">
-                        <i class="fas fa-layer-group"></i>
-                        <h4>No Sub-Playlists Available</h4>
-                        <p>There are no sub-playlists assigned to your subjects.</p>
-                    </div>
+					<!-- Playlists Section -->
+					<h3 class="section-header">
+						<i class="fas fa-list-ol"></i> Playlists <span class="type-badge"
+							th:text="${playlists.size()} + ' items'"></span>
+					</h3>
 
-                    <!-- Scenarios Section -->
-                    <h3 class="section-header">
-                        <i class="fas fa-scroll"></i> Scenarios
-                        <span class="type-badge" th:text="${scenarios.size()} + ' items'"></span>
-                    </h3>
-                    
-                    <div th:if="${scenarios != null and !scenarios.empty}">
-                        <div class="row">
-                            <div th:each="scenario : ${scenarios}" class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                                <div class="task-card">
-                                    <div class="card-image">
-                                        <img th:src="@{/report/image/{id}(id=${scenario.id})}" 
-                                             th:alt="${scenario.scenarioTitle}" 
-                                             loading="lazy"
-                                             onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
-                                    </div>
-                                    <div class="card-content">
-                                        <h3 class="card-title" th:text="${scenario.scenarioTitle}">Scenario Title</h3>
-                                        <h5 class="card-subtitle" th:text="${scenario.scenarioName}">Scenario Name</h5>
-                                        
-                                        <div class="card-tags">
-                                            <span th:if="${scenario.category}" class="tag">
-                                                <i class="fas fa-folder"></i> 
-                                                <span th:text="${scenario.category}">Category</span>
-                                            </span>
-                                            <span th:if="${scenario.scenarioType}" class="tag">
-                                                <i class="fas fa-layer-group"></i> 
-                                                <span th:text="${scenario.scenarioType}">Type</span>
-                                            </span>
-                                            <span th:if="${scenario.difficultyLevel}" class="tag">
-                                                <i class="fas fa-signal"></i> 
-                                                <span th:text="${scenario.difficultyLevel}">Difficulty</span>
-                                            </span>
-                                        </div>
-                                        
-                                        <div class="card-actions">
-                                            <span class="text-muted">Scenario</span>
-                                            <a th:href="@{/guac/View_Scenario}" class="start-btn">
-                                                <i class="fas fa-play"></i> Start Scenario
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div th:if="${scenarios == null or scenarios.empty}" class="empty-state">
-                        <i class="fas fa-scroll"></i>
-                        <h4>No Scenarios Available</h4>
-                        <p>There are no scenarios assigned to your subjects.</p>
-                    </div>
+					<div th:if="${playlists != null and !playlists.empty}">
+						<div class="row">
+							<div th:each="playlist : ${playlists}"
+								class="col-lg-4 col-md-6 col-sm-12 mb-4">
+								<div class="task-card">
+									<div class="card-image">
+										<img th:src="@{/guac/Playlistimage/{id}(id=${playlist.id})}"
+											th:alt="${playlist.playlistTitle}" loading="lazy"
+											onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+									</div>
+									<div class="card-content">
+										<h3 class="card-title" th:text="${playlist.playlistTitle}">Playlist
+											Title</h3>
+										<h5 class="card-subtitle" th:text="${playlist.playlistName}">Playlist
+											Name</h5>
+										<p class="card-description"
+											th:text="${playlist.description} ?: 'No description available'">Description</p>
 
-                </div>
-            </section>
-        </div>
+										<div class="card-tags">
+											<span th:if="${playlist.tag}" class="tag"> <i
+												class="fas fa-tag"></i> <span th:text="${playlist.tag}">Tag</span>
+											</span>
+										</div>
 
-        <div th:replace="fragments/footer :: footer"></div>
-    </div>
+										<div class="card-actions">
+											<span class="text-muted">Playlist</span> <a
+												th:href="@{/guac/View_Particular_Playlist(Id=${playlist.id})}"
+												class="start-btn"> <i class="fas fa-play"></i> Start
+												Playlist
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
-    <div th:replace="template :: jsscript"></div>
+					<div th:if="${playlists == null or playlists.empty}"
+						class="empty-state">
+						<i class="fas fa-list-ol"></i>
+						<h4>No Playlists Available</h4>
+						<p>There are no playlists assigned to your subjects.</p>
+					</div>
 
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        console.log("Subject Tasks page loaded successfully");
-        
-        // Add any additional JavaScript functionality here if needed
-    });
-    </script>
+					<!-- Sub-Playlists Section -->
+					<h3 class="section-header">
+						<i class="fas fa-layer-group"></i> Sub-Playlists <span
+							class="type-badge" th:text="${subPlaylists.size()} + ' items'"></span>
+					</h3>
+
+					<div th:if="${subPlaylists != null and !subPlaylists.empty}">
+						<div class="row">
+							<div th:each="subplaylist : ${subPlaylists}"
+								class="col-lg-4 col-md-6 col-sm-12 mb-4">
+								<div class="task-card">
+									<div class="card-image">
+
+										<img
+											th:src="@{/guac/SubPlaylistimage/{id}(id=${subplaylist.id})}"
+											th:alt="${subplaylist.playlistTitle}" loading="lazy"
+											onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200?text=No+Image';" />
+
+
+									</div>
+									<div class="card-content">
+										<h3 class="card-title" th:text="${subplaylist.playlistTitle}">Sub-Playlist
+											Title</h3>
+										<h5 class="card-subtitle"
+											th:text="${subplaylist.playlistName}">Sub-Playlist Name</h5>
+										<p class="card-description"
+											th:text="${subplaylist.description} ?: 'No description available'">Description</p>
+
+										<div class="card-tags">
+											<span th:if="${subplaylist.tag}" class="tag"> <i
+												class="fas fa-tag"></i> <span th:text="${subplaylist.tag}">Tag</span>
+											</span>
+										</div>
+
+										<div class="card-actions">
+											<span class="text-muted">Sub-Playlist</span> <a
+												th:href="@{/guac/View_Particular_SubPlaylist(Id=${subplaylist.id})}"
+												class="start-btn"> <i class="fas fa-play"></i> Start
+												Sub-Playlist
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div th:if="${subPlaylists == null or subPlaylists.empty}"
+						class="empty-state">
+						<i class="fas fa-layer-group"></i>
+						<h4>No Sub-Playlists Available</h4>
+						<p>There are no sub-playlists assigned to your subjects.</p>
+					</div>
+
+					<!-- Scenarios Section -->
+					<h3 class="section-header">
+						<i class="fas fa-scroll"></i> Scenarios <span class="type-badge"
+							th:text="${scenarios.size()} + ' items'"></span>
+					</h3>
+
+					<div th:if="${scenarios != null and !scenarios.empty}">
+						<div class="row">
+							<div th:each="scenario : ${scenarios}"
+								class="col-lg-4 col-md-6 col-sm-12 mb-4">
+								<div class="task-card">
+									<div class="card-image">
+										<img th:src="@{/report/image/{id}(id=${scenario.id})}"
+											th:alt="${scenario.scenarioTitle}" loading="lazy"
+											onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+									</div>
+									<div class="card-content">
+										<h3 class="card-title" th:text="${scenario.scenarioTitle}">Scenario
+											Title</h3>
+										<h5 class="card-subtitle" th:text="${scenario.scenarioName}">Scenario
+											Name</h5>
+
+										<div class="card-tags">
+											<span th:if="${scenario.category}" class="tag"> <i
+												class="fas fa-folder"></i> <span
+												th:text="${scenario.category}">Category</span>
+											</span> <span th:if="${scenario.scenarioType}" class="tag"> <i
+												class="fas fa-layer-group"></i> <span
+												th:text="${scenario.scenarioType}">Type</span>
+											</span> <span th:if="${scenario.difficultyLevel}" class="tag">
+												<i class="fas fa-signal"></i> <span
+												th:text="${scenario.difficultyLevel}">Difficulty</span>
+											</span>
+										</div>
+
+										<div class="card-actions">
+											<span class="text-muted">Scenario</span> <a
+												th:href="@{/guac/View_Particular_Scenerio(Id=${scenario.id})}"
+												class="start-btn"> <i class="fas fa-play"></i> Start
+												Scenario
+											</a>
+
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div th:if="${scenarios == null or scenarios.empty}"
+						class="empty-state">
+						<i class="fas fa-scroll"></i>
+						<h4>No Scenarios Available</h4>
+						<p>There are no scenarios assigned to your subjects.</p>
+					</div>
+
+				</div>
+			</section>
+		</div>
+
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			console.log("Subject Tasks page loaded successfully");
+
+			// Add any additional JavaScript functionality here if needed
+		});
+	</script>
 </body>
 </html>
