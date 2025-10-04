@@ -640,7 +640,7 @@ body {
                     <a th:href="@{/guac/subjectView/{userId}(userId=${user.userId})}" 
                        class="btn btn-primary btn-sm" 
                        target="_blank">
-                        <i class="fas fa-tasks"></i> View Tasks
+                        <i class="fas fa-tasks"></i> View Subjects
                     </a>
                 </div>
                 <span th:if="${userSubjectsMap == null or userSubjectsMap.get(user.userId) == null or userSubjectsMap.get(user.userId).empty}">

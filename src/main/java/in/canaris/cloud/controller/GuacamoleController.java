@@ -3335,6 +3335,7 @@ public class GuacamoleController {
 //	}
 	
 	@GetMapping("/View_Playlist")
+	@ResponseBody
 	public ModelAndView getView_Playlist(Principal principal) {
 	    ModelAndView mav = new ModelAndView("View_Playlist");
 	    JSONArray Finalarray = new JSONArray();
