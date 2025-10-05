@@ -4,6 +4,11 @@
     <title>My Subjects | Cyber Ranges</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Select CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/css/bootstrap-multiselect.css">
+    
 </head>
 
 <style>
@@ -58,8 +63,6 @@ body {
     margin-bottom: 25px;
     overflow: hidden;
 }
-
-
 
 .subject-card .card-header {
     background: linear-gradient(135deg, #2d4fa6, #1e3a8a);
@@ -163,6 +166,117 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
+/* Add Subject Button */
+.add-subject-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2d4fa6, #1e3a8a);
+    color: white;
+    border: none;
+    box-shadow: 0 5px 20px rgba(45, 79, 166, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.add-subject-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(45, 79, 166, 0.6);
+    color: white;
+}
+
+/* Modal Styling */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #2d4fa6, #1e3a8a);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    border: none;
+    padding: 20px 25px;
+}
+
+.modal-header .modal-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.modal-footer {
+    border-top: 1px solid #eee;
+    padding: 20px 25px;
+    border-radius: 0 0 15px 15px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.submit-btn {
+    background: linear-gradient(90deg, #16a34a, #22c55e);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(90deg, #15803d, #16a34a);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(22, 163, 74, 0.3);
+    color: white;
+}
+
+.close-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    background: #5a6268;
+    color: white;
+}
+
+/* Bootstrap Select Customization */
+.bootstrap-select .dropdown-toggle {
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 10px 15px;
+}
+
+.bootstrap-select .dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.2rem rgba(45, 79, 166, 0.25);
+    border-color: #2d4fa6;
+}
+
+.bootstrap-select .dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .subject-card {
@@ -172,6 +286,13 @@ body {
     .header-section {
         padding: 20px 0;
         margin-bottom: 20px;
+    }
+    
+    .add-subject-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 55px;
+        height: 55px;
     }
 }
 </style>
@@ -262,7 +383,9 @@ body {
                                         </div>
                                         <div th:if="${subject.semester != null}" class="info-item">
                                             <span class="info-label">Semester:</span>
-                                            <span class="info-value" th:text="${subject.semester.semesterName}">Semester</span>
+                                            <span id="semesterId" class="info-value" th:text="${subject.semester.semesterName}">Semester</span>
+
+                                            
                                         </div>
                                         <div th:if="${subject.semester != null and subject.semester.course != null}" class="info-item">
                                             <span class="info-label">Course:</span>
@@ -293,26 +416,109 @@ body {
         <div th:replace="fragments/footer :: footer"></div>
     </div>
 
-    <div th:replace="template :: jsscript"></div>
+    <!-- Add Subject Button -->
+    <button type="button" class="add-subject-btn" data-toggle="modal" data-target="#electiveSubjectModal">
+        <i class="fas fa-plus"></i>
+    </button>
 
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        console.log("Subject View page loaded successfully");
-        
-        // Add any additional JavaScript functionality here
-        const subjectCards = document.querySelectorAll('.subject-card');
-        subjectCards.forEach(card => {
-            card.addEventListener('click', function(e) {
-                // Prevent navigation if clicking on the start button (it has its own link)
-                if (!e.target.closest('.start-btn')) {
-                    const startBtn = this.querySelector('.start-btn');
-                    if (startBtn) {
-                        startBtn.click();
-                    }
-                }
-            });
+    <!-- Elective Subject Modal -->
+    <!-- Elective Subject Modal -->
+<!-- Elective Subject Modal -->
+<div class="modal fade" id="electiveSubjectModal" tabindex="-1" role="dialog" aria-labelledby="electiveSubjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="electiveSubjectModalLabel">
+                    <i class="fas fa-book-medical mr-2"></i>Add Elective Subjects
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="electiveSubjectForm">
+                    <!-- Multiple ways to get semester ID -->
+                    <input type="hidden" id="semesterIdInput" 
+                           th:if="${user.semesterName != null}"
+                           th:value="${user.semesterName.semesterId}" />
+                    
+                    <!-- Alternative: Get from first subject if user semester is null -->
+                    <input type="hidden" id="semesterIdFromSubject" 
+                           th:if="${user.semesterName == null and !userSubjects.empty}"
+                           th:value="${userSubjects[0].semester.semesterId}" />
+                    
+                    <div class="form-group">
+                        <label for="electiveSubjects">Select Elective Subjects</label>
+                        <select class="form-control" id="electiveSubjects" multiple="multiple" name="electiveSubjects">
+                            <option th:each="elective : ${electiveSubjects}" 
+                                    th:value="${elective.id}" 
+                                    th:text="${elective.electiveSubjectName}">
+                            </option>
+                        </select>
+                        <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple subjects</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn close-btn" data-dismiss="modal">Close</button>
+                <button type="button" class="btn submit-btn" id="submitElectiveSubjects">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div th:replace="template :: jsscript"></div>
+    
+    <!-- Bootstrap Select JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/js/bootstrap-multiselect.min.js"></script>
+    
+
+ <script>
+$(document).ready(function() {
+    // Initialize multiselect
+    $('#electiveSubjects').multiselect({
+        includeSelectAllOption: true,
+        enableFiltering: true,
+        maxHeight: 250,
+        buttonWidth: '100%'
+    });
+
+    $('#submitElectiveSubjects').on('click', function () {
+        const selectedSubjects = $('#electiveSubjects').val();
+        let semesterId = $('#semesterIdInput').val() || $('#semesterIdFromSubject').val();
+
+        if (!selectedSubjects || selectedSubjects.length === 0) {
+            alert('Please select at least one elective subject.');
+            return;
+        }
+
+        if (!semesterId) {
+            alert('Semester information not found. Please ensure you are assigned to a semester.');
+            return;
+        }
+
+        $.ajax({
+            url: '/guac/electivesadd',
+            type: 'POST',
+            data: {
+                "subjectIds": selectedSubjects,
+                "semesterId": semesterId
+            },
+            success: function (response) {
+                alert('Elective subjects added successfully!');
+                $('#electiveSubjectModal').modal('hide');
+                $('#electiveSubjectForm')[0].reset();
+                $('#electiveSubjects').multiselect('refresh');
+            },
+            error: function (xhr) {
+                console.error("Error:", xhr);
+                alert('An error occurred: ' + (xhr.responseJSON?.message || xhr.statusText));
+            }
         });
     });
-    </script>
+
+});
+</script>
 </body>
 </html>

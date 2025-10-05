@@ -12,24 +12,24 @@ public class SubjectMaster {
 	@Column(name = "subject_id", updatable = false, nullable = false)
 	private int subjectId;
 
-	@Column(name = "subject_name", nullable = false, length = 100)
+	@Column(name = "subject_name", length = 100)
 	private String subjectName;
 
 	// Foreign Key → SemesterMaster
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "semester_id", nullable = false, referencedColumnName = "semester_id")
+	@JoinColumn(name = "semester_id", referencedColumnName = "semester_id")
 	private SemesterMaster semester;
 
 	@Column(name = "is_enabled", nullable = false)
 	private boolean isEnabled = true;
 
-	@Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	@Column(name = "created_at")
 	private Timestamp createdAt;
 
-	@Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+	@Column(name = "updated_at")
 	private Timestamp updatedAt;
 
-	@Column(name = "subject_code", nullable = false, length = 50)
+	@Column(name = "subject_code",  length = 50)
 	private String subjectCode;
 
 	// Getters & Setters

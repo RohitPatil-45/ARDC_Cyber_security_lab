@@ -51,25 +51,24 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- In your controller, pre-process the data and add simpler properties -->
-<tr th:each="electiveSubject, iterStat : ${electiveSubjects}">
-    <td th:text="${iterStat.count}">1</td>
-    <td th:text="${electiveSubject.departmentName != null} ? ${electiveSubject.departmentName} : 'N/A'">Department Name</td>
-    <td th:text="${electiveSubject.courseName != null} ? ${electiveSubject.courseName} : 'N/A'">Course Name</td>
-    <td th:text="${electiveSubject.semesterName != null} ? ${electiveSubject.semesterName} : 'N/A'">Semester Name</td>
-    <td th:text="${electiveSubject.electiveSubjectName}">Elective Subject Name</td>
-    <td>
-        <a th:href="@{/guac/Add_ElectiveSubject(Id=${electiveSubject.id})}"
-           class="btn btn-sm btn-info" title="Edit">
-            <i class="fas fa-edit"></i>
-        </a>
-        <a href="#"
-           th:onclick="'confirmDelete(' + ${electiveSubject.id} + ')'"
-           class="btn btn-sm btn-danger" title="Delete">
-            <i class="fas fa-trash-alt"></i>
-        </a>
-    </td>
-</tr>
+                                    <tr th:each="electiveSubject, iterStat : ${electiveSubjects}">
+                                        <td th:text="${iterStat.count}">1</td>
+                                        <td th:text="${electiveSubject.semester?.course?.department?.departmentName}">Department Name</td>
+                                        <td th:text="${electiveSubject.semester?.course?.courseName}">Course Name</td>
+                                        <td th:text="${electiveSubject.semester?.semesterName}">Semester Name</td>
+                                        <td th:text="${electiveSubject.electiveSubjectName}">Elective Subject Name</td>
+                                        <td>
+                                            <a th:href="@{/guac/Add_ElectiveSubject(Id=${electiveSubject.id})}"
+                                                class="btn btn-sm btn-info" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="#"
+                                                th:onclick="'confirmDelete(' + ${electiveSubject.id} + ')'"
+                                                class="btn btn-sm btn-danger" title="Delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
                                     <tr th:if="${#lists.isEmpty(electiveSubjects)}">
                                         <td colspan="6" class="text-center">No elective subjects found.</td>
                                     </tr>

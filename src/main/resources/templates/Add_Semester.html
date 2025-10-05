@@ -2,110 +2,127 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head th:replace="template :: headFragment(${pageTitle})">
-    <title th:text="${pageTitle}">Semester Form</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<title th:text="${pageTitle}">Semester Form</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+	<div class="wrapper">
 
-        <div th:replace="fragments/header :: header"></div>
-        <div th:replace="fragments/sidebar :: aside"></div>
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
 
-        <div class="content-wrapper">
-            <section class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1 th:text="${semester.semesterId == 0} ? 'Create Semester' : 'Edit Semester'">Semester Form</h1>
-                        </div>
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a th:href="@{/}"><i class="fas fa-home"></i> Home</a></li>
-                                <li class="breadcrumb-item"><a th:href="@{/semesters}">Semesters</a></li>
-                                <li class="breadcrumb-item active" th:text="${semester.semesterId == 0} ? 'Create' : 'Edit'">Action</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-            </section>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1
+								th:text="${semester.semesterId == 0} ? 'Create Semester' : 'Edit Semester'">Semester
+								Form</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a th:href="@{/}"><i
+										class="fas fa-home"></i> Home</a></li>
+								<li class="breadcrumb-item"><a th:href="@{/semesters}">Semesters</a></li>
+								<li class="breadcrumb-item active"
+									th:text="${semester.semesterId == 0} ? 'Create' : 'Edit'">Action</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
 
-            <section class="content">
-                <div class="container-fluid">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-calendar-alt"></i>
-                                <span th:text="${semester.semesterId == 0} ? 'Add New Semester' : 'Edit Semester'">Semester</span>
-                            </h3>
-                        </div>
+			<section class="content">
+				<div class="container-fluid">
+					<div class="card">
+						<div class="card-header">
+							<h3 class="card-title">
+								<i class="fas fa-calendar-alt"></i> <span
+									th:text="${semester.semesterId == 0} ? 'Add New Semester' : 'Edit Semester'">Semester</span>
+							</h3>
+						</div>
 
-                        <form th:action="@{/guac/saveSemester}" method="post" th:object="${semester}">
-                            <div class="card-body">
-                                <!-- Hidden semesterId -->
-                                <input type="hidden" th:field="*{semesterId}" />
+						<form th:action="@{/guac/saveSemester}" method="post"
+							th:object="${semester}">
+							<div class="card-body">
+								<!-- Hidden semesterId -->
+								<input type="hidden" th:field="*{semesterId}" />
+								
+								<!-- Department Dropdown -->
+								<div class="form-group">
+									<label for="department">Department</label> <select
+										id="department" class="form-control" required>
+										<option value="" disabled
+											th:selected="${semester.course == null || semester.course.department == null}">--
+											Select Department --</option>
+										<option th:each="dept : ${departments}"
+											th:value="${dept.departmentId}"
+											th:text="${dept.departmentName}"
+											th:selected="${selectedDepartmentId != null and dept.departmentId == selectedDepartmentId}">
+										</option>
+									</select>
+								</div>
 
-                                <!-- Department Dropdown -->
-                                <div class="form-group">
-                                    <label for="department">Department</label>
-                                    <select id="department" class="form-control" required>
-                                        <option value="" disabled th:selected="${semester.course == null || semester.course.department == null}">-- Select Department --</option>
-                                        <option th:each="dept : ${departments}"
-                                                th:value="${dept.departmentId}"
-                                                th:text="${dept.departmentName}"
-                                                th:selected="${selectedDepartmentId != null and dept.departmentId == selectedDepartmentId}">
-                                        </option>
-                                    </select>
-                                </div>
+								<!-- Course Dropdown -->
+								<div class="form-group">
+									<label for="course">Course</label> <select id="course"
+										name="course.courseId" class="form-control" required
+										th:data-selected="${semester.course != null ? semester.course.courseId : 0}">
+										<option value="">-- Select Course --</option>
+									</select>
+								</div>
 
-                                <!-- Course Dropdown -->
-                                <div class="form-group">
-                                    <label for="course">Course</label>
-                                    <select id="course" name="course.courseId" class="form-control" required
-                                            th:data-selected="${semester.course != null ? semester.course.courseId : 0}">
-                                        <option value="">-- Select Course --</option>
-                                    </select>
-                                </div>
+								<!-- Semester Name Input -->
+								<div class="form-group">
+									<label for="semesterName">Semester Name</label> <input
+										type="text" th:field="*{semesterName}" id="semesterName"
+										class="form-control" placeholder="Enter semester name"
+										required />
+								</div>
 
-                                <!-- Semester Name Input -->
-                                <div class="form-group">
-                                    <label for="semesterName">Semester Name</label>
-                                    <input type="text" th:field="*{semesterName}" id="semesterName" class="form-control"
-                                           placeholder="Enter semester name" required />
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="semesterName">Semester Code</label>
-                                    <input type="text" th:field="*{semesterCode}" id="semesterCode" class="form-control"
-                                           placeholder="Enter semester code" required />
-                                </div>
-                            </div>
-                            
-                            
+								<div class="form-group">
+									<label for="semesterName">Semester Code</label> <input
+										type="text" th:field="*{semesterCode}" id="semesterCode"
+										class="form-control" placeholder="Enter semester code"
+										required />
+								</div>
+								
+								
+								<div class="form-group form-check">
+								<input type="checkbox" th:field="*{elective}"
+									class="form-check-input" id="elective" /> <label
+									class="form-check-label" for="elective">Elective Subject</label>
+							</div>
+							</div>
 
-                            <div class="card-footer text-right">
-                                <a th:href="@{/guac/semesters}" class="btn btn-secondary">Cancel</a>
-                                <button type="reset" class="btn btn-outline-secondary">Reset</button>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Save
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </section>
-        </div>
+							
 
-        <div th:replace="fragments/footer :: footer"></div>
-    </div>
+							<div class="card-footer text-right">
+								<a th:href="@{/guac/semesters}" class="btn btn-secondary">Cancel</a>
+								<button type="reset" class="btn btn-outline-secondary">Reset</button>
+								<button type="submit" class="btn btn-primary">
+									<i class="fas fa-save"></i> Save
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</section>
+		</div>
 
-    <div th:replace="template :: jsscript"></div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
 
-    <!-- jQuery (for AJAX) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<div th:replace="template :: jsscript"></div>
 
-    <!-- Course Fetch Script -->
-  <script>
+	<!-- jQuery (for AJAX) -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+	<!-- Course Fetch Script -->
+	<script>
     $(document).ready(function () {
         const departmentSelect = $('#department');
         const courseSelect = $('#course');

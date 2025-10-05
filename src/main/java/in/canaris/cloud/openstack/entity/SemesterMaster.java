@@ -14,29 +14,34 @@ public class SemesterMaster {
     @Column(name = "semester_id", updatable = false, nullable = false)
     private int semesterId;
 
-    @Column(name = "semester_name", nullable = false, length = 50)
+    @Column(name = "semester_name", length = 50)
     private String semesterName;
     
-    @Column(name = "semester_code", nullable = false, length = 50)
+    @Column(name = "semester_code", length = 50)
     private String semesterCode;
 
     // Foreign Key → CourseMaster
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id", nullable = false, referencedColumnName = "course_id")
+    @JoinColumn(name = "course_id",  referencedColumnName = "course_id")
     private CourseMaster course;
 
-    @Column(name = "is_enabled", nullable = false)
+    @Column(name = "is_enabled")
     private boolean isEnabled = true;
 
-    @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_at")
     private Timestamp createdAt;
 
-    @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Column(name = "updated_at")
     private Timestamp updatedAt;
 
     // 👇 Relationship with Subjects (One semester can have many subjects)
     @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<SubjectMaster> subjects = new ArrayList<>();
+    
+    
+    @Column(name = "is_elective")
+    private boolean elective;
+
 
     // Getters & Setters
     public int getSemesterId() {
@@ -55,8 +60,6 @@ public class SemesterMaster {
         this.semesterName = semesterName;
     }
     
-    
-
     public String getSemesterCode() {
 		return semesterCode;
 	}
@@ -104,4 +107,20 @@ public class SemesterMaster {
     public void setSubjects(List<SubjectMaster> subjects) {
         this.subjects = subjects;
     }
+
+	public boolean isElective() {
+		return elective;
+	}
+
+	public void setElective(boolean elective) {
+		this.elective = elective;
+	}
+    
+   
+
+
+	
+	
+    
+    
 }

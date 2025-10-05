@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:include="template :: headFragment(${pageTitle})">
+    <title>Add Scenario In Sub Playlist | Cyber Ranges</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Bootstrap Multiselect CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/css/bootstrap-multiselect.css" />
+
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --light: #ecf0f1;
+            --danger: #e74c3c;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            border: none;
+        }
+
+        .card-header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0 !important;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .form-control {
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+
+        .required-field::after,
+        label.required::after {
+            content: "*";
+            color: var(--danger);
+            margin-left: 4px;
+        }
+
+        /* Validation styling */
+        .btn-group.is-invalid {
+            border: 1px solid var(--danger) !important;
+            border-radius: 6px !important;
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+
+        <div th:replace="fragments/header :: header"></div>
+        <div th:replace="fragments/sidebar :: aside"></div>
+
+        <div class="content-wrapper">
+
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>[[${pageTitle}]]</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i> Home</a></li>
+                                <li class="breadcrumb-item active">Playlists</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="container">
+                    <h2 class="mb-4">Map Elective Subject</h2>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-link"></i> Map Elective Subjects
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/guac/saveElectiveSubjectMapping}" method="post" id="mappingForm"
+                                onsubmit="return validateForm()">
+
+                                <div class="form-group">
+                                    <label for="electiveSubjectIds" class="required">Select Elective Subjects</label>
+                                    <select id="electiveSubjectIds" name="electiveSubjectIds" multiple="multiple"
+                                        class="form-control" required>
+                                        <option th:each="elective : ${electiveSubjects}" th:value="${elective.id}"
+                                            th:text="${elective.electiveSubjectName}"></option>
+                                    </select>
+                                    <div class="invalid-feedback" style="display:none;">Please select at least one
+                                        elective subject.</div>
+                                </div>
+
+                                <div class="text-right">
+                                    <a th:href="@{/guac/View_ElectiveSubjectMapping}"
+                                        class="btn btn-secondary mr-2">Cancel</a>
+                                    <button type="reset" class="btn btn-outline-secondary mr-2"
+                                        onclick="resetMultiselect()">Reset</button>
+                                    <button type="submit" class="btn btn-primary"><i
+                                            class="fas fa-save"></i> Save Mapping</button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
+
+    <div th:replace="template :: jsscript"></div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS and Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap Multiselect JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/js/bootstrap-multiselect.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize Bootstrap Multiselect
+            $('#electiveSubjectIds').multiselect({
+                includeSelectAllOption: true,
+                enableFiltering: true,
+                buttonWidth: '100%',
+                maxHeight: 250,
+                nonSelectedText: 'Select Elective Subjects',
+                allSelectedText: 'All Selected',
+                numberDisplayed: 2
+            });
+
+            // Remove invalid class when selection changes
+            $('#electiveSubjectIds').on('change', function () {
+                if ($(this).val() && $(this).val().length > 0) {
+                    $(this).next('.btn-group').removeClass('is-invalid');
+                    $(this).siblings('.invalid-feedback').hide();
+                }
+            });
+        });
+
+        function validateForm() {
+            const selected = $('#electiveSubjectIds').val();
+            if (!selected || selected.length === 0) {
+                // Show validation error on multiselect button
+                $('#electiveSubjectIds').next('.btn-group').addClass('is-invalid');
+                $('#electiveSubjectIds').siblings('.invalid-feedback').show();
+                return false;
+            }
+            return true;
+        }
+
+        function resetMultiselect() {
+            $('#electiveSubjectIds').multiselect('deselectAll', false);
+            $('#electiveSubjectIds').next('.btn-group').removeClass('is-invalid');
+            $('#electiveSubjectIds').siblings('.invalid-feedback').hide();
+        }
+    </script>
+</body>
+
+</html>
