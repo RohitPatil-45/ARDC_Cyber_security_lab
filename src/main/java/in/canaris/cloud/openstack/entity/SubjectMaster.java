@@ -31,6 +31,9 @@ public class SubjectMaster {
 
 	@Column(name = "subject_code",  length = 50)
 	private String subjectCode;
+	
+	@Column(name = "is_elective")
+    private boolean elective;
 
 	// Getters & Setters
 	public int getSubjectId() {
@@ -88,4 +91,14 @@ public class SubjectMaster {
 	public void setSubjectCode(String subjectCode) {
 		this.subjectCode = subjectCode;
 	}
+
+	public boolean isElective() {
+		return elective;
+	}
+
+	public void setElective(boolean elective) {
+		this.elective = elective;
+	}
+	
+	
 }

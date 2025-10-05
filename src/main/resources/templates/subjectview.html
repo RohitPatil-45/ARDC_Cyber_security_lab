@@ -6,9 +6,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap Select CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
-    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/css/bootstrap-multiselect.css">
-    
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 
 <style>
@@ -72,6 +72,10 @@ body {
     text-align: center;
 }
 
+.elective-card .card-header {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+}
+
 .subject-card .card-title {
     font-family: 'Poppins', sans-serif;
     font-weight: 700;
@@ -93,6 +97,10 @@ body {
     font-size: 3rem;
 }
 
+.elective-icon i {
+    color: #f59e0b !important;
+}
+
 .subject-code {
     background: #f1f5f9;
     color: #2d4fa6;
@@ -102,6 +110,11 @@ body {
     font-size: 0.9rem;
     display: inline-block;
     margin-bottom: 20px;
+}
+
+.elective-code {
+    background: #fef3c7 !important;
+    color: #d97706 !important;
 }
 
 .subject-info {
@@ -146,6 +159,15 @@ body {
     box-shadow: 0 5px 15px rgba(22, 163, 74, 0.3);
     color: white;
     text-decoration: none;
+}
+
+.elective-btn {
+    background: linear-gradient(90deg, #f59e0b, #d97706) !important;
+}
+
+.elective-btn:hover {
+    background: linear-gradient(90deg, #eab308, #ca8a04) !important;
+    box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3) !important;
 }
 
 .empty-state {
@@ -277,6 +299,21 @@ body {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
+/* Section Headers */
+.section-header {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #2d4fa6;
+    margin: 30px 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.elective-section {
+    color: #f59e0b !important;
+    border-bottom-color: #fef3c7 !important;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .subject-card {
@@ -303,8 +340,6 @@ body {
         <div th:replace="fragments/sidebar :: aside"></div>
 
         <div class="content-wrapper">
-            <!-- Header Section -->
-            
             <section class="content-header">
 				<div class="container-fluid">
 					<div class="row align-items-center mb-4">
@@ -315,8 +350,7 @@ body {
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
-								<li class="breadcrumb-item"><a href="#" class="text-decoration-none"> <i class="fas fa-home mr-2"></i>Home
-								</a></li>
+								<li class="breadcrumb-item"><a href="#" class="text-decoration-none"> <i class="fas fa-home mr-2"></i>Home</a></li>
 								<li class="breadcrumb-item active">Subject List</li>
 							</ol>
 						</div>
@@ -362,48 +396,98 @@ body {
                         </div>
                     </div>
 
-                    <!-- Subjects Grid -->
-                    <div class="row">
-                        <div th:each="subject : ${userSubjects}" class="col-lg-4 col-md-6">
-                            <div class="card subject-card">
-                                <div class="card-header">
-                                    <h5 class="card-title" th:text="${subject.subjectName}">Subject Name</h5>
+                    <!-- Regular Subjects Section -->
+                    <div th:if="${not userSubjects.empty}">
+                        <h4 class="section-header">
+                            <i class="fas fa-book mr-2"></i>Regular Subjects
+                        </h4>
+                        <div class="row">
+                            <div th:each="subject : ${userSubjects}" class="col-lg-4 col-md-6">
+                                <div class="card subject-card">
+                                    <div class="card-header">
+                                        <h5 class="card-title" th:text="${subject.subjectName}">Subject Name</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="subject-icon">
+                                            <i class="fas fa-book"></i>
+                                        </div>
+                                        
+                                        <div class="subject-code" th:text="${subject.subjectCode}">SUB001</div>
+                                        
+                                        <div class="subject-info">
+                                            <div class="info-item">
+                                                <span class="info-label">Subject Code:</span>
+                                                <span class="info-value" th:text="${subject.subjectCode}">CODE</span>
+                                            </div>
+                                            <div th:if="${subject.semester != null}" class="info-item">
+                                                <span class="info-label">Semester:</span>
+                                                <span class="info-value" th:text="${subject.semester.semesterName}">Semester</span>
+                                            </div>
+                                            <div th:if="${subject.semester != null and subject.semester.course != null}" class="info-item">
+                                                <span class="info-label">Course:</span>
+                                                <span class="info-value" th:text="${subject.semester.course.courseName}">Course</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="info-label">Type:</span>
+                                                <span class="info-value">Regular</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <a th:href="@{/guac/viewsubjectTasks/{subjectId}(subjectId=${subject.subjectId})}" 
+                                           class="start-btn">
+                                            <i class="fas fa-play"></i> Start Learning
+                                        </a>
+                                    </div>
                                 </div>
-                                <div class="card-body">
-                                    <div class="subject-icon">
-                                        <i class="fas fa-book"></i>
-                                    </div>
-                                    
-                                    <div class="subject-code" th:text="${subject.subjectCode}">SUB001</div>
-                                    
-                                    <div class="subject-info">
-                                        <div class="info-item">
-                                            <span class="info-label">Subject Code:</span>
-                                            <span class="info-value" th:text="${subject.subjectCode}">CODE</span>
-                                        </div>
-                                        <div th:if="${subject.semester != null}" class="info-item">
-                                            <span class="info-label">Semester:</span>
-                                            <span id="semesterId" class="info-value" th:text="${subject.semester.semesterName}">Semester</span>
+                            </div>
+                        </div>
+                    </div>
 
-                                            
-                                        </div>
-                                        <div th:if="${subject.semester != null and subject.semester.course != null}" class="info-item">
-                                            <span class="info-label">Course:</span>
-                                            <span class="info-value" th:text="${subject.semester.course.courseName}">Course</span>
-                                        </div>
+                    <!-- Elective Subjects Section -->
+                    <div th:if="${not userElectiveSubjects.empty}">
+                        <h4 class="section-header elective-section">
+                            <i class="fas fa-star mr-2"></i>Elective Subjects
+                        </h4>
+                        <div class="row">
+                            <div th:each="elective : ${userElectiveSubjects}" class="col-lg-4 col-md-6">
+                                <div class="card subject-card elective-card">
+                                    <div class="card-header">
+                                        <h5 class="card-title" th:text="${elective.subjectName}">Elective Subject Name</h5>
                                     </div>
-                                    
-                                    <a th:href="@{/guac/viewsubjectTasks/{subjectId}(subjectId=${subject.subjectId})}" 
-                                       class="start-btn">
-                                        <i class="fas fa-play"></i> Start Learning
-                                    </a>
+                                    <div class="card-body">
+                                        <div class="subject-icon elective-icon">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        
+                                        <div class="subject-code elective-code">ELECTIVE</div>
+                                        
+                                        <div class="subject-info">
+                                            <div class="info-item">
+                                                <span class="info-label">Subject Name:</span>
+                                                <span class="info-value" th:text="${elective.subjectName}">Elective Subject</span>
+                                            </div>
+                                            <div th:if="${elective.semester != null}" class="info-item">
+                                                <span class="info-label">Semester:</span>
+                                                <span class="info-value" th:text="${elective.semester.semesterName}">Semester</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="info-label">Type:</span>
+                                                <span class="info-value">Elective</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <a th:href="@{/guac/viewsubjectTasks/{subjectId}(subjectId=${elective.subjectId})}" 
+                                           class="start-btn elective-btn">
+                                            <i class="fas fa-play"></i> Start Learning
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Empty State -->
-                    <div th:if="${userSubjects == null or userSubjects.empty}" class="empty-state">
+                    <div th:if="${(userSubjects == null or userSubjects.empty) and (userElectiveSubjects == null or userElectiveSubjects.empty)}" class="empty-state">
                         <i class="fas fa-book"></i>
                         <h4>No Subjects Available</h4>
                         <p>You don't have any subjects assigned to your semester.</p>
@@ -417,108 +501,145 @@ body {
     </div>
 
     <!-- Add Subject Button -->
+    <!-- Add Subject Button -->
+<div id="eletiveAddDiv" th:if="${!hasElectiveMappings}">
     <button type="button" class="add-subject-btn" data-toggle="modal" data-target="#electiveSubjectModal">
         <i class="fas fa-plus"></i>
     </button>
+</div>
+
+  
 
     <!-- Elective Subject Modal -->
-    <!-- Elective Subject Modal -->
-<!-- Elective Subject Modal -->
-<div class="modal fade" id="electiveSubjectModal" tabindex="-1" role="dialog" aria-labelledby="electiveSubjectModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="electiveSubjectModalLabel">
-                    <i class="fas fa-book-medical mr-2"></i>Add Elective Subjects
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="electiveSubjectForm">
-                    <!-- Multiple ways to get semester ID -->
-                    <input type="hidden" id="semesterIdInput" 
-                           th:if="${user.semesterName != null}"
-                           th:value="${user.semesterName.semesterId}" />
-                    
-                    <!-- Alternative: Get from first subject if user semester is null -->
-                    <input type="hidden" id="semesterIdFromSubject" 
-                           th:if="${user.semesterName == null and !userSubjects.empty}"
-                           th:value="${userSubjects[0].semester.semesterId}" />
-                    
-                    <div class="form-group">
-                        <label for="electiveSubjects">Select Elective Subjects</label>
-                        <select class="form-control" id="electiveSubjects" multiple="multiple" name="electiveSubjects">
-                            <option th:each="elective : ${electiveSubjects}" 
-                                    th:value="${elective.id}" 
-                                    th:text="${elective.electiveSubjectName}">
-                            </option>
-                        </select>
-                        <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple subjects</small>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn close-btn" data-dismiss="modal">Close</button>
-                <button type="button" class="btn submit-btn" id="submitElectiveSubjects">Submit</button>
+    <div class="modal fade" id="electiveSubjectModal" tabindex="-1" role="dialog" aria-labelledby="electiveSubjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="electiveSubjectModalLabel">
+                        <i class="fas fa-book-medical mr-2"></i>Add Elective Subjects
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="electiveSubjectForm">
+                        <input type="hidden" id="semesterIdInput" 
+                               th:if="${user.semesterName != null}"
+                               th:value="${user.semesterName.semesterId}" />
+                        
+                        <input type="hidden" id="semesterIdFromSubject" 
+                               th:if="${user.semesterName == null and !userSubjects.empty}"
+                               th:value="${userSubjects[0].semester.semesterId}" />
+                        
+                        <div class="form-group">
+                            <label for="electiveSubjects">Select Elective Subjects</label>
+                            <select class="form-control" id="electiveSubjects" multiple="multiple" name="electiveSubjects">
+                                <option th:each="elective : ${electiveSubjects}" 
+                                        th:value="${elective.subjectId}" 
+                                        th:text="${elective.subjectName}">
+                                </option>
+                            </select>
+                            <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple subjects</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn close-btn" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn submit-btn" id="submitElectiveSubjects">Submit</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <div th:replace="template :: jsscript"></div>
     
     <!-- Bootstrap Select JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/js/bootstrap-multiselect.min.js"></script>
-    
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
- <script>
-$(document).ready(function() {
-    // Initialize multiselect
-    $('#electiveSubjects').multiselect({
-        includeSelectAllOption: true,
-        enableFiltering: true,
-        maxHeight: 250,
-        buttonWidth: '100%'
-    });
+    <script>
+    $(document).ready(function() {
+        // Initialize multiselect
+        $('#electiveSubjects').multiselect({
+            includeSelectAllOption: true,
+            enableFiltering: true,
+            maxHeight: 250,
+            buttonWidth: '100%'
+        });
 
-    $('#submitElectiveSubjects').on('click', function () {
-        const selectedSubjects = $('#electiveSubjects').val();
-        let semesterId = $('#semesterIdInput').val() || $('#semesterIdFromSubject').val();
+        $('#submitElectiveSubjects').on('click', function () {
+            const selectedSubjects = $('#electiveSubjects').val();
+            let semesterId = $('#semesterIdInput').val() || $('#semesterIdFromSubject').val();
 
-        if (!selectedSubjects || selectedSubjects.length === 0) {
-            alert('Please select at least one elective subject.');
-            return;
-        }
-
-        if (!semesterId) {
-            alert('Semester information not found. Please ensure you are assigned to a semester.');
-            return;
-        }
-
-        $.ajax({
-            url: '/guac/electivesadd',
-            type: 'POST',
-            data: {
-                "subjectIds": selectedSubjects,
-                "semesterId": semesterId
-            },
-            success: function (response) {
-                alert('Elective subjects added successfully!');
-                $('#electiveSubjectModal').modal('hide');
-                $('#electiveSubjectForm')[0].reset();
-                $('#electiveSubjects').multiselect('refresh');
-            },
-            error: function (xhr) {
-                console.error("Error:", xhr);
-                alert('An error occurred: ' + (xhr.responseJSON?.message || xhr.statusText));
+            if (!selectedSubjects || selectedSubjects.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Selection Required',
+                    text: 'Please select at least one elective subject.',
+                    confirmButtonColor: '#2d4fa6'
+                });
+                return;
             }
+
+            if (!semesterId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Semester Not Found',
+                    text: 'Semester information not found. Please ensure you are assigned to a semester.',
+                    confirmButtonColor: '#2d4fa6'
+                });
+                return;
+            }
+
+            // Show loading state
+            Swal.fire({
+                title: 'Adding Subjects...',
+                text: 'Please wait while we process your request',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const params = new URLSearchParams();
+            selectedSubjects.forEach(subjectId => {
+                params.append('subjectIds', subjectId);
+            });
+            params.append('semesterId', semesterId);
+
+            $.ajax({
+                url: '/guac/electivesadd',
+                type: 'POST',
+                data: params.toString(),
+                success: function (response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Elective subjects added successfully!',
+                        confirmButtonColor: '#16a34a',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        $('#electiveSubjectModal').modal('hide');
+                        $('#electiveSubjectForm')[0].reset();
+                        $('#electiveSubjects').multiselect('refresh');
+                        location.reload();
+                    });
+                },
+                error: function (xhr) {
+                    console.error("Error:", xhr);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred: ' + (xhr.responseJSON?.message || xhr.statusText),
+                        confirmButtonColor: '#dc3545'
+                    });
+                }
+            });
         });
     });
-
-});
-</script>
+    </script>
 </body>
 </html>

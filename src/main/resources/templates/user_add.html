@@ -223,17 +223,14 @@
 
 
 <div class="form-group">
-													<label>Batch</label> <select id="batchSelect"
-														class="form-control" name="batchId"
-														th:field="*{appUser.batchName}" required>
-														<option value="">-- Select Batch --</option>
-														<option value="2021">2021</option>
-														<option value="2022">2022</option>
-														<option value="2023">2023</option>
-														<option value="2024">2024</option>
-														<option value="2025">2025</option>
-													</select>
-												</div>
+    <label>Batch</label>
+    <select id="batchSelect" class="form-control" name="batchId"
+            th:field="*{appUser.batchName}" required>
+        <option value="">-- Select Batch --</option>
+        <!-- Dynamically populated via jQuery -->
+    </select>
+</div>
+
 
 											</div>
 
@@ -348,6 +345,7 @@
         if (!cId) {
             semSel.html('<option value="">-- Select Semester --</option>');
             subjectSel.html('<option value="">-- Select Subject --</option>');
+            $('#batchSelect').html('<option value="">-- Select Batch --</option>');
             return;
         }
         $.ajax({
@@ -378,6 +376,19 @@
                 subjectSel.empty().append('<option value="">-- Select Subject --</option>');
                 data.forEach(sub => {
                     subjectSel.append(`<option value="${sub.subjectId}">${sub.subjectName}</option>`);
+                });
+            }
+        });
+        
+        $.ajax({
+            url: '/guac/batches',
+            type: 'GET',
+            data: { semesterId: sId },
+            success: function(data) {
+                const batchSelect = $('#batchSelect');
+                batchSelect.empty().append('<option value="">-- Select Batch --</option>');
+                data.forEach(b => {
+                    batchSelect.append(`<option value="${b.batchId}">${b.batchName}</option>`);
                 });
             }
         });

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment(${pageTitle})"></head>
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/multiselect/bootstrap-multiselect.css}">
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header_bk :: header"></div>
+
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Enroll to Elective Subject</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Enroll to Elective Subject</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/elective/enrollments'}"
+												class="btn btn-block bg-gradient-primary">View Enrollments</a>
+										</div>
+									</div>
+								</div>
+								<form th:action="@{/elective/enroll/save}" method="post"
+									onsubmit="return validateEnrollmentForm()">
+									<div class="card-body">
+										<div class="row">
+											<!-- Department dropdown -->
+											<div class="col-md-6">
+												<div class="form-group">
+													<label>Department</label> 
+													<select id="departmentSelect"
+														class="form-control" name="departmentId" required>
+														<option value="">-- Select Department --</option>
+														<option th:each="d : ${departments}"
+															th:value="${d.departmentId}"
+															th:text="${d.departmentName}"></option>
+													</select>
+												</div>
+											</div>
+											<div class="col-md-6">
+												<!-- Course dropdown -->
+												<div class="form-group">
+													<label>Course</label> 
+													<select id="courseSelect"
+														class="form-control" name="courseId" required>
+														<option value="">-- Select Course --</option>
+													</select>
+												</div>
+											</div>
+
+											<div class="col-md-6">
+												<!-- Semester dropdown -->
+												<div class="form-group">
+													<label>Semester</label> 
+													<select id="semesterSelect"
+														class="form-control" name="semesterId" required>
+														<option value="">-- Select Semester --</option>
+													</select>
+												</div>
+											</div>
+											<div class="col-md-6">
+												<!-- Batch dropdown -->
+												<div class="form-group">
+													<label>Batch</label>
+													<select id="batchSelect" class="form-control" name="batchId" required>
+														<option value="">-- Select Batch --</option>
+													</select>
+												</div>
+											</div>
+											
+											<div class="col-md-6">
+												<!-- Users multiselect -->
+												<div class="form-group">
+													<label>Users</label>
+													<select id="userSelect" class="form-control select2" name="userIds" 
+															multiple="multiple" required style="width: 100%;">
+														<option value="">-- Select Users --</option>
+														<option th:each="user : ${users}"
+															th:value="${user.userId}"
+															th:text="${user.name + ' (' + user.userName + ')'}"></option>
+													</select>
+												</div>
+											</div>
+											
+											<div class="col-md-6">
+												<!-- Elective Subjects multiselect -->
+												<div class="form-group">
+													<label>Elective Subjects</label>
+													<select id="electiveSubjectSelect" class="form-control select2" 
+															name="subjectIds" multiple="multiple" required style="width: 100%;">
+														<option value="">-- Select Elective Subjects --</option>
+														<!-- Dynamically populated based on semester selection -->
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="card-footer" id="adduseridd">
+										<button type="submit" id="enrollForm" class="btn btn-primary">Enroll</button>
+										<a th:href="@{'/elective/enrollments'}" class="btn btn-secondary">Cancel</a>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.container-fluid -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+</body>
+<script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+<script
+	th:src="@{/webtemplate/multiselect/bootstrap-multiselect.min.js}"></script>
+<script th:src="@{/webtemplate/multiselect/bootstrap-multi.js}"></script>
+<script th:src="@{/webtemplate/multiselect/bootstrap-multiselect.js}"></script>
+<script
+	th:src="@{/webtemplate/multiselect/bootstrap-multiselect.min.js.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+<script
+	th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+
+<script th:inline="javascript">
+	$(function() {
+		// Initialize select2 for multiselect
+		$('.select2').select2({
+			placeholder: "Select options",
+			allowClear: true
+		});
+	});
+
+	$(document).ready(function() {
+    const deptSel = $('#departmentSelect');
+    const courseSel = $('#courseSelect');
+    const semSel = $('#semesterSelect');
+    const batchSel = $('#batchSelect');
+    const electiveSubjectSel = $('#electiveSubjectSelect');
+
+    deptSel.change(function() {
+        const deptId = $(this).val();
+        if (!deptId) {
+            courseSel.html('<option value="">-- Select Course --</option>');
+            semSel.html('<option value="">-- Select Semester --</option>');
+            batchSel.html('<option value="">-- Select Batch --</option>');
+            electiveSubjectSel.html('<option value="">-- Select Elective Subjects --</option>');
+            return;
+        }
+        $.ajax({
+            url: '/guac/courses',
+            type: 'GET',
+            data: { departmentId: deptId },
+            success: function(data) {
+                courseSel.empty().append('<option value="">-- Select Course --</option>');
+                semSel.html('<option value="">-- Select Semester --</option>');
+                batchSel.html('<option value="">-- Select Batch --</option>');
+                electiveSubjectSel.html('<option value="">-- Select Elective Subjects --</option>');
+                data.forEach(c => {
+                    courseSel.append(`<option value="${c.courseId}">${c.courseName}</option>`);
+                });
+            }
+        });
+    });
+
+    courseSel.change(function() {
+        const cId = $(this).val();
+        if (!cId) {
+            semSel.html('<option value="">-- Select Semester --</option>');
+            batchSel.html('<option value="">-- Select Batch --</option>');
+            electiveSubjectSel.html('<option value="">-- Select Elective Subjects --</option>');
+            return;
+        }
+        $.ajax({
+            url: '/guac/semesters',
+            type: 'GET',
+            data: { courseId: cId },
+            success: function(data) {
+                semSel.empty().append('<option value="">-- Select Semester --</option>');
+                batchSel.html('<option value="">-- Select Batch --</option>');
+                electiveSubjectSel.html('<option value="">-- Select Elective Subjects --</option>');
+                data.forEach(s => {
+                    semSel.append(`<option value="${s.semesterId}">${s.semesterName}</option>`);
+                });
+            }
+        });
+    });
+
+    semSel.change(function() {
+        const sId = $(this).val();
+        if (!sId) {
+            batchSel.html('<option value="">-- Select Batch --</option>');
+            electiveSubjectSel.html('<option value="">-- Select Elective Subjects --</option>');
+            return;
+        }
+        
+        // Fetch batches for the selected semester
+        $.ajax({
+            url: '/guac/batches',
+            type: 'GET',
+            data: { semesterId: sId },
+            success: function(data) {
+                batchSel.empty().append('<option value="">-- Select Batch --</option>');
+                data.forEach(b => {
+                    batchSel.append(`<option value="${b.batchId}">${b.batchName}</option>`);
+                });
+            }
+        });
+        
+        // Fetch elective subjects for the selected semester
+        $.ajax({
+            url: '/guac/elective-subjects',
+            type: 'GET',
+            data: { semesterId: sId },
+            success: function(data) {
+                electiveSubjectSel.empty().append('<option value="">-- Select Elective Subjects --</option>');
+                if (data && data.length > 0) {
+                    data.forEach(subject => {
+                        electiveSubjectSel.append(`<option value="${subject.subjectId}">${subject.subjectName} (${subject.subjectCode})</option>`);
+                    });
+                } else {
+                    electiveSubjectSel.append(`<option value="">No elective subjects available for this semester</option>`);
+                }
+                // Refresh select2 to show new options
+                electiveSubjectSel.select2();
+            },
+            error: function() {
+                electiveSubjectSel.html('<option value="">Error loading elective subjects</option>');
+                electiveSubjectSel.select2();
+            }
+        });
+    });
+    
+    // Form validation function
+    function validateEnrollmentForm() {
+        const userIds = $('#userSelect').val();
+        const subjectIds = $('#electiveSubjectSelect').val();
+        
+        if (!userIds || userIds.length === 0) {
+            alert('Please select at least one user');
+            return false;
+        }
+        
+        if (!subjectIds || subjectIds.length === 0) {
+            alert('Please select at least one elective subject');
+            return false;
+        }
+        
+        return true;
+    }
+});
+</script>
+</html>

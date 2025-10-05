@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head th:replace="template :: headFragment(${pageTitle})">
-    <title th:text="${pageTitle}">Elective Subject Form</title>
+    <title th:text="${pageTitle}">Batch Form</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 
@@ -13,46 +13,52 @@
         <div th:replace="fragments/sidebar :: aside"></div>
 
         <div class="content-wrapper">
+            <!-- Page Header -->
             <section class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 th:text="${electiveSubject.id == 0} ? 'Create Elective Subject' : 'Edit Elective Subject'">Elective Subject Form</h1>
+                            <h1 th:text="${batch.batchId == 0} ? 'Create Batch' : 'Edit Batch'">Batch Form</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a th:href="@{/}"><i class="fas fa-home"></i> Home</a></li>
-                                <li class="breadcrumb-item"><a th:href="@{/guac/View_ElectiveSubject}">Elective Subjects</a></li>
-                                <li class="breadcrumb-item active" th:text="${electiveSubject.id == 0} ? 'Create' : 'Edit'">Action</li>
+                                <li class="breadcrumb-item"><a th:href="@{/guac/View_Batches}">Batches</a></li>
+                                <li class="breadcrumb-item active" th:text="${batch.batchId == 0} ? 'Create' : 'Edit'">Action</li>
                             </ol>
                         </div>
                     </div>
                 </div>
             </section>
 
+            <!-- Main Content -->
             <section class="content">
                 <div class="container-fluid">
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-book"></i>
-                                <span th:text="${electiveSubject.id == 0} ? 'Add New Elective Subject' : 'Edit Elective Subject'">Elective Subject</span>
+                                <i class="fas fa-layer-group"></i>
+                                <span th:text="${batch.batchId == 0} ? 'Add New Batch' : 'Edit Batch'">Batch</span>
                             </h3>
                         </div>
 
-                        <form th:action="@{/guac/electiveSubjectsave}" method="post" th:object="${electiveSubject}">
+                        <!-- Form Start -->
+                        <form th:action="@{/guac/saveBatch}" method="post" th:object="${batch}">
                             <div class="card-body">
-                                <input type="hidden" th:field="*{id}" />
+                                <!-- Hidden Batch ID -->
+                                <input type="hidden" th:field="*{batchId}" />
+
+                               
 
                                 <!-- Department -->
                                 <div class="form-group">
                                     <label for="department">Department</label>
                                     <select id="department" name="semester.course.department.departmentId" class="form-control" required>
-                                        <option value="" >-- Select Department --</option>
+                                        <option value="">-- Select Department --</option>
                                         <option th:each="dept : ${departments}"
-                                            th:value="${dept.departmentId}"
-                                            th:text="${dept.departmentName}"
-                                            th:selected="${selectedDepartmentId != null and dept.departmentId == selectedDepartmentId}">
+                                                th:value="${dept.departmentId}"
+                                                th:text="${dept.departmentName}"
+                                                th:selected="${selectedDepartmentId != null and dept.departmentId == selectedDepartmentId}">
                                         </option>
                                     </select>
                                 </div>
@@ -74,16 +80,24 @@
                                         <option value="">-- Select Semester --</option>
                                     </select>
                                 </div>
-
-                                <!-- Elective Subject Name -->
+                                
+                                 <!-- Batch Name -->
                                 <div class="form-group">
-                                    <label for="electiveSubjectName">Elective Subject Name</label>
-                                    <input type="text" th:field="*{electiveSubjectName}" id="electiveSubjectName" class="form-control" placeholder="Enter elective subject name" required />
+                                    <label for="batchName">Batch Name</label>
+                                    <input type="text" th:field="*{batchName}" id="batchName" class="form-control" placeholder="Enter batch name" required />
                                 </div>
+                                
+                                <div class="form-group">
+                                    <label for="batchName">Batch Code</label>
+                                    <input type="text" th:field="*{batchCode}" id="batchCode" class="form-control" placeholder="Enter batch code" required />
+                                </div>
+                                
+                                
                             </div>
 
+                            <!-- Buttons -->
                             <div class="card-footer text-right">
-                                <a th:href="@{/guac/View_ElectiveSubject}" class="btn btn-secondary">Cancel</a>
+                                <a th:href="@{/guac/View_Batches}" class="btn btn-secondary">Cancel</a>
                                 <button type="reset" class="btn btn-outline-secondary">Reset</button>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save"></i> Save
@@ -100,6 +114,7 @@
 
     <div th:replace="template :: jsscript"></div>
 
+    <!-- JQuery and Dynamic Dropdown Logic -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
@@ -133,7 +148,7 @@
                                 courseSelect.append(`<option value="${course.courseId}" ${isSelected}>${course.courseName}</option>`);
                             });
 
-                            if(selectedId > 0) {
+                            if (selectedId > 0) {
                                 fetchSemesters(selectedId, selectedSemesterId);
                             }
                         }
@@ -157,7 +172,6 @@
                     dataType: 'json',
                     data: { courseId: courseId },
                     success: function (data) {
-                        console.log(data);
                         semesterSelect.empty();
                         semesterSelect.append('<option value="">-- Select Semester --</option>');
 
@@ -174,20 +188,20 @@
                 });
             }
 
-            // Initial load: fetch courses and semesters if department & course are preselected
+            // Initial load
             const initialDeptId = departmentSelect.val();
             if (initialDeptId) {
                 fetchCourses(initialDeptId, selectedCourseId);
             }
 
-            // When department changes, load courses & reset semesters
+            // On Department change
             departmentSelect.change(function () {
                 const deptId = $(this).val();
                 fetchCourses(deptId);
                 semesterSelect.html('<option value="">-- Select Semester --</option>');
             });
 
-            // When course changes, load semesters
+            // On Course change
             courseSelect.change(function () {
                 const courseId = $(this).val();
                 fetchSemesters(courseId);
@@ -196,5 +210,4 @@
     </script>
 
 </body>
-
 </html>

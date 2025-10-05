@@ -37,11 +37,7 @@ public class SemesterMaster {
     // 👇 Relationship with Subjects (One semester can have many subjects)
     @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<SubjectMaster> subjects = new ArrayList<>();
-    
-    
-    @Column(name = "is_elective")
-    private boolean elective;
-
+   
 
     // Getters & Setters
     public int getSemesterId() {
@@ -108,19 +104,6 @@ public class SemesterMaster {
         this.subjects = subjects;
     }
 
-	public boolean isElective() {
-		return elective;
-	}
-
-	public void setElective(boolean elective) {
-		this.elective = elective;
-	}
-    
-   
-
-
-	
-	
     
     
 }

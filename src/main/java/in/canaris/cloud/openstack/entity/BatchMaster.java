@@ -32,6 +32,9 @@ public class BatchMaster {
 	@Column(name = "batch_name", length = 100)
 	private String batchName;
 	
+	@Column(name = "batch_code", length = 100)
+	private String batchCode;
+	
 //	@ManyToOne(fetch = FetchType.LAZY)
 //	@JoinColumn(name = "semester_id", referencedColumnName = "semester_id")
 //	private SemesterMaster semester;
@@ -98,6 +101,14 @@ public class BatchMaster {
 
 	public void setUpdatedAt(Timestamp updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+
+	public String getBatchCode() {
+		return batchCode;
+	}
+
+	public void setBatchCode(String batchCode) {
+		this.batchCode = batchCode;
 	}
 	
 	

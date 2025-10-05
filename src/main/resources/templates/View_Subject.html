@@ -2,112 +2,121 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head th:include="template :: headFragment(${pageTitle})">
-    <title th:text="${pageTitle}">Elective Subjects List</title>
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<title th:text="${pageTitle}">Subject List</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+	<div class="wrapper">
 
-        <!-- Header -->
-        <div th:replace="fragments/header :: header"></div>
+		<!-- Header -->
+		<div th:replace="fragments/header :: header"></div>
 
-        <!-- Sidebar -->
-        <div th:replace="fragments/sidebar :: aside"></div>
+		<!-- Sidebar -->
+		<div th:replace="fragments/sidebar :: aside"></div>
 
-        <div class="content-wrapper">
-            <section class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1>Elective Subjects List</h1>
-                        </div>
-                        <div class="col-sm-6">
-                            <a th:href="@{/guac/Add_ElectiveSubject}"
-                                class="btn btn-primary float-right">
-                                <i class="fas fa-plus"></i>
-                                Add New Elective Subject
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </section>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Subjects List</h1>
+						</div>
+						<div class="col-sm-6">
+							<a th:href="@{/guac/Add_Subject}"
+								class="btn btn-primary float-right"> <i class="fas fa-plus"></i>
+								Add New Subject
+							</a>
+						</div>
+					</div>
+				</div>
+			</section>
 
-            <section class="content">
-                <div class="container-fluid">
-                    <div class="card">
-                        <div class="card-body table-responsive p-0"
-                            style="max-height: 600px;">
-                            <table class="table table-hover table-striped text-nowrap">
-                                <thead>
-                                    <tr>
-                                        <th>Sr No</th>
-                                        <th>Department</th>
-                                        <th>Course</th>
-                                        <th>Semester</th>
-                                        <th>Elective Subject Name</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- In your controller, pre-process the data and add simpler properties -->
-<tr th:each="electiveSubject, iterStat : ${electiveSubjects}">
-    <td th:text="${iterStat.count}">1</td>
-    <td th:text="${electiveSubject.departmentName != null} ? ${electiveSubject.departmentName} : 'N/A'">Department Name</td>
-    <td th:text="${electiveSubject.courseName != null} ? ${electiveSubject.courseName} : 'N/A'">Course Name</td>
-    <td th:text="${electiveSubject.semesterName != null} ? ${electiveSubject.semesterName} : 'N/A'">Semester Name</td>
-    <td th:text="${electiveSubject.electiveSubjectName}">Elective Subject Name</td>
-    <td>
-        <a th:href="@{/guac/Add_ElectiveSubject(Id=${electiveSubject.id})}"
-           class="btn btn-sm btn-info" title="Edit">
-            <i class="fas fa-edit"></i>
-        </a>
-        <a href="#"
-           th:onclick="'confirmDelete(' + ${electiveSubject.id} + ')'"
-           class="btn btn-sm btn-danger" title="Delete">
-            <i class="fas fa-trash-alt"></i>
-        </a>
-    </td>
-</tr>
-                                    <tr th:if="${#lists.isEmpty(electiveSubjects)}">
-                                        <td colspan="6" class="text-center">No elective subjects found.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
+			<section class="content">
+				<div class="container-fluid">
+					<div class="card">
+						<div class="card-body table-responsive p-0"
+							style="max-height: 600px;">
+							<table class="table table-hover table-striped text-nowrap">
+								<thead>
+									<tr>
+										<th>Sr No</th>
+										<th>Department</th>
+										<th>Course</th>
+										<th>Semester</th>
+										<th>Subject Name</th>
+										<th>Subject Code</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
 
-        <!-- Footer -->
-        <div th:replace="fragments/footer :: footer"></div>
+									<tr th:each="subject, iterStat : ${subjects}">
+										<td th:text="${iterStat.count}">1</td>
+										<td
+											th:text="${subject.semester.course?.department?.departmentName}">Department
+											Name</td>
+										<td th:text="${subject.semester.course?.courseName}">Course
+											Name</td>
+										<td th:text="${subject.semester.semesterName}">Semester
+											Name</td>
+										<td th:text="${subject.subjectName}">Subject Name</td>
+										<td th:text="${subject.subjectCode}">Subject Code</td>
+										<td><a
+											th:href="@{/guac/Add_Subject(Id=${subject.subjectId})}"
+											class="btn btn-sm btn-info" title="Edit"> <i
+												class="fas fa-edit"></i>
+										</a> <a href="#"
+											th:onclick="'confirmDelete(' + ${subject.subjectId} + ')'"
+											class="btn btn-sm btn-danger" title="Delete"> <i
+												class="fas fa-trash-alt"></i>
+										</a></td>
+									</tr>
+									<tr th:if="${#lists.isEmpty(subjects)}">
+										<td colspan="7" class="text-center">No subjects found.</td>
+									</tr>
 
-    </div>
 
-    <!-- Scripts -->
-    <div th:replace="template :: jsscript"></div>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <script>
-        function confirmDelete(id) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "Do you really want to delete this elective subject?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/guac/deleteElectiveSubject?Id=' + id;
-                }
-            });
-        }
-    </script>
+									<tr th:if="${#lists.isEmpty(subjects)}">
+										<td colspan="7" class="text-center">No subjects found.</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
 
+		<!-- Footer -->
+		<div th:replace="fragments/footer :: footer"></div>
+
+	</div>
+
+	<!-- Scripts -->
+	<div th:replace="template :: jsscript"></div>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	
+	<script>
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you really want to delete this subject?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/guac/deleteSubject?Id=' + id;
+            }
+        });
+    }
+</script>
+
+	
 </body>
 </html>

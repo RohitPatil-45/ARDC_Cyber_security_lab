@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head th:include="template :: headFragment(${pageTitle})">
-    <title th:text="${pageTitle}">Elective Subjects List</title>
+    <title th:text="${pageTitle}">Batches List</title>
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
@@ -16,61 +16,70 @@
         <!-- Sidebar -->
         <div th:replace="fragments/sidebar :: aside"></div>
 
+        <!-- Content Wrapper -->
         <div class="content-wrapper">
+
+            <!-- Page Header -->
             <section class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Elective Subjects List</h1>
+                            <h1>Batches List</h1>
                         </div>
                         <div class="col-sm-6">
-                            <a th:href="@{/guac/Add_ElectiveSubject}"
-                                class="btn btn-primary float-right">
-                                <i class="fas fa-plus"></i>
-                                Add New Elective Subject
+                            <a th:href="@{/guac/Add_batch}" class="btn btn-primary float-right">
+                                <i class="fas fa-plus"></i> Add New Batch
                             </a>
                         </div>
                     </div>
                 </div>
             </section>
 
+            <!-- Page Content -->
             <section class="content">
                 <div class="container-fluid">
                     <div class="card">
-                        <div class="card-body table-responsive p-0"
-                            style="max-height: 600px;">
+                        <div class="card-body table-responsive p-0" style="max-height: 600px;">
                             <table class="table table-hover table-striped text-nowrap">
                                 <thead>
                                     <tr>
                                         <th>Sr No</th>
+                                        <th>Batch Name</th>
+                                        <th>Batch Code</th>
                                         <th>Department</th>
                                         <th>Course</th>
                                         <th>Semester</th>
-                                        <th>Elective Subject Name</th>
+<!--                                         <th>Enabled</th> -->
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="electiveSubject, iterStat : ${electiveSubjects}">
+                                    <tr th:each="batch, iterStat : ${batches}">
                                         <td th:text="${iterStat.count}">1</td>
-                                        <td th:text="${electiveSubject.semester?.course?.department?.departmentName}">Department Name</td>
-                                        <td th:text="${electiveSubject.semester?.course?.courseName}">Course Name</td>
-                                        <td th:text="${electiveSubject.semester?.semesterName}">Semester Name</td>
-                                        <td th:text="${electiveSubject.electiveSubjectName}">Elective Subject Name</td>
+                                        <td th:text="${batch.batchName}">Batch Name</td>
+                                        <td th:text="${batch.batchCode}">Batch Code</td>
+                                        <td th:text="${batch.semester?.course?.department?.departmentName}">Department</td>
+                                        <td th:text="${batch.semester?.course?.courseName}">Course</td>
+                                        <td th:text="${batch.semester?.semesterName}">Semester</td>
+<!--                                         <td> -->
+<!--                                             <span th:text="${batch.enabled} ? 'Yes' : 'No'" -->
+<!--                                                   th:classappend="${batch.enabled} ? 'text-success' : 'text-danger'"> -->
+<!--                                             </span> -->
+<!--                                         </td> -->
                                         <td>
-                                            <a th:href="@{/guac/Add_ElectiveSubject(Id=${electiveSubject.id})}"
-                                                class="btn btn-sm btn-info" title="Edit">
+                                            <a th:href="@{/guac/Add_batch(Id=${batch.batchId})}"
+                                               class="btn btn-sm btn-info" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="#"
-                                                th:onclick="'confirmDelete(' + ${electiveSubject.id} + ')'"
-                                                class="btn btn-sm btn-danger" title="Delete">
+                                            <a href="#" th:onclick="'confirmDelete(' + ${batch.batchId} + ')'"
+                                               class="btn btn-sm btn-danger" title="Delete">
                                                 <i class="fas fa-trash-alt"></i>
                                             </a>
                                         </td>
                                     </tr>
-                                    <tr th:if="${#lists.isEmpty(electiveSubjects)}">
-                                        <td colspan="6" class="text-center">No elective subjects found.</td>
+
+                                    <tr th:if="${#lists.isEmpty(batches)}">
+                                        <td colspan="8" class="text-center">No batches found.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -82,18 +91,17 @@
 
         <!-- Footer -->
         <div th:replace="fragments/footer :: footer"></div>
-
     </div>
 
-    <!-- Scripts -->
+    <!-- JS Scripts -->
     <div th:replace="template :: jsscript"></div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <script>
         function confirmDelete(id) {
             Swal.fire({
                 title: 'Are you sure?',
-                text: "Do you really want to delete this elective subject?",
+                text: "Do you really want to delete this batch?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -102,7 +110,7 @@
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '/guac/deleteElectiveSubject?Id=' + id;
+                    window.location.href = '/guac/deleteBatch?Id=' + id;
                 }
             });
         }

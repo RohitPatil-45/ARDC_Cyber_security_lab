@@ -19,6 +19,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import in.canaris.cloud.openstack.entity.BatchMaster;
 import in.canaris.cloud.openstack.entity.CourseMaster;
 import in.canaris.cloud.openstack.entity.DepartmentMaster;
 import in.canaris.cloud.openstack.entity.SemesterMaster;
@@ -30,7 +31,7 @@ import in.canaris.cloud.openstack.entity.SubjectMaster;
 //		uniqueConstraints = { //
 //				@UniqueConstraint(name = "APP_USER_UK", columnNames = "User_Name") })
 public class AppUser implements Serializable {
-
+ 
 	private static final long serialVersionUID = -2264642949863409860L;
 
 //	@Id
@@ -79,13 +80,13 @@ public class AppUser implements Serializable {
 
 	@Column(nullable = false)
 	private Boolean isFirstTimeLogin = true;
-	
+
 	@Column(name = "status")
 	private String status;
-	
+
 //	@Column(name = "department_name")
 //	private String departmentName;
-	
+
 //	@Column(name = "course_name")
 //	private String courseName;
 //	
@@ -95,28 +96,22 @@ public class AppUser implements Serializable {
 //	
 //	@Column(name = "subject_name")
 //	private String subjectName;
-	
-	@Column(name = "batch_name")
-	private String batchName;
-	
-	
-	   @ManyToOne(fetch = FetchType.LAZY)
-	    @JoinColumn(name = "department_name")
-	    private DepartmentMaster departmentName;
-	    
-	    @ManyToOne(fetch = FetchType.LAZY)
-	    @JoinColumn(name = "course_name")
-	    private CourseMaster courseName;
-	    
-	    @ManyToOne(fetch = FetchType.LAZY)
-	    @JoinColumn(name = "semester_name")
-	    private SemesterMaster semesterName;
-	    
-	    @ManyToOne(fetch = FetchType.LAZY)
-	    @JoinColumn(name = "subject_name")
-	    private SubjectMaster subjectName;
-	
-	
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "batch_name")
+	private BatchMaster batchName;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "department_name")
+	private DepartmentMaster departmentName;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "course_name")
+	private CourseMaster courseName;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "semester_name")
+	private SemesterMaster semesterName;
 
 	@Column(name = "password_changed_time")
 	private Date passwordChangedTime;
@@ -242,17 +237,6 @@ public class AppUser implements Serializable {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
-	
-
-
-	public String getBatchName() {
-		return batchName;
-	}
-
-	public void setBatchName(String batchName) {
-		this.batchName = batchName;
-	}
 
 	public DepartmentMaster getDepartmentName() {
 		return departmentName;
@@ -278,20 +262,12 @@ public class AppUser implements Serializable {
 		this.semesterName = semesterName;
 	}
 
-	public SubjectMaster getSubjectName() {
-		return subjectName;
+	public BatchMaster getBatchName() {
+		return batchName;
 	}
 
-	public void setSubjectName(SubjectMaster subjectName) {
-		this.subjectName = subjectName;
+	public void setBatchName(BatchMaster batchName) {
+		this.batchName = batchName;
 	}
-	
-	
 
-
-
-	
-	
-	
-	
 }

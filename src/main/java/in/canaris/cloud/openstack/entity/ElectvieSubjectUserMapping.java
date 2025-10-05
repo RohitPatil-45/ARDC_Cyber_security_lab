@@ -32,7 +32,7 @@ public class ElectvieSubjectUserMapping {
 	@JoinColumn(name = "elective_subject_id", nullable = false)
 	@OnDelete(action = OnDeleteAction.NO_ACTION)
 	@JsonIgnore
-	private ElectiveSubject elective;
+	private SubjectMaster elective;
 	
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -54,14 +54,14 @@ public class ElectvieSubjectUserMapping {
 	public void setId(int id) {
 		Id = id;
 	}
+	
 
-
-	public ElectiveSubject getElective() {
+	public SubjectMaster getElective() {
 		return elective;
 	}
 
 
-	public void setElective(ElectiveSubject elective) {
+	public void setElective(SubjectMaster elective) {
 		this.elective = elective;
 	}
 
