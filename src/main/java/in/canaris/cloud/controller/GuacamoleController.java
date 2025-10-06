@@ -127,7 +127,6 @@ import in.canaris.cloud.repository.ElectiveSubjectRepository;
 import in.canaris.cloud.repository.ElectvieSubjectUserMappingRepository;
 import in.canaris.cloud.repository.BatchMasterRepository;
 
-
 import in.canaris.cloud.repository.SubPlaylistRepository;
 import in.canaris.cloud.repository.UserLabRepository;
 import in.canaris.cloud.service.DockerService;
@@ -261,7 +260,7 @@ public class GuacamoleController {
 
 	@Autowired
 	ElectvieSubjectUserMappingRepository ElectvieSubjectUserMappingRepository;
-	
+
 	@Autowired
 	BatchMasterRepository BatchMasterRepository;
 
@@ -2427,61 +2426,61 @@ public class GuacamoleController {
 
 	@GetMapping("/Add_batch")
 	public String showAddBatchForm(@RequestParam(value = "Id", required = false) Integer id, Model model) {
-	    BatchMaster batch = new BatchMaster();
-	    Integer selectedDepartmentId = null;
-	    Integer selectedCourseId = null;
-	    Integer selectedSemesterId = null;
+		BatchMaster batch = new BatchMaster();
+		Integer selectedDepartmentId = null;
+		Integer selectedCourseId = null;
+		Integer selectedSemesterId = null;
 
-	    if (id != null) {
-	        Optional<BatchMaster> optionalBatch = BatchMasterRepository.findById(id);
-	        if (optionalBatch.isPresent()) {
-	            batch = optionalBatch.get();
-	            SemesterMaster sem = batch.getSemester();
-	            if (sem != null && sem.getCourse() != null && sem.getCourse().getDepartment() != null) {
-	                selectedDepartmentId = sem.getCourse().getDepartment().getDepartmentId();
-	                selectedCourseId = sem.getCourse().getCourseId();
-	                selectedSemesterId = sem.getSemesterId();
-	            }
-	        }
-	    }
+		if (id != null) {
+			Optional<BatchMaster> optionalBatch = BatchMasterRepository.findById(id);
+			if (optionalBatch.isPresent()) {
+				batch = optionalBatch.get();
+				SemesterMaster sem = batch.getSemester();
+				if (sem != null && sem.getCourse() != null && sem.getCourse().getDepartment() != null) {
+					selectedDepartmentId = sem.getCourse().getDepartment().getDepartmentId();
+					selectedCourseId = sem.getCourse().getCourseId();
+					selectedSemesterId = sem.getSemesterId();
+				}
+			}
+		}
 
-	    // Ensure semester is not null
-	    if (batch.getSemester() == null) {
-	        batch.setSemester(new SemesterMaster());
-	    }
+		// Ensure semester is not null
+		if (batch.getSemester() == null) {
+			batch.setSemester(new SemesterMaster());
+		}
 
-	    List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+		List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
 
-	    model.addAttribute("batch", batch);
-	    model.addAttribute("departments", departments);
-	    model.addAttribute("selectedDepartmentId", selectedDepartmentId);
-	    model.addAttribute("selectedCourseId", selectedCourseId);
-	    model.addAttribute("selectedSemesterId", selectedSemesterId);
-	    model.addAttribute("pageTitle", (id != null) ? "Edit Batch" : "Create Batch");
+		model.addAttribute("batch", batch);
+		model.addAttribute("departments", departments);
+		model.addAttribute("selectedDepartmentId", selectedDepartmentId);
+		model.addAttribute("selectedCourseId", selectedCourseId);
+		model.addAttribute("selectedSemesterId", selectedSemesterId);
+		model.addAttribute("pageTitle", (id != null) ? "Edit Batch" : "Create Batch");
 
-	    return "Add_Batch";
+		return "Add_Batch";
 	}
 
 	@PostMapping("/saveBatch")
 	public String saveBatch(@ModelAttribute("batch") BatchMaster batch) {
-	    System.out.println("Inside saveBatch :: " + batch);
+		System.out.println("Inside saveBatch :: " + batch);
 
-	    // Optional: set timestamps here if not using @CreationTimestamp / @UpdateTimestamp
-	    if (batch.getBatchId() == 0) {
-	        batch.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-	    }
-	    batch.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+		// Optional: set timestamps here if not using @CreationTimestamp /
+		// @UpdateTimestamp
+		if (batch.getBatchId() == 0) {
+			batch.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+		}
+		batch.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
-	    BatchMaster savedBatch = BatchMasterRepository.save(batch);
+		BatchMaster savedBatch = BatchMasterRepository.save(batch);
 
-	    if (savedBatch.getBatchId() == 0) {
-	        // Should not normally happen
-	        return "redirect:/guac/View_Batches";
-	    } else {
-	        return "redirect:/guac/View_Batches?Id=" + savedBatch.getBatchId();
-	    }
+		if (savedBatch.getBatchId() == 0) {
+			// Should not normally happen
+			return "redirect:/guac/View_Batches";
+		} else {
+			return "redirect:/guac/View_Batches?Id=" + savedBatch.getBatchId();
+		}
 	}
-
 
 //	@GetMapping("/View_ElectiveSubject")
 //	public String listElectiveSubject(Model model) {
@@ -2493,28 +2492,23 @@ public class GuacamoleController {
 
 	@GetMapping("/View_Batches")
 	public String listBatches(Model model) {
-	    List<BatchMaster> batchList = BatchMasterRepository.findAll();
-	    model.addAttribute("batches", batchList);
-	    model.addAttribute("pageTitle", "Batch List");
-	    return "View_Batch"; // Make sure the HTML file is named View_Batches.html
+		List<BatchMaster> batchList = BatchMasterRepository.findAll();
+		model.addAttribute("batches", batchList);
+		model.addAttribute("pageTitle", "Batch List");
+		return "View_Batch"; // Make sure the HTML file is named View_Batches.html
 	}
-
 
 	@GetMapping("/deleteBatch")
 	public String deleteBatch(@RequestParam("Id") Integer id) {
-	    BatchMasterRepository.deleteById(id);
-	    return "redirect:/guac/View_Batches";
+		BatchMasterRepository.deleteById(id);
+		return "redirect:/guac/View_Batches";
 	}
-	
-	
+
 	@GetMapping("/batches")
 	@ResponseBody
 	public List<BatchMaster> getBatchesBySemester(@RequestParam int semesterId) {
-        return BatchMasterRepository.findBySemester_SemesterId(semesterId);
-    }
-
-
-
+		return BatchMasterRepository.findBySemester_SemesterId(semesterId);
+	}
 
 	@GetMapping("/Add_Course")
 	public String showAddCourseForm(@RequestParam(value = "Id", required = false) Integer id, Model model) {
@@ -6958,7 +6952,7 @@ public class GuacamoleController {
 					.findByUserName(user.getUserName());
 			List<SubjectMaster> userElectiveSubjects = userElectiveMappings.stream()
 					.map(ElectvieSubjectUserMapping::getElective).collect(Collectors.toList());
-			
+
 			boolean hasElectiveMappings = !userElectiveSubjects.isEmpty();
 			model.addAttribute("hasElectiveMappings", hasElectiveMappings);
 
@@ -7087,62 +7081,337 @@ public class GuacamoleController {
 					.body("Error saving mappings: " + e.getMessage());
 		}
 	}
-	
-	
+
 	@GetMapping("/EnrollToElectiveSubject")
 	public String EnrollToElectiveSubjectFromShow(Model model) {
-	    UserMasterRole user = new UserMasterRole();
-	    model.addAttribute("objEnt", user);
-	    model.addAttribute("pageTitle", "Enroll User to Elective Subject");
-	    
-	    List<AppUser> appuser = AppUserRepository.findAll();
-	    model.addAttribute("users", appuser);
+		UserMasterRole user = new UserMasterRole();
+		model.addAttribute("objEnt", user);
+		model.addAttribute("pageTitle", "Enroll User to Elective Subject");
 
+		List<AppUser> appuser = AppUserRepository.findAll();
+		model.addAttribute("users", appuser);
 
+		// Also send departments for the first dropdown
+		List<DepartmentMaster> depts = DepartmentMasterRepository.findAll();
+		model.addAttribute("departments", depts);
 
-	    // Also send departments for the first dropdown
-	    List<DepartmentMaster> depts = DepartmentMasterRepository.findAll();
-	    model.addAttribute("departments", depts);
-
-	    return "EnrollToElect";
+		return "EnrollToElect";
 	}
-	
-	
+
 	@GetMapping("/elective-subjects")
 	@ResponseBody
+//	@Transactional
 	public List<SubjectMaster> getElectiveSubjectsBySemester(@RequestParam Integer semesterId) {
-	    // Use the corrected repository method
-	    return SubjectMasterRepository.findBySemesterSemesterIdAndElectiveTrueAndIsEnabledTrue(semesterId);
+		System.out.println("Insdie___Elective subjects for semester ID " + semesterId + ":");
+		List<SubjectMaster> subjects = SubjectMasterRepository.findBySemesterAndvvElective(semesterId);
+
+		System.out.println("Elective subjects for semester ID " + semesterId + ":");
+		for (SubjectMaster subject : subjects) {
+			System.out.println(" - ID: " + subject.getSubjectId() + ", Name: " + subject.getSubjectName() + ", Code: "
+					+ subject.getSubjectCode() + ", Elective: " + subject.isElective());
+		}
+
+		return subjects;
 	}
-	    
-	    @PostMapping("/enrollsave")
-	    public String saveEnrollment(@RequestParam Integer departmentId,
-	                                @RequestParam Integer courseId,
-	                                @RequestParam Integer semesterId,
-	                                @RequestParam Integer batchId,
-	                                @RequestParam List<Integer> userIds,
-	                                @RequestParam List<Integer> subjectIds,
-	                                RedirectAttributes redirectAttributes) {
-	        try {
-	            // Your enrollment saving logic here
-	            // userIds - contains selected user IDs
-	            // subjectIds - contains selected subject IDs
-	            
-	            System.out.println("Department ID: " + departmentId);
-	            System.out.println("Course ID: " + courseId);
-	            System.out.println("Semester ID: " + semesterId);
-	            System.out.println("Batch ID: " + batchId);
-	            System.out.println("User IDs: " + userIds);
-	            System.out.println("Subject IDs: " + subjectIds);
-	            
-	            // TODO: Save enrollment data to your database
-	            // You might need to create an enrollment entity or mapping table
-	            
-	            redirectAttributes.addFlashAttribute("success", "Enrollment successful!");
-	            return "redirect:/elective/enrollments";
-	        } catch (Exception e) {
-	            redirectAttributes.addFlashAttribute("error", "Enrollment failed: " + e.getMessage());
-	            return "redirect:/elective/enroll";
-	        }
+
+	@PostMapping("/enrollsave")
+	public String saveEnrollment(@RequestParam Integer departmentId, @RequestParam Integer courseId,
+			@RequestParam Integer semesterId, @RequestParam Integer batchId, @RequestParam List<Long> userIds,
+			@RequestParam List<Integer> subjectIds, RedirectAttributes redirectAttributes, Principal principal) {
+		try {
+
+			System.out.println("Department ID: " + departmentId);
+			System.out.println("Course ID: " + courseId);
+			System.out.println("Semester ID: " + semesterId);
+			System.out.println("Batch ID: " + batchId);
+			System.out.println("User IDs: " + userIds);
+			System.out.println("Subject IDs: " + subjectIds);
+
+			Authentication auth = (Authentication) principal;
+			String superAdminUsername = auth.getName();
+
+			// Validate inputs
+			if (userIds == null || userIds.isEmpty()) {
+				redirectAttributes.addFlashAttribute("error", "No users selected!");
+				return "redirect:/guac/EnrollToElectiveSubject";
+			}
+
+			if (subjectIds == null || subjectIds.isEmpty()) {
+				redirectAttributes.addFlashAttribute("error", "No elective subjects selected!");
+				return "redirect:/guac/EnrollToElectiveSubject";
+			}
+
+			// Fetch semester entity
+			Optional<SemesterMaster> semesterOpt = SemesterMasterRepository.findById(semesterId);
+			if (!semesterOpt.isPresent()) {
+				redirectAttributes.addFlashAttribute("error", "Invalid semester ID!");
+				return "redirect:/guac/EnrollToElectiveSubject";
+			}
+			SemesterMaster semester = semesterOpt.get();
+
+			int savedCount = 0;
+
+			// Loop through each user and each subject to create mappings
+			for (Long userId : userIds) {
+				// Get username directly from repository method
+				String studentUsername = AppUserRepository.getUserNameById(userId);
+
+				// Check if username was found
+				if (studentUsername == null || studentUsername.isEmpty()) {
+					System.out.println("User not found for ID: " + userId);
+					continue;
+				}
+
+				for (Integer subjectId : subjectIds) {
+					// Fetch subject entity
+					Optional<SubjectMaster> subjectOpt = SubjectMasterRepository.findById(subjectId);
+					if (!subjectOpt.isPresent()) {
+						System.out.println("Subject not found for ID: " + subjectId);
+						continue;
+					}
+					SubjectMaster subject = subjectOpt.get();
+
+					// Check if mapping already exists to avoid duplicates
+					boolean mappingExists = ElectvieSubjectUserMappingRepository
+							.existsByUserNameAndElectiveAndSemester(studentUsername, subject, semester);
+					if (mappingExists) {
+						System.out.println("Mapping already exists for user: " + studentUsername + ", subject: "
+								+ subjectId + ", semester: " + semesterId);
+						continue;
+					}
+
+					// Create and save the mapping
+					ElectvieSubjectUserMapping mapping = new ElectvieSubjectUserMapping();
+					mapping.setElective(subject);
+					mapping.setSemester(semester);
+					mapping.setUserName(studentUsername);
+
+					ElectvieSubjectUserMappingRepository.save(mapping);
+					savedCount++;
+					System.out.println("Saved mapping for student: " + studentUsername + ", subject: " + subjectId
+							+ ", semester: " + semesterId + " (Enrolled by superadmin: " + superAdminUsername + ")");
+				}
+			}
+
+			if (savedCount > 0) {
+				redirectAttributes.addFlashAttribute("success",
+						"Successfully enrolled " + savedCount + " user-subject combinations!");
+			} else {
+				redirectAttributes.addFlashAttribute("warning",
+						"No new enrollments were created. All combinations might already exist.");
+			}
+
+			return "redirect:/guac/EnrollToElectiveSubject";
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("error", "Enrollment failed: " + e.getMessage());
+			return "redirect:/guac/EnrollToElectiveSubject";
+		}
+	}
+
+	@GetMapping("/teachers")
+	public String getAllTeachers(Model model, Principal principal) {
+	    if (principal == null) {
+	        return "redirect:/";
 	    }
+	    
+	    Authentication authentication = (Authentication) principal;
+	    User loginedUser = (User) ((Authentication) principal).getPrincipal();
+	    String groupName = "";
+	    
+	    try {
+	        List<AppUser> teachers = new ArrayList<AppUser>();
+	        boolean isSuperAdmin = authentication.getAuthorities().stream()
+	                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+
+	        boolean isAdmin = authentication.getAuthorities().stream()
+	                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+
+	        List<AppUser> currentUser = userRepository.findByuserName(loginedUser.getUsername());
+	        for (AppUser appUser : currentUser) {
+	            groupName = appUser.getGroupName();
+	        }
+
+	        if (isSuperAdmin) {
+	            teachers = userRepository.findUsersByRoleName("ROLE_TEACHER");
+	        } else if (isAdmin) {
+	            List<String> groups = new ArrayList<>();
+	            if (groupName != null && !groupName.isEmpty()) {
+	                StringTokenizer token = new StringTokenizer(groupName, ",");
+	                while (token.hasMoreTokens()) {
+	                    groups.add(token.nextToken());
+	                }
+	            }
+	            teachers = userRepository.findUsersByRoleNameAndGroups("ROLE_TEACHER", groups);
+	        }
+
+	        model.addAttribute("listObj", teachers);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("message", "Error loading teachers: " + e.getMessage());
+	    }
+	    return "teacher_view";
+	}
+
+	@GetMapping("/assign-subject")
+	public String assignSubjectToTeacher(Model model) {
+		model.addAttribute("pageTitle", "Assign Subject to Teacher");
+
+		// Get departments for dropdown
+		List<DepartmentMaster> depts = DepartmentMasterRepository.findAll();
+		model.addAttribute("departments", depts);
+
+		// Get all teachers for dropdown
+		List<AppUser> teachers = userRepository.findUsersByRoleName("ROLE_TEACHER");
+		model.addAttribute("teachers", teachers);
+
+		return "assign-subject";
+	}
+
+	@PostMapping("/assign_subject_save")
+	public String saveAssignedSubject(@RequestParam Integer departmentId, @RequestParam Integer courseId,
+			@RequestParam Integer semesterId, @RequestParam Integer batchId, @RequestParam Long teacherId,
+			@RequestParam List<Integer> subjectIds, RedirectAttributes redirectAttributes, Principal principal) {
+		try {
+
+			System.out.println("Department ID: " + departmentId);
+			System.out.println("Course ID: " + courseId);
+			System.out.println("Semester ID: " + semesterId);
+			System.out.println("Batch ID: " + batchId);
+			System.out.println("Teacher ID: " + teacherId);
+			System.out.println("Subject IDs: " + subjectIds);
+
+			Authentication auth = (Authentication) principal;
+			String assignedBy = auth.getName();
+
+			// Validate inputs
+			if (teacherId == null) {
+				redirectAttributes.addFlashAttribute("error", "Please select a teacher!");
+				return "redirect:/assign-subject";
+			}
+
+			if (subjectIds == null || subjectIds.isEmpty()) {
+				redirectAttributes.addFlashAttribute("error", "Please select at least one subject!");
+				return "redirect:/assign-subject";
+			}
+
+			// Get teacher details
+			Optional<AppUser> teacherOpt = userRepository.findById(teacherId);
+			if (!teacherOpt.isPresent()) {
+				redirectAttributes.addFlashAttribute("error", "Selected teacher not found!");
+				return "redirect:/assign-subject";
+			}
+			AppUser teacher = teacherOpt.get();
+			String teacherName = teacher.getName();
+
+			int assignedCount = 0;
+
+			// Assign subjects to teacher
+			for (Integer subjectId : subjectIds) {
+				Optional<SubjectMaster> subjectOpt = SubjectMasterRepository.findById(subjectId);
+				if (subjectOpt.isPresent()) {
+					SubjectMaster subject = subjectOpt.get();
+
+					// Check if subject is already assigned to another teacher
+					if (subject.getTeacher() != null && !subject.getTeacher().isEmpty()) {
+						System.out.println("Subject " + subject.getSubjectName() + " is already assigned to: "
+								+ subject.getTeacher());
+						continue;
+					}
+
+					// Assign teacher to subject
+					subject.setTeacher(teacherName);
+					SubjectMasterRepository.save(subject);
+					assignedCount++;
+
+					System.out.println("Assigned subject: " + subject.getSubjectName() + " to teacher: " + teacherName);
+				}
+			}
+
+			if (assignedCount > 0) {
+				redirectAttributes.addFlashAttribute("success",
+						"Successfully assigned " + assignedCount + " subjects to " + teacherName + "!");
+			} else {
+				redirectAttributes.addFlashAttribute("warning",
+						"No subjects were assigned. They might be already assigned to other teachers.");
+			}
+
+			return "redirect:/guac/assign-subject";
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("error", "Assignment failed: " + e.getMessage());
+			return "redirect:/guac/assign-subject";
+		}
+	}
+	
+	
+	@GetMapping("/teacher-subjects/{teacherId}")
+	public String getTeacherSubjects(@PathVariable("teacherId") Long teacherId, Model model) {
+	    try {
+	        // Get teacher details
+	        Optional<AppUser> teacherOpt = userRepository.findById(teacherId);
+	        if (!teacherOpt.isPresent()) {
+	            model.addAttribute("error", "Teacher not found!");
+	            return "teacher-subjects";
+	        }
+	        AppUser teacher = teacherOpt.get();
+	        model.addAttribute("teacher", teacher);
+	        
+	        // Get subjects assigned to this teacher - using simple findByTeacher method
+	        List<SubjectMaster> assignedSubjects = SubjectMasterRepository.findByTeacher(teacher.getName());
+	        model.addAttribute("assignedSubjects", assignedSubjects);
+	        
+	        model.addAttribute("pageTitle", "Subjects Assigned to " + teacher.getName());
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("error", "Error loading teacher subjects: " + e.getMessage());
+	    }
+	    return "teacher-subjects";
+	}
+	
+	
+	@PostMapping("/remove-subject")
+	public String removeSubjectFromTeacher(@RequestParam Integer subjectId,
+	                                      @RequestParam(required = false) Long teacherId,
+	                                      RedirectAttributes redirectAttributes) {
+	    try {
+	        Optional<SubjectMaster> subjectOpt = SubjectMasterRepository.findById(subjectId);
+	        if (subjectOpt.isPresent()) {
+	            SubjectMaster subject = subjectOpt.get();
+	            String teacherName = subject.getTeacher();
+	            String subjectName = subject.getSubjectName();
+	            
+	            if (teacherName == null || teacherName.isEmpty()) {
+	                redirectAttributes.addFlashAttribute("error", 
+	                    "Subject '" + subjectName + "' is not assigned to any teacher!");
+	                return "redirect:/teachers";
+	            }
+	            
+	            // Remove teacher assignment
+	            subject.setTeacher(null);
+	            SubjectMasterRepository.save(subject);
+	            
+	            redirectAttributes.addFlashAttribute("success", 
+	                "Subject '" + subjectName + "' has been removed from teacher '" + teacherName + "' successfully!");
+	            
+	            System.out.println("Removed subject: " + subjectName + " from teacher: " + teacherName);
+	            
+	            // If teacherId is provided, redirect back to teacher's subjects page
+	            if (teacherId != null) {
+	                return "redirect:/guac/teacher-subjects/" + teacherId;
+	            }
+	            
+	        } else {
+	            redirectAttributes.addFlashAttribute("error", "Subject not found!");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("error", "Error removing subject: " + e.getMessage());
+	    }
+	    return "redirect:/teachers";
+	}
 }

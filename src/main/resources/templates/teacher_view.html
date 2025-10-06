@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>View Teachers</title>
+<head th:include="templateListing :: headFragment"></head>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header_bk :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>View Teachers</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">View Teachers</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">Teachers Details</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/guac/assign-subject'}"
+												class="btn btn-block bg-gradient-primary">Assign Subject</a>
+										</div>
+									</div>
+									<div th:if="${message != null}"
+										class="alert alert-success alert-dismissible fade show text-center message"
+										role="alert">
+										[[${message}]]
+										<button type="button" class="close btn-sm"
+											data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+								<div class="card-body" th:if="${listObj != null }">
+									<table id="teachersTable" class="table table-bordered table-striped">
+										<thead class="thead-light">
+											<tr>
+												<th scope="col">Sr</th>
+												<th scope="col">Name</th>
+												<th scope="col">Username</th>
+												<th scope="col">Email Id</th>
+												<th scope="col">Mobile No</th>
+												<th scope="col">Department</th>
+												<th scope="col">Course</th>
+												<th scope="col">Semester</th>
+												<th scope="col">Batch</th>
+												<th scope="col">Group Name</th>
+												<th scope="col">Status</th>
+												<th scope="col">View Subjects</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="teacher, teacherStat : ${listObj}">
+												<th scope="row" th:text="${teacherStat.count}">1</th>
+												<td>[[${teacher.name}]]</td>
+												<td>[[${teacher.userName}]]</td>
+												<td>[[${teacher.email}]]</td>
+												<td>[[${teacher.mobileNo}]]</td>
+												<td>
+													<span th:if="${teacher.departmentName}" th:text="${teacher.departmentName.departmentName}"></span>
+													<span th:unless="${teacher.departmentName}" class="text-muted">N/A</span>
+												</td>
+												<td>
+													<span th:if="${teacher.courseName}" th:text="${teacher.courseName.courseName}"></span>
+													<span th:unless="${teacher.courseName}" class="text-muted">N/A</span>
+												</td>
+												<td>
+													<span th:if="${teacher.semesterName}" th:text="${teacher.semesterName.semesterName}"></span>
+													<span th:unless="${teacher.semesterName}" class="text-muted">N/A</span>
+												</td>
+												<td>
+													<span th:if="${teacher.batchName}" th:text="${teacher.batchName.batchName}"></span>
+													<span th:unless="${teacher.batchName}" class="text-muted">N/A</span>
+												</td>
+												<td th:text="${teacher.groupName == null ? 'No Group' : teacher.groupName == '' ? 'No Group' : teacher.groupName}"></td>
+												<td>
+													<span th:if="${teacher.enabled}" class="badge badge-success">Active</span>
+													<span th:unless="${teacher.enabled}" class="badge badge-danger">Inactive</span>
+												</td>
+												<td>
+													<a th:href="@{'/guac/teacher-subjects/' + ${teacher.userId}}"
+														class="btn btn-info btn-sm">
+														View Subjects
+													</a>
+												</td>
+											</tr>
+											<tr th:if="${listObj.empty}">
+												<td colspan="12" class="text-center">No teachers found</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="templateListing :: jsscript"></div>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			// Initialize DataTable
+			$('#teachersTable').DataTable({
+				"paging": true,
+				"lengthChange": true,
+				"searching": true,
+				"ordering": true,
+				"info": true,
+				"autoWidth": false,
+				"responsive": true,
+			});
+		});
+	</script>
+</body>
+</html>

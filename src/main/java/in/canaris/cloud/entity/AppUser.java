@@ -2,6 +2,8 @@ package in.canaris.cloud.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 
@@ -112,6 +115,10 @@ public class AppUser implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "semester_name")
 	private SemesterMaster semesterName;
+	
+	
+	@OneToMany(mappedBy = "appUser", fetch = FetchType.LAZY)
+	private Set<UserRole> userRoles = new HashSet<>();
 
 	@Column(name = "password_changed_time")
 	private Date passwordChangedTime;
@@ -269,5 +276,15 @@ public class AppUser implements Serializable {
 	public void setBatchName(BatchMaster batchName) {
 		this.batchName = batchName;
 	}
+
+	public Set<UserRole> getUserRoles() {
+		return userRoles;
+	}
+
+	public void setUserRoles(Set<UserRole> userRoles) {
+		this.userRoles = userRoles;
+	}
+	
+	
 
 }

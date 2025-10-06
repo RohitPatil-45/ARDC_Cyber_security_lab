@@ -12,12 +12,15 @@ import in.canaris.cloud.openstack.entity.SubjectMaster;
 public interface SubjectMasterRepository extends JpaRepository<SubjectMaster, Integer> {
 
 	List<SubjectMaster> findBysemester_SemesterId(Integer semesterId);
-	
+
 	List<SubjectMaster> findBySemesterAndElective(SemesterMaster semester, boolean elective);
 
-	
-	  @Query("SELECT s FROM SubjectMaster s WHERE s.semester.semesterId = :semesterId AND s.elective = true")
-	  List<SubjectMaster> findElectiveSubjectsBySemester(@Param("semesterId") Integer semesterId);
-	
+	@Query(value = "SELECT * FROM subject_master WHERE semester_id = :semesterId AND is_elective = true", nativeQuery = true)
+	List<SubjectMaster> findBySemesterAndvvElective(@Param("semesterId") Integer semesterId);
+
+	List<SubjectMaster> findByTeacher(String name);
+
+
+
 
 }

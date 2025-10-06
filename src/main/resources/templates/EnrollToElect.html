@@ -45,12 +45,12 @@
 											<h3 class="card-title" style="padding-top: 10px">[[${pageTitle}]]</h3>
 										</div>
 										<div class="col-md-2">
-											<a th:href="@{'/elective/enrollments'}"
-												class="btn btn-block bg-gradient-primary">View Enrollments</a>
+<!-- 											<a th:href="@{'/elective/enrollments'}" -->
+<!-- 												class="btn btn-block bg-gradient-primary">View Enrollments</a> -->
 										</div>
 									</div>
 								</div>
-								<form th:action="@{/elective/enroll/save}" method="post"
+								<form th:action="@{/guac/enrollsave}" method="post"
 									onsubmit="return validateEnrollmentForm()">
 									<div class="card-body">
 										<div class="row">
@@ -107,7 +107,7 @@
 														<option value="">-- Select Users --</option>
 														<option th:each="user : ${users}"
 															th:value="${user.userId}"
-															th:text="${user.name + ' (' + user.userName + ')'}"></option>
+															th:text="${user.name}"></option>
 													</select>
 												</div>
 											</div>
@@ -249,7 +249,7 @@
                 electiveSubjectSel.empty().append('<option value="">-- Select Elective Subjects --</option>');
                 if (data && data.length > 0) {
                     data.forEach(subject => {
-                        electiveSubjectSel.append(`<option value="${subject.subjectId}">${subject.subjectName} (${subject.subjectCode})</option>`);
+                        electiveSubjectSel.append(`<option value="${subject.subjectId}">${subject.subjectName}</option>`);
                     });
                 } else {
                     electiveSubjectSel.append(`<option value="">No elective subjects available for this semester</option>`);

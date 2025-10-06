@@ -121,8 +121,8 @@
 														<!-- <option value="">Please Select</option> -->
 														<option value="2" selected>User</option>
 														<option value="1">Admin</option>
-
 														<option value="3">Super Admin</option>
+														<option value="4">Teacher</option>
 
 													</select>
 												</div>
@@ -213,23 +213,23 @@
 
 
 												<!-- Subject dropdown -->
-<!-- 												<div class="form-group"> -->
-<!-- 													<label>Subject</label> <select id="subjectSelect" -->
-<!-- 														class="form-control" name="subjectId" -->
-<!-- 														th:field="*{appUser.subjectName}" required> -->
-<!-- 														<option value="">-- Select Subject --</option> -->
-<!-- 													</select> -->
-<!-- 												</div> -->
+												<!-- 												<div class="form-group"> -->
+												<!-- 													<label>Subject</label> <select id="subjectSelect" -->
+												<!-- 														class="form-control" name="subjectId" -->
+												<!-- 														th:field="*{appUser.subjectName}" required> -->
+												<!-- 														<option value="">-- Select Subject --</option> -->
+												<!-- 													</select> -->
+												<!-- 												</div> -->
 
 
-<div class="form-group">
-    <label>Batch</label>
-    <select id="batchSelect" class="form-control" name="batchId"
-            th:field="*{appUser.batchName}" required>
-        <option value="">-- Select Batch --</option>
-        <!-- Dynamically populated via jQuery -->
-    </select>
-</div>
+												<div class="form-group">
+													<label>Batch</label> <select id="batchSelect"
+														class="form-control" name="batchId"
+														th:field="*{appUser.batchName}" required>
+														<option value="">-- Select Batch --</option>
+														<!-- Dynamically populated via jQuery -->
+													</select>
+												</div>
 
 
 											</div>

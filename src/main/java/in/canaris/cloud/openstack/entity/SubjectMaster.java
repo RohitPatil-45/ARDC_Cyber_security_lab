@@ -3,6 +3,8 @@ package in.canaris.cloud.openstack.entity;
 import java.sql.Timestamp;
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "subject_master")
 public class SubjectMaster {
@@ -18,6 +20,7 @@ public class SubjectMaster {
 	// Foreign Key → SemesterMaster
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "semester_id", referencedColumnName = "semester_id")
+	@JsonIgnore
 	private SemesterMaster semester;
 
 	@Column(name = "is_enabled", nullable = false)
@@ -29,11 +32,14 @@ public class SubjectMaster {
 	@Column(name = "updated_at")
 	private Timestamp updatedAt;
 
-	@Column(name = "subject_code",  length = 50)
+	@Column(name = "subject_code", length = 50)
 	private String subjectCode;
-	
+
 	@Column(name = "is_elective")
-    private boolean elective;
+	private boolean elective;
+	
+	@Column(name = "teacher", length = 100)
+	private String teacher;
 
 	// Getters & Setters
 	public int getSubjectId() {
@@ -99,6 +105,15 @@ public class SubjectMaster {
 	public void setElective(boolean elective) {
 		this.elective = elective;
 	}
+
+	public String getTeacher() {
+		return teacher;
+	}
+
+	public void setTeacher(String teacher) {
+		this.teacher = teacher;
+	}
 	
 	
+
 }

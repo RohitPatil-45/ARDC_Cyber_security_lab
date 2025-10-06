@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Teacher Subjects</title>
+<head th:include="templateListing :: headFragment"></head>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header_bk :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>[[${pageTitle}]]</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a th:href="@{'/teachers'}">Teachers</a></li>
+								<li class="breadcrumb-item active">Assigned Subjects</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card card-info">
+								<div class="card-header">
+									<h3 class="card-title">Teacher Information</h3>
+								</div>
+								<div class="card-body">
+									<div class="row" th:if="${teacher}">
+										<div class="col-md-3">
+											<strong>Name:</strong> [[${teacher.name}]]
+										</div>
+										<div class="col-md-3">
+											<strong>Username:</strong> [[${teacher.userName}]]
+										</div>
+										<div class="col-md-3">
+											<strong>Email:</strong> [[${teacher.email}]]
+										</div>
+										<div class="col-md-3">
+											<strong>Mobile:</strong> [[${teacher.mobileNo}]]
+										</div>
+									</div>
+									<div class="row mt-2" th:if="${teacher}">
+										<div class="col-md-3">
+											<strong>Department:</strong> 
+											<span th:if="${teacher.departmentName}" th:text="${teacher.departmentName.departmentName}"></span>
+											<span th:unless="${teacher.departmentName}" class="text-muted">N/A</span>
+										</div>
+										<div class="col-md-3">
+											<strong>Course:</strong> 
+											<span th:if="${teacher.courseName}" th:text="${teacher.courseName.courseName}"></span>
+											<span th:unless="${teacher.courseName}" class="text-muted">N/A</span>
+										</div>
+										<div class="col-md-3">
+											<strong>Semester:</strong> 
+											<span th:if="${teacher.semesterName}" th:text="${teacher.semesterName.semesterName}"></span>
+											<span th:unless="${teacher.semesterName}" class="text-muted">N/A</span>
+										</div>
+										<div class="col-md-3">
+											<strong>Batch:</strong> 
+											<span th:if="${teacher.batchName}" th:text="${teacher.batchName.batchName}"></span>
+											<span th:unless="${teacher.batchName}" class="text-muted">N/A</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="card card-primary">
+								<div class="card-header">
+									<h3 class="card-title">Assigned Subjects</h3>
+									<div class="card-tools">
+										<a th:href="@{'/guac/assign-subject'}" class="btn btn-sm btn-success">
+											<i class="fas fa-plus"></i> Assign More Subjects
+										</a>
+									</div>
+								</div>
+								<div class="card-body">
+									<!-- Success/Error Messages -->
+									<div th:if="${success}" class="alert alert-success alert-dismissible">
+										<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+										<span th:text="${success}"></span>
+									</div>
+									<div th:if="${error}" class="alert alert-danger alert-dismissible">
+										<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+										<span th:text="${error}"></span>
+									</div>
+									
+									<table id="subjectsTable" class="table table-bordered table-striped">
+										<thead class="thead-light">
+											<tr>
+												<th>Sr</th>
+												<th>Subject Name</th>
+												<th>Subject Code</th>
+												<th>Department</th>
+												<th>Course</th>
+												<th>Semester</th>
+												<th>Subject Type</th>
+												<th>Status</th>
+												<th>Actions</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="subject, subjectStat : ${assignedSubjects}">
+												<td th:text="${subjectStat.count}">1</td>
+												<td>[[${subject.subjectName}]]</td>
+												<td>[[${subject.subjectCode}]]</td>
+												<td>
+													<span th:if="${subject.semester?.course?.department}" 
+														  th:text="${subject.semester.course.department.departmentName}"></span>
+													<span th:unless="${subject.semester?.course?.department}" 
+														  class="text-muted">N/A</span>
+												</td>
+												<td>
+													<span th:if="${subject.semester?.course}" 
+														  th:text="${subject.semester.course.courseName}"></span>
+													<span th:unless="${subject.semester?.course}" 
+														  class="text-muted">N/A</span>
+												</td>
+												<td>
+													<span th:if="${subject.semester}" th:text="${subject.semester.semesterName}"></span>
+													<span th:unless="${subject.semester}" class="text-muted">N/A</span>
+												</td>
+												<td>
+													<span th:if="${subject.elective}" class="badge badge-info">Elective</span>
+													<span th:unless="${subject.elective}" class="badge badge-primary">Core</span>
+												</td>
+												<td>
+													<span th:if="${subject.enabled}" class="badge badge-success">Active</span>
+													<span th:unless="${subject.enabled}" class="badge badge-danger">Inactive</span>
+												</td>
+												<td>
+													<button type="button" 
+															class="btn btn-danger btn-sm btn-remove"
+															th:attr="data-subject-id=${subject.subjectId}, 
+																	data-subject-name=${subject.subjectName},
+																	data-teacher-id=${teacher.userId}">
+														<i class="fas fa-trash"></i> Remove
+													</button>
+												</td>
+											</tr>
+											<tr th:if="${assignedSubjects.empty}">
+												<td colspan="9" class="text-center">No subjects assigned to this teacher</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<!-- Remove Subject Confirmation Modal -->
+	<div class="modal fade" id="removeSubjectModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Remove Subject Confirmation</h5>
+					<button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					Are you sure you want to remove subject "<span id="subjectNameToRemove"></span>" from this teacher?
+					<br><small class="text-muted">This action cannot be undone.</small>
+				</div>
+				<div class="modal-footer">
+					<form id="removeSubjectForm" method="post" action="#" style="display: inline;">
+						<input type="hidden" id="teacherIdInput" name="teacherId" value="">
+						<input type="hidden" id="subjectIdInput" name="subjectId" value="">
+						<button type="submit" class="btn btn-danger">
+							<i class="fas fa-trash"></i> Remove
+						</button>
+					</form>
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">
+						<i class="fas fa-times"></i> Cancel
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="templateListing :: jsscript"></div>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			// Initialize DataTable
+			$('#subjectsTable').DataTable({
+				"paging": true,
+				"lengthChange": true,
+				"searching": true,
+				"ordering": true,
+				"info": true,
+				"autoWidth": false,
+				"responsive": true,
+			});
+			
+			// Remove subject button click handler
+			$('.btn-remove').on('click', function() {
+				const subjectId = $(this).data('subject-id');
+				const subjectName = $(this).data('subject-name');
+				const teacherId = $(this).data('teacher-id');
+				
+				// Set values in the modal form
+				$('#subjectNameToRemove').text(subjectName);
+				$('#subjectIdInput').val(subjectId);
+				$('#teacherIdInput').val(teacherId);
+				$('#removeSubjectForm').attr('action', '/guac/remove-subject');
+				
+				// Show the modal
+				$('#removeSubjectModal').modal('show');
+			});
+		});
+	</script>
+</body>
+</html>

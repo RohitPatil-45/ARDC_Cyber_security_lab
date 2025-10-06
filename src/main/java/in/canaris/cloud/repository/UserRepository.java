@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import in.canaris.cloud.entity.AppUser;
@@ -42,6 +43,12 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
 	
 	@Query("SELECT user FROM AppUser user WHERE user.groupName LIKE CONCAT('%', :groupName, '%')")
 	List<AppUser> findByGroupNameContaining(String groupName);
+
+	@Query("SELECT DISTINCT u FROM AppUser u JOIN u.userRoles ur JOIN ur.appRole r WHERE r.roleName = :roleName")
+	List<AppUser> findUsersByRoleName(@Param("roleName") String roleName);
+
+	@Query("SELECT DISTINCT u FROM AppUser u JOIN u.userRoles ur JOIN ur.appRole r WHERE r.roleName = :roleName AND u.groupName IN :groups")
+	List<AppUser> findUsersByRoleNameAndGroups(@Param("roleName") String roleName, @Param("groups") List<String> groups);
 	
 
 }
