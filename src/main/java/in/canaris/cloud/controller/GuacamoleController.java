@@ -80,6 +80,7 @@ import in.canaris.cloud.openstack.entity.SubPlaylist;
 import in.canaris.cloud.openstack.entity.SubPlaylistScenario;
 import in.canaris.cloud.openstack.entity.SubjectMaster;
 import in.canaris.cloud.openstack.entity.SubjectPlaylistMapping;
+import in.canaris.cloud.openstack.entity.SubjectPlaylistView;
 import in.canaris.cloud.openstack.entity.SubjectScenarioMapping;
 import in.canaris.cloud.openstack.entity.SubjectSubplaylistMapping;
 import in.canaris.cloud.openstack.entity.SubjectWisePlaylistView;
@@ -2382,7 +2383,7 @@ public class GuacamoleController {
 	@GetMapping("/deleteDepartment")
 	public String deleteDepartment(@RequestParam("Id") Integer id) {
 		DepartmentMasterRepository.deleteById(id);
-		return "redirect:/departments"; // redirect to listing after delete
+		return "redirect:/guac/View_Department"; // redirect to listing after delete
 	}
 
 //	@GetMapping("/Add_ElectiveSubject")
@@ -6424,286 +6425,323 @@ public class GuacamoleController {
 		return "SemesterWisePlaylist";
 	}
 
+//	@PostMapping("/save_SubjectWisePlaylist")
+//	public String save_SubjectWisePlaylist(@RequestParam(required = false) String groupId,
+//			@RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
+//			@RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
+//			@RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds,
+//			@RequestParam(value = "subjectId", required = false) Integer subjectId) {
+//
+//		try {
+//
+//			if (subjectId != null) {
+//				System.out.println("Saving for Subject ID: " + subjectId);
+//
+//				if (playlistIds != null) {
+//					for (Integer playlistId : playlistIds) {
+//						SubjectPlaylistMapping sp = new SubjectPlaylistMapping();
+//						sp.setSubject(subjectId);
+//						sp.setPlaylistId(playlistId);
+//						SubjectPlaylistMappingRepository.save(sp);
+//					}
+//				}
+//
+//				if (subplaylistIds != null) {
+//					for (Integer subplaylistId : subplaylistIds) {
+//						SubjectSubplaylistMapping ssp = new SubjectSubplaylistMapping();
+//						ssp.setSubject(subjectId);
+//						ssp.setSubPlaylistId(subplaylistId);
+//						SubjectSubplaylistMappingRepository.save(ssp);
+//					}
+//				}
+//
+//				if (scenarioIds != null) {
+//					for (Integer scenarioId : scenarioIds) {
+//						SubjectScenarioMapping ssm = new SubjectScenarioMapping();
+//						ssm.setSubject(subjectId);
+//						ssm.setScenarioId(scenarioId);
+//						SubjectScenarioMappingRepository.save(ssm);
+//					}
+//				}
+//			} else {
+//				System.err.println("⚠ Subject ID is null. Skipping subject-wise saving.");
+//			}
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//
+//		return "redirect:/guac/View_SubjectWisePlaylist";
+//	}
+	
+	
 	@PostMapping("/save_SubjectWisePlaylist")
 	public String save_SubjectWisePlaylist(@RequestParam(required = false) String groupId,
-			@RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
-			@RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
-			@RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds,
-			@RequestParam(value = "subjectId", required = false) Integer subjectId) {
+	        @RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
+	        @RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
+	        @RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds,
+	        @RequestParam(value = "subjectId", required = false) Integer subjectId) {
 
-		try {
+	    try {
+	        if (subjectId != null) {
+	            System.out.println("Saving for Subject ID: " + subjectId);
 
-			if (subjectId != null) {
-				System.out.println("Saving for Subject ID: " + subjectId);
+	            // Get existing mappings
+	            List<SubjectPlaylistMapping> existingPlaylists = SubjectPlaylistMappingRepository.findBySubject(subjectId);
+	            List<SubjectSubplaylistMapping> existingSubplaylists = SubjectSubplaylistMappingRepository.findBySubject(subjectId);
+	            List<SubjectScenarioMapping> existingScenarios = SubjectScenarioMappingRepository.findBySubject(subjectId);
 
-				if (playlistIds != null) {
-					for (Integer playlistId : playlistIds) {
-						SubjectPlaylistMapping sp = new SubjectPlaylistMapping();
-						sp.setSubject(subjectId);
-						sp.setPlaylistId(playlistId);
-						SubjectPlaylistMappingRepository.save(sp);
-					}
-				}
+	            // Delete existing mappings
+	            SubjectPlaylistMappingRepository.deleteAll(existingPlaylists);
+	            SubjectSubplaylistMappingRepository.deleteAll(existingSubplaylists);
+	            SubjectScenarioMappingRepository.deleteAll(existingScenarios);
 
-				if (subplaylistIds != null) {
-					for (Integer subplaylistId : subplaylistIds) {
-						SubjectSubplaylistMapping ssp = new SubjectSubplaylistMapping();
-						ssp.setSubject(subjectId);
-						ssp.setSubPlaylistId(subplaylistId);
-						SubjectSubplaylistMappingRepository.save(ssp);
-					}
-				}
+	            // Save new playlist mappings
+	            if (playlistIds != null && !playlistIds.isEmpty()) {
+	                for (Integer playlistId : playlistIds) {
+	                    SubjectPlaylistMapping sp = new SubjectPlaylistMapping();
+	                    sp.setSubject(subjectId);
+	                    sp.setPlaylistId(playlistId);
+	                    SubjectPlaylistMappingRepository.save(sp);
+	                }
+	            }
 
-				if (scenarioIds != null) {
-					for (Integer scenarioId : scenarioIds) {
-						SubjectScenarioMapping ssm = new SubjectScenarioMapping();
-						ssm.setSubject(subjectId);
-						ssm.setScenarioId(scenarioId);
-						SubjectScenarioMappingRepository.save(ssm);
-					}
-				}
-			} else {
-				System.err.println("⚠ Subject ID is null. Skipping subject-wise saving.");
-			}
+	            // Save new subplaylist mappings
+	            if (subplaylistIds != null && !subplaylistIds.isEmpty()) {
+	                for (Integer subplaylistId : subplaylistIds) {
+	                    SubjectSubplaylistMapping ssp = new SubjectSubplaylistMapping();
+	                    ssp.setSubject(subjectId);
+	                    ssp.setSubPlaylistId(subplaylistId);
+	                    SubjectSubplaylistMappingRepository.save(ssp);
+	                }
+	            }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	            // Save new scenario mappings
+	            if (scenarioIds != null && !scenarioIds.isEmpty()) {
+	                for (Integer scenarioId : scenarioIds) {
+	                    SubjectScenarioMapping ssm = new SubjectScenarioMapping();
+	                    ssm.setSubject(subjectId);
+	                    ssm.setScenarioId(scenarioId);
+	                    SubjectScenarioMappingRepository.save(ssm);
+	                }
+	            }
+	            
+	            System.out.println("Successfully updated mappings for Subject ID: " + subjectId);
+	        } else {
+	            System.err.println("⚠ Subject ID is null. Skipping subject-wise saving.");
+	        }
 
-		return "redirect:/guac/SemesterWisePlaylist";
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        System.err.println("Error saving subject-wise playlist: " + e.getMessage());
+	    }
+
+	    return "redirect:/guac/View_SubjectWisePlaylist";
 	}
 
-//	@GetMapping("/SubjectWisePlaylistView")
-//	public String viewSubjectWisePlaylists(Model model) {
-//	    model.addAttribute("pageTitle", "Subject Wise Playlists");
-//	    
-//	    List<Map<String, Object>> viewData = SubjectMasterRepository.findAllWithHierarchy().stream()
-//	        .map(subject -> {
-//	            Map<String, Object> row = new HashMap<>();
-//	            row.put("subjectId", subject.getSubjectId());
-//	            row.put("subjectName", subject.getSubjectName());
-//	            
-//	            // Get playlists
-//	            List<Playlist> playlists = getPlaylistsForSubject(subject.getSubjectId());
-//	            row.put("playlists", playlists);
-//	            row.put("playlistNames", playlists.stream().map(Playlist::getPlaylistName).collect(Collectors.joining(", ")));
-//	            row.put("playlistCount", playlists.size());
-//	            
-//	            // Get subplaylists
-//	            List<SubPlaylist> subplaylists = getSubplaylistsForSubject(subject.getSubjectId());
-//	            row.put("subplaylists", subplaylists);
-//	            row.put("subplaylistNames", subplaylists.stream().map(SubPlaylist::getPlaylistName).collect(Collectors.joining(", ")));
-//	            row.put("subplaylistCount", subplaylists.size());
-//	            
-//	            // Get scenarios
-//	            List<Add_Scenario> scenarios = getScenariosForSubject(subject.getSubjectId());
-//	            row.put("scenarios", scenarios);
-//	            row.put("scenarioNames", scenarios.stream().map(Add_Scenario::getScenarioName).collect(Collectors.joining(", ")));
-//	            row.put("scenarioCount", scenarios.size());
-//	            
-//	            row.put("totalCount", playlists.size() + subplaylists.size() + scenarios.size());
-//	            
-//	            return row;
-//	        })
-//	        .filter(row -> (Integer)row.get("totalCount") > 0)
-//	        .collect(Collectors.toList());
-//	    
-//	    model.addAttribute("subjectWisePlaylists", viewData);
-//	    return "SubjectWisePlaylistView";
-//	}
-//
-//	
-//	private List<Playlist> getPlaylistsForSubject(Integer subjectId) {
-//	    return SubjectPlaylistMappingRepository.findBySubject(subjectId).stream()
-//	        .map(mapping -> PlaylistRepository.findById(mapping.getPlaylistId()).orElse(null))
-//	        .filter(Objects::nonNull)
-//	        .collect(Collectors.toList());
-//	}
-//
-//	private List<SubPlaylist> getSubplaylistsForSubject(Integer subjectId) {
-//	    return SubjectSubplaylistMappingRepository.findBySubject(subjectId).stream()
-//	        .map(mapping -> SubPlaylistRepository.findById(mapping.getSubPlaylistId()).orElse(null))
-//	        .filter(Objects::nonNull)
-//	        .collect(Collectors.toList());
-//	}
-//
-//	private List<Add_Scenario> getScenariosForSubject(Integer subjectId) {
-//	    return SubjectScenarioMappingRepository.findBySubject(subjectId).stream()
-//	        .map(mapping -> ScenarioRepository.findById(mapping.getScenarioId()).orElse(null))
-//	        .filter(Objects::nonNull)
-//	        .collect(Collectors.toList());
-//	}
 
-//	@GetMapping("/viewsubjectTasks")
-//	public String viewSubjectTasks(Model model, Principal principal) {
-//	    Authentication auth = (Authentication) principal;
-//	    String username = auth.getName();
-//	    
-//	    try {
-//	        // Get playlists for the user
-//	        List<Playlist> playlists = getPlaylistsForUser(username, auth);
-//	        model.addAttribute("playlists", playlists);
-//	        
-//	        // Get sub-playlists for the user  
-//	        List<SubPlaylist> subPlaylists = getSubPlaylistsForUser(username, auth);
-//	        model.addAttribute("subPlaylists", subPlaylists);
-//	        
-//	        // Get scenarios for the user
-//	        List<Add_Scenario> scenarios = getScenariosForUser(username, auth);
-//	        model.addAttribute("scenarios", scenarios);
-//	        
-//	        model.addAttribute("pageTitle", "Subject Tasks");
-//	        
-//	    } catch (Exception e) {
-//	        e.printStackTrace();
-//	        model.addAttribute("error", "Error loading tasks");
-//	    }
-//	    
-//	    return "viewsubjecttasks";
-//	}
-//
-	// Helper methods to get data based on user role
-//	private List<Playlist> getPlaylistsForUser(String username, Authentication auth) {
-//	    boolean isSuperAdmin = auth.getAuthorities().stream()
-//	            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
-//	    
-//	    if (isSuperAdmin) {
-//	        return PlaylistRepository.findAll();
-//	    } else {
-//	        List<Integer> userSubjectIds = getUserSubjectIds(username);
-//	        if (userSubjectIds != null && !userSubjectIds.isEmpty()) {
-//	            List<Integer> playlistIds = SubjectPlaylistMappingRepository.findPlaylistIdsBySubjectIds(userSubjectIds);
-//	            if (playlistIds != null && !playlistIds.isEmpty()) {
-//	                return PlaylistRepository.findAllById(playlistIds);
-//	            }
-//	        }
-//	        return new ArrayList<>();
-//	    }
-//	}
-//
-//	private List<SubPlaylist> getSubPlaylistsForUser(String username, Authentication auth) {
-//	    boolean isSuperAdmin = auth.getAuthorities().stream()
-//	            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
-//	    
-//	    if (isSuperAdmin) {
-//	        return SubPlaylistRepository.findAll();
-//	    } else {
-//	        List<Integer> userSubjectIds = getUserSubjectIds(username);
-//	        if (userSubjectIds != null && !userSubjectIds.isEmpty()) {
-//	            List<Integer> subPlaylistIds = SubjectSubplaylistMappingRepository.findSubPlaylistIdsBySubjectIds(userSubjectIds);
-//	            if (subPlaylistIds != null && !subPlaylistIds.isEmpty()) {
-//	                return SubPlaylistRepository.findAllById(subPlaylistIds);
-//	            }
-//	        }
-//	        return new ArrayList<>();
-//	    }
-//	}
-//
-//	private List<Add_Scenario> getScenariosForUser(String username, Authentication auth) {
-//	    boolean isSuperAdmin = auth.getAuthorities().stream()
-//	            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
-//	    
-//	    if (isSuperAdmin) {
-//	        return ScenarioRepository.findAll();
-//	    } else {
-//	        List<Integer> userSubjectIds = getUserSubjectIds(username);
-//	        if (userSubjectIds != null && !userSubjectIds.isEmpty()) {
-//	            List<Integer> scenarioIds = SubjectScenarioMappingRepository.findScenarioIdsBySubjectIds(userSubjectIds);
-//	            if (scenarioIds != null && !scenarioIds.isEmpty()) {
-//	                return ScenarioRepository.findAllById(scenarioIds);
-//	            }
-//	        }
-//	        return new ArrayList<>();
-//	    }
-//	}
+	@GetMapping("/View_SubjectWisePlaylist")
+	public String viewSubjectWisePlaylist(Model model) {
+	    try {
+	        // Get all subject-wise playlist mappings
+	        List<SubjectPlaylistMapping> subjectPlaylists = SubjectPlaylistMappingRepository.findAll();
+	        List<SubjectSubplaylistMapping> subjectSubplaylists = SubjectSubplaylistMappingRepository.findAll();
+	        List<SubjectScenarioMapping> subjectScenarios = SubjectScenarioMappingRepository.findAll();
+	        
+	        // Create a combined view model
+	        List<SubjectPlaylistView> viewList = new ArrayList<>();
+	        
+	        // Get all unique subjects from mappings
+	        Set<Integer> subjectIds = new HashSet<>();
+	        subjectPlaylists.forEach(sp -> subjectIds.add(sp.getSubject()));
+	        subjectSubplaylists.forEach(ssp -> subjectIds.add(ssp.getSubject()));
+	        subjectScenarios.forEach(ssm -> subjectIds.add(ssm.getSubject()));
+	        
+	        for (Integer subjectId : subjectIds) {
+	            SubjectPlaylistView view = new SubjectPlaylistView();
+	            
+	            // Get subject details
+	            Optional<SubjectMaster> subjectOpt = SubjectMasterRepository.findById(subjectId);
+	            if (subjectOpt.isPresent()) {
+	                SubjectMaster subject = subjectOpt.get();
+	                view.setSubjectId(subjectId);
+	                view.setSubjectName(subject.getSubjectName());
+	                view.setSubjectCode(subject.getSubjectCode());
+	                
+	                // Get semester, course, department info
+	                if (subject.getSemester() != null) {
+	                    view.setSemesterName(subject.getSemester().getSemesterName());
+	                    if (subject.getSemester().getCourse() != null) {
+	                        view.setCourseName(subject.getSemester().getCourse().getCourseName());
+	                        if (subject.getSemester().getCourse().getDepartment() != null) {
+	                            view.setDepartmentName(subject.getSemester().getCourse().getDepartment().getDepartmentName());
+	                        }
+	                    }
+	                }
+	            }
+	            
+	            // Get playlists
+	            List<String> playlistNames = subjectPlaylists.stream()
+	            	    .filter(sp -> sp.getSubject() == subjectId)
+	            	    .map(sp -> {
+	            	        Optional<Playlist> playlist = PlaylistRepository.findById(sp.getPlaylistId());
+	            	        return playlist.map(Playlist::getPlaylistName).orElse("Unknown Playlist");
+	            	    })
+	            	    .collect(Collectors.toList());
+	            view.setPlaylistNames(playlistNames);
+	            
+	            // Get subplaylists
+	            List<String> subplaylistNames = subjectSubplaylists.stream()
+	            	    .filter(ssp -> ssp.getSubject() == subjectId)
+	            	    .map(ssp -> {
+	            	        Optional<SubPlaylist> subplaylist = SubPlaylistRepository.findById(ssp.getSubPlaylistId());
+	            	        return subplaylist.map(SubPlaylist::getPlaylistName).orElse("Unknown SubPlaylist");
+	            	    })
+	            	    .collect(Collectors.toList());
+	            	view.setSubplaylistNames(subplaylistNames);
 
-//	@GetMapping("/viewsubjectTasks/{subjectId}")
-//	public String viewSubjectTasks(@PathVariable("subjectId") Integer subjectId, 
-//	                              Model model, Principal principal) {
-//	    Authentication auth = (Authentication) principal;
-//	    String username = auth.getName();
-//	    
-//	    try {
-//	        // Verify subject exists
-//	        SubjectMaster subject = SubjectMasterRepository.findById(subjectId)
-//	            .orElseThrow(() -> new RuntimeException("Subject not found with ID: " + subjectId));
-//	        
-//	        // Check if user has access to this subject
-//	        if (!hasAccessToSubject(username, subjectId, auth)) {
-//	            model.addAttribute("error", "You don't have access to this subject");
-//	            return "viewsubjecttasks";
-//	        }
-//	        
-//	        // Get playlists for this specific subject using mapping table
-//	        List<Playlist> playlists = getPlaylistsForSubject(subjectId);
-//	        model.addAttribute("playlists", playlists);
-//	        
-//	        // Get sub-playlists for this specific subject using mapping table
-//	        List<SubPlaylist> subPlaylists = getSubPlaylistsForSubject(subjectId);
-//	        model.addAttribute("subPlaylists", subPlaylists);
-//	        
-//	        // Get scenarios for this specific subject using mapping table
-//	        List<Add_Scenario> scenarios = getScenariosForSubject(subjectId);
-//	        model.addAttribute("scenarios", scenarios);
-//	        
-//	        // Add subject info to model
-//	        model.addAttribute("subject", subject);
-//	        model.addAttribute("subjectId", subjectId);
-//	        model.addAttribute("pageTitle", subject.getSubjectName() + " - Tasks");
-//	        
-//	    } catch (Exception e) {
-//	        e.printStackTrace();
-//	        model.addAttribute("error", "Error loading tasks: " + e.getMessage());
-//	    }
-//	    
-//	    return "viewsubjecttasks";
-//	}
-//
-//	
-//	private List<Playlist> getPlaylistsForSubject(Integer subjectId) {
-//	    // Get playlist IDs from mapping table
-//	    List<Integer> playlistIds = SubjectPlaylistMappingRepository.findSubject(subjectId);
-//	    
-//	    if (playlistIds != null && !playlistIds.isEmpty()) {
-//	        return PlaylistRepository.findAllById(playlistIds);
-//	    }
-//	    return new ArrayList<>();
-//	}
-//
-//	
-//	private List<SubPlaylist> getSubPlaylistsForSubject(Integer subjectId) {
-//	    // Get sub-playlist IDs from mapping table
-//	    List<Integer> subPlaylistIds = SubjectSubplaylistMappingRepository.findSubject(subjectId);
-//	   
-//	    if (subPlaylistIds != null && !subPlaylistIds.isEmpty()) {
-//	        return SubPlaylistRepository.findAllById(subPlaylistIds);
-//	    }
-//	    return new ArrayList<>();
-//	}
-//
-//	
-//	private List<Add_Scenario> getScenariosForSubject(Integer subjectId) {
-//	    // Get scenario IDs from mapping table
-//	    List<Integer> scenarioIds = SubjectScenarioMappingRepository.findSubject(subjectId);
-//	    
-//	    if (scenarioIds != null && !scenarioIds.isEmpty()) {
-//	        return ScenarioRepository.findAllById(scenarioIds);
-//	    }
-//	    return new ArrayList<>();
-//	}
-//
-//	// Check if user has access to the subject
-//	private boolean hasAccessToSubject(String username, Integer subjectId, Authentication auth) {
-//	    boolean isSuperAdmin = auth.getAuthorities().stream()
-//	            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
-//	    
-//	    if (isSuperAdmin) {
-//	        return true;
-//	    } else {
-//	        List<Integer> userSubjectIds = getUserSubjectIds(username);
-//	        return userSubjectIds != null && userSubjectIds.contains(subjectId);
-//	    }
-//	}
+	            	// Get scenarios
+	            	List<String> scenarioNames = subjectScenarios.stream()
+	            	    .filter(ssm -> ssm.getSubject() == subjectId)
+	            	    .map(ssm -> {
+	            	        Optional<Add_Scenario> scenario = ScenarioRepository.findById(ssm.getScenarioId());
+	            	        return scenario.map(Add_Scenario::getScenarioName).orElse("Unknown Scenario");
+	            	    })
+	            	    .collect(Collectors.toList());
+	            	view.setScenarioNames(scenarioNames);
+	            
+	            viewList.add(view);
+	        }
+	        
+	        model.addAttribute("pageTitle", "Subject Wise Playlist");
+	        model.addAttribute("playlistMappings", viewList);
+	        
+	    } catch (Exception e) {
+	        model.addAttribute("error", "Error loading playlist mappings: " + e.getMessage());
+	    }
+	    
+	    return "View_SubjectWisePlaylist";
+	}
+
+	@GetMapping("/edit_SubjectWisePlaylist/{subjectId}")
+	public String editSubjectWisePlaylist(@PathVariable("subjectId") Integer subjectId, Model model) {
+	    try {
+	        // Get subject details
+	        Optional<SubjectMaster> subjectOpt = SubjectMasterRepository.findById(subjectId);
+	        if (subjectOpt.isPresent()) {
+	            SubjectMaster subject = subjectOpt.get();
+	            model.addAttribute("subject", subject);
+	            
+	            // Get current mappings
+	            List<SubjectPlaylistMapping> currentPlaylists = SubjectPlaylistMappingRepository.findBySubject(subjectId);
+	            List<SubjectSubplaylistMapping> currentSubplaylists = SubjectSubplaylistMappingRepository.findBySubject(subjectId);
+	            List<SubjectScenarioMapping> currentScenarios = SubjectScenarioMappingRepository.findBySubject(subjectId);
+	            
+	            model.addAttribute("currentPlaylistIds", 
+	                currentPlaylists.stream().map(SubjectPlaylistMapping::getPlaylistId).collect(Collectors.toList()));
+	            model.addAttribute("currentSubplaylistIds", 
+	                currentSubplaylists.stream().map(SubjectSubplaylistMapping::getSubPlaylistId).collect(Collectors.toList()));
+	            model.addAttribute("currentScenarioIds", 
+	                currentScenarios.stream().map(SubjectScenarioMapping::getScenarioId).collect(Collectors.toList()));
+	            
+	            // Get department, course, semester info for pre-selection
+	            if (subject.getSemester() != null) {
+	                SemesterMaster semester = subject.getSemester();
+	                CourseMaster course = semester.getCourse();
+	                DepartmentMaster department = course.getDepartment();
+	                
+	                model.addAttribute("currentDepartmentId", department.getDepartmentId());
+	                model.addAttribute("currentCourseId", course.getCourseId());
+	                model.addAttribute("currentSemesterId", semester.getSemesterId());
+	                model.addAttribute("currentSubjectId", subject.getSubjectId());
+	            }
+	        }
+	        
+	        // Get all available options
+	        List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+	        List<Playlist> playlists = PlaylistRepository.findAll();
+	        List<SubPlaylist> subplaylists = SubPlaylistRepository.findAll();
+	        List<Add_Scenario> scenarios = ScenarioRepository.findAll();
+	        
+	        model.addAttribute("departments", departments);
+	        model.addAttribute("playlists", playlists);
+	        model.addAttribute("subplaylists", subplaylists);
+	        model.addAttribute("scenarios", scenarios);
+	        model.addAttribute("pageTitle", "Edit Subject Wise Playlist");
+	        
+	    } catch (Exception e) {
+	        model.addAttribute("error", "Error loading edit form: " + e.getMessage());
+	    }
+	    
+	    return "SemesterWisePlaylist";
+	}
+
+	@PostMapping("/update_SubjectWisePlaylist")
+	public String updateSubjectWisePlaylist(@RequestParam("subjectId") Integer subjectId,
+	                                       @RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
+	                                       @RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
+	                                       @RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds,
+	                                       RedirectAttributes redirectAttributes) {
+	    try {
+	        // Delete existing mappings
+	        SubjectPlaylistMappingRepository.deleteBySubject(subjectId);
+	        SubjectSubplaylistMappingRepository.deleteBySubject(subjectId);
+	        SubjectScenarioMappingRepository.deleteBySubject(subjectId);
+	        
+	        // Save new mappings
+	        if (playlistIds != null) {
+	            for (Integer playlistId : playlistIds) {
+	                SubjectPlaylistMapping sp = new SubjectPlaylistMapping();
+	                sp.setSubject(subjectId);
+	                sp.setPlaylistId(playlistId);
+	                SubjectPlaylistMappingRepository.save(sp);
+	            }
+	        }
+	        
+	        if (subplaylistIds != null) {
+	            for (Integer subplaylistId : subplaylistIds) {
+	                SubjectSubplaylistMapping ssp = new SubjectSubplaylistMapping();
+	                ssp.setSubject(subjectId);
+	                ssp.setSubPlaylistId(subplaylistId);
+	                SubjectSubplaylistMappingRepository.save(ssp);
+	            }
+	        }
+	        
+	        if (scenarioIds != null) {
+	            for (Integer scenarioId : scenarioIds) {
+	                SubjectScenarioMapping ssm = new SubjectScenarioMapping();
+	                ssm.setSubject(subjectId);
+	                ssm.setScenarioId(scenarioId);
+	                SubjectScenarioMappingRepository.save(ssm);
+	            }
+	        }
+	        
+	        redirectAttributes.addFlashAttribute("success", "Playlist mappings updated successfully!");
+	        
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("error", "Error updating playlist mappings: " + e.getMessage());
+	    }
+	    
+	    return "redirect:/guac/View_SubjectWisePlaylist";
+	}
+
+	@GetMapping("/delete_SubjectWisePlaylist/{subjectId}")
+	public String deleteSubjectWisePlaylist(@PathVariable("subjectId") Integer subjectId, 
+	                                       RedirectAttributes redirectAttributes) {
+	    try {
+	        // Delete all mappings for this subject
+	        SubjectPlaylistMappingRepository.deleteBySubject(subjectId);
+	        SubjectSubplaylistMappingRepository.deleteBySubject(subjectId);
+	        SubjectScenarioMappingRepository.deleteBySubject(subjectId);
+	        
+	        redirectAttributes.addFlashAttribute("success", "Playlist mappings deleted successfully!");
+	        
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("error", "Error deleting playlist mappings: " + e.getMessage());
+	    }
+	    
+	    return "redirect:/guac/View_SubjectWisePlaylist";
+	}
 
 	@GetMapping("/viewsubjectTasks/{subjectId}")
 	public String viewSubjectTasks(@PathVariable("subjectId") Integer subjectId, Model model, Principal principal) {
@@ -7413,5 +7451,106 @@ public class GuacamoleController {
 	        redirectAttributes.addFlashAttribute("error", "Error removing subject: " + e.getMessage());
 	    }
 	    return "redirect:/teachers";
+	}
+	
+	
+	@GetMapping("/teacher-dashboard")
+	public String teacherDashboard(Model model, Principal principal) {
+	    try {
+	        Authentication auth = (Authentication) principal;
+	        String username = auth.getName();
+	        
+	        // Get teacher details
+	        List<AppUser> teachers = AppUserRepository.findByUserName(username);
+	        if (teachers.isEmpty()) {
+	            model.addAttribute("error", "Teacher not found!");
+	            return "teacher-dashboard";
+	        }
+	        
+	        AppUser teacher = teachers.get(0);
+	        model.addAttribute("teacher", teacher);
+	        model.addAttribute("pageTitle", "Teacher Dashboard - " + teacher.getName());
+	        
+	        // Get subjects assigned to this teacher
+	        List<SubjectMaster> assignedSubjects = SubjectMasterRepository.findByTeacher(teacher.getName());
+	        model.addAttribute("assignedSubjects", assignedSubjects != null ? assignedSubjects : new ArrayList<>());
+	        
+	        // Get student counts for each subject based on semester (only ROLE_USER)
+	        Map<Integer, Long> subjectStudentCounts = new HashMap<>();
+	        Map<Integer, List<AppUser>> subjectStudentsMap = new HashMap<>();
+	        
+	        if (assignedSubjects != null) {
+	            for (SubjectMaster subject : assignedSubjects) {
+	                // Get semester ID from the subject
+	                Integer semesterId = null;
+	                if (subject.getSemester() != null) {
+	                    semesterId = subject.getSemester().getSemesterId();
+	                }
+	                
+	                Long studentCount = 0L;
+	                List<AppUser> students = new ArrayList<>();
+	                
+	                if (semesterId != null) {
+	                  
+	                    studentCount = AppUserRepository.countOnlyStudentsBySemesterId(semesterId);
+	                    students = AppUserRepository.findOnlyStudentsBySemesterId(semesterId);
+	                }
+	                
+	                subjectStudentCounts.put(subject.getSubjectId(), studentCount != null ? studentCount : 0L);
+	                subjectStudentsMap.put(subject.getSubjectId(), students != null ? students : new ArrayList<>());
+	            }
+	        }
+	        
+	        model.addAttribute("subjectStudentCounts", subjectStudentCounts);
+	        model.addAttribute("subjectStudentsMap", subjectStudentsMap);
+	        
+	        // Calculate totals
+	        long totalStudents = subjectStudentCounts.values().stream().mapToLong(Long::longValue).sum();
+	        model.addAttribute("totalStudents", totalStudents);
+	        model.addAttribute("totalSubjects", assignedSubjects != null ? assignedSubjects.size() : 0);
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("error", "Error loading dashboard: " + e.getMessage());
+	        
+	        model.addAttribute("assignedSubjects", new ArrayList<>());
+	        model.addAttribute("subjectStudentCounts", new HashMap<>());
+	        model.addAttribute("subjectStudentsMap", new HashMap<>());
+	        model.addAttribute("totalStudents", 0);
+	        model.addAttribute("totalSubjects", 0);
+	    }
+	    return "teacher-dashboard";
+	}
+
+	@GetMapping("/subject-students/{subjectId}")
+	public String viewSubjectStudents(@PathVariable("subjectId") int subjectId, Model model, Principal principal) {
+	    try {
+	        // Get subject details
+	        Optional<SubjectMaster> subjectOpt = SubjectMasterRepository.findBysubjectId(subjectId);
+	        if (!subjectOpt.isPresent()) {
+	            model.addAttribute("error", "Subject not found!");
+	            return "subject-students";
+	        }
+	        
+	        SubjectMaster subject = subjectOpt.get();
+	        model.addAttribute("subject", subject);
+	        model.addAttribute("pageTitle", "Students - " + subject.getSubjectName());
+	        
+	        
+	        List<AppUser> students = new ArrayList<>();
+	        if (subject.getSemester() != null) {
+	            students = AppUserRepository.findOnlyStudentsBySemesterId(subject.getSemester().getSemesterId());
+	        }
+	        
+	        model.addAttribute("students", students != null ? students : new ArrayList<>());
+	        model.addAttribute("studentCount", students != null ? students.size() : 0);
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("error", "Error loading students: " + e.getMessage());
+	        model.addAttribute("students", new ArrayList<>());
+	        model.addAttribute("studentCount", 0);
+	    }
+	    return "subject-students";
 	}
 }

@@ -80,8 +80,6 @@
 				src="/webtemplate/dist/img/Magicbox-logo.png" width="100px"
 				alt="Magicbox logo" style="width: 90%;">
 			</a>
-
-
 		</div>
 
 		<!-- Sidebar -->
@@ -103,6 +101,11 @@
 			<nav class="mt-2">
 				<ul class="nav nav-pills nav-sidebar flex-column"
 					data-widget="treeview" role="menu" data-accordion="false">
+					
+					
+					
+
+					
 					<!-- Add icons to the links using the .nav-icon class
                    with font-awesome or any other icon font library -->
 
@@ -264,6 +267,13 @@
 								class="nav-link"> <i class="far fa-circle nav-icon"></i>
 									<p>Dashboard</p>
 							</a></li>
+							
+							<li class="nav-item"><a href="/guac/teacher-dashboard"
+								class="nav-link"> <i class="far fa-circle nav-icon"></i>
+									<p>Teacher Dashboard</p>
+							</a></li>
+							
+							
 
 							<!-- Templates -->
 							<li class="nav-item has-treeview"><a href="#"
@@ -374,6 +384,13 @@
 											<p>Semester Wise Playlist</p>
 									</a></li>
 									
+									<li class="nav-item"><a href="/guac/View_SubjectWisePlaylist"
+										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+											<p>View SubjectWisePlaylist</p>
+									</a></li>
+									
+									
+									
 									<li class="nav-item"><a href="/guac/EnrollToElectiveSubject"
 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 											<p>Enroll To Elective Subject</p>
@@ -389,13 +406,6 @@
 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 											<p>Assign subject to Teacher</p>
 									</a></li>
-									
-									
-									
-									
-									
-									
-									
 									
 								</ul></li>
 
@@ -539,9 +549,58 @@
 							</a></li>
 						</ul>
 					</li>
+					
+					
+										
+					<!-- Teacher Section -->
+					<li sec:authorize="hasAnyRole('ROLE_TEACHER','ROLE_SUPERADMIN','ROLE_ADMIN')" class="nav-item">
+						<a href="#" class="nav-link"> <i
+							class="nav-icon fas fa-chalkboard-teacher"></i>
+							<p>
+								Teacher <i class="right fas fa-angle-left"></i>
+							</p>
+					</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item"><a href="/guac/teacher-dashboard"
+								class="nav-link"> <i class="far fa-circle nav-icon"></i>
+									<p>Dashboard</p>
+							</a></li>
+							
+							<!-- Teacher's Classes -->
+<!-- 							<li class="nav-item has-treeview"><a href="#" -->
+<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+<!-- 									<p> -->
+<!-- 										My Classes <i class="right fas fa-angle-left"></i> -->
+<!-- 									</p> -->
+<!-- 							</a> -->
+<!-- 								<ul class="nav nav-treeview"> -->
+<!-- 									<li class="nav-item"><a href="/guac/teacher-classes" -->
+<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+<!-- 											<p>View My Classes</p> -->
+<!-- 									</a></li> -->
+<!-- 									<li class="nav-item"><a href="/guac/create-assignment" -->
+<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+<!-- 											<p>Create Assignment</p> -->
+<!-- 									</a></li> -->
+<!-- 									<li class="nav-item"><a href="/guac/view-assignments" -->
+<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+<!-- 											<p>View Assignments</p> -->
+<!-- 									</a></li> -->
+<!-- 								</ul></li> -->
+							
+							<!-- Student Management -->
+							
+							
+							<!-- Content Management -->
+							
+								
+							<!-- Assessments -->
+							
+						</ul>
+					</li>
 
 					<li
-						sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_USER','ROLE_SUPERADMIN')"
+						sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_USER','ROLE_SUPERADMIN','ROLE_TEACHER')"
 						class="nav-item"><a href="#" class="nav-link"> <i
 							class="nav-icon fas fa-cloud"></i>
 							<p>

@@ -75,6 +75,10 @@ body {
 	text-align: left;
 	width: 100%;
 }
+
+.hidden {
+    display: none;
+}
 </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -108,25 +112,34 @@ body {
 							<div class="card">
 								<div class="card-header">
 									<h3 class="card-title">
-										<i class="fas fa-list"></i> Add User Wise Playlist
+										<i class="fas fa-list"></i> 
+										<span th:if="${subject != null}">Edit</span>
+										<span th:unless="${subject != null}">Add</span> 
+										Subject Wise Playlist
 									</h3>
 								</div>
 								<form th:action="@{/guac/save_SubjectWisePlaylist}" method="post">
+									<!-- Hidden field for subject ID when editing -->
+									<input type="hidden" id="subjectId" name="subjectId" th:value="${currentSubjectId}" />
+									
 									<div class="card-body">
 										<div class="row">
 											<div class="col-md-6">
 												<div class="form-group">
 													<label class="required-field">Department</label> 
-													<select id="departmentSelect" name="departmentId" class="form-control" required>
+													<select id="departmentSelect" name="departmentId" class="form-control" required
+														th:disabled="${subject != null}">
 														<option value="">-- Select Department --</option>
 														<option th:each="d : ${departments}"
 															th:value="${d.departmentId}"
-															th:text="${d.departmentName}"></option>
+															th:text="${d.departmentName}"
+															th:selected="${currentDepartmentId == d.departmentId}"></option>
 													</select>
 												</div>
 												<div class="form-group">
 													<label class="required-field">Semester</label> 
-													<select id="semesterSelect" name="semesterId" class="form-control" required>
+													<select id="semesterSelect" name="semesterId" class="form-control" required
+														th:disabled="${subject != null}">
 														<option value="">-- Select Semester --</option>
 													</select>
 												</div>
@@ -135,13 +148,15 @@ body {
 											<div class="col-md-6">
 												<div class="form-group">
 													<label class="required-field">Course</label> 
-													<select id="courseSelect" name="courseId" class="form-control" required>
+													<select id="courseSelect" name="courseId" class="form-control" required
+														th:disabled="${subject != null}">
 														<option value="">-- Select Course --</option>
 													</select>
 												</div>
 												<div class="form-group">
 													<label>Subject</label> 
-													<select id="subjectSelect" name="subjectId" class="form-control">
+													<select id="subjectSelect" name="subjectId" class="form-control"
+														th:disabled="${subject != null}">
 														<option value="">-- Select Subject --</option>
 													</select>
 												</div>
@@ -194,7 +209,9 @@ body {
 											<i class="fas fa-undo mr-1"></i> Reset
 										</button>
 										<button type="submit" class="btn btn-primary">
-											<i class="fas fa-save mr-1"></i> Save 
+											<i class="fas fa-save mr-1"></i> 
+											<span th:if="${subject != null}">Update</span>
+											<span th:unless="${subject != null}">Save</span>
 											<span id="spinner" class="spinner-border spinner-border-sm ml-2 d-none"></span>
 										</button>
 									</div>
@@ -216,6 +233,16 @@ body {
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/js/bootstrap-multiselect.min.js"></script>
 
 	<script type="text/javascript">
+    // Store current values for initialization
+    const currentDepartmentId = [[${currentDepartmentId != null ? currentDepartmentId : 'null'}]];
+    const currentCourseId = [[${currentCourseId != null ? currentCourseId : 'null'}]];
+    const currentSemesterId = [[${currentSemesterId != null ? currentSemesterId : 'null'}]];
+    const currentSubjectId = [[${currentSubjectId != null ? currentSubjectId : 'null'}]];
+    
+    const currentPlaylistIds = [[${currentPlaylistIds != null ? currentPlaylistIds : '[]'}]];
+    const currentSubplaylistIds = [[${currentSubplaylistIds != null ? currentSubplaylistIds : '[]'}]];
+    const currentScenarioIds = [[${currentScenarioIds != null ? currentScenarioIds : '[]'}]];
+    
     function resetForm() {
         $('#departmentSelect').val('');
         $('#courseSelect').html('<option value="">-- Select Course --</option>');
@@ -233,8 +260,8 @@ body {
         $('#scenarioIds').multiselect('refresh');
     }
     
-    $(document).ready(function() {
-        // Initialize multiselects
+    function initializeMultiselects() {
+        // Initialize multiselects with current values
         $('#playlistIds').multiselect({
             includeSelectAllOption: true,
             enableFiltering: true,
@@ -243,7 +270,7 @@ body {
             nonSelectedText: 'Select Playlists',
             numberDisplayed: 1
         });
-
+        
         $('#subplaylistIds').multiselect({
             includeSelectAllOption: true,
             enableFiltering: true,
@@ -252,7 +279,7 @@ body {
             nonSelectedText: 'Select Sub Playlists',
             numberDisplayed: 1
         });
-
+        
         $('#scenarioIds').multiselect({
             includeSelectAllOption: true,
             enableFiltering: true,
@@ -261,11 +288,44 @@ body {
             nonSelectedText: 'Select Scenarios',
             numberDisplayed: 1
         });
-
+        
+        // Set current selections if editing
+        if (currentPlaylistIds && currentPlaylistIds.length > 0) {
+            $('#playlistIds').multiselect('select', currentPlaylistIds);
+        }
+        if (currentSubplaylistIds && currentSubplaylistIds.length > 0) {
+            $('#subplaylistIds').multiselect('select', currentSubplaylistIds);
+        }
+        if (currentScenarioIds && currentScenarioIds.length > 0) {
+            $('#scenarioIds').multiselect('select', currentScenarioIds);
+        }
+    }
+    
+    function loadCascadingDropdowns() {
         const deptSel = $('#departmentSelect');
         const courseSel = $('#courseSelect');
         const semSel = $('#semesterSelect');
         const subjectSel = $('#subjectSelect');
+
+        // If editing, automatically load the cascading dropdowns
+        if (currentDepartmentId) {
+            deptSel.val(currentDepartmentId);
+            loadCourses(currentDepartmentId, function() {
+                if (currentCourseId) {
+                    courseSel.val(currentCourseId);
+                    loadSemesters(currentCourseId, function() {
+                        if (currentSemesterId) {
+                            semSel.val(currentSemesterId);
+                            loadSubjects(currentSemesterId, function() {
+                                if (currentSubjectId) {
+                                    subjectSel.val(currentSubjectId);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
 
         deptSel.change(function() {
             const deptId = $(this).val();
@@ -275,22 +335,7 @@ body {
                 subjectSel.html('<option value="">-- Select Subject --</option>');
                 return;
             }
-            $.ajax({
-                url: '/guac/courses',
-                type: 'GET',
-                data: { departmentId: deptId },
-                success: function(data) {
-                    courseSel.empty().append('<option value="">-- Select Course --</option>');
-                    semSel.html('<option value="">-- Select Semester --</option>');
-                    subjectSel.html('<option value="">-- Select Subject --</option>');
-                    data.forEach(c => {
-                        courseSel.append(`<option value="${c.courseId}">${c.courseName}</option>`);
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching courses:', error);
-                }
-            });
+            loadCourses(deptId);
         });
 
         courseSel.change(function() {
@@ -300,21 +345,7 @@ body {
                 subjectSel.html('<option value="">-- Select Subject --</option>');
                 return;
             }
-            $.ajax({
-                url: '/guac/semesters',
-                type: 'GET',
-                data: { courseId: cId },
-                success: function(data) {
-                    semSel.empty().append('<option value="">-- Select Semester --</option>');
-                    subjectSel.html('<option value="">-- Select Subject --</option>');
-                    data.forEach(s => {
-                        semSel.append(`<option value="${s.semesterId}">${s.semesterName}</option>`);
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching semesters:', error);
-                }
-            });
+            loadSemesters(cId);
         });
 
         semSel.change(function() {
@@ -323,21 +354,70 @@ body {
                 subjectSel.html('<option value="">-- Select Subject --</option>');
                 return;
             }
-            $.ajax({
-                url: '/guac/subjects',
-                type: 'GET',
-                data: { semesterId: sId },
-                success: function(data) {
-                    subjectSel.empty().append('<option value="">-- Select Subject --</option>');
-                    data.forEach(sub => {
-                        subjectSel.append(`<option value="${sub.subjectId}">${sub.subjectName}</option>`);
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching subjects:', error);
-                }
-            });
+            loadSubjects(sId);
         });
+    }
+    
+    function loadCourses(departmentId, callback) {
+        $.ajax({
+            url: '/guac/courses',
+            type: 'GET',
+            data: { departmentId: departmentId },
+            success: function(data) {
+                $('#courseSelect').empty().append('<option value="">-- Select Course --</option>');
+                $('#semesterSelect').html('<option value="">-- Select Semester --</option>');
+                $('#subjectSelect').html('<option value="">-- Select Subject --</option>');
+                data.forEach(c => {
+                    $('#courseSelect').append(`<option value="${c.courseId}">${c.courseName}</option>`);
+                });
+                if (callback) callback();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching courses:', error);
+            }
+        });
+    }
+    
+    function loadSemesters(courseId, callback) {
+        $.ajax({
+            url: '/guac/semesters',
+            type: 'GET',
+            data: { courseId: courseId },
+            success: function(data) {
+                $('#semesterSelect').empty().append('<option value="">-- Select Semester --</option>');
+                $('#subjectSelect').html('<option value="">-- Select Subject --</option>');
+                data.forEach(s => {
+                    $('#semesterSelect').append(`<option value="${s.semesterId}">${s.semesterName}</option>`);
+                });
+                if (callback) callback();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching semesters:', error);
+            }
+        });
+    }
+    
+    function loadSubjects(semesterId, callback) {
+        $.ajax({
+            url: '/guac/subjects',
+            type: 'GET',
+            data: { semesterId: semesterId },
+            success: function(data) {
+                $('#subjectSelect').empty().append('<option value="">-- Select Subject --</option>');
+                data.forEach(sub => {
+                    $('#subjectSelect').append(`<option value="${sub.subjectId}">${sub.subjectName}</option>`);
+                });
+                if (callback) callback();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching subjects:', error);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        initializeMultiselects();
+        loadCascadingDropdowns();
     });
 </script>
 </body>

@@ -246,6 +246,42 @@ public class UserController {
 //		}
 //	}
 	
+//	@GetMapping("/edit/{id}")
+//	public String editTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+//	    try {
+//	        AppUser user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+//	        
+//	        UserMasterRole usermasterRole = new UserMasterRole();
+//	        usermasterRole.setAppUser(user);
+//
+//	        long roleID = userRoleRepository.findRole(id);
+//	        AppRole role = appRoleRepository.findByRoleId(roleID);
+//	        usermasterRole.setAppRole(role);
+//
+//	        model.addAttribute("user", user);
+//	        model.addAttribute("pageTitle", "Edit User (ID: " + id + ")");
+//	        model.addAttribute("userID", id);
+//	        model.addAttribute("objEnt", usermasterRole);
+//	        model.addAttribute("groupList", groupRepository.getAllGroups());
+//	        model.addAttribute("switchList", switchRepository.getAllSwitch());
+//
+//	        // Add Departments
+//	        List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+//	        model.addAttribute("departments", departments);
+//
+//	        // ✅ Pass selected values for preselection in JS
+//	        model.addAttribute("selectedDepartmentId", user.getDepartmentName());
+//	        model.addAttribute("selectedCourseId", user.getCourseName());
+//	        model.addAttribute("selectedSemesterId", user.getSemesterName());
+//
+//	        return "user_add";
+//	    } catch (Exception e) {
+//	        redirectAttributes.addFlashAttribute("message", e.getMessage());
+//	        return "redirect:/users/view";
+//	    }
+//	}
+	
+	
 	@GetMapping("/edit/{id}")
 	public String editTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
 	    try {
@@ -269,10 +305,16 @@ public class UserController {
 	        List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
 	        model.addAttribute("departments", departments);
 
-	        // ✅ Pass selected values for preselection in JS
-	        model.addAttribute("selectedDepartmentId", user.getDepartmentName());
-	        model.addAttribute("selectedCourseId", user.getCourseName());
-	        model.addAttribute("selectedSemesterId", user.getSemesterName());
+	        // ✅ CORRECTED: Pass IDs instead of entire entities
+	        Integer selectedDepartmentId = (user.getDepartmentName() != null) ? user.getDepartmentName().getDepartmentId() : null;
+	        Integer selectedCourseId = (user.getCourseName() != null) ? user.getCourseName().getCourseId() : null;
+	        Integer selectedSemesterId = (user.getSemesterName() != null) ? user.getSemesterName().getSemesterId() : null;
+	        Integer selectedBatchId = (user.getBatchName() != null) ? user.getBatchName().getBatchId() : null;
+
+	        model.addAttribute("selectedDepartmentId", selectedDepartmentId);
+	        model.addAttribute("selectedCourseId", selectedCourseId);
+	        model.addAttribute("selectedSemesterId", selectedSemesterId);
+	        model.addAttribute("selectedBatchId", selectedBatchId);
 
 	        return "user_add";
 	    } catch (Exception e) {

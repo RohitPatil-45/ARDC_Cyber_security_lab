@@ -123,7 +123,6 @@
 														<option value="1">Admin</option>
 														<option value="3">Super Admin</option>
 														<option value="4">Teacher</option>
-
 													</select>
 												</div>
 
@@ -172,69 +171,50 @@
 														<option value='2'>Generation 2</option>
 													</select>
 												</div>
-
-
 											</div>
 
+											<!-- Academic Fields - Only show for User role (roleId = 2) -->
+											<div class="col-md-12 academic-fields" id="academicFields" style="display: none;">
+												<div class="row">
+													<div class="col-md-6">
+														<div class="form-group">
+															<label>Department</label> 
+															<select id="departmentSelect" class="form-control" name="departmentId">
+																<option value="">-- Select Department --</option>
+																<option th:each="d : ${departments}"
+																	th:value="${d.departmentId}"
+																	th:text="${d.departmentName}"
+																	th:selected="${selectedDepartmentId != null and d.departmentId == selectedDepartmentId}">
+																</option>
+															</select>
+														</div>
+														<!-- Semester dropdown -->
+														<div class="form-group">
+															<label>Semester</label> 
+															<select id="semesterSelect" class="form-control" name="semesterId">
+																<option value="">-- Select Semester --</option>
+															</select>
+														</div>
+													</div>
+													<div class="col-md-6">
+														<!-- Course dropdown -->
+														<div class="form-group">
+															<label>Course</label> 
+															<select id="courseSelect" class="form-control" name="courseId">
+																<option value="">-- Select Course --</option>
+															</select>
+														</div>
 
-
-											<!-- Department dropdown -->
-											<div class="col-md-6">
-												<div class="form-group">
-													<label>Department</label> <select id="departmentSelect"
-														class="form-control" name="departmentId"
-														th:field="*{appUser.departmentName}" required>
-														<option value="">-- Select Department --</option>
-														<option th:each="d : ${departments}"
-															th:value="${d.departmentId}"
-															th:text="${d.departmentName}"></option>
-													</select>
+														<!-- Batch dropdown -->
+														<div class="form-group">
+															<label>Batch</label>
+															<select id="batchSelect" class="form-control" name="batchId">
+																<option value="">-- Select Batch --</option>
+															</select>
+														</div>
+													</div>
 												</div>
-												<!-- Semester dropdown -->
-												<div class="form-group">
-													<label>Semester</label> <select id="semesterSelect"
-														class="form-control" name="semesterId"
-														th:field="*{appUser.semesterName}" required>
-														<option value="">-- Select Semester --</option>
-													</select>
-												</div>
-
 											</div>
-											<div class="col-md-6">
-
-												<!-- Course dropdown -->
-												<div class="form-group">
-													<label>Course</label> <select id="courseSelect"
-														class="form-control" name="courseId"
-														th:field="*{appUser.courseName}" required>
-														<option value="">-- Select Course --</option>
-													</select>
-												</div>
-
-
-												<!-- Subject dropdown -->
-												<!-- 												<div class="form-group"> -->
-												<!-- 													<label>Subject</label> <select id="subjectSelect" -->
-												<!-- 														class="form-control" name="subjectId" -->
-												<!-- 														th:field="*{appUser.subjectName}" required> -->
-												<!-- 														<option value="">-- Select Subject --</option> -->
-												<!-- 													</select> -->
-												<!-- 												</div> -->
-
-
-												<div class="form-group">
-													<label>Batch</label> <select id="batchSelect"
-														class="form-control" name="batchId"
-														th:field="*{appUser.batchName}" required>
-														<option value="">-- Select Batch --</option>
-														<!-- Dynamically populated via jQuery -->
-													</select>
-												</div>
-
-
-											</div>
-
-
 										</div>
 									</div>
 									<div class="card-footer" id="adduseridd">
@@ -270,130 +250,200 @@
 
 <script th:inline="javascript">
 	$(function() {
-
 		$('.select2').select2()
 		
+		var selectedRole = $('#userRole').val();
+		toggleAcademicFields(selectedRole);
 		
-		 var selectedRole = $('#userRole').val();
-      var $groupName = $('#appUser\\.groupName');
+		var $groupName = $('#appUser\\.groupName');
 
-      if (selectedRole == '1' || selectedRole == '3') { // Example condition for Admin and Super Admin
-          $groupName.prop('multiple', true).addClass('select2');
-          $groupName.select2({
-              placeholder: "Select Group",
-              allowClear: true
-          });
-      } else {
-          $groupName.prop('multiple', false).removeClass('select2').select2('destroy');
-      }
+		if (selectedRole == '1' || selectedRole == '3') { // Example condition for Admin and Super Admin
+			$groupName.prop('multiple', true).addClass('select2');
+			$groupName.select2({
+				placeholder: "Select Group",
+				allowClear: true
+			});
+		} else {
+			$groupName.prop('multiple', false).removeClass('select2').select2('destroy');
+		}
 		
 	})
 
 	$(function() {
-		// 		alert("dsads")
 		var selectedValues = [[${objEnt.appUser.groupName}]];
-// 				alert(selectedValues);
 		var selectElement = document.getElementById('appUser.groupName');
-		// 		alert(selectElement);
 
 		for (var i = 0; i < selectElement.options.length; i++) {
 			var option = selectElement.options[i];
 			if (selectedValues.includes(option.value)) {
-				// 				alert("inside")
-				// 			option.selected = true;
 				option.setAttribute('selected', 'selected');
-				// 				option.setAttribute('data-select2-id', '10');
-
-				// 				$("#appUser.groupName").val(option.value).change();
 			}
 			$('.select2').select2()
 		}
 	})
 	
+	// Function to toggle academic fields based on role
+	function toggleAcademicFields(roleId) {
+		const academicFields = $('#academicFields');
+		const deptSel = $('#departmentSelect');
+		const courseSel = $('#courseSelect');
+		const semSel = $('#semesterSelect');
+		const batchSel = $('#batchSelect');
+		
+		// Show academic fields only for User role (roleId = 2)
+		if (roleId == '2') {
+			academicFields.show();
+			// Make fields required
+			deptSel.prop('required', true);
+			courseSel.prop('required', true);
+			semSel.prop('required', true);
+			batchSel.prop('required', true);
+		} else {
+			academicFields.hide();
+			// Remove required attribute for other roles
+			deptSel.prop('required', false);
+			courseSel.prop('required', false);
+			semSel.prop('required', false);
+			batchSel.prop('required', false);
+			// Clear values
+			deptSel.val('');
+			courseSel.val('').html('<option value="">-- Select Course --</option>');
+			semSel.val('').html('<option value="">-- Select Semester --</option>');
+			batchSel.val('').html('<option value="">-- Select Batch --</option>');
+		}
+	}
+	
+	// Role change event
+	function roleChange(roleId) {
+		toggleAcademicFields(roleId);
+		
+		var $groupName = $('#appUser\\.groupName');
+		
+		// Handle group name multiple selection for Admin and Super Admin
+		if (roleId == '1' || roleId == '3') {
+			$groupName.prop('multiple', true).addClass('select2');
+			$groupName.select2({
+				placeholder: "Select Group",
+				allowClear: true
+			});
+		} else {
+			$groupName.prop('multiple', false).removeClass('select2').select2('destroy');
+		}
+	}
 	
 	$(document).ready(function() {
-    const deptSel = $('#departmentSelect');
-    const courseSel = $('#courseSelect');
-    const semSel = $('#semesterSelect');
-    const subjectSel = $('#subjectSelect');
+		const deptSel = $('#departmentSelect');
+		const courseSel = $('#courseSelect');
+		const semSel = $('#semesterSelect');
+		const batchSel = $('#batchSelect');
 
-    deptSel.change(function() {
-        const deptId = $(this).val();
-        if (!deptId) {
-            courseSel.html('<option value="">-- Select Course --</option>');
-            semSel.html('<option value="">-- Select Semester --</option>');
-            subjectSel.html('<option value="">-- Select Subject --</option>');
-            return;
-        }
-        $.ajax({
-            url: '/guac/courses',
-            type: 'GET',
-            data: { departmentId: deptId },
-            success: function(data) {
-                courseSel.empty().append('<option value="">-- Select Course --</option>');
-                semSel.html('<option value="">-- Select Semester --</option>');
-                subjectSel.html('<option value="">-- Select Subject --</option>');
-                data.forEach(c => {
-                    courseSel.append(`<option value="${c.courseId}">${c.courseName}</option>`);
-                });
-            }
-        });
-    });
+		// Get selected values from Thymeleaf
+		const selectedDepartmentId = [[${selectedDepartmentId}]];
+		const selectedCourseId = [[${selectedCourseId}]];
+		const selectedSemesterId = [[${selectedSemesterId}]];
+		const selectedBatchId = [[${selectedBatchId}]];
 
-    courseSel.change(function() {
-        const cId = $(this).val();
-        if (!cId) {
-            semSel.html('<option value="">-- Select Semester --</option>');
-            subjectSel.html('<option value="">-- Select Subject --</option>');
-            $('#batchSelect').html('<option value="">-- Select Batch --</option>');
-            return;
-        }
-        $.ajax({
-            url: '/guac/semesters',
-            type: 'GET',
-            data: { courseId: cId },
-            success: function(data) {
-                semSel.empty().append('<option value="">-- Select Semester --</option>');
-                subjectSel.html('<option value="">-- Select Subject --</option>');
-                data.forEach(s => {
-                    semSel.append(`<option value="${s.semesterId}">${s.semesterName}</option>`);
-                });
-            }
-        });
-    });
+		// Function to fetch courses
+		function fetchCourses(departmentId, selectedId = 0) {
+			if (!departmentId) {
+				courseSel.html('<option value="">-- Select Course --</option>');
+				semSel.html('<option value="">-- Select Semester --</option>');
+				batchSel.html('<option value="">-- Select Batch --</option>');
+				return;
+			}
+			$.ajax({
+				url: '/guac/courses',
+				type: 'GET',
+				data: { departmentId: departmentId },
+				success: function(data) {
+					courseSel.empty().append('<option value="">-- Select Course --</option>');
+					semSel.html('<option value="">-- Select Semester --</option>');
+					batchSel.html('<option value="">-- Select Batch --</option>');
+					
+					data.forEach(c => {
+						const isSelected = (selectedId && c.courseId == selectedId) ? 'selected' : '';
+						courseSel.append(`<option value="${c.courseId}" ${isSelected}>${c.courseName}</option>`);
+					});
 
-    semSel.change(function() {
-        const sId = $(this).val();
-        if (!sId) {
-            subjectSel.html('<option value="">-- Select Subject --</option>');
-            return;
-        }
-        $.ajax({
-            url: '/guac/subjects',
-            type: 'GET',
-            data: { semesterId: sId },
-            success: function(data) {
-                subjectSel.empty().append('<option value="">-- Select Subject --</option>');
-                data.forEach(sub => {
-                    subjectSel.append(`<option value="${sub.subjectId}">${sub.subjectName}</option>`);
-                });
-            }
-        });
-        
-        $.ajax({
-            url: '/guac/batches',
-            type: 'GET',
-            data: { semesterId: sId },
-            success: function(data) {
-                const batchSelect = $('#batchSelect');
-                batchSelect.empty().append('<option value="">-- Select Batch --</option>');
-                data.forEach(b => {
-                    batchSelect.append(`<option value="${b.batchId}">${b.batchName}</option>`);
-                });
-            }
-        });
-    });
-});
+					// If we have a selected course ID, fetch semesters
+					if (selectedId > 0) {
+						fetchSemesters(selectedId, selectedSemesterId);
+					}
+				}
+			});
+		}
 
+		// Function to fetch semesters
+		function fetchSemesters(courseId, selectedId = 0) {
+			if (!courseId) {
+				semSel.html('<option value="">-- Select Semester --</option>');
+				batchSel.html('<option value="">-- Select Batch --</option>');
+				return;
+			}
+			$.ajax({
+				url: '/guac/semesters',
+				type: 'GET',
+				data: { courseId: courseId },
+				success: function(data) {
+					semSel.empty().append('<option value="">-- Select Semester --</option>');
+					batchSel.html('<option value="">-- Select Batch --</option>');
+					
+					data.forEach(s => {
+						const isSelected = (selectedId && s.semesterId == selectedId) ? 'selected' : '';
+						semSel.append(`<option value="${s.semesterId}" ${isSelected}>${s.semesterName}</option>`);
+					});
+
+					// If we have a selected semester ID, fetch batches
+					if (selectedId > 0) {
+						fetchBatches(selectedId, selectedBatchId);
+					}
+				}
+			});
+		}
+
+		// Function to fetch batches
+		function fetchBatches(semesterId, selectedId = 0) {
+			if (!semesterId) {
+				batchSel.html('<option value="">-- Select Batch --</option>');
+				return;
+			}
+			$.ajax({
+				url: '/guac/batches',
+				type: 'GET',
+				data: { semesterId: semesterId },
+				success: function(data) {
+					batchSel.empty().append('<option value="">-- Select Batch --</option>');
+					data.forEach(b => {
+						const isSelected = (selectedId && b.batchId == selectedId) ? 'selected' : '';
+						batchSel.append(`<option value="${b.batchId}" ${isSelected}>${b.batchName}</option>`);
+					});
+				}
+			});
+		}
+
+		// Set initial department selection only if academic fields are visible
+		if (selectedDepartmentId && $('#academicFields').is(':visible')) {
+			deptSel.val(selectedDepartmentId);
+			fetchCourses(selectedDepartmentId, selectedCourseId);
+		}
+
+		// Department change event
+		deptSel.change(function() {
+			const deptId = $(this).val();
+			fetchCourses(deptId);
+		});
+
+		// Course change event
+		courseSel.change(function() {
+			const cId = $(this).val();
+			fetchSemesters(cId);
+		});
+
+		// Semester change event
+		semSel.change(function() {
+			const sId = $(this).val();
+			fetchBatches(sId);
+		});
+	});
 </script>
 </html>

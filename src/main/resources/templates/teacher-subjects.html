@@ -47,28 +47,28 @@
 											<strong>Mobile:</strong> [[${teacher.mobileNo}]]
 										</div>
 									</div>
-									<div class="row mt-2" th:if="${teacher}">
-										<div class="col-md-3">
-											<strong>Department:</strong> 
-											<span th:if="${teacher.departmentName}" th:text="${teacher.departmentName.departmentName}"></span>
-											<span th:unless="${teacher.departmentName}" class="text-muted">N/A</span>
-										</div>
-										<div class="col-md-3">
-											<strong>Course:</strong> 
-											<span th:if="${teacher.courseName}" th:text="${teacher.courseName.courseName}"></span>
-											<span th:unless="${teacher.courseName}" class="text-muted">N/A</span>
-										</div>
-										<div class="col-md-3">
-											<strong>Semester:</strong> 
-											<span th:if="${teacher.semesterName}" th:text="${teacher.semesterName.semesterName}"></span>
-											<span th:unless="${teacher.semesterName}" class="text-muted">N/A</span>
-										</div>
-										<div class="col-md-3">
-											<strong>Batch:</strong> 
-											<span th:if="${teacher.batchName}" th:text="${teacher.batchName.batchName}"></span>
-											<span th:unless="${teacher.batchName}" class="text-muted">N/A</span>
-										</div>
-									</div>
+<!-- 									<div class="row mt-2" th:if="${teacher}"> -->
+<!-- 										<div class="col-md-3"> -->
+<!-- 											<strong>Department:</strong>  -->
+<!-- 											<span th:if="${teacher.departmentName}" th:text="${teacher.departmentName.departmentName}"></span> -->
+<!-- 											<span th:unless="${teacher.departmentName}" class="text-muted">N/A</span> -->
+<!-- 										</div> -->
+<!-- 										<div class="col-md-3"> -->
+<!-- 											<strong>Course:</strong>  -->
+<!-- 											<span th:if="${teacher.courseName}" th:text="${teacher.courseName.courseName}"></span> -->
+<!-- 											<span th:unless="${teacher.courseName}" class="text-muted">N/A</span> -->
+<!-- 										</div> -->
+<!-- 										<div class="col-md-3"> -->
+<!-- 											<strong>Semester:</strong>  -->
+<!-- 											<span th:if="${teacher.semesterName}" th:text="${teacher.semesterName.semesterName}"></span> -->
+<!-- 											<span th:unless="${teacher.semesterName}" class="text-muted">N/A</span> -->
+<!-- 										</div> -->
+<!-- 										<div class="col-md-3"> -->
+<!-- 											<strong>Batch:</strong>  -->
+<!-- 											<span th:if="${teacher.batchName}" th:text="${teacher.batchName.batchName}"></span> -->
+<!-- 											<span th:unless="${teacher.batchName}" class="text-muted">N/A</span> -->
+<!-- 										</div> -->
+<!-- 									</div> -->
 								</div>
 							</div>
 							

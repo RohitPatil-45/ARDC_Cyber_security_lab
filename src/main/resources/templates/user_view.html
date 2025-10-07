@@ -3,6 +3,8 @@
 <head>
 <title>View Users</title>
 <head th:include="templateListing :: headFragment"></head>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 	<div class="wrapper">
@@ -32,40 +34,51 @@
 								<div class="card-header">
 									<div class="row">
 										<div class="col-md-10">
-											<h3 class="card-title" style="padding-top: 10px">User
-												Details</h3>
+											<h3 class="card-title" style="padding-top: 10px">User Details</h3>
 										</div>
 										<div class="col-md-2">
-											<a th:href="@{'/users/new/'}"
-												class="btn btn-block bg-gradient-primary">Add</a>
+											<a th:href="@{'/users/new/'}" class="btn btn-block bg-gradient-primary">Add</a>
 										</div>
 									</div>
-									<div th:if="${message != null}"
-										class="alert alert-success alert-dismissible fade show text-center message"
-										role="alert">
+									<div th:if="${message != null}" class="alert alert-success alert-dismissible fade show text-center message" role="alert">
 										[[${message}]]
-										<button type="button" class="close btn-sm"
-											data-dismiss="alert" aria-label="Close">
+										<button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Close">
 											<span aria-hidden="true">&times;</span>
 										</button>
 									</div>
 								</div>
 								<div class="card-body" th:if="${listObj != null }">
-									<table id="example1" class="table table-bordered table-striped">
+									<table id="usersTable" class="table table-bordered table-striped">
 										<thead class="thead-light">
 											<tr>
 												<th scope="col">Sr</th>
 												<th scope="col">Name</th>
 												<th scope="col">Username</th>
-												<!-- <th scope="col">User Type</th> -->
 												<th scope="col">Email Id</th>
 												<th scope="col">Mobile No</th>
-
 												<th scope="col">Group Name</th>
-												<!-- <th scope="col">Generation Type</th>
-												<th scope="col">Switch</th> -->
-
+												<th scope="col">Department</th>
+												<th scope="col">Course</th>
+												<th scope="col">Semester</th>
+												<th scope="col">Batch</th>
+												<th scope="col">Status</th>
 												<th scope="col">Actions</th>
+											</tr>
+										</thead>
+										<thead class="thead-light" id="searchHeader" style="display: none;">
+											<tr>
+												<th scope="col"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search name" data-column="1"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search username" data-column="2"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search email" data-column="3"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search mobile" data-column="4"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search group" data-column="5"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search department" data-column="6"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search course" data-column="7"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search semester" data-column="8"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search batch" data-column="9"></th>
+												<th scope="col"></th>
+												<th scope="col"></th>
 											</tr>
 										</thead>
 										<tbody>
@@ -73,22 +86,50 @@
 												<th scope="row" th:text="${userStat.count}">1</th>
 												<td>[[${user.name}]]</td>
 												<td>[[${user.userName}]]</td>
-
 												<td>[[${user.email}]]</td>
 												<td>[[${user.mobileNo}]]</td>
-												<td
-													th:text="${user.groupName == null ? 'No Group' : user.groupName == '' ? 'No Group' : user.groupName}"></td>
-												<!-- <td>[[${user.generationType}]]</td>
-												<td>[[${user.switch_id.getSwitch_name}]]</td> -->
-
-												<td><a th:href="@{'/users/edit/' + ${user.userId}}"
-													title="Edit this user" class="fa fa-edit"></a> &nbsp; <a
-													th:href="@{'/users/delete/' + ${user.userId}}"
-													th:tutorialTitle="${user.name}" id="btnDelete"
-													title="Delete this user" class="fa fa-trash btn-delete"></a>
-													&nbsp; <a
-													th:href="@{'/users/resetuserpassword/' + ${user.userId}}"
-													title="Reset Password" class="fa fa-key"></a></td>
+												<td th:text="${user.groupName == null ? 'No Group' : user.groupName == '' ? 'No Group' : user.groupName}"></td>
+												<td>
+													<span th:if="${user.departmentName != null}">
+														[[${user.departmentName.departmentName}]]
+													</span>
+													<span th:if="${user.departmentName == null}" class="text-muted">
+														Not Assigned
+													</span>
+												</td>
+												<td>
+													<span th:if="${user.courseName != null}">
+														[[${user.courseName.courseName}]]
+													</span>
+													<span th:if="${user.courseName == null}" class="text-muted">
+														Not Assigned
+													</span>
+												</td>
+												<td>
+													<span th:if="${user.semesterName != null}">
+														[[${user.semesterName.semesterName}]]
+													</span>
+													<span th:if="${user.semesterName == null}" class="text-muted">
+														Not Assigned
+													</span>
+												</td>
+												<td>
+													<span th:if="${user.batchName != null}">
+														[[${user.batchName.batchName}]]
+													</span>
+													<span th:if="${user.batchName == null}" class="text-muted">
+														Not Assigned
+													</span>
+												</td>
+												<td>
+													<span th:if="${user.enabled}" class="badge badge-success">Active</span>
+													<span th:if="${!user.enabled}" class="badge badge-danger">Inactive</span>
+												</td>
+												<td>
+													<a th:href="@{'/users/edit/' + ${user.userId}}" title="Edit this user" class="fa fa-edit"></a> &nbsp;
+													<a th:href="@{'/users/delete/' + ${user.userId}}" th:tutorialTitle="${user.name}" id="btnDelete" title="Delete this user" class="fa fa-trash btn-delete"></a> &nbsp;
+													<a th:href="@{'/users/resetuserpassword/' + ${user.userId}}" title="Reset Password" class="fa fa-key"></a>
+												</td>
 											</tr>
 										</tbody>
 									</table>
@@ -113,8 +154,7 @@
 					</div>
 					<div class="modal-footer">
 						<a type="button" id="yesBtn" class="btn btn-danger">Yes</a>
-						<button type="button" class="btn btn-secondary"
-							data-dismiss="modal">No</button>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
 					</div>
 				</div>
 			</div>
@@ -122,52 +162,104 @@
 		<div th:replace="fragments/footer :: footer"></div>
 	</div>
 	<div th:replace="templateListing :: jsscript"></div>
+	
+	<!-- DataTables Scripts -->
+	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+	
 	<script type="text/javascript">
-		$(document).ready(
-				function() {
-					$(".btn-delete").on(
-							"click",
-							function(e) {
-								e.preventDefault();
-								link = $(this);
-
-								tutorialTitle = link.attr("tutorialTitle");
-								$("#yesBtn").attr("href", link.attr("href"));
-								$("#confirmText").html(
-										"Do you want to delete the User \<strong\>"
-												+ tutorialTitle
-												+ "\<\/strong\>?");
-								$("#confirmModal").modal();
-							});
-
-					$("#btnClear").on("click", function(e) {
-						e.preventDefault();
-						$("#keyword").text("");
-						window.location = "[[@{/tutorials}]]";
-					});
-
-				});
+		$(document).ready(function() {
+			// Initialize DataTable
+			var table = $('#usersTable').DataTable({
+				"responsive": true,
+				"lengthChange": true,
+				"autoWidth": false,
+				"pageLength": 10,
+				"dom": '<"row"<"col-md-6"B><"col-md-6"f>><"row"<"col-md-12"tr>><"row"<"col-md-5"i><"col-md-7"p>>',
+				"buttons": [
+					{
+						extend: 'collection',
+						className: 'btn btn-secondary',
+						text: '<i class="fas fa-cog"></i> Options',
+						buttons: [
+							{
+								extend: 'copy',
+								className: 'btn btn-secondary',
+								text: '<i class="fas fa-copy"></i> Copy'
+							},
+							{
+								extend: 'excel',
+								className: 'btn btn-success',
+								text: '<i class="fas fa-file-excel"></i> Excel'
+							},
+							{
+								extend: 'pdf',
+								className: 'btn btn-danger',
+								text: '<i class="fas fa-file-pdf"></i> PDF'
+							},
+							{
+								extend: 'print',
+								className: 'btn btn-info',
+								text: '<i class="fas fa-print"></i> Print'
+							},
+							{
+								text: '<i class="fas fa-search"></i> Toggle Search',
+								className: 'btn btn-warning',
+								action: function ( e, dt, node, config ) {
+									$('#searchHeader').toggle();
+									// Adjust table header if needed
+									table.columns.adjust();
+								}
+							}
+						]
+					}
+				],
+				"language": {
+					"search": "Global Search:",
+					"lengthMenu": "Show _MENU_ entries"
+				}
+			});
+			
+			// Individual column search
+			$('#usersTable thead').on('keyup', '.column-search', function() {
+				var columnIndex = $(this).data('column');
+				table.column(columnIndex).search(this.value).draw();
+			});
+			
+			// Delete confirmation
+			$(".btn-delete").on("click", function(e) {
+				e.preventDefault();
+				link = $(this);
+				tutorialTitle = link.attr("tutorialTitle");
+				$("#yesBtn").attr("href", link.attr("href"));
+				$("#confirmText").html("Do you want to delete the User <strong>" + tutorialTitle + "</strong>?");
+				$("#confirmModal").modal();
+			});
+		});
 	</script>
 	<script th:inline="javascript">
-	if([[${userPasswordResetMsg}]] == 'success'){
-		Swal.fire({
-			position: "top",
-			icon: "success",
-			title: 'Password has reset successfully..!',
-			showConfirmButton: true,
-			timer: 5000,
-		})
-	}
-	else if([[${userPasswordResetMsg}]] == 'fail'){
-		Swal.fire({
-			position: "top",
-			icon: "warning",
-			title: 'Failed to reset password..!',
-			showConfirmButton: true,
-			timer: 5000,
-		})
-	}
-</script>
+		if([[${userPasswordResetMsg}]] == 'success'){
+			Swal.fire({
+				position: "top",
+				icon: "success",
+				title: 'Password has reset successfully..!',
+				showConfirmButton: true,
+				timer: 5000,
+			})
+		}
+		else if([[${userPasswordResetMsg}]] == 'fail'){
+			Swal.fire({
+				position: "top",
+				icon: "warning",
+				title: 'Failed to reset password..!',
+				showConfirmButton: true,
+				timer: 5000,
+			})
+		}
+	</script>
 </body>
-
 </html>

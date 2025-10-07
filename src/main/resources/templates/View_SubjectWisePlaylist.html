@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-
 <head th:include="template :: headFragment(${pageTitle})">
-    <title th:text="${pageTitle}">Course List</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+<title th:text="${pageTitle}">Subject Wise Playlist</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
 
         <div th:replace="fragments/header :: header"></div>
-
         <div th:replace="fragments/sidebar :: aside"></div>
 
         <div class="content-wrapper">
@@ -20,12 +18,12 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>View Courses</h1>
+                            <h1>View Subject Wise Playlist</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i> Home</a></li>
-                                <li class="breadcrumb-item active">View Courses</li>
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item active">View Subject Wise Playlist</li>
                             </ol>
                         </div>
                     </div>
@@ -40,60 +38,109 @@
                                 <div class="card-header">
                                     <div class="row">
                                         <div class="col-md-10">
-                                            <h3 class="card-title" style="padding-top: 10px">Course Details</h3>
+                                            <h3 class="card-title" style="padding-top: 10px">Subject Playlist Mappings</h3>
                                         </div>
                                         <div class="col-md-2">
-                                            <a th:href="@{'/guac/Add_Course'}" class="btn btn-block bg-gradient-primary">Add</a>
+                                            <a th:href="@{'/guac/SemesterWisePlaylist'}" class="btn btn-block bg-gradient-primary">Add New</a>
                                         </div>
                                     </div>
-                                    <div th:if="${message != null}" class="alert alert-success alert-dismissible fade show text-center message" role="alert">
-                                        [[${message}]]
+                                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show text-center message" role="alert">
+                                        [[${success}]]
+                                        <button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show text-center message" role="alert">
+                                        [[${error}]]
                                         <button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
                                 </div>
-                                <div class="card-body" th:if="${courses != null }">
-                                    <table id="coursesTable" class="table table-bordered table-striped">
+                                <div class="card-body" th:if="${playlistMappings != null}">
+                                    <table id="playlistMappingsTable" class="table table-bordered table-striped">
                                         <thead class="thead-light">
                                             <tr>
                                                 <th scope="col">Sr</th>
-                                                <th scope="col">Course Name</th>
-                                                <th scope="col">Course Code</th>
-                                                <th scope="col">Department Name</th>
-                                                <th scope="col">Actions</th>
+                                                <th scope="col">Subject Name</th>
+                                                <th scope="col">Subject Code</th>
+                                                <th scope="col">Department</th>
+                                                <th scope="col">Course</th>
+                                                <th scope="col">Semester</th>
+                                                <th scope="col">Playlists</th>
+                                                <th scope="col">Sub Playlists</th>
+                                                <th scope="col">Scenarios</th>
+                                                <th scope="col">Update</th>
                                             </tr>
                                         </thead>
                                         <thead class="thead-light" id="searchHeader" style="display: none;">
                                             <tr>
                                                 <th scope="col"></th>
-                                                <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search course" data-column="1"></th>
+                                                <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search subject" data-column="1"></th>
                                                 <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search code" data-column="2"></th>
                                                 <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search department" data-column="3"></th>
+                                                <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search course" data-column="4"></th>
+                                                <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search semester" data-column="5"></th>
+                                                <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search playlists" data-column="6"></th>
+                                                <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search sub playlists" data-column="7"></th>
+                                                <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search scenarios" data-column="8"></th>
                                                 <th scope="col"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr th:each="course, iterStat : ${courses}">
+                                            <tr th:each="mapping, iterStat : ${playlistMappings}">
                                                 <th scope="row" th:text="${iterStat.count}">1</th>
-                                                <td>[[${course.courseName}]]</td>
-                                                <td>[[${course.courseCode}]]</td>
+                                                <td>[[${mapping.subjectName}]]</td>
+                                                <td>[[${mapping.subjectCode}]]</td>
                                                 <td>
-                                                    <span th:if="${course.department != null}">
-                                                        [[${course.department.departmentName}]]
+                                                    <span th:if="${mapping.departmentName}" th:text="${mapping.departmentName}"></span>
+                                                    <span th:if="${mapping.departmentName == null}" class="text-muted">N/A</span>
+                                                </td>
+                                                <td>
+                                                    <span th:if="${mapping.courseName}" th:text="${mapping.courseName}"></span>
+                                                    <span th:if="${mapping.courseName == null}" class="text-muted">N/A</span>
+                                                </td>
+                                                <td>
+                                                    <span th:if="${mapping.semesterName}" th:text="${mapping.semesterName}"></span>
+                                                    <span th:if="${mapping.semesterName == null}" class="text-muted">N/A</span>
+                                                </td>
+                                                <td>
+                                                    <span th:if="${not #lists.isEmpty(mapping.playlistNames)}">
+                                                        <div th:each="playlist : ${mapping.playlistNames}" class="badge badge-info mr-1 mb-1">
+                                                            [[${playlist}]]
+                                                        </div>
                                                     </span>
-                                                    <span th:if="${course.department == null}" class="text-muted">
-                                                        Not Assigned
+                                                    <span th:if="${#lists.isEmpty(mapping.playlistNames)}" class="text-muted">
+                                                        No Playlists
                                                     </span>
                                                 </td>
                                                 <td>
-                                               
-                                                     <a th:href="@{/guac/Add_Course(Id=${course.courseId})}" title="Edit this course" class="fa fa-edit"></a> &nbsp;
-                                                    <a href="#" th:onclick="'confirmDelete(' + ${course.courseId} + ')'" title="Delete this course" class="fa fa-trash btn-delete"></a>
+                                                    <span th:if="${not #lists.isEmpty(mapping.subplaylistNames)}">
+                                                        <div th:each="subplaylist : ${mapping.subplaylistNames}" class="badge badge-primary mr-1 mb-1">
+                                                            [[${subplaylist}]]
+                                                        </div>
+                                                    </span>
+                                                    <span th:if="${#lists.isEmpty(mapping.subplaylistNames)}" class="text-muted">
+                                                        No Sub Playlists
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span th:if="${not #lists.isEmpty(mapping.scenarioNames)}">
+                                                        <div th:each="scenario : ${mapping.scenarioNames}" class="badge badge-success mr-1 mb-1">
+                                                            [[${scenario}]]
+                                                        </div>
+                                                    </span>
+                                                    <span th:if="${#lists.isEmpty(mapping.scenarioNames)}" class="text-muted">
+                                                        No Scenarios
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a th:href="@{'/guac/edit_SubjectWisePlaylist/' + ${mapping.subjectId}}" title="Edit mappings" class="fa fa-edit text-primary mr-2"></a>
+<!--                                                     <a href="#" th:onclick="'confirmDelete(' + ${mapping.subjectId} + ')'" title="Delete mappings" class="fa fa-trash text-danger btn-delete"></a> -->
                                                 </td>
                                             </tr>
-                                            <tr th:if="${courses.size() == 0}">
-                                                <td colspan="5" class="text-center">No courses found.</td>
+                                            <tr th:if="${#lists.isEmpty(playlistMappings)}">
+                                                <td colspan="10" class="text-center">No playlist mappings found.</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -144,7 +191,7 @@
     <script type="text/javascript">
         $(document).ready(function() {
             // Initialize DataTable with export and search options
-            var table = $('#coursesTable').DataTable({
+            var table = $('#playlistMappingsTable').DataTable({
                 "responsive": true,
                 "lengthChange": true,
                 "autoWidth": false,
@@ -191,16 +238,16 @@
                 "language": {
                     "search": "Global Search:",
                     "lengthMenu": "Show _MENU_ entries",
-                    "emptyTable": "No courses found",
-                    "info": "Showing _START_ to _END_ of _TOTAL_ courses",
-                    "infoEmpty": "Showing 0 to 0 of 0 courses",
-                    "infoFiltered": "(filtered from _MAX_ total courses)",
-                    "zeroRecords": "No matching courses found"
+                    "emptyTable": "No playlist mappings found",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ mappings",
+                    "infoEmpty": "Showing 0 to 0 of 0 mappings",
+                    "infoFiltered": "(filtered from _MAX_ total mappings)",
+                    "zeroRecords": "No matching mappings found"
                 }
             });
             
             // Individual column search
-            $('#coursesTable thead').on('keyup', '.column-search', function() {
+            $('#playlistMappingsTable thead').on('keyup', '.column-search', function() {
                 var columnIndex = $(this).data('column');
                 table.column(columnIndex).search(this.value).draw();
             });
@@ -209,12 +256,12 @@
             $(".btn-delete").on("click", function(e) {
                 e.preventDefault();
                 var link = $(this);
-                var courseId = link.attr('onclick').match(/\d+/)[0];
-                var courseName = link.closest('tr').find('td:first').text();
+                var subjectId = link.attr('onclick').match(/\d+/)[0];
+                var subjectName = link.closest('tr').find('td:first').text();
                 
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "Do you really want to delete the course \"" + courseName + "\"?",
+                    text: "Do you really want to delete all playlist mappings for subject \"" + subjectName + "\"?",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
@@ -223,19 +270,19 @@
                     cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = '/guac/deleteCourse?Id=' + courseId;
+                        window.location.href = '/guac/delete_SubjectWisePlaylist/' + subjectId;
                     }
                 });
             });
         });
 
         // Alternative delete function for onclick attribute
-        function confirmDelete(id) {
-            var courseName = $('tr').find('a[onclick="confirmDelete(' + id + ')"]').closest('tr').find('td:first').text();
+        function confirmDelete(subjectId) {
+            var subjectName = $('tr').find('a[onclick="confirmDelete(' + subjectId + ')"]').closest('tr').find('td:first').text();
             
             Swal.fire({
                 title: 'Are you sure?',
-                text: "Do you really want to delete the course \"" + courseName + "\"?",
+                text: "Do you really want to delete all playlist mappings for subject \"" + subjectName + "\"?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -244,12 +291,10 @@
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '/guac/deleteCourse?Id=' + id;
+                    window.location.href = '/guac/delete_SubjectWisePlaylist/' + subjectId;
                 }
             });
         }
     </script>
-
 </body>
-
 </html>

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:include="template :: headFragment(${pageTitle})">
+<title th:text="${pageTitle}">Teacher Dashboard</title>
+<link rel="icon" type="image/png" href="/webtemplate/dist/img/magicboxEye3.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<style>
+:root {
+	--primary: #4361ee;
+	--secondary: #3f37c9;
+	--success: #4cc9f0;
+	--danger: #f72585;
+	--warning: #f8961e;
+	--info: #4895ef;
+	--dark: #2b2d42;
+	--light: #f8f9fa;
+	--gray: #6c757d;
+	--white: #ffffff;
+	--card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+	background: linear-gradient(135deg, #f5f7fa 0%, #e4e7ec 100%);
+	color: var(--dark);
+	line-height: 1.6;
+	min-height: 100vh;
+}
+
+/* Modern Card Design */
+.dashboard-card {
+	border: none;
+	border-radius: 16px;
+	box-shadow: var(--card-shadow);
+	background: var(--white);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	overflow: hidden;
+	position: relative;
+	backdrop-filter: blur(10px);
+}
+
+.dashboard-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 4px;
+	background: linear-gradient(90deg, var(--primary), var(--success));
+}
+
+.dashboard-card .card-header {
+	background: transparent;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+	padding: 1.5rem;
+	position: relative;
+}
+
+.dashboard-card .card-body {
+	padding: 1.5rem;
+	flex: 1;
+}
+
+/* Enhanced Total Section */
+.total-section {
+	text-align: center;
+	padding: 2rem 1rem;
+	background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+	border-radius: 12px;
+	color: white;
+	margin-bottom: 1.5rem;
+	position: relative;
+	overflow: hidden;
+}
+
+.total-section::before {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -50%;
+	width: 200%;
+	height: 200%;
+	background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1%, transparent 1%);
+	background-size: 20px 20px;
+	animation: float 6s ease-in-out infinite;
+}
+
+.total-count {
+	font-size: 3.5rem;
+	font-weight: 800;
+	line-height: 1;
+	margin-bottom: 0.5rem;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.total-label {
+	font-size: 0.9rem;
+	opacity: 0.9;
+	font-weight: 500;
+	letter-spacing: 1px;
+}
+
+/* Summary Cards */
+.summary-card {
+	text-align: center;
+	padding: 2rem 1rem;
+	border-radius: 16px;
+	background: linear-gradient(135deg, var(--white) 0%, #f8f9fa 100%);
+	box-shadow: var(--card-shadow);
+	transition: all 0.3s ease;
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	position: relative;
+	overflow: hidden;
+	cursor: pointer;
+}
+
+.summary-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.summary-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 4px;
+	background: linear-gradient(90deg, var(--primary), var(--success));
+}
+
+.summary-card .icon-wrapper {
+	width: 80px;
+	height: 80px;
+	border-radius: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto 1.5rem;
+	font-size: 2rem;
+	background: rgba(67, 97, 238, 0.1);
+	color: var(--primary);
+	transition: all 0.3s ease;
+}
+
+.summary-card:hover .icon-wrapper {
+	transform: scale(1.1);
+	background: rgba(67, 97, 238, 0.2);
+}
+
+.summary-card .count {
+	font-size: 2.5rem;
+	font-weight: 800;
+	color: var(--dark);
+	line-height: 1;
+	margin-bottom: 0.5rem;
+}
+
+.summary-card .label {
+	font-size: 0.9rem;
+	color: var(--gray);
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+/* Normal Table Styling */
+.subject-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.subject-table th {
+	background-color: #f8f9fa;
+	color: #495057;
+	font-weight: 600;
+	padding: 1rem;
+	text-align: left;
+	border-bottom: 2px solid #dee2e6;
+}
+
+.subject-table td {
+	padding: 1rem;
+	border-bottom: 1px solid #dee2e6;
+}
+
+.subject-table tr:hover {
+	background-color: #f8f9fa;
+}
+
+.student-count-link {
+	color: var(--primary);
+	font-weight: 600;
+	text-decoration: none;
+	transition: all 0.3s ease;
+}
+
+.student-count-link:hover {
+	color: var(--secondary);
+	text-decoration: underline;
+}
+
+/* Search Header Styling */
+.search-header input {
+	border: 1px solid #dee2e6;
+	border-radius: 4px;
+	padding: 0.375rem 0.75rem;
+	font-size: 0.875rem;
+	width: 100%;
+}
+
+.search-header input:focus {
+	border-color: #4361ee;
+	box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+}
+
+/* Animation */
+@keyframes float {
+	0%, 100% { transform: translateY(0px); }
+	50% { transform: translateY(-10px); }
+}
+
+.animate-fade-in {
+	animation: fadeIn 0.8s ease-in;
+}
+
+.animate-slide-up {
+	animation: slideUp 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes slideUp {
+	from { 
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to { 
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+	.content-header h1 {
+		font-size: 1.75rem;
+	}
+	.total-count {
+		font-size: 2.5rem;
+	}
+}
+
+/* DataTables Custom Styling */
+.dataTables_wrapper .dataTables_filter input {
+	border: 1px solid #dee2e6;
+	border-radius: 4px;
+	padding: 0.375rem 0.75rem;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+	border: 1px solid #dee2e6;
+	border-radius: 4px;
+	padding: 0.375rem 0.75rem;
+	margin: 0 2px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+	background: var(--primary);
+	color: white !important;
+	border-color: var(--primary);
+}
+</style>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+			<!-- Enhanced Header -->
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row align-items-center mb-4">
+						<div class="col-sm-6">
+							<h1 class="animate-fade-in">
+								<i class="fas fa-chalkboard-teacher mr-3"></i> 
+								<span th:text="${pageTitle}">Teacher Dashboard</span>
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#" class="text-decoration-none">
+									<i class="fas fa-home mr-2"></i>Home
+								</a></li>
+								<li class="breadcrumb-item active" th:text="${pageTitle}">Teacher Dashboard</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Main Content -->
+			<section class="content animate-slide-up">
+				<div class="container-fluid">
+					
+					<!-- Teacher Welcome Section -->
+					<div class="row mb-4">
+						<div class="col-12">
+							<div class="total-section">
+								<div class="total-count" th:text="'Welcome, ' + ${teacher?.name} + '!'">Welcome, Teacher!</div>
+								<div class="total-label">You are teaching across multiple subjects and semesters</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Quick Statistics -->
+					<div class="row mb-5">
+						<div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+							<div class="summary-card">
+								<div class="icon-wrapper">
+									<i class="fas fa-book"></i>
+								</div>
+								<div class="count" th:text="${totalSubjects}">0</div>
+								<div class="label">Total Subjects</div>
+							</div>
+						</div>
+
+						<div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+							<div class="summary-card">
+								<div class="icon-wrapper">
+									<i class="fas fa-users"></i>
+								</div>
+								<div class="count" th:text="${totalStudents}">0</div>
+								<div class="label">Total Students</div>
+							</div>
+						</div>
+
+						<div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+							<div class="summary-card">
+								<div class="icon-wrapper">
+									<i class="fas fa-university"></i>
+								</div>
+								<div class="count" th:text="${#lists.size(assignedSubjects)}">0</div>
+								<div class="label">Active Classes</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Assigned Subjects Table -->
+					<div class="row">
+						<div class="col-12">
+							<div class="dashboard-card">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="mb-0">
+												<i class="fas fa-list-alt mr-2"></i>My Assigned Subjects
+											</h3>
+										</div>
+										<div class="col-md-2">
+											<!-- Export and Search Options Button -->
+										</div>
+									</div>
+								</div>
+								<div class="card-body">
+									<!-- Success/Error Messages -->
+									<div th:if="${success}" class="alert alert-success alert-dismissible">
+										<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+										<span th:text="${success}"></span>
+									</div>
+									<div th:if="${error}" class="alert alert-danger alert-dismissible">
+										<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+										<span th:text="${error}"></span>
+									</div>
+									
+									<div class="table-responsive">
+										<table id="subjectsTable" class="table table-bordered table-striped subject-table">
+											<thead class="thead-light">
+												<tr>
+													<th>Sr</th>
+													<th>Subject Name</th>
+													<th>Subject Code</th>
+													<th>Department</th>
+													<th>Course</th>
+													<th>Semester</th>
+													<th>Subject Type</th>
+													<th>Students Count</th>
+													<th>Actions</th>
+												</tr>
+											</thead>
+											<thead class="thead-light search-header" id="searchHeader" style="display: none;">
+												<tr>
+													<th></th>
+													<th><input type="text" class="form-control form-control-sm column-search" placeholder="Search name" data-column="1"></th>
+													<th><input type="text" class="form-control form-control-sm column-search" placeholder="Search code" data-column="2"></th>
+													<th><input type="text" class="form-control form-control-sm column-search" placeholder="Search department" data-column="3"></th>
+													<th><input type="text" class="form-control form-control-sm column-search" placeholder="Search course" data-column="4"></th>
+													<th><input type="text" class="form-control form-control-sm column-search" placeholder="Search semester" data-column="5"></th>
+													<th><input type="text" class="form-control form-control-sm column-search" placeholder="Search type" data-column="6"></th>
+													<th></th>
+													<th></th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr th:each="subject, subjectStat : ${assignedSubjects}">
+													<td th:text="${subjectStat.count}">1</td>
+													<td>[[${subject.subjectName}]]</td>
+													<td>[[${subject.subjectCode}]]</td>
+													<td>
+														<span th:if="${subject.semester?.course?.department}" 
+															  th:text="${subject.semester.course.department.departmentName}"></span>
+														<span th:unless="${subject.semester?.course?.department}" 
+															  class="text-muted">N/A</span>
+													</td>
+													<td>
+														<span th:if="${subject.semester?.course}" 
+															  th:text="${subject.semester.course.courseName}"></span>
+														<span th:unless="${subject.semester?.course}" 
+															  class="text-muted">N/A</span>
+													</td>
+													<td>
+														<span th:if="${subject.semester}" th:text="${subject.semester.semesterName}"></span>
+														<span th:unless="${subject.semester}" class="text-muted">N/A</span>
+													</td>
+													<td>
+														<span th:if="${subject.elective}" class="badge badge-info">Elective</span>
+														<span th:unless="${subject.elective}" class="badge badge-primary">Core</span>
+													</td>
+													<td>
+														<a th:href="@{'/guac/subject-students/' + ${subject.subjectId}}"
+														   class="student-count-link"
+														   th:text="${subjectStudentCounts?.get(subject.subjectId) ?: 0}">
+															0
+														</a>
+													</td>
+													<td>
+														<a th:href="@{'/guac/subject-students/' + ${subject.subjectId}}"
+														   class="btn btn-primary btn-sm">
+															<i class="fas fa-eye"></i> View Students
+														</a>
+													</td>
+												</tr>
+												<tr th:if="${#lists.isEmpty(assignedSubjects)}">
+													<td colspan="9" class="text-center">No subjects assigned to you</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	
+	<!-- DataTables Scripts -->
+	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			// Initialize DataTable with export and search options
+			var table = $('#subjectsTable').DataTable({
+				"responsive": true,
+				"lengthChange": true,
+				"autoWidth": false,
+				"pageLength": 10,
+				"dom": '<"row"<"col-md-6"B><"col-md-6"f>><"row"<"col-md-12"tr>><"row"<"col-md-5"i><"col-md-7"p>>',
+				"buttons": [
+					{
+						extend: 'collection',
+						className: 'btn btn-secondary',
+						text: '<i class="fas fa-cog"></i> Options',
+						buttons: [
+							{
+								extend: 'copy',
+								className: 'btn btn-secondary',
+								text: '<i class="fas fa-copy"></i> Copy'
+							},
+							{
+								extend: 'excel',
+								className: 'btn btn-success',
+								text: '<i class="fas fa-file-excel"></i> Excel'
+							},
+							{
+								extend: 'pdf',
+								className: 'btn btn-danger',
+								text: '<i class="fas fa-file-pdf"></i> PDF'
+							},
+							{
+								extend: 'print',
+								className: 'btn btn-info',
+								text: '<i class="fas fa-print"></i> Print'
+							},
+							{
+								text: '<i class="fas fa-search"></i> Toggle Search',
+								className: 'btn btn-warning',
+								action: function ( e, dt, node, config ) {
+									$('#searchHeader').toggle();
+									// Adjust table header if needed
+									table.columns.adjust();
+								}
+							}
+						]
+					}
+				],
+				"language": {
+					"search": "Search:",
+					"lengthMenu": "Show _MENU_ entries"
+				}
+			});
+			
+			// Individual column search
+			$('#subjectsTable thead').on('keyup', '.column-search', function() {
+				var columnIndex = $(this).data('column');
+				table.column(columnIndex).search(this.value).draw();
+			});
+		});
+	</script>
+</body>
+</html>

@@ -17,6 +17,12 @@ public interface SubjectPlaylistMappingRepository extends JpaRepository<SubjectP
     @Query("SELECT s.playlistId FROM SubjectPlaylistMapping s WHERE s.subject IN :subjectIds")
 	List<Integer> findSubject(@Param("subjectIds")Integer subjectIds);
 
+
+	void deleteBySubject(Integer subjectId);
+
+
+	List<SubjectPlaylistMapping> findBySubject(Integer subjectId);
+
 	
 
 

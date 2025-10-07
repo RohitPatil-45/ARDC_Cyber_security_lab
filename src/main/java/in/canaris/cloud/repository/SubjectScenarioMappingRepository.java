@@ -18,6 +18,14 @@ public interface SubjectScenarioMappingRepository extends JpaRepository<SubjectS
 	@Query("SELECT s.scenarioId FROM SubjectScenarioMapping s WHERE s.subject IN :subjectIds")
 	List<Integer> findSubject(@Param("subjectIds") Integer subjectIds);
 
+
+
+	void deleteBySubject(Integer subjectId);
+
+
+
+	List<SubjectScenarioMapping> findBySubject(Integer subjectId);
+
 	
 
 	

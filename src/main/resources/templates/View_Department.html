@@ -3,8 +3,9 @@
 
 <head th:include="template :: headFragment(${pageTitle})">
     <title th:text="${pageTitle}">Department List</title>
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -19,12 +20,12 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 th:text="${pageTitle}">Departments</h1>
+                            <h1>View Departments</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i> Home</a></li>
-                                <li class="breadcrumb-item active">Departments</li>
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item active">View Departments</li>
                             </ol>
                         </div>
                     </div>
@@ -33,57 +34,85 @@
 
             <section class="content">
                 <div class="container-fluid">
-                    <div class="mb-3">
-                        <a th:href="@{/guac/Add_Department}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Add Department
-                        </a>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-body table-responsive p-0" style="max-height: 500px;">
-                            <table class="table table-head-fixed text-nowrap">
-                                <thead>
-                                    <tr>
-                                        <th>Sr No</th>
-                                        <th>Department Name</th>
-                                        <th>Department Code</th>
-                                        
-<!--                                         <th>Enabled</th> -->
-<!--                                         <th>Created At</th> -->
-<!--                                         <th>Updated At</th> -->
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="department, iterStat : ${departments}">
-                                        <td th:text="${iterStat.count}">1</td>
-                                        <td th:text="${department.departmentName}">Department Name</td>
-                                         <td th:text="${department.departmentCode}">Department Code</td>
-                                        
-                                        
-<!--                                         <td> -->
-<!--                                             <span th:text="${department.is_enabled} ? 'Yes' : 'No'">Yes</span> -->
-<!--                                         </td> -->
-<!--                                         <td th:text="${#dates.format(department.created_at, 'yyyy-MM-dd HH:mm')}">2025-01-01</td> -->
-<!--                                         <td th:text="${#dates.format(department.updatedAt, 'yyyy-MM-dd HH:mm')}">2025-01-01</td> -->
-                                        <td>
-                                            <a th:href="@{/guac/Add_Department(Id=${department.departmentId})}" class="btn btn-sm btn-info" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <a href="#" th:onclick="'confirmDelete(' + ${department.departmentId} + ')'" class="btn btn-sm btn-danger" title="Delete">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <tr th:if="${departments.size() == 0}">
-                                        <td colspan="6" class="text-center">No departments found.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card card-secondary">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-10">
+                                            <h3 class="card-title" style="padding-top: 10px">Department Details</h3>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a th:href="@{'/guac/Add_Department'}" class="btn btn-block bg-gradient-primary">Add</a>
+                                        </div>
+                                    </div>
+                                    <div th:if="${message != null}" class="alert alert-success alert-dismissible fade show text-center message" role="alert">
+                                        [[${message}]]
+                                        <button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body" th:if="${departments != null }">
+                                    <table id="departmentsTable" class="table table-bordered table-striped">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th scope="col">Sr</th>
+                                                <th scope="col">Department Name</th>
+                                                <th scope="col">Department Code</th>
+                                                <th scope="col">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <thead class="thead-light" id="searchHeader" style="display: none;">
+                                            <tr>
+                                                <th scope="col"></th>
+                                                <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search name" data-column="1"></th>
+                                                <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search code" data-column="2"></th>
+                                                <th scope="col"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="department, iterStat : ${departments}">
+                                                <th scope="row" th:text="${iterStat.count}">1</th>
+                                                <td>[[${department.departmentName}]]</td>
+                                                <td>[[${department.departmentCode}]]</td>
+                                                <td>
+                                               
+                                                     <a th:href="@{/guac/Add_Semester(Id=${department.departmentId})}" title="Edit this department" class="fa fa-edit"></a> &nbsp;
+                                                    <a href="#" th:onclick="'confirmDelete(' + ${department.departmentId} + ')'" title="Delete this department" class="fa fa-trash btn-delete"></a>
+                                                </td>
+                                            </tr>
+                                            <tr th:if="${departments.size() == 0}">
+                                                <td colspan="4" class="text-center">No departments found.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
+        </div>
+
+        <div class="modal fade text-center" id="confirmModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete Confirmation</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <span id="confirmText"></span>
+                    </div>
+                    <div class="modal-footer">
+                        <a type="button" id="yesBtn" class="btn btn-danger">Yes</a>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div th:replace="fragments/footer :: footer"></div>
@@ -91,27 +120,125 @@
 
     <div th:replace="template :: jsscript"></div>
 
-  <!-- SweetAlert2 CDN (only include once per page) -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- DataTables Scripts -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
-<script>
-    function confirmDelete(id) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you really want to delete this department?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = '/guac/deleteElectiveSubject?Id=' + id;
-            }
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Initialize DataTable with export and search options
+            var table = $('#departmentsTable').DataTable({
+                "responsive": true,
+                "lengthChange": true,
+                "autoWidth": false,
+                "pageLength": 10,
+                "dom": '<"row"<"col-md-6"B><"col-md-6"f>><"row"<"col-md-12"tr>><"row"<"col-md-5"i><"col-md-7"p>>',
+                "buttons": [
+                    {
+                        extend: 'collection',
+                        className: 'btn btn-secondary',
+                        text: '<i class="fas fa-cog"></i> Options',
+                        buttons: [
+                            {
+                                extend: 'copy',
+                                className: 'btn btn-secondary',
+                                text: '<i class="fas fa-copy"></i> Copy'
+                            },
+                            {
+                                extend: 'excel',
+                                className: 'btn btn-success',
+                                text: '<i class="fas fa-file-excel"></i> Excel'
+                            },
+                            {
+                                extend: 'pdf',
+                                className: 'btn btn-danger',
+                                text: '<i class="fas fa-file-pdf"></i> PDF'
+                            },
+                            {
+                                extend: 'print',
+                                className: 'btn btn-info',
+                                text: '<i class="fas fa-print"></i> Print'
+                            },
+                            {
+                                text: '<i class="fas fa-search"></i> Toggle Search',
+                                className: 'btn btn-warning',
+                                action: function ( e, dt, node, config ) {
+                                    $('#searchHeader').toggle();
+                                    // Adjust table header if needed
+                                    table.columns.adjust();
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "language": {
+                    "search": "Global Search:",
+                    "lengthMenu": "Show _MENU_ entries",
+                    "emptyTable": "No departments found",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ departments",
+                    "infoEmpty": "Showing 0 to 0 of 0 departments",
+                    "infoFiltered": "(filtered from _MAX_ total departments)",
+                    "zeroRecords": "No matching departments found"
+                }
+            });
+            
+            // Individual column search
+            $('#departmentsTable thead').on('keyup', '.column-search', function() {
+                var columnIndex = $(this).data('column');
+                table.column(columnIndex).search(this.value).draw();
+            });
+            
+            // Delete confirmation
+            $(".btn-delete").on("click", function(e) {
+                e.preventDefault();
+                var link = $(this);
+                var departmentId = link.attr('onclick').match(/\d+/)[0];
+                var departmentName = link.closest('tr').find('td:first').text();
+                
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you really want to delete the department \"" + departmentName + "\"?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/guac/deleteDepartment?Id=' + departmentId;
+                    }
+                });
+            });
         });
-    }
-</script>
+
+        // Alternative delete function for onclick attribute
+        function confirmDelete(id) {
+            var departmentName = $('tr').find('a[onclick="confirmDelete(' + id + ')"]').closest('tr').find('td:first').text();
+            
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you really want to delete the department \"" + departmentName + "\"?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/guac/deleteDepartment?Id=' + id;
+                }
+            });
+        }
+    </script>
 
 </body>
 

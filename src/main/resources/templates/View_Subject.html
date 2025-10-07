@@ -3,17 +3,16 @@
 
 <head th:include="template :: headFragment(${pageTitle})">
 <title th:text="${pageTitle}">Subject List</title>
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
 	<div class="wrapper">
 
-		<!-- Header -->
 		<div th:replace="fragments/header :: header"></div>
 
-		<!-- Sidebar -->
 		<div th:replace="fragments/sidebar :: aside"></div>
 
 		<div class="content-wrapper">
@@ -21,13 +20,13 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>Subjects List</h1>
+							<h1>View Subjects</h1>
 						</div>
 						<div class="col-sm-6">
-							<a th:href="@{/guac/Add_Subject}"
-								class="btn btn-primary float-right"> <i class="fas fa-plus"></i>
-								Add New Subject
-							</a>
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">View Subjects</li>
+							</ol>
 						</div>
 					</div>
 				</div>
@@ -35,88 +34,247 @@
 
 			<section class="content">
 				<div class="container-fluid">
-					<div class="card">
-						<div class="card-body table-responsive p-0"
-							style="max-height: 600px;">
-							<table class="table table-hover table-striped text-nowrap">
-								<thead>
-									<tr>
-										<th>Sr No</th>
-										<th>Department</th>
-										<th>Course</th>
-										<th>Semester</th>
-										<th>Subject Name</th>
-										<th>Subject Code</th>
-										<th>Actions</th>
-									</tr>
-								</thead>
-								<tbody>
-
-									<tr th:each="subject, iterStat : ${subjects}">
-										<td th:text="${iterStat.count}">1</td>
-										<td
-											th:text="${subject.semester.course?.department?.departmentName}">Department
-											Name</td>
-										<td th:text="${subject.semester.course?.courseName}">Course
-											Name</td>
-										<td th:text="${subject.semester.semesterName}">Semester
-											Name</td>
-										<td th:text="${subject.subjectName}">Subject Name</td>
-										<td th:text="${subject.subjectCode}">Subject Code</td>
-										<td><a
-											th:href="@{/guac/Add_Subject(Id=${subject.subjectId})}"
-											class="btn btn-sm btn-info" title="Edit"> <i
-												class="fas fa-edit"></i>
-										</a> <a href="#"
-											th:onclick="'confirmDelete(' + ${subject.subjectId} + ')'"
-											class="btn btn-sm btn-danger" title="Delete"> <i
-												class="fas fa-trash-alt"></i>
-										</a></td>
-									</tr>
-									<tr th:if="${#lists.isEmpty(subjects)}">
-										<td colspan="7" class="text-center">No subjects found.</td>
-									</tr>
-
-
-									<tr th:if="${#lists.isEmpty(subjects)}">
-										<td colspan="7" class="text-center">No subjects found.</td>
-									</tr>
-								</tbody>
-							</table>
+					<div class="row">
+						<div class="col-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">Subject Details</h3>
+										</div>
+										<div class="col-md-2">
+											<a th:href="@{'/guac/Add_Subject'}" class="btn btn-block bg-gradient-primary">Add</a>
+										</div>
+									</div>
+									<div th:if="${message != null}" class="alert alert-success alert-dismissible fade show text-center message" role="alert">
+										[[${message}]]
+										<button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+								<div class="card-body" th:if="${subjects != null }">
+									<table id="subjectsTable" class="table table-bordered table-striped">
+										<thead class="thead-light">
+											<tr>
+												<th scope="col">Sr</th>
+												<th scope="col">Department</th>
+												<th scope="col">Course</th>
+												<th scope="col">Semester</th>
+												<th scope="col">Subject Name</th>
+												<th scope="col">Subject Code</th>
+												<th scope="col">Subject Type</th>
+												<th scope="col">Actions</th>
+											</tr>
+										</thead>
+										<thead class="thead-light" id="searchHeader" style="display: none;">
+											<tr>
+												<th scope="col"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search department" data-column="1"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search course" data-column="2"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search semester" data-column="3"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search subject" data-column="4"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search code" data-column="5"></th>
+												<th scope="col"></th>
+												<th scope="col"></th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="subject, iterStat : ${subjects}">
+												<th scope="row" th:text="${iterStat.count}">1</th>
+												<td>
+													<span th:if="${subject.semester?.course?.department != null}">
+														[[${subject.semester.course.department.departmentName}]]
+													</span>
+													<span th:if="${subject.semester?.course?.department == null}" class="text-muted">
+														Not Assigned
+													</span>
+												</td>
+												<td>
+													<span th:if="${subject.semester?.course != null}">
+														[[${subject.semester.course.courseName}]]
+													</span>
+													<span th:if="${subject.semester?.course == null}" class="text-muted">
+														Not Assigned
+													</span>
+												</td>
+												<td>
+													<span th:if="${subject.semester != null}">
+														[[${subject.semester.semesterName}]]
+													</span>
+													<span th:if="${subject.semester == null}" class="text-muted">
+														Not Assigned
+													</span>
+												</td>
+												<td>[[${subject.subjectName}]]</td>
+												<td>[[${subject.subjectCode}]]</td>
+												<td>
+													<span th:if="${subject.elective}" class="badge badge-info">Elective</span>
+													<span th:unless="${subject.elective}" class="badge badge-primary">Core</span>
+												</td>
+												<td>
+												
+													<a th:href="@{/guac/Add_Subject(Id=${subject.subjectId})}" title="Edit this subject" class="fa fa-edit"></a> &nbsp;
+													<a href="#" th:onclick="'confirmDelete(' + ${subject.subjectId} + ')'" title="Delete this subject" class="fa fa-trash btn-delete"></a>
+												</td>
+											</tr>
+											<tr th:if="${#lists.isEmpty(subjects)}">
+												<td colspan="8" class="text-center">No subjects found.</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</section>
 		</div>
 
-		<!-- Footer -->
-		<div th:replace="fragments/footer :: footer"></div>
+		<div class="modal fade text-center" id="confirmModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Delete Confirmation</h5>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<span id="confirmText"></span>
+					</div>
+					<div class="modal-footer">
+						<a type="button" id="yesBtn" class="btn btn-danger">Yes</a>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+					</div>
+				</div>
+			</div>
+		</div>
 
+		<div th:replace="fragments/footer :: footer"></div>
 	</div>
 
-	<!-- Scripts -->
 	<div th:replace="template :: jsscript"></div>
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-	
-	<script>
-    function confirmDelete(id) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you really want to delete this subject?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = '/guac/deleteSubject?Id=' + id;
-            }
-        });
-    }
-</script>
 
-	
+	<!-- DataTables Scripts -->
+	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+	<!-- SweetAlert2 CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			// Initialize DataTable with export and search options
+			var table = $('#subjectsTable').DataTable({
+				"responsive": true,
+				"lengthChange": true,
+				"autoWidth": false,
+				"pageLength": 10,
+				"dom": '<"row"<"col-md-6"B><"col-md-6"f>><"row"<"col-md-12"tr>><"row"<"col-md-5"i><"col-md-7"p>>',
+				"buttons": [
+					{
+						extend: 'collection',
+						className: 'btn btn-secondary',
+						text: '<i class="fas fa-cog"></i> Options',
+						buttons: [
+							{
+								extend: 'copy',
+								className: 'btn btn-secondary',
+								text: '<i class="fas fa-copy"></i> Copy'
+							},
+							{
+								extend: 'excel',
+								className: 'btn btn-success',
+								text: '<i class="fas fa-file-excel"></i> Excel'
+							},
+							{
+								extend: 'pdf',
+								className: 'btn btn-danger',
+								text: '<i class="fas fa-file-pdf"></i> PDF'
+							},
+							{
+								extend: 'print',
+								className: 'btn btn-info',
+								text: '<i class="fas fa-print"></i> Print'
+							},
+							{
+								text: '<i class="fas fa-search"></i> Toggle Search',
+								className: 'btn btn-warning',
+								action: function ( e, dt, node, config ) {
+									$('#searchHeader').toggle();
+									// Adjust table header if needed
+									table.columns.adjust();
+								}
+							}
+						]
+					}
+				],
+				"language": {
+					"search": "Search:",
+					"lengthMenu": "Show _MENU_ entries",
+					"emptyTable": "No subjects found",
+					"info": "Showing _START_ to _END_ of _TOTAL_ subjects",
+					"infoEmpty": "Showing 0 to 0 of 0 subjects",
+					"infoFiltered": "(filtered from _MAX_ total subjects)",
+					"zeroRecords": "No matching subjects found"
+				}
+			});
+			
+			// Individual column search
+			$('#subjectsTable thead').on('keyup', '.column-search', function() {
+				var columnIndex = $(this).data('column');
+				table.column(columnIndex).search(this.value).draw();
+			});
+			
+			// Delete confirmation
+			$(".btn-delete").on("click", function(e) {
+				e.preventDefault();
+				var link = $(this);
+				var subjectId = link.attr('onclick').match(/\d+/)[0];
+				var subjectName = link.closest('tr').find('td:nth-child(5)').text();
+				
+				Swal.fire({
+					title: 'Are you sure?',
+					text: "Do you really want to delete the subject \"" + subjectName + "\"?",
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonColor: '#d33',
+					cancelButtonColor: '#3085d6',
+					confirmButtonText: 'Yes, delete it!',
+					cancelButtonText: 'Cancel'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						window.location.href = '/guac/deleteSubject?Id=' + subjectId;
+					}
+				});
+			});
+		});
+
+		// Alternative delete function for onclick attribute
+		function confirmDelete(id) {
+			var subjectName = $('tr').find('a[onclick="confirmDelete(' + id + ')"]').closest('tr').find('td:nth-child(5)').text();
+			
+			Swal.fire({
+				title: 'Are you sure?',
+				text: "Do you really want to delete the subject \"" + subjectName + "\"?",
+				icon: 'warning',
+				showCancelButton: true,
+				confirmButtonColor: '#d33',
+				cancelButtonColor: '#3085d6',
+				confirmButtonText: 'Yes, delete it!',
+				cancelButtonText: 'Cancel'
+			}).then((result) => {
+				if (result.isConfirmed) {
+					window.location.href = '/guac/deleteSubject?Id=' + id;
+				}
+			});
+		}
+	</script>
+
 </body>
 </html>

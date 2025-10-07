@@ -1,6 +1,7 @@
 package in.canaris.cloud.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,8 @@ public interface SubjectMasterRepository extends JpaRepository<SubjectMaster, In
 	List<SubjectMaster> findBySemesterAndvvElective(@Param("semesterId") Integer semesterId);
 
 	List<SubjectMaster> findByTeacher(String name);
+
+	Optional<SubjectMaster> findBysubjectId(int subjectId);
 
 
 
