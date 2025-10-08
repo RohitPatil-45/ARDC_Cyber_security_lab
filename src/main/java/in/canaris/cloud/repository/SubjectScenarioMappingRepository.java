@@ -25,6 +25,9 @@ public interface SubjectScenarioMappingRepository extends JpaRepository<SubjectS
 
 
 	List<SubjectScenarioMapping> findBySubject(Integer subjectId);
+	
+	
+
 
 	
 

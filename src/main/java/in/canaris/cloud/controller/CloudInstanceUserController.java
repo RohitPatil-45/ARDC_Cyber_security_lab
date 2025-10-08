@@ -42,6 +42,8 @@ import in.canaris.cloud.repository.SubProductRepository;
 import in.canaris.cloud.repository.SwitchRepository;
 import in.canaris.cloud.repository.UserRepository;
 import in.canaris.cloud.repository.VPCRepository;
+import in.canaris.cloud.repository.AssessmentUserLabRepository;
+
 
 @Controller
 @RequestMapping("/cloud_instance_user")
@@ -85,6 +87,9 @@ public class CloudInstanceUserController {
 
 	@Autowired
 	private AdditionalStorageRepository externalStorageRepository;
+	
+	@Autowired
+	private AssessmentUserLabRepository assessmentUserLabRepository;
 
 	final String var_function_name = "cloud_instance"; // small letter
 	final String disp_function_name = "Cloud Instance"; // capital letter

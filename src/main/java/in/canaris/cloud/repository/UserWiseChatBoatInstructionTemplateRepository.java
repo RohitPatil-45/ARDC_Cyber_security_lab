@@ -54,12 +54,11 @@ public interface UserWiseChatBoatInstructionTemplateRepository
 //	@Transactional
 //	@Query(value = "UPDATE userwise_chatboat_instruction_template SET isCommandExecuted = 'false' WHERE lab_name = :containerName", nativeQuery = true)
 //	void UpdateresetByLabName(@Param("containerName") String containerName);
-	
+
 	@Modifying
 	@Transactional
 	@Query(value = "UPDATE userwise_chatboat_instruction_template  SET isCommandExecuted = 'false' WHERE lab_name = :containerName", nativeQuery = true)
 	int UpdateresetByLabName(@Param("containerName") String containerName);
-
 
 	@Query(value = "SELECT * FROM userwise_chatboat_instruction_template WHERE lab_name = :labName AND isCommandExecuted = 'true' ORDER BY id ASC", nativeQuery = true)
 	List<UserWiseChatBoatInstructionTemplate> findExecutedByLabName(@Param("labName") String labName);
@@ -93,23 +92,23 @@ public interface UserWiseChatBoatInstructionTemplateRepository
 	List<Object[]> findDistinctLabUserTemplate();
 
 	@Query("SELECT COUNT(u) FROM UserWiseChatBoatInstructionTemplate u WHERE u.username = :userName AND u.ScenarioId = :scenarioId AND u.isCommandExecuted = 'false'")
-	Integer getFalseCompletionCountsByusernameandscenarioId(@Param("userName") String userName,@Param("scenarioId") int scenarioId);
+	Integer getFalseCompletionCountsByusernameandscenarioId(@Param("userName") String userName,
+			@Param("scenarioId") int scenarioId);
 
 	@Query("SELECT COUNT(u) FROM UserWiseChatBoatInstructionTemplate u WHERE u.username = :userName AND u.ScenarioId = :scenarioId AND u.isCommandExecuted = 'true'")
-	Integer getTrueCompletionCountsByusernameandscenarioId(@Param("userName") String userName,@Param("scenarioId") int scenarioId);
+	Integer getTrueCompletionCountsByusernameandscenarioId(@Param("userName") String userName,
+			@Param("scenarioId") int scenarioId);
 
-	
-	
 	@Query(value = "SELECT DISTINCT scenarioId FROM userwise_chatboat_instruction_template WHERE username = :userName", nativeQuery = true)
 	List<Object> findByScenarioIdAndUserName(@Param("userName") String userName);
 
+	@Query("SELECT COUNT(u) FROM UserWiseChatBoatInstructionTemplate u WHERE u.labId = :labId AND u.ScenarioId = :scenarioId AND u.isCommandExecuted = 'true'")
+	Integer getTrueCompletionCountsByLabIdAndScenarioId(@Param("labId") int labId,
+			@Param("scenarioId") int scenarioId);
 
-
-	
-
-
-
-	
+	@Query("SELECT COUNT(u) FROM UserWiseChatBoatInstructionTemplate u WHERE u.labId = :labId AND u.ScenarioId = :scenarioId AND u.isCommandExecuted = 'false'")
+	Integer getFalseCompletionCountsByLabIdAndScenarioId(@Param("labId") int labId,
+			@Param("scenarioId") int scenarioId);
 
 //	@Query(value = "SELECT COUNT(*) FROM userwise_chatboat_instruction_template "
 //			+ "WHERE isCommandExecuted='false' and username=:username", nativeQuery = true)

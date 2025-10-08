@@ -177,6 +177,30 @@ body {
 	letter-spacing: 0.5px;
 }
 
+/* Progress Summary Cards */
+.progress-summary-card {
+	text-align: center;
+	padding: 1.5rem 1rem;
+	border-radius: 12px;
+	background: linear-gradient(135deg, var(--white) 0%, #f8f9fa 100%);
+	box-shadow: var(--card-shadow);
+	transition: all 0.3s ease;
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	height: 100%;
+}
+
+.progress-summary-card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.progress-distribution {
+	background: rgba(248, 249, 250, 0.8);
+	border-radius: 8px;
+	padding: 1rem;
+	border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
 /* Normal Student Table Styling */
 .student-table {
 	width: 100%;
@@ -264,6 +288,59 @@ body {
 	color: white;
 }
 
+.badge-warning {
+	background: linear-gradient(135deg, var(--warning), #f39c12);
+	color: white;
+}
+
+.badge-light {
+	background-color: #f8f9fa;
+	color: #495057;
+	font-weight: 600;
+	padding: 0.25rem 0.5rem;
+}
+
+/* Progress Bar Styling */
+.progress {
+	border-radius: 10px;
+	overflow: hidden;
+	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+	background-color: #e9ecef;
+	height: 8px;
+}
+
+.progress-bar {
+	border-radius: 10px;
+	transition: width 0.6s ease;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar.bg-success {
+	background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.progress-bar.bg-warning {
+	background: linear-gradient(135deg, #ffc107, #fd7e14);
+}
+
+.progress-bar.bg-danger {
+	background: linear-gradient(135deg, #dc3545, #e83e8c);
+}
+
+.progress-bar.bg-secondary {
+	background: linear-gradient(135deg, #6c757d, #adb5bd);
+}
+
+.progress-wrapper {
+	min-width: 120px;
+}
+
+.progress-percentage {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: #495057;
+}
+
 /* Animation */
 @keyframes float {
 	0%, 100% { transform: translateY(0px); }
@@ -304,6 +381,14 @@ body {
 	}
 	.summary-card .count {
 		font-size: 2rem;
+	}
+	.student-table th,
+	.student-table td {
+		padding: 0.5rem;
+		font-size: 0.875rem;
+	}
+	.progress-summary-card {
+		padding: 1rem 0.5rem;
 	}
 }
 
@@ -363,6 +448,33 @@ body {
 	background: var(--primary);
 	color: white !important;
 	border-color: var(--primary);
+}
+
+/* Progress Stats Grid */
+.progress-stats-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 1rem;
+	margin-top: 1rem;
+}
+
+.progress-stat-item {
+	text-align: center;
+	padding: 1rem;
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+	backdrop-filter: blur(10px);
+}
+
+.progress-stat-value {
+	font-size: 1.5rem;
+	font-weight: 700;
+	margin-bottom: 0.25rem;
+}
+
+.progress-stat-label {
+	font-size: 0.8rem;
+	opacity: 0.9;
 }
 </style>
 
@@ -480,6 +592,94 @@ body {
 						</div>
 					</div>
 
+					<!-- Subject Progress Summary -->
+					<div class="row mb-4">
+						<div class="col-12">
+							<div class="dashboard-card">
+								<div class="card-header">
+									<h4 class="mb-0">
+										<i class="fas fa-chart-line mr-2"></i>Subject Progress Overview
+									</h4>
+								</div>
+								<div class="card-body">
+									<div class="row">
+										<!-- Overall Progress Card -->
+										<div class="col-lg-4 col-md-6 mb-4">
+											<div class="progress-summary-card">
+												<div class="icon-wrapper" style="background: rgba(76, 201, 240, 0.1); color: var(--success);">
+													<i class="fas fa-chart-pie"></i>
+												</div>
+												<div class="count" th:text="${overallProgress} + '%'">0%</div>
+												<div class="label">Overall Progress</div>
+											</div>
+										</div>
+
+										<!-- Average Progress Card -->
+										<div class="col-lg-4 col-md-6 mb-4">
+											<div class="progress-summary-card">
+												<div class="icon-wrapper" style="background: rgba(67, 97, 238, 0.1); color: var(--primary);">
+													<i class="fas fa-chart-bar"></i>
+												</div>
+												<div class="count" th:text="${averageProgress} + '%'">0%</div>
+												<div class="label">Average Student Progress</div>
+											</div>
+										</div>
+
+										<!-- Completion Rate Card -->
+										<div class="col-lg-4 col-md-6 mb-4">
+											<div class="progress-summary-card">
+												<div class="icon-wrapper" style="background: rgba(247, 37, 133, 0.1); color: var(--danger);">
+													<i class="fas fa-trophy"></i>
+												</div>
+												<div class="count" th:text="${completionRate} + '%'">0%</div>
+												<div class="label">Completion Rate</div>
+											</div>
+										</div>
+									</div>
+
+									<!-- Progress Distribution -->
+									<div class="row mt-3">
+										<div class="col-12">
+											<h5 class="mb-3">Progress Distribution</h5>
+											<div class="progress-distribution">
+												<div class="row">
+													<div class="col-lg-3 col-md-6 mb-3">
+														<div class="d-flex align-items-center">
+															<span class="badge badge-success mr-2" style="width: 20px; height: 20px;"></span>
+															<small>Completed (100%)</small>
+															<span class="badge badge-light ml-2" th:text="${completedStudents}">0</span>
+														</div>
+													</div>
+													<div class="col-lg-3 col-md-6 mb-3">
+														<div class="d-flex align-items-center">
+															<span class="badge badge-warning mr-2" style="width: 20px; height: 20px;"></span>
+															<small>Good Progress (50-99%)</small>
+															<span class="badge badge-light ml-2" th:text="${goodProgressStudents}">0</span>
+														</div>
+													</div>
+													<div class="col-lg-3 col-md-6 mb-3">
+														<div class="d-flex align-items-center">
+															<span class="badge badge-danger mr-2" style="width: 20px; height: 20px;"></span>
+															<small>Needs Work (1-49%)</small>
+															<span class="badge badge-light ml-2" th:text="${needsWorkStudents}">0</span>
+														</div>
+													</div>
+													<div class="col-lg-3 col-md-6 mb-3">
+														<div class="d-flex align-items-center">
+															<span class="badge badge-secondary mr-2" style="width: 20px; height: 20px;"></span>
+															<small>Not Started (0%)</small>
+															<span class="badge badge-light ml-2" th:text="${notStartedStudents}">0</span>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
 					<!-- Students Table -->
 					<div class="row">
 						<div class="col-12">
@@ -522,6 +722,7 @@ body {
 													<th>Course</th>
 													<th>Semester</th>
 													<th>Batch</th>
+													<th>Progress</th>
 													<th>Status</th>
 												</tr>
 											</thead>
@@ -537,6 +738,7 @@ body {
 													<th><input type="text" class="form-control form-control-sm column-search" placeholder="Search course" data-column="7"></th>
 													<th><input type="text" class="form-control form-control-sm column-search" placeholder="Search semester" data-column="8"></th>
 													<th><input type="text" class="form-control form-control-sm column-search" placeholder="Search batch" data-column="9"></th>
+													<th></th>
 													<th></th>
 												</tr>
 											</thead>
@@ -580,6 +782,26 @@ body {
 														<span th:unless="${student.batchName}" 
 															  class="text-muted">N/A</span>
 													</td>
+													<!-- Progress Column -->
+													<td>
+														<div class="progress-wrapper">
+															<div class="d-flex justify-content-between align-items-center mb-1">
+																<small class="progress-percentage" 
+																	   th:text="${#maps.containsKey(studentProgressMap, student.userName) ? studentProgressMap.get(student.userName) + '%' : '0%'}">
+																	0%
+																</small>
+															</div>
+															<div class="progress">
+																<div class="progress-bar" 
+																	 role="progressbar" 
+																	 th:attr="style=${#maps.containsKey(studentProgressMap, student.userName) ? 'width: ' + studentProgressMap.get(student.userName) + '%;' : 'width: 0%;'}"
+																	 th:classappend="${#maps.containsKey(studentProgressMap, student.userName) ? 
+																		 (studentProgressMap.get(student.userName) == 100 ? 'bg-success' : 
+																		  studentProgressMap.get(student.userName) >= 50 ? 'bg-warning' : 'bg-danger') : 'bg-secondary'}">
+																</div>
+															</div>
+														</div>
+													</td>
 													<td>
 														<span th:if="${student.enabled}" class="badge badge-success">
 															<i class="fas fa-check-circle mr-1"></i> Active
@@ -590,7 +812,7 @@ body {
 													</td>
 												</tr>
 												<tr th:if="${#lists.isEmpty(students)}">
-													<td colspan="11" class="text-center py-4">
+													<td colspan="12" class="text-center py-4">
 														<i class="fas fa-users fa-3x text-muted mb-3"></i>
 														<h5 class="text-muted">No Students Found</h5>
 														<p class="text-muted">There are no students enrolled in this subject for the current semester.</p>
@@ -630,6 +852,13 @@ body {
 				"autoWidth": false,
 				"pageLength": 10,
 				"dom": '<"row"<"col-md-6"B><"col-md-6"f>><"row"<"col-md-12"tr>><"row"<"col-md-5"i><"col-md-7"p>>',
+				"columnDefs": [
+					{
+						"targets": [10], // Progress column (index 10)
+						"orderable": false,
+						"searchable": false
+					}
+				],
 				"buttons": [
 					{
 						extend: 'collection',
@@ -693,6 +922,32 @@ body {
 				Swal.fire({
 					title: label,
 					text: `Total: ${count} students`,
+					icon: 'info',
+					confirmButtonText: 'OK'
+				});
+			});
+
+			// Add click event for progress bars to show detailed progress
+			$('#studentsTable').on('click', '.progress-bar', function() {
+				const progressPercentage = $(this).closest('td').find('.progress-percentage').text();
+				const studentName = $(this).closest('tr').find('td:nth-child(3)').text().trim();
+				
+				Swal.fire({
+					title: 'Progress Details',
+					html: `<strong>${studentName}</strong><br>Completion: ${progressPercentage}`,
+					icon: 'info',
+					confirmButtonText: 'OK'
+				});
+			});
+
+			// Add click event for progress summary cards
+			$('.progress-summary-card').click(function() {
+				const count = $(this).find('.count').text();
+				const label = $(this).find('.label').text();
+				
+				Swal.fire({
+					title: label,
+					text: `Current Status: ${count}`,
 					icon: 'info',
 					confirmButtonText: 'OK'
 				});

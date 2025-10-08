@@ -126,124 +126,87 @@ public class UserController {
 //	}
 	
 	
-	@GetMapping("/new")
-	public String addUser(Model model) {
-	    UserMasterRole user = new UserMasterRole();
-	    model.addAttribute("objEnt", user);
-	    model.addAttribute("pageTitle", "Create new User");
-
-	    model.addAttribute("groupList", groupRepository.getAllGroups());
-	    model.addAttribute("switchList", switchRepository.getAllSwitch());
-
-	    // Also send departments for the first dropdown
-	    List<DepartmentMaster> depts = DepartmentMasterRepository.findAll();
-	    model.addAttribute("departments", depts);
-
-	    return "user_add";
-	}
-
-
-	@PostMapping("/save")
-	public String saveUser(UserMasterRole userRole, RedirectAttributes redirectAttributes, BindingResult result,
-			Model model) {
-		System.out.println("App User save: controler ");
-
-		if (result.hasErrors()) {
-			System.out.println("App User save: error ");
-
-		}
-		AppUser user = userRole.getAppUser();
-		System.out.println("hhhhhhhhhh " + user.getGroupName());
-		System.out.println("user id = " + user.getUserId());
-
-		if (user.getUserId() == null) {
-			try {
-				BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-				user.setEncrytedPassword(encoder.encode(user.getEncrytedPassword()));
-				user.setEnabled(true);
-				System.out.println("hhhhhhhhhh " + user.getGroupName());
-				userRepository.save(user);
-				redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
-			} catch (Exception e) {
-				// redirectAttributes.addAttribute("message", e.getMessage());
-				System.out.println("Exception e1:" + e);
-				UserMasterRole user2 = new UserMasterRole();
-				user2.setAppUser(user);
-				model.addAttribute("objEnt", user2);
-				model.addAttribute("pageTitle", "Create new User");
-				model.addAttribute("groupList", groupRepository.getAllGroups());
-				return "user_add";
-			}
-
-			try {
-				Long role_id = userRole.getAppRole().getRoleId();
-				AppRole aprole = new AppRole();
-				aprole.setRoleId(role_id);
-
-				UserRole userRole2 = new UserRole();
-				System.out.println("hhhhhhhhhh " + user.getGroupName());
-				userRole2.setAppUser(user);
-
-				userRole2.setAppRole(aprole);
-				userRoleRepository.save(userRole2);
-				
-				userDetailsServiceImpl.sendSimpleMail(user.getUserName(), user.getConfirmPassword(), user.getEmail());
-				
-				redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
-			} catch (Exception e) {
-				// redirectAttributes.addAttribute("message", e.getMessage());
-				System.out.println("Exception e2:" + e);
-			}
-		} else {
-			try {
-
-				userRepository.updateUser(user.getName(), user.getEmail(), user.getMobileNo(), user.getGroupName(),
-						user.getSwitch_id(), user.getGenerationType(), user.getUserId());
-				userRoleRepository.updateUserRole(user.getUserId(), userRole.getAppRole().getRoleId());
-				redirectAttributes.addFlashAttribute("message", "The User has been updated successfully!");
-			} catch (Exception e) {
-				System.out.println("Exception occured while updating user:" + e);
-			}
-		}
-
-		return "redirect:/users/view";
-	}
-
-//	@GetMapping("/edit/{id}")
-//	public String editTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-//		try {
-//			AppUser user = userRepository.findById(id).get();
+//	@GetMapping("/new")
+//	public String addUser(Model model) {
+//	    UserMasterRole user = new UserMasterRole();
+//	    model.addAttribute("objEnt", user);
+//	    model.addAttribute("pageTitle", "Create new User");
 //
-//			UserMasterRole usermasterRole = new UserMasterRole();
-//			usermasterRole.setAppUser(user);
-//			// UserRole userRole = userRoleRepository.findRole(id);
-//			long roleID = userRoleRepository.findRole(id);
-//			System.out.println("role id = " + roleID);
-//			AppRole role = appRoleRepository.findByRoleId(roleID);
+//	    model.addAttribute("groupList", groupRepository.getAllGroups());
+//	    model.addAttribute("switchList", switchRepository.getAllSwitch());
 //
-//			usermasterRole.setAppRole(role);
+//	    // Also send departments for the first dropdown
+//	    List<DepartmentMaster> depts = DepartmentMasterRepository.findAll();
+//	    model.addAttribute("departments", depts);
 //
-//			model.addAttribute("user", user);
-//			model.addAttribute("pageTitle", "Edit User (ID: " + id + ")");
-//			model.addAttribute("userID", id);
-//			// model.addAttribute("roleID",userRoleRepository.findRole(id));
-//			model.addAttribute("objEnt", usermasterRole);
-//			model.addAttribute("groupList", groupRepository.getAllGroups());
-//			model.addAttribute("switchList", switchRepository.getAllSwitch());
-//			
-//			List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+//	    return "user_add";
+//	}
 //
-//			model.addAttribute("subject", subject);
-//			model.addAttribute("departments", departments);
-//			model.addAttribute("selectedDepartmentId", selectedDepartmentId);
-//			model.addAttribute("selectedCourseId", selectedCourseId);
-//			model.addAttribute("selectedSemesterId", selectedSemesterId);
-//			
-//			return "user_add";
-//		} catch (Exception e) {
-//			redirectAttributes.addFlashAttribute("message", e.getMessage());
-//			return "redirect:/users/view";
+//
+//	@PostMapping("/save")
+//	public String saveUser(UserMasterRole userRole, RedirectAttributes redirectAttributes, BindingResult result,
+//			Model model) {
+//		System.out.println("App User save: controler ");
+//
+//		if (result.hasErrors()) {
+//			System.out.println("App User save: error ");
+//
 //		}
+//		AppUser user = userRole.getAppUser();
+//		System.out.println("hhhhhhhhhh " + user.getGroupName());
+//		System.out.println("user id = " + user.getUserId());
+//
+//		if (user.getUserId() == null) {
+//			try {
+//				BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//				user.setEncrytedPassword(encoder.encode(user.getEncrytedPassword()));
+//				user.setEnabled(true);
+//				System.out.println("hhhhhhhhhh " + user.getGroupName());
+//				userRepository.save(user);
+//				redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
+//			} catch (Exception e) {
+//				// redirectAttributes.addAttribute("message", e.getMessage());
+//				System.out.println("Exception e1:" + e);
+//				UserMasterRole user2 = new UserMasterRole();
+//				user2.setAppUser(user);
+//				model.addAttribute("objEnt", user2);
+//				model.addAttribute("pageTitle", "Create new User");
+//				model.addAttribute("groupList", groupRepository.getAllGroups());
+//				return "user_add";
+//			}
+//
+//			try {
+//				Long role_id = userRole.getAppRole().getRoleId();
+//				AppRole aprole = new AppRole();
+//				aprole.setRoleId(role_id);
+//
+//				UserRole userRole2 = new UserRole();
+//				System.out.println("hhhhhhhhhh " + user.getGroupName());
+//				userRole2.setAppUser(user);
+//
+//				userRole2.setAppRole(aprole);
+//				userRoleRepository.save(userRole2);
+//				
+//				userDetailsServiceImpl.sendSimpleMail(user.getUserName(), user.getConfirmPassword(), user.getEmail());
+//				
+//				redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
+//			} catch (Exception e) {
+//				// redirectAttributes.addAttribute("message", e.getMessage());
+//				System.out.println("Exception e2:" + e);
+//			}
+//		} else {
+//			try {
+//
+//				userRepository.updateUser(user.getName(), user.getEmail(), user.getMobileNo(), user.getGroupName(),
+//						user.getSwitch_id(), user.getGenerationType(), user.getUserId());
+//				userRoleRepository.updateUserRole(user.getUserId(), userRole.getAppRole().getRoleId());
+//				redirectAttributes.addFlashAttribute("message", "The User has been updated successfully!");
+//			} catch (Exception e) {
+//				System.out.println("Exception occured while updating user:" + e);
+//			}
+//		}
+//
+//		return "redirect:/users/view";
 //	}
 	
 //	@GetMapping("/edit/{id}")
@@ -282,6 +245,102 @@ public class UserController {
 //	}
 	
 	
+	@GetMapping("/new")
+	public String addUser(Model model) {
+	    UserMasterRole user = new UserMasterRole();
+	    model.addAttribute("objEnt", user);
+	    model.addAttribute("pageTitle", "Create new User");
+
+	    model.addAttribute("groupList", groupRepository.getAllGroups());
+	    model.addAttribute("switchList", switchRepository.getAllSwitch());
+
+	    // Also send departments for the first dropdown
+	    List<DepartmentMaster> depts = DepartmentMasterRepository.findAll();
+	    model.addAttribute("departments", depts);
+
+	    return "user_add";
+	}
+
+	@PostMapping("/save")
+	public String saveUser(UserMasterRole userRole, RedirectAttributes redirectAttributes, BindingResult result,
+	        Model model) {
+	    System.out.println("App User save: controller ");
+
+	    if (result.hasErrors()) {
+	        System.out.println("App User save: error ");
+	    }
+	    
+	    AppUser user = userRole.getAppUser();
+	    System.out.println("Group: " + user.getGroupName());
+	    System.out.println("user id = " + user.getUserId());
+
+	    // For Admin, Super Admin, Teacher - clear academic fields
+	    Long roleId = userRole.getAppRole().getRoleId();
+	    if (roleId == 1L || roleId == 3L || roleId == 4L) { // Admin, Super Admin, Teacher
+	        user.setDepartmentName(null);
+	        user.setCourseName(null);
+	        user.setSemesterName(null);
+	        user.setBatchName(null);
+	    }
+
+	    if (user.getUserId() == null) {
+	        try {
+	            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	            user.setEncrytedPassword(encoder.encode(user.getEncrytedPassword()));
+	            user.setEnabled(true);
+	            System.out.println("Group: " + user.getGroupName());
+	            userRepository.save(user);
+	            redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
+	        } catch (Exception e) {
+	            System.out.println("Exception e1:" + e);
+	            UserMasterRole user2 = new UserMasterRole();
+	            user2.setAppUser(user);
+	            model.addAttribute("objEnt", user2);
+	            model.addAttribute("pageTitle", "Create new User");
+	            model.addAttribute("groupList", groupRepository.getAllGroups());
+	            model.addAttribute("departments", DepartmentMasterRepository.findAll());
+	            return "user_add";
+	        }
+
+	        try {
+	            Long role_id = userRole.getAppRole().getRoleId();
+	            AppRole aprole = new AppRole();
+	            aprole.setRoleId(role_id);
+
+	            UserRole userRole2 = new UserRole();
+	            userRole2.setAppUser(user);
+	            userRole2.setAppRole(aprole);
+	            userRoleRepository.save(userRole2);
+	            
+	            userDetailsServiceImpl.sendSimpleMail(user.getUserName(), user.getConfirmPassword(), user.getEmail());
+	            
+	            redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
+	        } catch (Exception e) {
+	            System.out.println("Exception e2:" + e);
+	        }
+	    } else {
+	        try {
+	            // Update user with academic fields
+	            userRepository.updateUserWithAcademic(user.getName(), user.getEmail(), user.getMobileNo(), 
+	                    user.getGroupName(), user.getSwitch_id(), user.getGenerationType(), 
+	                    user.getDepartmentName(), user.getCourseName(), user.getSemesterName(), 
+	                    user.getBatchName(), user.getUserId());
+	                    
+	            userRoleRepository.updateUserRole(user.getUserId(), userRole.getAppRole().getRoleId());
+	            redirectAttributes.addFlashAttribute("message", "The User has been updated successfully!");
+	        } catch (Exception e) {
+	            System.out.println("Exception occurred while updating user:" + e);
+	            // Reload necessary data for the form
+	            model.addAttribute("groupList", groupRepository.getAllGroups());
+	            model.addAttribute("switchList", switchRepository.getAllSwitch());
+	            model.addAttribute("departments", DepartmentMasterRepository.findAll());
+	            return "user_add";
+	        }
+	    }
+
+	    return "redirect:/users/view";
+	}
+
 	@GetMapping("/edit/{id}")
 	public String editTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
 	    try {
@@ -305,16 +364,19 @@ public class UserController {
 	        List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
 	        model.addAttribute("departments", departments);
 
-	        // ✅ CORRECTED: Pass IDs instead of entire entities
-	        Integer selectedDepartmentId = (user.getDepartmentName() != null) ? user.getDepartmentName().getDepartmentId() : null;
-	        Integer selectedCourseId = (user.getCourseName() != null) ? user.getCourseName().getCourseId() : null;
-	        Integer selectedSemesterId = (user.getSemesterName() != null) ? user.getSemesterName().getSemesterId() : null;
-	        Integer selectedBatchId = (user.getBatchName() != null) ? user.getBatchName().getBatchId() : null;
-
-	        model.addAttribute("selectedDepartmentId", selectedDepartmentId);
-	        model.addAttribute("selectedCourseId", selectedCourseId);
-	        model.addAttribute("selectedSemesterId", selectedSemesterId);
-	        model.addAttribute("selectedBatchId", selectedBatchId);
+	        // Get selected values for preselection
+	        if (user.getDepartmentName() != null) {
+	            model.addAttribute("selectedDepartmentId", user.getDepartmentName().getDepartmentId());
+	        }
+	        if (user.getCourseName() != null) {
+	            model.addAttribute("selectedCourseId", user.getCourseName().getCourseId());
+	        }
+	        if (user.getSemesterName() != null) {
+	            model.addAttribute("selectedSemesterId", user.getSemesterName().getSemesterId());
+	        }
+	        if (user.getBatchName() != null) {
+	            model.addAttribute("selectedBatchId", user.getBatchName().getBatchId());
+	        }
 
 	        return "user_add";
 	    } catch (Exception e) {

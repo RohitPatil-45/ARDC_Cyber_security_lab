@@ -13,4 +13,6 @@ public interface DepartmentMasterRepository extends JpaRepository<DepartmentMast
 
 	Optional<Playlist> findByDepartmentId(Integer id);
 
+	DepartmentMaster findByDepartmentId(Long departmentId);
+
 }

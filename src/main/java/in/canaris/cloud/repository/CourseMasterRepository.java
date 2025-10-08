@@ -13,4 +13,8 @@ public interface CourseMasterRepository extends JpaRepository<CourseMaster, Inte
 
 	List<CourseMaster> findByDepartment_DepartmentId(int deptId);
 
+	Optional<CourseMaster> findBycourseId(Long courseId);
+
+	List<CourseMaster> findByDepartmentDepartmentId(int deptId);
+
 }

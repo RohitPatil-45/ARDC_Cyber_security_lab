@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+<title>Assessment Lab | CMP</title>
+<link rel="icon" type="image/png"
+	href="/webtemplate/dist/img/magicboxEye3.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap & Font Awesome -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root {
+    --assessment-color: #8a2be2;
+    --assessment-dark: #6a0dad;
+    --assessment-light: #9b4dff;
+}
+
+body {
+	overflow: hidden;
+	background-color: #0f172a;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Timer Styles */
+.timer-container {
+    background: linear-gradient(135deg, var(--assessment-color), var(--assessment-dark));
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+}
+
+.timer-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+}
+
+.timer-display {
+    font-size: 2.5rem;
+    font-weight: 700;
+    font-family: 'Roboto Mono', monospace;
+    margin: 0;
+}
+
+.timer-warning {
+    background: linear-gradient(135deg, #ffab00, #ff6b00);
+}
+
+.timer-danger {
+    background: linear-gradient(135deg, #ff1744, #c40000);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+.connection-container {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	position: relative;
+}
+
+.main-content {
+	display: flex;
+	flex: 1;
+	overflow: hidden;
+}
+
+.rdp-frame-container {
+	flex: 1;
+	position: relative;
+}
+
+.rdp-frame {
+	width: 100%;
+	height: 100%;
+	border: none;
+}
+
+.sidebar {
+	width: 350px;
+	background-color: #1a202c;
+	border-left: 1px solid #2d3748;
+	display: flex;
+	flex-direction: column;
+}
+
+.sidebar-tabs {
+	display: flex;
+	border-bottom: 1px solid #2d3748;
+}
+
+.sidebar-tab {
+	flex: 1;
+	background: none;
+	border: none;
+	color: #a0aec0;
+	padding: 12px;
+	cursor: pointer;
+	transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar-tab:hover {
+	background-color: #2d3748;
+	color: white;
+}
+
+.sidebar-tab.active {
+	background-color: #2d3748;
+	color: white;
+	border-bottom: 2px solid var(--assessment-color);
+}
+
+.tab-content {
+	flex: 1;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+.tab-pane {
+	display: none;
+	flex-direction: column;
+	height: 100%;
+	overflow: hidden;
+}
+
+.tab-pane.active {
+	display: flex;
+}
+
+.details-container {
+	flex: 1;
+	overflow: auto;
+	padding: 15px;
+}
+
+.detail-row {
+	display: flex;
+	margin-bottom: 12px;
+}
+
+.detail-label {
+	font-weight: bold;
+	margin-right: 6px;
+	min-width: 100px;
+	color: #adb5bd;
+}
+
+.detail-value {
+	color: #f8f9fa;
+}
+
+.top-controls {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 20px;
+	background-color: #1a202c;
+	border-bottom: 1px solid #2d3748;
+	color: white;
+}
+
+.brand {
+	font-weight: bold;
+	color: var(--assessment-color);
+}
+
+.connection-info {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.status-indicator {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background-color: #48bb78;
+}
+
+.control-buttons {
+	display: flex;
+	gap: 10px;
+}
+
+.btn-control {
+	background-color: var(--assessment-color);
+	color: white;
+	border: none;
+	padding: 8px 15px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+.btn-control:hover {
+	background-color: var(--assessment-dark);
+}
+
+.assessment-warning {
+    background-color: rgba(138, 43, 226, 0.1);
+    border: 1px solid var(--assessment-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px;
+    text-align: center;
+}
+
+.assessment-warning i {
+    color: var(--assessment-color);
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.assessment-warning h5 {
+    color: var(--assessment-color);
+    margin-bottom: 10px;
+}
+
+.assessment-warning p {
+    color: #a0aec0;
+    margin: 0;
+}
+
+/* Focus management for RDP frame */
+.rdp-frame:focus {
+	outline: 2px solid var(--assessment-color);
+	outline-offset: -2px;
+}
+</style>
+
+<link rel="stylesheet" th:href="@{/webtemplate/css/style_connetion.css}">
+</head>
+
+<body>
+	<div class="connection-container">
+		<!-- Top controls bar -->
+		<div class="top-controls">
+			<div class="brand">
+				<i class="fas fa-clipboard-check"></i> MAGICBOX Assessment Lab
+			</div>
+
+			<div class="connection-info">
+				<div class="status-indicator"></div>
+				<span>Assessment Session</span>
+				<span class="text-muted">|</span>
+				<span><i class="fas fa-clock"></i> <span id="session-timer">00:00:00</span></span>
+			</div>
+
+			<div class="control-buttons">
+				<button class="btn-control" id="fullscreen-btn">
+					<i class="fas fa-expand"></i> Fullscreen
+				</button>
+				<button class="btn-control" onclick="window.history.back();">
+					<i class="fas fa-times"></i> End Assessment
+				</button>
+			</div>
+		</div>
+
+		<!-- Assessment Timer -->
+		<div class="timer-container" id="timerContainer">
+			<div class="timer-label">
+				<i class="fas fa-clock"></i> ASSESSMENT TIME REMAINING
+			</div>
+			<div class="timer-display" id="timerDisplay">
+				[[${assessmentTime}]]
+			</div>
+		</div>
+
+		<!-- Main content area -->
+		<div class="main-content">
+			<!-- RDP Frame -->
+			<div class="rdp-frame-container">
+				<iframe th:src="${embedUrl}" class="rdp-frame" id="rdp-frame" 
+					allow="clipboard-read; clipboard-write"></iframe>
+			</div>
+
+			<!-- Sidebar with details only -->
+			<div class="sidebar" id="instruction-sidebar">
+				<div class="sidebar-tabs">
+					<button class="sidebar-tab active" data-tab="details">
+						<i class="fas fa-info-circle"></i> Connection Details
+					</button>
+				</div>
+
+				<div class="tab-content">
+					<!-- Details Tab -->
+					<div class="tab-pane active" id="details-tab">
+						<div class="details-container">
+							<div class="assessment-warning">
+								<i class="fas fa-clipboard-check"></i>
+								<h5>Assessment Mode</h5>
+								<p>You are in assessment mode. Instructions and chat support are disabled.</p>
+								<p>Complete the tasks within the allocated time.</p>
+							</div>
+							
+							<h5 class="mb-3" style="color: aliceblue;">Connection Details</h5>
+							<div id="connection_details">
+								<!-- Connection details will be dynamically loaded here -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<!-- SweetAlert2 -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script>
+		// Function to extract ID from URL
+		function getLabIdFromUrl() {
+			const path = window.location.pathname;
+			const parts = path.split('/');
+			return parts[parts.length - 1];
+		}
+		
+		// Global variable to store current lab ID
+		let currentLabId = getLabIdFromUrl();
+		
+		// Timer functionality
+		function startTimer(duration, display) {
+			let timer = duration, minutes, seconds;
+			const timerContainer = document.getElementById('timerContainer');
+			
+			const interval = setInterval(function () {
+				minutes = parseInt(timer / 60, 10);
+				seconds = parseInt(timer % 60, 10);
+
+				minutes = minutes < 10 ? "0" + minutes : minutes;
+				seconds = seconds < 10 ? "0" + seconds : seconds;
+
+				display.textContent = minutes + ":" + seconds;
+
+				// Update timer container class based on remaining time
+				if (timer <= 300) { // 5 minutes
+					timerContainer.classList.add('timer-danger');
+					timerContainer.classList.remove('timer-warning');
+				} else if (timer <= 900) { // 15 minutes
+					timerContainer.classList.add('timer-warning');
+					timerContainer.classList.remove('timer-danger');
+				} else {
+					timerContainer.classList.remove('timer-warning', 'timer-danger');
+				}
+
+				if (--timer < 0) {
+					clearInterval(interval);
+					display.textContent = "TIME'S UP!";
+					timerContainer.classList.add('timer-danger');
+					
+					// Show time up message
+					Swal.fire({
+						icon: 'warning',
+						title: 'Assessment Time Expired!',
+						html: 'Your assessment time has ended. Your work will be submitted automatically.',
+						confirmButtonText: 'OK',
+						allowOutsideClick: false
+					});
+				}
+			}, 1000);
+		}
+
+		function ConnectionDetails(id) {
+		    $.ajax({
+		        type: "POST",
+		        url: "/guac/assessment/getConnectionDeatils",
+		        data: { LabId: id },
+		        success: function(response) {
+		            if (response.success) {
+		                $('#connection_details').empty();
+
+		                const detailsHtml = `
+		                    <div class="detail-row">
+		                        <span class="detail-label">Username:</span>
+		                        <span class="detail-value">${response.username || '-'}</span>
+		                    </div>
+		                    <div class="detail-row">
+                            <span class="detail-label">Password:</span>
+                            <span class="detail-value">${response.password || '-'}</span>
+                        </div>
+		                    <div class="detail-row">
+		                        <span class="detail-label">Lab Name:</span>
+		                        <span class="detail-value">${response.labName || '-'}</span>
+		                    </div>
+		                    <div class="detail-row">
+		                        <span class="detail-label">IP Address:</span>
+		                        <span class="detail-value">${response.ipAddress || '-'}</span>
+		                    </div>
+		                    <div class="detail-row">
+		                        <span class="detail-label">Status:</span>
+		                        <span class="detail-value" style="color: var(--assessment-color);">Assessment Mode</span>
+		                    </div>
+		                `;
+		                $('#connection_details').html(detailsHtml);
+		            } else {
+		                console.error('Failed to load connection details:', response.error);
+		                $('#connection_details').html('<div class="text-muted">Error loading connection details</div>');
+		            }
+		        },
+		        error: function() {
+		            $('#connection_details').html('<div class="text-muted">Error loading connection details</div>');
+		        }
+		    });
+		}
+
+		$(document).ready(function() {
+			// Initialize assessment timer
+			const timerDisplay = document.getElementById('timerDisplay');
+			if (timerDisplay) {
+				const timeString = timerDisplay.textContent;
+				const [minutes, seconds] = timeString.split(':').map(Number);
+				const totalSeconds = minutes * 60 + seconds;
+				
+				if (totalSeconds > 0) {
+					startTimer(totalSeconds, timerDisplay);
+				}
+			}
+
+			// Load connection details
+			if (currentLabId) {
+				ConnectionDetails(currentLabId);
+			}
+			
+			// Session timer
+			let startTime = Date.now();
+			function updateTimer() {
+				const elapsed = Date.now() - startTime;
+				const seconds = Math.floor((elapsed / 1000) % 60);
+				const minutes = Math.floor((elapsed / (1000 * 60)) % 60);
+				const hours = Math.floor(elapsed / (1000 * 60 * 60));
+				
+				const timeString = [
+					hours.toString().padStart(2, '0'),
+					minutes.toString().padStart(2, '0'),
+					seconds.toString().padStart(2, '0')
+				].join(':');
+				
+				$('#session-timer').text(timeString);
+			}
+			setInterval(updateTimer, 1000);
+			
+			// Fullscreen functionality
+			$('#fullscreen-btn').click(function() {
+				const elem = $('.connection-container')[0];
+				
+				if (!document.fullscreenElement) {
+					if (elem.requestFullscreen) {
+						elem.requestFullscreen();
+					} else if (elem.webkitRequestFullscreen) {
+						elem.webkitRequestFullscreen();
+					} else if (elem.msRequestFullscreen) {
+						elem.msRequestFullscreen();
+					}
+					$(this).html('<i class="fas fa-compress"></i> Exit Fullscreen');
+				} else {
+					if (document.exitFullscreen) {
+						document.exitFullscreen();
+					} else if (document.webkitExitFullscreen) {
+						document.webkitExitFullscreen();
+					} else if (document.msExitFullscreen) {
+						document.msExitFullscreen();
+					}
+					$(this).html('<i class="fas fa-expand"></i> Fullscreen');
+				}
+			});
+			
+			// Focus RDP frame for better interaction
+			const iframe = document.getElementById("rdp-frame");
+			iframe.setAttribute("tabindex", "0");
+			
+			// Return focus to iframe after any click
+			window.addEventListener("click", () => {
+				setTimeout(() => {
+					iframe.focus();
+				}, 50);
+			});
+		});
+	</script>
+</body>
+</html>

@@ -128,9 +128,36 @@ body {
 	transition: all 0.3s ease;
 }
 
+.assessment-btn {
+	background: linear-gradient(90deg, #9333ea, #a855f7);
+	color: #fff;
+	padding: 6px 16px;
+	border-radius: 20px;
+	font-size: 0.9rem;
+	font-weight: 600;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	transition: all 0.3s ease;
+	border: none;
+	cursor: pointer;
+}
 
+.assessment-btn:hover {
+	background: linear-gradient(90deg, #7e22ce, #9333ea);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+	color: white;
+	text-decoration: none;
+}
 
 .start-btn i {
+	font-size: 0.9rem;
+}
+
+.assessment-btn i {
 	font-size: 0.9rem;
 }
 
@@ -473,6 +500,14 @@ body {
 	background-color: #1e3a8a;
 	border-color: #1e3a8a;
 }
+
+/* Button container spacing */
+.button-container {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
 </style>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -640,21 +675,27 @@ document.addEventListener("DOMContentLoaded", function () {
                                 </select>
                             </div>
                             
-                            <div id="viewLab_btn">
-                            <a href="javascript:void(0);"
-                               class="btn btn-sm btn-success start-btn create-btn"
-                               onclick="updateLastActiveSession('${item.Id}')">
-                               <i class="fas fa-play"></i> View Lab
-                            </a>
-                        </div>
+                            <div class="button-container">
+                                <div id="viewLab_btn">
+                                    <a href="javascript:void(0);"
+                                       class="btn btn-sm btn-success start-btn create-btn"
+                                       onclick="updateLastActiveSession('${item.Id}')">
+                                       <i class="fas fa-play"></i> View Lab
+                                    </a>
+                                </div>
 
+                                <div id="createLab_btn" style="display:none">
+                                    <button type="button" class="start-btn create-btn" onclick="createDockerContainer()">
+                                        <i class="fas fa-play"></i> Create Lab
+                                    </button>
+                                </div>
 
-                          
-							<div id="createLab_btn" style="display:none">
-								<button   type="button" class="start-btn create-btn" onclick="createDockerContainer()">
-									<i class="fas fa-play"></i> Create Lab
-								</button>
-							</div>
+                                <div id="assessment_btn">
+                                    <button type="button" class="assessment-btn" onclick="startAssessment()">
+                                        <i class="fas fa-clipboard-check"></i> Start Assessment
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="card-tags mt-3 d-flex flex-wrap gap-2">
@@ -942,6 +983,48 @@ function createDockerContainer() {
 			window.location = "/guac/View_Vm_Listing?Id="+scenarioId;
 		}
 	});
+}
+
+function startAssessment() {
+    $("#pageLoader").show();
+    $.ajax({
+        type: "POST",
+        url: '/cloud_instance/assessment',
+        data: {
+            "scenarioId": scenarioId,
+        },
+        success: function(result) {
+            $("#pageLoader").hide();
+            if (result === "success") {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Assessment Started!',
+                    text: 'Your assessment has been successfully initiated.',
+                    confirmButtonText: 'Continue to Assessment'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Redirect to assessment page
+                        window.location = "/guac/assessmentView_Vm_Listing?Id=" + scenarioId;
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Assessment Failed',
+                    text: result.message || 'Unable to start assessment. Please try again.'
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            $("#pageLoader").hide();
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while starting the assessment. Please try again.'
+            });
+            console.error("Assessment AJAX error:", error);
+        }
+    });
 }
 
 function showLabButtonOn_Check() {

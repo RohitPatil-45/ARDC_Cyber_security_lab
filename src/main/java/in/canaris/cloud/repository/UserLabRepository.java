@@ -76,5 +76,7 @@ public interface UserLabRepository extends JpaRepository<UserLab, Integer> {
 	@Query("UPDATE UserLab u SET u.mandatoryCommandExecuted = :status WHERE u.guacamoleId = :guacamoleId")
 	void updateMandatoryCommandStatus(@Param("guacamoleId") Integer guacamoleId, @Param("status") Boolean status);
 
+	UserLab findByUsernameAndScenarioId(String username, int scenarioId);
+
 
 }
