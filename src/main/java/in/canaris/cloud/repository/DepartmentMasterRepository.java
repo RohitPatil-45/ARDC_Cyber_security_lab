@@ -15,4 +15,6 @@ public interface DepartmentMasterRepository extends JpaRepository<DepartmentMast
 
 	DepartmentMaster findByDepartmentId(Long departmentId);
 
+	DepartmentMaster findByDepartmentName(String string);
+
 }

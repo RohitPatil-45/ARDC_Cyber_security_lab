@@ -36,9 +36,13 @@
 										<div class="col-md-10">
 											<h3 class="card-title" style="padding-top: 10px">User Details</h3>
 										</div>
-										<div class="col-md-2">
+										<div class="col-md-1">
 											<a th:href="@{'/users/new/'}" class="btn btn-block bg-gradient-primary">Add</a>
 										</div>
+										<div class="col-md-1">
+											<a th:href="@{'/users/upload/'}" class="btn btn-block bg-gradient-primary">Upload</a>
+										</div>
+										
 									</div>
 									<div th:if="${message != null}" class="alert alert-success alert-dismissible fade show text-center message" role="alert">
 										[[${message}]]

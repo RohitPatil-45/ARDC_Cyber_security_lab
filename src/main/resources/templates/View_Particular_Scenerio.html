@@ -33,8 +33,6 @@ body {
 	transition: transform 0.2s, box-shadow 0.2s;
 }
 
-
-
 .card-image img {
 	width: 100%;
 	height: 300px;
@@ -145,6 +143,23 @@ body {
 	cursor: pointer;
 }
 
+.view-assessment-btn {
+	background: linear-gradient(90deg, #dc2626, #ef4444);
+	color: #fff;
+	padding: 6px 16px;
+	border-radius: 20px;
+	font-size: 0.9rem;
+	font-weight: 600;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	transition: all 0.3s ease;
+	border: none;
+	cursor: pointer;
+}
+
 .assessment-btn:hover {
 	background: linear-gradient(90deg, #7e22ce, #9333ea);
 	transform: translateY(-2px);
@@ -153,11 +168,19 @@ body {
 	text-decoration: none;
 }
 
+.view-assessment-btn:hover {
+	background: linear-gradient(90deg, #b91c1c, #dc2626);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+	color: white;
+	text-decoration: none;
+}
+
 .start-btn i {
 	font-size: 0.9rem;
 }
 
-.assessment-btn i {
+.assessment-btn i, .view-assessment-btn i {
 	font-size: 0.9rem;
 }
 
@@ -211,8 +234,6 @@ body {
 	transition: color 0.2s;
 }
 
-
-
 .comment-form {
 	background-color: #f8f9fa;
 	border-radius: 8px;
@@ -260,13 +281,10 @@ body {
 	color: white;
 }
 
-
-
 .comment-cancel-btn {
 	background-color: #6c757d;
 	color: white;
 }
-
 
 .comment-edit-form {
 	margin-top: 10px;
@@ -277,25 +295,22 @@ body {
 }
 
 /* CSS for page loader */
-/* ---- Page loader overlay ---- */
 .loader-overlay {
 	position: fixed;
-	inset: 0; /* top:0 right:0 bottom:0 left:0 */
+	inset: 0;
 	display: grid;
-	place-items: center; /* perfect centering */
+	place-items: center;
 	background: rgba(255, 255, 255, 0.9);
 	backdrop-filter: blur(2px);
-	/* subtle polish (ignored if unsupported) */
 	z-index: 9999;
 }
 
-/* ---- Spinner ---- */
 .spinner {
 	width: 64px;
 	height: 64px;
 	border-radius: 50%;
-	border: 6px solid #e6e6e6; /* track */
-	border-top-color: #2d4fa6; /* indicator */
+	border: 6px solid #e6e6e6;
+	border-top-color: #2d4fa6;
 	animation: spin 0.9s linear infinite;
 }
 
@@ -305,7 +320,6 @@ body {
 	}
 }
 
-/* Optional loading text */
 .loader-text {
 	margin-top: 14px;
 	color: #2d4fa6;
@@ -314,7 +328,6 @@ body {
 	letter-spacing: .2px;
 }
 
-/* Respect users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
 	.spinner {
 		animation: none;
@@ -322,7 +335,6 @@ body {
 	}
 }
 
-/* Demo content area */
 .page-content {
 	min-height: 100vh;
 	display: grid;
@@ -625,7 +637,6 @@ let currentScenarioIdForMove = null;
 document.addEventListener("DOMContentLoaded", function () {
     let rawData = '[[${listObj}]]'.replace(/&quot;/g, '"');
 
-   
     try {
         jsonData = JSON.parse(rawData);
     } catch (e) {
@@ -637,11 +648,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const item = jsonData[0];
     scenarioId = item.Id; 
-    noofinstance=item.NumberofInstance;
+    noofinstance = item.NumberofInstance;
     scenarioName = item.Scenario_Name;
     const container = document.getElementById("scenarioContainer");
-    showLabButtonOn_Check();
-    getPercenetageParticularScenerio();
+    
+    // Initialize all button states
+    initializeButtonStates();
+    
     const fragment = document.createDocumentFragment();
 
     // Card HTML
@@ -684,7 +697,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                     </a>
                                 </div>
 
-                                <div id="createLab_btn" style="display:none">
+                                <div id="createLab_btn">
                                     <button type="button" class="start-btn create-btn" onclick="createDockerContainer()">
                                         <i class="fas fa-play"></i> Create Lab
                                     </button>
@@ -693,6 +706,12 @@ document.addEventListener("DOMContentLoaded", function () {
                                 <div id="assessment_btn">
                                     <button type="button" class="assessment-btn" onclick="startAssessment()">
                                         <i class="fas fa-clipboard-check"></i> Start Assessment
+                                    </button>
+                                </div>
+                                
+                                <div id="viewAssessmentLab_btn">
+                                    <button type="button" class="view-assessment-btn" onclick="viewAssessmentLab()">
+                                        <i class="fas fa-eye"></i> View Assessment Lab
                                     </button>
                                 </div>
                             </div>
@@ -736,6 +755,139 @@ document.addEventListener("DOMContentLoaded", function () {
     loadComments();
 });
 
+// Initialize all button states based on completion percentage and assessment lab status
+function initializeButtonStates() {
+    // First check completion percentage
+    getPercenetageParticularScenerio();
+}
+
+// Get completion percentage and update button visibility
+function getPercenetageParticularScenerio() {
+    $.ajax({
+        type: "POST",
+        url: '/guac/getPercentageParticularScenario',
+        data: {
+            "scenarioId": scenarioId,
+            "scenarioName": scenarioName
+        },
+        success: function(result) {
+            result = result.trim();
+            
+            if (!isNaN(result)) {
+                let percentage = parseFloat(result);
+                const el = document.getElementById("Complete_Per");
+                el.innerText = "Completion: " + percentage + "%";
+
+                // Update completion text color
+                if (percentage == 100) {
+                    el.style.color = "green";
+                } else if (percentage >= 50) {
+                    el.style.color = "orange";
+                } else {
+                    el.style.color = "red";
+                }
+
+                // Check if completion is 100%
+                if (percentage == 100) {
+                    // Hide Create Lab and View Lab buttons
+                    $('#createLab_btn').hide();
+                    $('#viewLab_btn').hide();
+                    
+                    // Check if assessment lab exists
+                    checkAssessmentLabStatus();
+                } else {
+                    // If completion is not 100%, show normal lab buttons
+                    checkLabAvailability();
+                    $('#assessment_btn').hide();
+                    $('#viewAssessmentLab_btn').hide();
+                }
+            } else {
+                const el = document.getElementById("Complete_Per");
+                el.innerText = "Completion: N/A";
+                el.style.color = "gray";
+                
+                // Default to normal lab buttons
+                checkLabAvailability();
+                $('#assessment_btn').hide();
+                $('#viewAssessmentLab_btn').hide();
+            }
+        },
+        error: function(err) {
+            console.error("AJAX error:", err);
+            document.getElementById("Complete_Per").innerText = "Error";
+            
+            // Default to normal lab buttons on error
+            checkLabAvailability();
+            $('#assessment_btn').hide();
+            $('#viewAssessmentLab_btn').hide();
+        }
+    });
+}
+
+// Check if assessment lab exists
+function checkAssessmentLabStatus() {
+    $.ajax({
+        type: "POST",
+        url: '/guac/checkAssessmentLabStatus',
+        data: {
+            "scenarioId": scenarioId
+        },
+        success: function(result) {
+            result = result.trim();
+            if (result === "available") {
+                // If assessment lab exists, show View Assessment Lab button and hide Start Assessment button
+                $('#viewAssessmentLab_btn').show();
+                $('#assessment_btn').hide();
+            } else {
+                // If assessment lab doesn't exist, show Start Assessment button
+                $('#assessment_btn').show();
+                $('#viewAssessmentLab_btn').hide();
+            }
+        },
+        error: function(err) {
+            console.error("Assessment status check error:", err);
+            // On error, show Start Assessment button
+            $('#assessment_btn').show();
+            $('#viewAssessmentLab_btn').hide();
+        }
+    });
+}
+
+// Check if lab is available and update button visibility
+function checkLabAvailability() {
+    $.ajax({
+        type: "POST",
+        url: '/guac/showLabButtonOn_Check',
+        data: {
+            "scenarioId": scenarioId,
+            "scenarioName": scenarioName
+        },
+        success: function(result) {
+            result = result.trim();
+            if (result === "available") {
+                // Show View Lab, hide Create Lab
+                $('#viewLab_btn').show();
+                $('#createLab_btn').hide();
+            } else if (result === "notavailable") {
+                // Show Create Lab, hide View Lab
+                $('#createLab_btn').show();
+                $('#viewLab_btn').hide();
+            } else {
+                console.error("Unexpected result from server:", result);
+                // Default to Create Lab
+                $('#createLab_btn').show();
+                $('#viewLab_btn').hide();
+            }
+        },
+        error: function(err) {
+            console.error("AJAX error:", err);
+            // Default to Create Lab on error
+            $('#createLab_btn').show();
+            $('#viewLab_btn').hide();
+        }
+    });
+}
+
 // Event listeners for comment functionality
 document.getElementById("addCommentBtn").addEventListener("click", showCommentForm);
 document.getElementById("cancelCommentBtn").addEventListener("click", hideCommentForm);
@@ -776,14 +928,14 @@ function submitComment() {
     // Determine the appropriate endpoint
     const endpoint = editingCommentId ? "/guac/updateComment" : "/guac/addComment";
     
- // Send the request
+    // Send the request
     $.ajax({
         url: endpoint,
         type: "POST",
         data: {
             scenarioId: scenarioId,
             comment: commentText,
-            ...(editingCommentId && { commentId: editingCommentId }) // add only if editing
+            ...(editingCommentId && { commentId: editingCommentId })
         },
         success: function (data) {
             if (data === "success") {
@@ -805,13 +957,12 @@ function loadComments() {
     $.ajax({
         url: `/guac/getComments`,
         type: "GET",
-        data: { scenarioId: scenarioId }, // Pass scenarioId as query param
-        dataType: "json", // Expect JSON response
+        data: { scenarioId: scenarioId },
+        dataType: "json",
         success: function (comments) {
             const commentsContainer = document.getElementById("commentsContainer");
             const noCommentsText = document.getElementById("noComments");
 
-            // Remove all comment blocks
             commentsContainer.querySelectorAll(".comment").forEach(el => el.remove());
 
             if (comments && comments.length > 0) {
@@ -836,7 +987,6 @@ function createCommentElement(comment) {
     commentEl.className = "comment";
     commentEl.dataset.commentId = comment.id;
     
-    // Format date
     const commentDate = new Date(comment.createdAt);
     const formattedDate = commentDate.toLocaleDateString() + ' ' + commentDate.toLocaleTimeString();
     
@@ -856,7 +1006,6 @@ function createCommentElement(comment) {
         </div>
     `;
     
-    // Add event listeners for edit and delete buttons
     commentEl.querySelector(".edit-comment-btn").addEventListener("click", () => editComment(comment));
     commentEl.querySelector(".delete-comment-btn").addEventListener("click", () => deleteComment(comment.id));
     
@@ -864,7 +1013,6 @@ function createCommentElement(comment) {
 }
 
 function editComment(comment) {
-    // Show the comment form with the existing content
     document.getElementById("commentText").value = comment.content;
     editingCommentId = comment.id;
     showCommentForm();
@@ -889,7 +1037,7 @@ function deleteComment(commentId) {
                 success: function(data) {
                     if (data==="success") {
                         Swal.fire("Success", "Comment deleted successfully!", "success");
-                        loadComments(); // Reload comments
+                        loadComments();
                     } else {
                         Swal.fire("Error", data.message || "Delete operation failed", "error");
                     }
@@ -914,7 +1062,6 @@ function handleActionChange(selectElement, SceneriotId) {
         MoveScenerio(SceneriotId);
     }
 
-    // Reset dropdown
     selectElement.value = "";
 }
 
@@ -924,10 +1071,7 @@ function MoveScenerio(id) {
 }
 
 function showMoveModal() {
-    // Show the modal
     document.getElementById("moveScenarioModal").style.display = "flex";
-    
-    // Load playlists
     loadPlaylists();
 }
 
@@ -971,18 +1115,22 @@ function deleteScenerio(id) {
 }
 
 function createDockerContainer() {
-	$("#pageLoader").show();
-	$.ajax({
-		type: "POST",
-		url : '/cloud_instance/docker',
-		data : {
-			"scenarioId" : scenarioId,
-		},
-		success : function(result) {
-			$("#pageLoader").hide();
-			window.location = "/guac/View_Vm_Listing?Id="+scenarioId;
-		}
-	});
+    $("#pageLoader").show();
+    $.ajax({
+        type: "POST",
+        url: '/cloud_instance/docker',
+        data: {
+            "scenarioId": scenarioId,
+        },
+        success: function(result) {
+            $("#pageLoader").hide();
+            window.location = "/guac/View_Vm_Listing?Id=" + scenarioId;
+        },
+        error: function() {
+            $("#pageLoader").hide();
+            Swal.fire("Error", "Failed to create lab. Please try again.", "error");
+        }
+    });
 }
 
 function startAssessment() {
@@ -1003,7 +1151,9 @@ function startAssessment() {
                     confirmButtonText: 'Continue to Assessment'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Redirect to assessment page
+                        // After starting assessment, hide Start Assessment button and show View Assessment Lab button
+                        $('#assessment_btn').hide();
+                        $('#viewAssessmentLab_btn').show();
                         window.location = "/guac/assessmentView_Vm_Listing?Id=" + scenarioId;
                     }
                 });
@@ -1027,75 +1177,11 @@ function startAssessment() {
     });
 }
 
-function showLabButtonOn_Check() {
-    $.ajax({
-        type: "POST",
-        url: '/guac/showLabButtonOn_Check',
-        data: {
-            "scenarioId": scenarioId,
-            "scenarioName": scenarioName
-        },
-        success: function(result) {
-            // Trim the result in case there are extra spaces
-            result = result.trim();
-            if (result === "available") {
-                // Show View Lab, hide Create Lab
-                $('#viewLab_btn').show();
-                $('#createLab_btn').hide();
-            } else if (result === "notavailable") {
-                // Show Create Lab, hide View Lab
-                $('#createLab_btn').show();
-                $('#viewLab_btn').hide();
-            } else {
-                console.error("Unexpected result from server:", result);
-            }
-        },
-        error: function(err) {
-            console.error("AJAX error:", err);
-        }
-    });
-}
-
-function getPercenetageParticularScenerio() {
-    $.ajax({
-        type: "POST",
-        url: '/guac/getPercentageParticularScenario',
-        data: {
-            "scenarioId": scenarioId,
-            "scenarioName": scenarioName
-        },
-        success: function(result) {
-            result = result.trim();
-            
-            if (!isNaN(result)) {
-                let percentage = parseFloat(result);
-                const el = document.getElementById("Complete_Per");
-                el.innerText = "Completion: " + percentage + "%";
-
-                // Optional: add color based on value
-                if (percentage == 100) {
-                    el.style.color = "green";
-                } else if (percentage >= 50) {
-                    el.style.color = "orange";
-                } else {
-                    el.style.color = "red";
-                }
-            } else {
-                const el = document.getElementById("Complete_Per");
-                el.innerText = "Completion: N/A";
-                el.style.color = "gray";
-            }
-
-        },
-        error: function(err) {
-            console.error("AJAX error:", err);
-            document.getElementById("Complete_Per").innerText = "Error";
-        }
-    });
+function viewAssessmentLab() {
+    window.location = "/guac/assessmentView_Vm_Listing?Id=" + scenarioId;
 }
 
 function updateLastActiveSession(itemId) {
-	
     $.ajax({
         type: "POST",
         url: "/guac/update_last_session",
@@ -1103,7 +1189,6 @@ function updateLastActiveSession(itemId) {
             id: itemId
         },
         success: function(response) {
-            // Redirect to the lab page after successful update
             window.location.href = `/guac/View_Vm_Listing?Id=${itemId}`;
         },
         error: function() {
@@ -1116,6 +1201,11 @@ function updateLastActiveSession(itemId) {
     });
 }
 
+// Load playlists function (you may need to implement this based on your existing code)
+function loadPlaylists() {
+    // Implementation depends on your existing code
+    console.log("Loading playlists...");
+}
 </script>
 </body>
 </html>

@@ -16,4 +16,8 @@ public interface SemesterMasterRepository extends JpaRepository<SemesterMaster, 
 
 	List<SemesterMaster> findByCourseCourseId(int courseId);
 
+	SemesterMaster findBySemesterName(String string);
+
+	
+
 }

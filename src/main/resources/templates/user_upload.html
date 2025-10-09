@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="template :: headFragment('Bulk User Upload')"></head>
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/dropzone/min/dropzone.min.css}">
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header_bk :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Bulk User Upload</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item"><a th:href="@{'/users/view/'}">Users</a></li>
+								<li class="breadcrumb-item active">Bulk Upload</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<!-- 								<div class="card-header"> -->
+								<!-- 									<h3 class="card-title">Upload Users in Bulk</h3> -->
+								<!-- 								</div> -->
+
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">Upload
+												Users in Bulk</h3>
+										</div>
+										<div class="col-md-2">
+											<a href="/users/view/"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+								</div>
+								<div class="card-body">
+									<!-- Download Template Section -->
+									<div class="row mb-4">
+										<div class="col-md-12">
+											<div class="alert alert-info">
+												<h5>
+													<i class="icon fas fa-info-circle"></i> Instructions
+												</h5>
+												<ul>
+													<li>Download the User file below</li>
+													<li>Fill in the user data according to the format</li>
+													<li>Upload the filled file (CSV or Excel)</li>
+													<li>Maximum file size: 10MB</li>
+													<li>Supported formats: .csv, .xlsx, .xls</li>
+												</ul>
+											</div>
+										</div>
+									</div>
+
+									<div class="row mb-4">
+										<div class="col-md-6">
+											<div class="card">
+												<div class="card-header">
+													<h5 class="card-title">Download Users File</h5>
+												</div>
+												<div class="card-body">
+													<p>Download the Users file to ensure correct
+														formatting:</p>
+													<div class="btn-group">
+														<a th:href="@{/users/download-csv-template}"
+															class="btn btn-success"> <i class="fas fa-download"></i>
+															Download CSV Users
+														</a> <a th:href="@{/users/download-excel-template}"
+															class="btn btn-success ml-2"> <i
+															class="fas fa-download"></i> Download Excel Users
+														</a>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="card">
+												<div class="card-header">
+													<h5 class="card-title">Sample Data Format</h5>
+												</div>
+												<div class="card-body">
+													<small> <strong>Required Fields:</strong> name,
+														userName, email, mobileNo, roleId, groupName, switchId<br>
+														<strong>Optional Fields:</strong> departmentName,
+														courseName, semesterName, batchName<br> <strong>Role
+															IDs:</strong> 1=Admin, 2=User, 3=Super Admin, 4=Teacher<br> <strong>Switch
+															ID:</strong> Must be a valid switch ID from the system
+													</small>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<!-- Upload Section -->
+									<div class="row">
+										<div class="col-md-12">
+											<form th:action="@{/users/bulk-upload}" method="post"
+												enctype="multipart/form-data" class="dropzone"
+												id="userUploadForm">
+												<div class="dz-message needsclick">
+													<i class="fas fa-cloud-upload-alt fa-3x text-muted"></i>
+													<h4>Drop files here or click to upload</h4>
+													<span class="note needsclick">(CSV or Excel files
+														only - Maximum size: 10MB)</span>
+												</div>
+												<div class="fallback">
+													<input name="file" type="file" accept=".csv,.xlsx,.xls" />
+												</div>
+											</form>
+										</div>
+									</div>
+
+									<!-- Progress and Results Section -->
+									<div class="row mt-4" id="progressSection"
+										style="display: none;">
+										<div class="col-md-12">
+											<div class="card">
+												<div class="card-header">
+													<h5 class="card-title">Upload Progress</h5>
+												</div>
+												<div class="card-body">
+													<div class="progress mb-3">
+														<div id="uploadProgress"
+															class="progress-bar progress-bar-striped progress-bar-animated"
+															role="progressbar" style="width: 0%">0%</div>
+													</div>
+													<div id="uploadStatus" class="alert alert-info">
+														Preparing upload...</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="row mt-4" id="resultsSection"
+										style="display: none;">
+										<div class="col-md-12">
+											<div class="card">
+												<div class="card-header">
+													<h5 class="card-title">Upload Results</h5>
+												</div>
+												<div class="card-body">
+													<div id="successResults" class="alert alert-success"
+														style="display: none;">
+														<h6>
+															<i class="icon fas fa-check"></i> Successful Uploads
+														</h6>
+														<div id="successList"></div>
+													</div>
+													<div id="errorResults" class="alert alert-danger"
+														style="display: none;">
+														<h6>
+															<i class="icon fas fa-exclamation-triangle"></i> Errors
+														</h6>
+														<div id="errorList"></div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="card-footer">
+									<a th:href="@{'/users/view/'}" class="btn btn-default">Back
+										to Users</a>
+									<button type="button" id="processUpload"
+										class="btn btn-primary" style="display: none;">
+										Process Upload</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+</body>
+<script th:src="@{/webtemplate/plugins/dropzone/min/dropzone.min.js}"></script>
+
+<script>
+    $(document).ready(function() {
+        // Initialize Dropzone
+        Dropzone.autoDiscover = false;
+        
+        const myDropzone = new Dropzone("#userUploadForm", {
+            paramName: "file",
+            maxFilesize: 10, // MB
+            maxFiles: 1,
+            acceptedFiles: ".csv,.xlsx,.xls",
+            autoProcessQueue: false,
+            addRemoveLinks: true,
+            dictDefaultMessage: "Drop files here or click to upload",
+            dictRemoveFile: "Remove",
+            init: function() {
+                this.on("addedfile", function(file) {
+                    $('#processUpload').show();
+                    $('#progressSection').hide();
+                    $('#resultsSection').hide();
+                });
+
+                this.on("removedfile", function(file) {
+                    if (this.files.length === 0) {
+                        $('#processUpload').hide();
+                    }
+                });
+            }
+        });
+
+        // Process upload button
+        $('#processUpload').click(function() {
+            if (myDropzone.files.length === 0) {
+                alert('Please select a file first.');
+                return;
+            }
+
+            $('#progressSection').show();
+            $('#resultsSection').hide();
+            updateProgress(0, 'Starting upload...');
+
+            // Process the file
+            myDropzone.processQueue();
+        });
+
+        // Handle upload progress
+        myDropzone.on("sending", function(file, xhr, formData) {
+            updateProgress(10, 'Uploading file...');
+        });
+
+        myDropzone.on("success", function(file, response) {
+            updateProgress(100, 'Processing complete!');
+            showResults(response);
+            myDropzone.removeFile(file);
+            $('#processUpload').hide();
+        });
+
+        myDropzone.on("error", function(file, errorMessage) {
+            updateProgress(0, 'Upload failed!');
+            showErrorResults([errorMessage]);
+        });
+
+        function updateProgress(percent, message) {
+            $('#uploadProgress').css('width', percent + '%').text(percent + '%');
+            $('#uploadStatus').text(message);
+        }
+
+        function showResults(response) {
+            $('#resultsSection').show();
+            
+            if (response.successUsers && response.successUsers.length > 0) {
+                $('#successResults').show();
+                let successHtml = '<ul>';
+                response.successUsers.forEach(user => {
+                    successHtml += `<li>${user.name} (${user.userName}) - Created successfully</li>`;
+                });
+                successHtml += '</ul>';
+                $('#successList').html(successHtml);
+            } else {
+                $('#successResults').hide();
+            }
+
+            if (response.errorUsers && response.errorUsers.length > 0) {
+                $('#errorResults').show();
+                let errorHtml = '<ul>';
+                response.errorUsers.forEach(error => {
+                    errorHtml += `<li><strong>${error.userName || 'Unknown'}:</strong> ${error.error}</li>`;
+                });
+                errorHtml += '</ul>';
+                $('#errorList').html(errorHtml);
+            } else {
+                $('#errorResults').hide();
+            }
+
+            // Show summary
+            if (response.successUsers && response.errorUsers) {
+                const total = response.successUsers.length + response.errorUsers.length;
+                const successCount = response.successUsers.length;
+                const errorCount = response.errorUsers.length;
+                
+                $('#uploadStatus').html(
+                    `<strong>Upload Complete!</strong><br>
+                    Total Records: ${total}<br>
+                    Successful: <span class="text-success">${successCount}</span><br>
+                    Errors: <span class="text-danger">${errorCount}</span>`
+                );
+            }
+        }
+
+        function showErrorResults(errors) {
+            $('#resultsSection').show();
+            $('#errorResults').show();
+            let errorHtml = '<ul>';
+            errors.forEach(error => {
+                errorHtml += `<li>${error}</li>`;
+            });
+            errorHtml += '</ul>';
+            $('#errorList').html(errorHtml);
+        }
+    });
+</script>
+</html>

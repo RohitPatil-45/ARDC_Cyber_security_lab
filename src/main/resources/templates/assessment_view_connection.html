@@ -16,9 +16,9 @@
 
 <style>
 :root {
-    --assessment-color: #8a2be2;
-    --assessment-dark: #6a0dad;
-    --assessment-light: #9b4dff;
+	--assessment-color: #8a2be2;
+	--assessment-dark: #6a0dad;
+	--assessment-light: #9b4dff;
 }
 
 body {
@@ -29,43 +29,43 @@ body {
 
 /* Timer Styles */
 .timer-container {
-    background: linear-gradient(135deg, var(--assessment-color), var(--assessment-dark));
-    color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+	background: linear-gradient(135deg, var(--assessment-color), var(--assessment-dark));
+	color: white;
+	padding: 1rem;
+	border-radius: 8px;
+	margin-bottom: 1rem;
+	text-align: center;
+	box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
 }
 
 .timer-label {
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0.5rem;
-    opacity: 0.9;
+	font-size: 0.9rem;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	margin-bottom: 0.5rem;
+	opacity: 0.9;
 }
 
 .timer-display {
-    font-size: 2.5rem;
-    font-weight: 700;
-    font-family: 'Roboto Mono', monospace;
-    margin: 0;
+	font-size: 2.5rem;
+	font-weight: 700;
+	font-family: 'Roboto Mono', monospace;
+	margin: 0;
 }
 
 .timer-warning {
-    background: linear-gradient(135deg, #ffab00, #ff6b00);
+	background: linear-gradient(135deg, #ffab00, #ff6b00);
 }
 
 .timer-danger {
-    background: linear-gradient(135deg, #ff1744, #c40000);
-    animation: pulse 1s infinite;
+	background: linear-gradient(135deg, #ff1744, #c40000);
+	animation: pulse 1s infinite;
 }
 
 @keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.7; }
-    100% { opacity: 1; }
+	0% { opacity: 1; }
+	50% { opacity: 0.7; }
+	100% { opacity: 1; }
 }
 
 .connection-container {
@@ -84,6 +84,11 @@ body {
 .rdp-frame-container {
 	flex: 1;
 	position: relative;
+	transition: all 0.3s ease;
+}
+
+.rdp-frame-container.expanded {
+	margin-right: 0;
 }
 
 .rdp-frame {
@@ -93,11 +98,16 @@ body {
 }
 
 .sidebar {
-	width: 350px;
+	width: 400px;
 	background-color: #1a202c;
 	border-left: 1px solid #2d3748;
 	display: flex;
 	flex-direction: column;
+	transition: all 0.3s ease;
+}
+
+.sidebar.collapsed {
+	display: none;
 }
 
 .sidebar-tabs {
@@ -214,34 +224,195 @@ body {
 }
 
 .assessment-warning {
-    background-color: rgba(138, 43, 226, 0.1);
-    border: 1px solid var(--assessment-color);
-    border-radius: 8px;
-    padding: 15px;
-    margin: 15px;
-    text-align: center;
+	background-color: rgba(138, 43, 226, 0.1);
+	border: 1px solid var(--assessment-color);
+	border-radius: 8px;
+	padding: 15px;
+	margin: 15px;
+	text-align: center;
 }
 
 .assessment-warning i {
-    color: var(--assessment-color);
-    font-size: 2rem;
-    margin-bottom: 10px;
+	color: var(--assessment-color);
+	font-size: 2rem;
+	margin-bottom: 10px;
 }
 
 .assessment-warning h5 {
-    color: var(--assessment-color);
-    margin-bottom: 10px;
+	color: var(--assessment-color);
+	margin-bottom: 10px;
 }
 
 .assessment-warning p {
-    color: #a0aec0;
-    margin: 0;
+	color: #a0aec0;
+	margin: 0;
+}
+
+/* Mandatory Command Styles */
+.mandatory-command {
+	background-color: rgba(255, 193, 7, 0.1);
+	border: 1px solid #ffc107;
+	border-radius: 8px;
+	padding: 15px;
+	margin: 15px;
+}
+
+.mandatory-command h6 {
+	color: #ffc107;
+	margin-bottom: 10px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.command-container {
+	position: relative;
+	margin: 10px 0;
+	padding: 12px;
+	background-color: #2d3748;
+	border-radius: 8px;
+	border-left: 3px solid #ffc107;
+}
+
+.command-text {
+	font-family: 'Courier New', monospace;
+	font-size: 14px;
+	color: #f8f9fa;
+	margin-right: 30px;
+	word-break: break-all;
+}
+
+.copy-button {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	background-color: transparent;
+	color: #a0aec0;
+	border: none;
+	border-radius: 4px;
+	padding: 5px;
+	font-size: 12px;
+	cursor: pointer;
+	transition: color 0.3s;
+}
+
+.copy-button:hover {
+	color: #007bff;
+}
+
+.copy-button.copied {
+	color: #28a745;
 }
 
 /* Focus management for RDP frame */
 .rdp-frame:focus {
 	outline: 2px solid var(--assessment-color);
 	outline-offset: -2px;
+}
+
+/* Warning message styles */
+.warning-message {
+	background-color: rgba(255, 193, 7, 0.1);
+	border: 1px solid #ffc107;
+	border-radius: 8px;
+	padding: 12px;
+	margin: 10px 15px;
+	color: #ffc107;
+	font-size: 0.9rem;
+}
+
+.warning-message i {
+	margin-right: 8px;
+}
+
+/* Sidebar toggle button */
+.sidebar-toggler {
+	position: absolute;
+	top: 50%;
+	right: 0;
+	transform: translateY(-50%);
+	background-color: #2d3748;
+	color: white;
+	border: none;
+	border-radius: 5px 0 0 5px;
+	padding: 10px 5px;
+	cursor: pointer;
+	z-index: 101;
+	display: none;
+}
+
+.sidebar.collapsed ~ .sidebar-toggler {
+	display: block;
+}
+
+/* Lab Completion Modal Styles */
+.lab-completion-modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.8);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 10000;
+}
+
+.lab-completion-content {
+	background: linear-gradient(135deg, #1a202c, #2d3748);
+	border-radius: 15px;
+	padding: 40px;
+	text-align: center;
+	max-width: 500px;
+	width: 90%;
+	border: 2px solid var(--assessment-color);
+	box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3);
+}
+
+.lab-completion-icon {
+	font-size: 4rem;
+	color: #28a745;
+	margin-bottom: 20px;
+	animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+	0%, 100% { transform: translateY(0); }
+	50% { transform: translateY(-10px); }
+}
+
+.lab-completion-title {
+	color: #28a745;
+	font-size: 2rem;
+	margin-bottom: 15px;
+	font-weight: bold;
+}
+
+.lab-completion-message {
+	color: #a0aec0;
+	font-size: 1.1rem;
+	margin-bottom: 25px;
+	line-height: 1.5;
+}
+
+.lab-completion-button {
+	background: linear-gradient(135deg, var(--assessment-color), var(--assessment-dark));
+	color: white;
+	border: none;
+	padding: 12px 30px;
+	border-radius: 8px;
+	font-size: 1.1rem;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-decoration: none;
+	display: inline-block;
+}
+
+.lab-completion-button:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+	color: white;
 }
 </style>
 
@@ -259,15 +430,16 @@ body {
 			<div class="connection-info">
 				<div class="status-indicator"></div>
 				<span>Assessment Session</span>
-				<span class="text-muted">|</span>
-				<span><i class="fas fa-clock"></i> <span id="session-timer">00:00:00</span></span>
 			</div>
 
 			<div class="control-buttons">
+				<button class="btn-control" id="toggle-sidebar">
+					<i class="fas fa-times"></i> Close Sidebar
+				</button>
 				<button class="btn-control" id="fullscreen-btn">
 					<i class="fas fa-expand"></i> Fullscreen
 				</button>
-				<button class="btn-control" onclick="window.history.back();">
+				<button class="btn-control" onclick="endAssessment()">
 					<i class="fas fa-times"></i> End Assessment
 				</button>
 			</div>
@@ -286,7 +458,7 @@ body {
 		<!-- Main content area -->
 		<div class="main-content">
 			<!-- RDP Frame -->
-			<div class="rdp-frame-container">
+			<div class="rdp-frame-container" id="rdp-container">
 				<iframe th:src="${embedUrl}" class="rdp-frame" id="rdp-frame" 
 					allow="clipboard-read; clipboard-write"></iframe>
 			</div>
@@ -310,14 +482,72 @@ body {
 								<p>Complete the tasks within the allocated time.</p>
 							</div>
 							
-							<h5 class="mb-3" style="color: aliceblue;">Connection Details</h5>
-							<div id="connection_details">
+							<!-- Mandatory Command Section -->
+							<div class="mandatory-command" id="mandatoryCommandSection">
+								<h6><i class="fas fa-exclamation-triangle"></i> Mandatory Setup Command</h6>
+								<p style="color: #a0aec0; font-size: 0.9rem; margin-bottom: 10px;">
+									Execute this command first to set up your assessment environment:
+								</p>
+								<div id="mandatoryCommandContainer">
+									<!-- Mandatory command will be loaded here -->
+								</div>
+								<div class="warning-message">
+									<i class="fas fa-exclamation-circle"></i>
+									You must execute this command before proceeding with assessment tasks.
+								</div>
+							</div>
+							
+<!-- 							<h5 class="mb-3" style="color: aliceblue;">Connection Details</h5> -->
+<!-- 							<div id="connection_details"> -->
 								<!-- Connection details will be dynamically loaded here -->
+<!-- 							</div> -->
+							
+							<!-- Assessment Progress -->
+							<div style="margin-top: 20px; padding: 15px; background-color: rgba(138, 43, 226, 0.1); border-radius: 8px;">
+								<h6 style="color: var(--assessment-color); margin-bottom: 10px;">
+									<i class="fas fa-tasks"></i> Assessment Progress
+								</h6>
+								<div id="assessmentProgress">
+									<div class="detail-row">
+										<span class="detail-label">Mandatory Command:</span>
+										<span class="detail-value" id="mandatoryStatus" style="color: #ff6b6b;">
+											<i class="fas fa-times-circle"></i> Not Executed
+										</span>
+									</div>
+									<div class="detail-row">
+										<span class="detail-label">Assessment Status:</span>
+										<span class="detail-value" id="assessmentStatus" style="color: #ffc107;">
+											<i class="fas fa-clock"></i> In Progress
+										</span>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
+
+			<!-- Sidebar toggle button -->
+			<button class="sidebar-toggler" id="sidebar-toggle">
+				<i class="fas fa-chevron-left" id="sidebar-toggle-icon"></i>
+			</button>
+		</div>
+	</div>
+
+	<!-- Lab Completion Modal -->
+	<div class="lab-completion-modal" id="labCompletionModal" style="display: none;">
+		<div class="lab-completion-content">
+			<div class="lab-completion-icon">
+				<i class="fas fa-check-circle"></i>
+			</div>
+			<h2 class="lab-completion-title">Lab Completed Successfully!</h2>
+			<p class="lab-completion-message">
+				Congratulations! You have successfully completed the lab assessment.<br>
+				Your performance has been recorded and scored.
+			</p>
+			<button class="lab-completion-button" onclick="redirectToPreviousPage()">
+				<i class="fas fa-chart-line"></i> Check Your Score & Go Back
+			</button>
 		</div>
 	</div>
 
@@ -325,22 +555,56 @@ body {
 	<!-- SweetAlert2 -->
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script>
-		// Function to extract ID from URL
-		function getLabIdFromUrl() {
+		// Global variables
+		let currentLabId = null;
+		let currentScenarioId = null;
+		let assessmentTimer = null;
+		let tabSwitchCount = 0;
+		let maxTabSwitches = 3;
+		let mandatoryCommandExecuted = false;
+		let assessmentCompleted = false;
+
+		// Function to extract IDs from URL
+		function getIdsFromUrl() {
 			const path = window.location.pathname;
 			const parts = path.split('/');
-			return parts[parts.length - 1];
+			const labId = parts[parts.length - 1];
+			const scenarioId = parts[parts.length - 2]; // Assuming URL pattern: /guac/assessmentviewPlaylistConnection/{scenarioId}/{labId}
+			return { labId, scenarioId };
 		}
 		
-		// Global variable to store current lab ID
-		let currentLabId = getLabIdFromUrl();
-		
+		// Function to redirect to previous page or scenario page
+		function redirectToPreviousPage() {
+			if (currentScenarioId) {
+				// Redirect to scenario page
+				window.location.href = `/guac/assessmentviewPlaylistConnection/${currentScenarioId}`;
+			} else {
+				// Go back to previous page
+				window.history.back();
+			}
+		}
+
+		// Function to show lab completion modal
+		function showLabCompletionModal() {
+			const modal = document.getElementById('labCompletionModal');
+			modal.style.display = 'flex';
+			
+			// Disable all controls
+			document.querySelectorAll('.btn-control').forEach(btn => {
+				btn.disabled = true;
+				btn.style.opacity = '0.5';
+			});
+			
+			// Stop the timer
+			clearInterval(assessmentTimer);
+		}
+
 		// Timer functionality
 		function startTimer(duration, display) {
 			let timer = duration, minutes, seconds;
 			const timerContainer = document.getElementById('timerContainer');
 			
-			const interval = setInterval(function () {
+			assessmentTimer = setInterval(function () {
 				minutes = parseInt(timer / 60, 10);
 				seconds = parseInt(timer % 60, 10);
 
@@ -361,20 +625,205 @@ body {
 				}
 
 				if (--timer < 0) {
-					clearInterval(interval);
+					clearInterval(assessmentTimer);
 					display.textContent = "TIME'S UP!";
 					timerContainer.classList.add('timer-danger');
 					
-					// Show time up message
-					Swal.fire({
-						icon: 'warning',
-						title: 'Assessment Time Expired!',
-						html: 'Your assessment time has ended. Your work will be submitted automatically.',
-						confirmButtonText: 'OK',
-						allowOutsideClick: false
-					});
+					// Mark assessment as completed due to time up
+					markAssessmentCompleted('Time expired');
 				}
 			}, 1000);
+		}
+
+		// Function to handle tab switching
+		function handleTabSwitch() {
+			if (assessmentCompleted) return;
+			
+			tabSwitchCount++;
+			const remainingSwitches = maxTabSwitches - tabSwitchCount;
+			
+			if (tabSwitchCount <= maxTabSwitches) {
+				Swal.fire({
+					icon: 'warning',
+					title: 'Warning!',
+					html: `Do not switch tabs during assessment!<br>
+						   <strong>Warning ${tabSwitchCount}/${maxTabSwitches}</strong><br>
+						   ${remainingSwitches > 0 ? 
+						   	`${remainingSwitches} warning${remainingSwitches > 1 ? 's' : ''} remaining before assessment is terminated.` : 
+						   	'Next violation will terminate your assessment!'}`,
+					confirmButtonText: 'I Understand',
+					allowOutsideClick: false,
+					background: '#1a202c',
+					color: 'white'
+				});
+			}
+			
+			if (tabSwitchCount >= maxTabSwitches) {
+			    Swal.fire({
+			        icon: 'error',
+			        title: 'Assessment Terminated!',
+			        html: 'You have exceeded the maximum allowed tab switches.<br>Your assessment has been terminated.',
+			        confirmButtonText: 'OK',
+			        allowOutsideClick: false,
+			        background: '#1a202c',
+			        color: 'white'
+			    }).then(() => {
+			        markAssessmentCompleted('Tab switching violation');
+			        window.history.back(); // Go back to previous page
+			    });
+			}
+		}
+
+		// Function to mark assessment as completed and redirect
+		function markAssessmentCompleted(reason) {
+			if (assessmentCompleted) return;
+			
+			assessmentCompleted = true;
+			clearInterval(assessmentTimer);
+			
+			// Update UI
+			document.getElementById('assessmentStatus').innerHTML = 
+				'<i class="fas fa-check-circle" style="color: #28a745;"></i> Completed';
+			document.getElementById('assessmentStatus').style.color = '#28a745';
+			
+			// Send completion to server
+			$.ajax({
+				type: "POST",
+				url: "/guac/assessment/markCompleted",
+				data: {
+					labId: currentLabId,
+					reason: reason
+				},
+				success: function(response) {
+					console.log('Assessment marked as completed:', response);
+					
+					// Show completion modal instead of SweetAlert
+					showLabCompletionModal();
+				},
+				error: function(error) {
+					console.error('Failed to mark assessment completed:', error);
+					// Still show completion modal even if there's an error
+					showLabCompletionModal();
+				}
+			});
+		}
+
+		// Function to check mandatory command status
+		function checkMandatoryCommandStatus() {
+			if (!currentLabId || assessmentCompleted) return;
+			
+			// Get the mandatory command text from the page
+			const mandatoryCommand = document.querySelector('.command-text')?.textContent?.trim();
+			
+			if (!mandatoryCommand) {
+				console.error('Mandatory command not found on page');
+				return;
+			}
+			
+			$.ajax({
+				type: "POST",
+				url: "/guac/assessment/checkMandatoryCommand",
+				data: { 
+					labId: currentLabId,
+					command: mandatoryCommand
+				},
+				success: function(response) {
+					if (response.success && response.executed) {
+						mandatoryCommandExecuted = true;
+						document.getElementById('mandatoryStatus').innerHTML = 
+							'<i class="fas fa-check-circle" style="color: #28a745;"></i> Executed';
+						document.getElementById('mandatoryStatus').style.color = '#28a745';
+						
+						// Hide the mandatory command section after execution
+						document.getElementById('mandatoryCommandSection').style.display = 'none';
+					}
+				},
+				error: function(error) {
+					console.error('Failed to check mandatory command status:', error);
+				}
+			});
+		}
+
+		// Function to setup copy button functionality
+		function setupCopyButtons() {
+			$(document).on('click', '.copy-button', function () {
+				const commandText = $(this).closest('.command-container').find('.command-text').text().trim();
+				const button = $(this);
+
+				// Try to copy command to clipboard
+				navigator.clipboard.writeText(commandText)
+					.then(() => {
+						// Success feedback
+						button.addClass('copied');
+						button.html('<i class="fas fa-check"></i>');
+
+						// Focus the RDP iframe
+						focusRDPFrame();
+
+						// Reset button after 2 seconds
+						setTimeout(function () {
+							button.removeClass('copied');
+							button.html('<i class="fas fa-copy"></i>');
+						}, 2000);
+					})
+					.catch(() => {
+						// Error feedback
+						Swal.fire({
+							icon: 'error',
+							title: 'Copy Failed',
+							text: 'Failed to copy command to clipboard. Please try again.',
+							timer: 2000,
+							showConfirmButton: false,
+							background: '#1a202c',
+							color: 'white'
+						});
+					});
+			});
+		}
+
+		// Function to focus on RDP frame
+		function focusRDPFrame() {
+			const iframe = document.getElementById("rdp-frame");
+			if (iframe) {
+				iframe.setAttribute("tabindex", "0");
+				iframe.focus();
+			}
+		}
+
+		// Function to end assessment
+		function endAssessment() {
+			Swal.fire({
+				title: 'End Assessment?',
+				html: 'Are you sure you want to end this assessment?<br><strong>This action cannot be undone!</strong>',
+				icon: 'warning',
+				showCancelButton: true,
+				confirmButtonText: 'Yes, End Assessment',
+				cancelButtonText: 'Cancel',
+				background: '#1a202c',
+				color: 'white',
+				confirmButtonColor: '#d33',
+				cancelButtonColor: '#3085d6'
+			}).then((result) => {
+				if (result.isConfirmed) {
+					markAssessmentCompleted('Manually ended by user');
+				}
+			});
+		}
+
+		// Function to toggle sidebar
+		function toggleSidebar() {
+			const sidebar = document.getElementById('instruction-sidebar');
+			const rdpContainer = document.getElementById('rdp-container');
+			const toggleBtn = document.getElementById('toggle-sidebar');
+			
+			sidebar.classList.toggle('collapsed');
+			rdpContainer.classList.toggle('expanded');
+			
+			if (sidebar.classList.contains('collapsed')) {
+				toggleBtn.innerHTML = '<i class="fas fa-bars"></i> Show Sidebar';
+			} else {
+				toggleBtn.innerHTML = '<i class="fas fa-times"></i> Close Sidebar';
+			}
 		}
 
 		function ConnectionDetails(id) {
@@ -403,10 +852,6 @@ body {
 		                        <span class="detail-label">IP Address:</span>
 		                        <span class="detail-value">${response.ipAddress || '-'}</span>
 		                    </div>
-		                    <div class="detail-row">
-		                        <span class="detail-label">Status:</span>
-		                        <span class="detail-value" style="color: var(--assessment-color);">Assessment Mode</span>
-		                    </div>
 		                `;
 		                $('#connection_details').html(detailsHtml);
 		            } else {
@@ -420,7 +865,39 @@ body {
 		    });
 		}
 
+		// Function to load mandatory command
+		function loadMandatoryCommand(labId) {
+			$.ajax({
+				type: "POST",
+				url: "/guac/assessment/getMandatoryCommand",
+				data: { labId: labId },
+				success: function(response) {
+					if (response.success && response.command) {
+						const commandHtml = `
+							<div class="command-container">
+								<div class="command-text">${response.command}</div>
+								<button class="copy-button">
+									<i class="fas fa-copy"></i>
+								</button>
+							</div>
+						`;
+						$('#mandatoryCommandContainer').html(commandHtml);
+					} else {
+						$('#mandatoryCommandSection').style.display = 'none';
+					}
+				},
+				error: function() {
+					console.error('Failed to load mandatory command');
+				}
+			});
+		}
+
 		$(document).ready(function() {
+			// Initialize current lab ID and scenario ID
+			const ids = getIdsFromUrl();
+			currentLabId = ids.labId;
+			currentScenarioId = ids.scenarioId;
+
 			// Initialize assessment timer
 			const timerDisplay = document.getElementById('timerDisplay');
 			if (timerDisplay) {
@@ -433,28 +910,18 @@ body {
 				}
 			}
 
-			// Load connection details
+			// Load connection details and mandatory command
 			if (currentLabId) {
 				ConnectionDetails(currentLabId);
+				loadMandatoryCommand(currentLabId);
+				
+				// Start periodic check for mandatory command execution
+				setInterval(checkMandatoryCommandStatus, 5000); // Check every 5 seconds
 			}
 			
-			// Session timer
-			let startTime = Date.now();
-			function updateTimer() {
-				const elapsed = Date.now() - startTime;
-				const seconds = Math.floor((elapsed / 1000) % 60);
-				const minutes = Math.floor((elapsed / (1000 * 60)) % 60);
-				const hours = Math.floor(elapsed / (1000 * 60 * 60));
-				
-				const timeString = [
-					hours.toString().padStart(2, '0'),
-					minutes.toString().padStart(2, '0'),
-					seconds.toString().padStart(2, '0')
-				].join(':');
-				
-				$('#session-timer').text(timeString);
-			}
-			setInterval(updateTimer, 1000);
+			// Sidebar toggle functionality
+			$('#toggle-sidebar').click(toggleSidebar);
+			$('#sidebar-toggle').click(toggleSidebar);
 			
 			// Fullscreen functionality
 			$('#fullscreen-btn').click(function() {
@@ -481,6 +948,9 @@ body {
 				}
 			});
 			
+			// Set up copy buttons
+			setupCopyButtons();
+			
 			// Focus RDP frame for better interaction
 			const iframe = document.getElementById("rdp-frame");
 			iframe.setAttribute("tabindex", "0");
@@ -490,6 +960,31 @@ body {
 				setTimeout(() => {
 					iframe.focus();
 				}, 50);
+			});
+
+			// Tab switching detection
+			document.addEventListener('visibilitychange', function() {
+				if (document.hidden && !assessmentCompleted) {
+					handleTabSwitch();
+				}
+			});
+
+			// Prevent context menu
+			document.addEventListener('contextmenu', function(e) {
+				if (!assessmentCompleted) {
+					e.preventDefault();
+				}
+			});
+
+			// Prevent keyboard shortcuts that might open new tabs/windows
+			document.addEventListener('keydown', function(e) {
+				if (!assessmentCompleted && (e.ctrlKey || e.metaKey)) {
+					// Prevent Ctrl+N, Ctrl+T, Ctrl+W, etc.
+					if (e.key === 'n' || e.key === 't' || e.key === 'w') {
+						e.preventDefault();
+						handleTabSwitch();
+					}
+				}
 			});
 		});
 	</script>

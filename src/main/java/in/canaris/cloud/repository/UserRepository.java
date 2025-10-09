@@ -68,4 +68,6 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
 	                           @Param("batch") BatchMaster batch,
 	                           @Param("userId") Long userId);
 
+	boolean existsByUserName(String string);
+
 }
