@@ -742,383 +742,405 @@ public class UserController {
 	
 	
 
+	@GetMapping("/upload")
+	public String showUploadPage(Model model) {
+	    model.addAttribute("pageTitle", "Bulk User Upload");
+	    return "user_upload";
+	}
 
-    @GetMapping("/upload")
-    public String showUploadPage(Model model) {
-        model.addAttribute("pageTitle", "Bulk User Upload");
-        return "user_upload";
-    }
+	@GetMapping("/download-csv-template")
+	public void downloadCsvTemplate(HttpServletResponse response) throws IOException {
+	    response.setContentType("text/csv");
+	    response.setHeader("Content-Disposition", "attachment; filename=user_upload.csv");
+	    
+	    String csvContent = "name,userName,email,mobileNo,roleId,groupName,switchId,generationType,departmentName,courseName,semesterName,batchName\n" +
+	                       "John Doe,john.doe,john@example.com,9876543210,2,Students,1,1,Computer Science,B.Tech CS,Semester 1,Batch A\n" +
+	                       "Jane Smith,jane.smith,jane@example.com,9876543211,4,Faculty,1,1,Computer Science,B.Tech CS,Semester 1,Batch A\n" +
+	                       "Admin User,admin,admin@example.com,9876543212,1,Administrators,1,1,,,,\n" +
+	                       "Super Admin,superadmin,super@example.com,9876543213,3,SuperAdmins,1,1,,,,\n\n" +
+	                       "Note:\n" +
+	                       "- Required fields: name, userName, email, mobileNo, roleId, groupName, switchId, generationType\n" +
+	                       "- Role IDs: 1=Admin, 2=User, 3=Super Admin, 4=Teacher\n" +
+	                       "- Generation Type: 1=Generation 1, 2=Generation 2\n" +
+	                       "- Switch ID: Must be a valid switch ID from the system\n" +
+	                       "- For Admin, Super Admin, Teacher roles: leave academic fields empty\n" +
+	                       "- For User role: fill academic fields (departmentName, courseName, semesterName, batchName)\n" +
+	                       "- Username, Email, and Mobile Number must be unique across the system";
+	    
+	    response.getWriter().write(csvContent);
+	}
 
-    @GetMapping("/download-csv-template")
-    public void downloadCsvTemplate(HttpServletResponse response) throws IOException {
-        response.setContentType("text/csv");
-        response.setHeader("Content-Disposition", "attachment; filename=user_upload.csv");
-        
-        String csvContent = "name,userName,email,mobileNo,roleId,groupName,switchId,generationType,departmentName,courseName,semesterName,batchName\n" +
-                           "John Doe,john.doe,john@example.com,9876543210,2,Students,1,1,Computer Science,B.Tech CS,Semester 1,Batch A\n" +
-                           "Jane Smith,jane.smith,jane@example.com,9876543211,4,Faculty,1,1,Computer Science,B.Tech CS,Semester 1,Batch A\n" +
-                           "Admin User,admin,admin@example.com,9876543212,1,Administrators,1,1,,,,\n" +
-                           "Super Admin,superadmin,super@example.com,9876543213,3,SuperAdmins,1,1,,,,\n\n" +
-                           "Note:\n" +
-                           "- Required fields: name, userName, email, mobileNo, roleId, groupName, switchId, generationType\n" +
-                           "- Role IDs: 1=Admin, 2=User, 3=Super Admin, 4=Teacher\n" +
-                           "- Generation Type: 1=Generation 1, 2=Generation 2\n" +
-                           "- Switch ID: Must be a valid switch ID from the system\n" +
-                           "- For Admin, Super Admin, Teacher roles: leave academic fields empty\n" +
-                           "- For User role: fill academic fields (departmentName, courseName, semesterName, batchName)";
-        
-        response.getWriter().write(csvContent);
-    }
+	@GetMapping("/download-excel-template")
+	public void downloadExcelTemplate(HttpServletResponse response) throws IOException {
+	    response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+	    response.setHeader("Content-Disposition", "attachment; filename=user_upload.xlsx");
+	    
+	    Workbook workbook = new XSSFWorkbook();
+	    Sheet sheet = workbook.createSheet("User Template");
+	    
+	    // Create header row
+	    Row headerRow = sheet.createRow(0);
+	    String[] headers = {"name", "userName", "email", "mobileNo", "roleId", "groupName", "switchId", "generationType", "departmentName", "courseName", "semesterName", "batchName"};
+	    for (int i = 0; i < headers.length; i++) {
+	        Cell cell = headerRow.createCell(i);
+	        cell.setCellValue(headers[i]);
+	    }
+	    
+	    // Create sample data rows
+	    Object[][] sampleData = {
+	        {"John Doe", "john.doe", "john@example.com", "9876543210", "2", "Students", "1", "1", "Computer Science", "B.Tech CS", "Semester 1", "Batch A"},
+	        {"Jane Smith", "jane.smith", "jane@example.com", "9876543211", "4", "Faculty", "1", "1", "Computer Science", "B.Tech CS", "Semester 1", "Batch A"},
+	        {"Admin User", "admin", "admin@example.com", "9876543212", "1", "Administrators", "1", "1", "", "", "", ""},
+	        {"Super Admin", "superadmin", "super@example.com", "9876543213", "3", "SuperAdmins", "1", "1", "", "", "", ""}
+	    };
+	    
+	    for (int i = 0; i < sampleData.length; i++) {
+	        Row row = sheet.createRow(i + 1);
+	        for (int j = 0; j < sampleData[i].length; j++) {
+	            Cell cell = row.createCell(j);
+	            cell.setCellValue(sampleData[i][j].toString());
+	        }
+	    }
+	    
+	    // Add note row
+	    Row noteRow = sheet.createRow(sampleData.length + 2);
+	    Cell noteCell = noteRow.createCell(0);
+	    noteCell.setCellValue("Note: Required fields - name, userName, email, mobileNo, roleId, groupName, switchId, generationType. Role IDs: 1=Admin, 2=User, 3=Super Admin, 4=Teacher. Generation Type: 1=Generation 1, 2=Generation 2. Username, Email, and Mobile Number must be unique.");
+	    
+	    // Auto-size columns
+	    for (int i = 0; i < headers.length; i++) {
+	        sheet.autoSizeColumn(i);
+	    }
+	    
+	    workbook.write(response.getOutputStream());
+	    workbook.close();
+	}
 
-    @GetMapping("/download-excel-template")
-    public void downloadExcelTemplate(HttpServletResponse response) throws IOException {
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=user_upload.xlsx");
-        
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("User Template");
-        
-        // Create header row
-        Row headerRow = sheet.createRow(0);
-        String[] headers = {"name", "userName", "email", "mobileNo", "roleId", "groupName", "switchId", "generationType", "departmentName", "courseName", "semesterName", "batchName"};
-        for (int i = 0; i < headers.length; i++) {
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
-        }
-        
-        // Create sample data rows
-        Object[][] sampleData = {
-            {"John Doe", "john.doe", "john@example.com", "9876543210", "2", "Students", "1", "1", "Computer Science", "B.Tech CS", "Semester 1", "Batch A"},
-            {"Jane Smith", "jane.smith", "jane@example.com", "9876543211", "4", "Faculty", "1", "1", "Computer Science", "B.Tech CS", "Semester 1", "Batch A"},
-            {"Admin User", "admin", "admin@example.com", "9876543212", "1", "Administrators", "1", "1", "", "", "", ""},
-            {"Super Admin", "superadmin", "super@example.com", "9876543213", "3", "SuperAdmins", "1", "1", "", "", "", ""}
-        };
-        
-        for (int i = 0; i < sampleData.length; i++) {
-            Row row = sheet.createRow(i + 1);
-            for (int j = 0; j < sampleData[i].length; j++) {
-                Cell cell = row.createCell(j);
-                cell.setCellValue(sampleData[i][j].toString());
-            }
-        }
-        
-        // Add note row
-        Row noteRow = sheet.createRow(sampleData.length + 2);
-        Cell noteCell = noteRow.createCell(0);
-        noteCell.setCellValue("Note: Required fields - name, userName, email, mobileNo, roleId, groupName, switchId, generationType. Role IDs: 1=Admin, 2=User, 3=Super Admin, 4=Teacher. Generation Type: 1=Generation 1, 2=Generation 2");
-        
-        // Auto-size columns
-        for (int i = 0; i < headers.length; i++) {
-            sheet.autoSizeColumn(i);
-        }
-        
-        workbook.write(response.getOutputStream());
-        workbook.close();
-    }
+	@PostMapping("/bulk-upload")
+	@ResponseBody
+	public Map<String, Object> bulkUpload(@RequestParam("file") MultipartFile file) {
+	    Map<String, Object> response = new HashMap<>();
+	    List<Map<String, String>> successUsers = new ArrayList<>();
+	    List<Map<String, String>> errorUsers = new ArrayList<>();
+	    
+	    try {
+	        String fileName = file.getOriginalFilename();
+	        
+	        if (fileName == null || fileName.isEmpty()) {
+	            throw new RuntimeException("File name is empty");
+	        }
+	        
+	        if (fileName.toLowerCase().endsWith(".csv")) {
+	            processCsvFile(file, successUsers, errorUsers);
+	        } else if (fileName.toLowerCase().endsWith(".xlsx") || fileName.toLowerCase().endsWith(".xls")) {
+	            processExcelFile(file, successUsers, errorUsers);
+	        } else {
+	            throw new RuntimeException("Unsupported file format. Please upload CSV or Excel file.");
+	        }
+	        
+	        response.put("success", true);
+	        response.put("message", "File processed successfully");
+	        response.put("successUsers", successUsers);
+	        response.put("errorUsers", errorUsers);
+	        response.put("totalProcessed", successUsers.size() + errorUsers.size());
+	        response.put("successCount", successUsers.size());
+	        response.put("errorCount", errorUsers.size());
+	        
+	    } catch (Exception e) {
+	        response.put("success", false);
+	        response.put("message", "Error processing file: " + e.getMessage());
+	    }
+	    
+	    return response;
+	}
 
-    @PostMapping("/bulk-upload")
-    @ResponseBody
-    public Map<String, Object> bulkUpload(@RequestParam("file") MultipartFile file) {
-        Map<String, Object> response = new HashMap<>();
-        List<Map<String, String>> successUsers = new ArrayList<>();
-        List<Map<String, String>> errorUsers = new ArrayList<>();
-        
-        try {
-            String fileName = file.getOriginalFilename();
-            
-            if (fileName == null || fileName.isEmpty()) {
-                throw new RuntimeException("File name is empty");
-            }
-            
-            if (fileName.toLowerCase().endsWith(".csv")) {
-                processCsvFile(file, successUsers, errorUsers);
-            } else if (fileName.toLowerCase().endsWith(".xlsx") || fileName.toLowerCase().endsWith(".xls")) {
-                processExcelFile(file, successUsers, errorUsers);
-            } else {
-                throw new RuntimeException("Unsupported file format. Please upload CSV or Excel file.");
-            }
-            
-            response.put("success", true);
-            response.put("message", "File processed successfully");
-            response.put("successUsers", successUsers);
-            response.put("errorUsers", errorUsers);
-            response.put("totalProcessed", successUsers.size() + errorUsers.size());
-            response.put("successCount", successUsers.size());
-            response.put("errorCount", errorUsers.size());
-            
-        } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "Error processing file: " + e.getMessage());
-        }
-        
-        return response;
-    }
+	private void processCsvFile(MultipartFile file, List<Map<String, String>> successUsers, List<Map<String, String>> errorUsers) throws IOException {
+	    try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+	         CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
+	        
+	        for (CSVRecord record : csvParser) {
+	            processUserRecord(record.toMap(), successUsers, errorUsers);
+	        }
+	    }
+	}
 
-    private void processCsvFile(MultipartFile file, List<Map<String, String>> successUsers, List<Map<String, String>> errorUsers) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
-            
-            for (CSVRecord record : csvParser) {
-                processUserRecord(record.toMap(), successUsers, errorUsers);
-            }
-        }
-    }
+	private void processExcelFile(MultipartFile file, List<Map<String, String>> successUsers, List<Map<String, String>> errorUsers) throws IOException {
+	    Workbook workbook;
+	    String fileName = file.getOriginalFilename();
+	    
+	    if (fileName.toLowerCase().endsWith(".xlsx")) {
+	        workbook = new XSSFWorkbook(file.getInputStream());
+	    } else {
+	        workbook = new HSSFWorkbook(file.getInputStream());
+	    }
+	    
+	    Sheet sheet = workbook.getSheetAt(0);
+	    Iterator<Row> rowIterator = sheet.iterator();
+	    
+	    // Skip header row
+	    if (rowIterator.hasNext()) {
+	        rowIterator.next();
+	    }
+	    
+	    while (rowIterator.hasNext()) {
+	        Row row = rowIterator.next();
+	        Map<String, String> userData = new HashMap<>();
+	        
+	        String[] headers = {"name", "userName", "email", "mobileNo", "roleId", "groupName", "switchId", "generationType", "departmentName", "courseName", "semesterName", "batchName"};
+	        
+	        for (int i = 0; i < headers.length && i < row.getLastCellNum(); i++) {
+	            Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+	            String value = getCellValueAsString(cell);
+	            userData.put(headers[i], value);
+	        }
+	        
+	        processUserRecord(userData, successUsers, errorUsers);
+	    }
+	    
+	    workbook.close();
+	}
 
-    private void processExcelFile(MultipartFile file, List<Map<String, String>> successUsers, List<Map<String, String>> errorUsers) throws IOException {
-        Workbook workbook;
-        String fileName = file.getOriginalFilename();
-        
-        if (fileName.toLowerCase().endsWith(".xlsx")) {
-            workbook = new XSSFWorkbook(file.getInputStream());
-        } else {
-            workbook = new HSSFWorkbook(file.getInputStream());
-        }
-        
-        Sheet sheet = workbook.getSheetAt(0);
-        Iterator<Row> rowIterator = sheet.iterator();
-        
-        // Skip header row
-        if (rowIterator.hasNext()) {
-            rowIterator.next();
-        }
-        
-        while (rowIterator.hasNext()) {
-            Row row = rowIterator.next();
-            Map<String, String> userData = new HashMap<>();
-            
-            String[] headers = {"name", "userName", "email", "mobileNo", "roleId", "groupName", "switchId", "generationType", "departmentName", "courseName", "semesterName", "batchName"};
-            
-            for (int i = 0; i < headers.length && i < row.getLastCellNum(); i++) {
-                Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                String value = getCellValueAsString(cell);
-                userData.put(headers[i], value);
-            }
-            
-            processUserRecord(userData, successUsers, errorUsers);
-        }
-        
-        workbook.close();
-    }
+	private String getCellValueAsString(Cell cell) {
+	    if (cell == null) {
+	        return "";
+	    }
+	    
+	    switch (cell.getCellType()) {
+	        case STRING:
+	            return cell.getStringCellValue().trim();
+	        case NUMERIC:
+	            if (DateUtil.isCellDateFormatted(cell)) {
+	                return cell.getDateCellValue().toString();
+	            } else {
+	                // Check if it's an integer value
+	                double numericValue = cell.getNumericCellValue();
+	                if (numericValue == Math.floor(numericValue)) {
+	                    return String.valueOf((long) numericValue);
+	                } else {
+	                    return String.valueOf(numericValue);
+	                }
+	            }
+	        case BOOLEAN:
+	            return String.valueOf(cell.getBooleanCellValue());
+	        case FORMULA:
+	            try {
+	                return cell.getStringCellValue();
+	            } catch (Exception e) {
+	                try {
+	                    return String.valueOf(cell.getNumericCellValue());
+	                } catch (Exception ex) {
+	                    return cell.getCellFormula();
+	                }
+	            }
+	        default:
+	            return "";
+	    }
+	}
 
-    private String getCellValueAsString(Cell cell) {
-        if (cell == null) {
-            return "";
-        }
-        
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.getStringCellValue().trim();
-            case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    return cell.getDateCellValue().toString();
-                } else {
-                    // Check if it's an integer value
-                    double numericValue = cell.getNumericCellValue();
-                    if (numericValue == Math.floor(numericValue)) {
-                        return String.valueOf((long) numericValue);
-                    } else {
-                        return String.valueOf(numericValue);
-                    }
-                }
-            case BOOLEAN:
-                return String.valueOf(cell.getBooleanCellValue());
-            case FORMULA:
-                try {
-                    return cell.getStringCellValue();
-                } catch (Exception e) {
-                    try {
-                        return String.valueOf(cell.getNumericCellValue());
-                    } catch (Exception ex) {
-                        return cell.getCellFormula();
-                    }
-                }
-            default:
-                return "";
-        }
-    }
+	private void processUserRecord(Map<String, String> userData, List<Map<String, String>> successUsers, List<Map<String, String>> errorUsers) {
+	    try {
+	        // Debug: Print all received data
+	        System.out.println("Processing record for user: " + userData.get("userName"));
+	        userData.forEach((key, value) -> System.out.println(key + ": '" + value + "'"));
+	        
+	        // Validate required fields
+	        if (!isValidUserData(userData)) {
+	            Map<String, String> error = new HashMap<>();
+	            error.put("userName", userData.get("userName"));
+	            error.put("error", "Missing required fields");
+	            errorUsers.add(error);
+	            return;
+	        }
+	        
+	        String userName = userData.get("userName");
+	        String email = userData.get("email");
+	        String mobileNo = userData.get("mobileNo");
+	        
+	        // Check for duplicate username, email, and mobile number
+	        String duplicateError = checkForDuplicateUser(userName, email, mobileNo);
+	        if (duplicateError != null) {
+	            Map<String, String> error = new HashMap<>();
+	            error.put("userName", userName);
+	            error.put("error", duplicateError);
+	            errorUsers.add(error);
+	            return;
+	        }
+	        
+	        // Validate switch exists with proper error handling
+	        String switchIdStr = userData.get("switchId");
+	        Integer switchId = null;
 
-    private void processUserRecord(Map<String, String> userData, List<Map<String, String>> successUsers, List<Map<String, String>> errorUsers) {
-        try {
-            // Debug: Print all received data
-            System.out.println("Processing record for user: " + userData.get("userName"));
-            userData.forEach((key, value) -> System.out.println(key + ": '" + value + "'"));
-            
-            // Validate required fields
-            if (!isValidUserData(userData)) {
-                Map<String, String> error = new HashMap<>();
-                error.put("userName", userData.get("userName"));
-                error.put("error", "Missing required fields");
-                errorUsers.add(error);
-                return;
-            }
-            
-            // Check if username already exists
-            if (userRepository.existsByUserName(userData.get("userName"))) {
-                Map<String, String> error = new HashMap<>();
-                error.put("userName", userData.get("userName"));
-                error.put("error", "Username already exists");
-                errorUsers.add(error);
-                return;
-            }
-            
-            // Validate switch exists with proper error handling
-            String switchIdStr = userData.get("switchId");
-            Integer switchId = null;
+	        try {
+	            if (switchIdStr != null && !switchIdStr.trim().isEmpty()) {
+	                switchId = Integer.parseInt(switchIdStr.trim());
+	            } else {
+	                Map<String, String> error = new HashMap<>();
+	                error.put("userName", userName);
+	                error.put("error", "Switch ID is required");
+	                errorUsers.add(error);
+	                return;
+	            }
+	        } catch (NumberFormatException e) {
+	            Map<String, String> error = new HashMap<>();
+	            error.put("userName", userName);
+	            error.put("error", "Invalid switch ID format: '" + switchIdStr + "'. Must be a number.");
+	            errorUsers.add(error);
+	            return;
+	        }
 
-            try {
-                if (switchIdStr != null && !switchIdStr.trim().isEmpty()) {
-                    switchId = Integer.parseInt(switchIdStr.trim());
-                } else {
-                    Map<String, String> error = new HashMap<>();
-                    error.put("userName", userData.get("userName"));
-                    error.put("error", "Switch ID is required");
-                    errorUsers.add(error);
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                Map<String, String> error = new HashMap<>();
-                error.put("userName", userData.get("userName"));
-                error.put("error", "Invalid switch ID format: '" + switchIdStr + "'. Must be a number.");
-                errorUsers.add(error);
-                return;
-            }
+	        Switch userSwitch = switchRepository.findById(switchId).orElse(null);
+	        if (userSwitch == null) {
+	            Map<String, String> error = new HashMap<>();
+	            error.put("userName", userName);
+	            error.put("error", "Invalid switch ID: " + switchId);
+	            errorUsers.add(error);
+	            return;
+	        }
+	        
+	        // Create and save user
+	        AppUser user = new AppUser();
+	        user.setName(userData.get("name"));
+	        user.setUserName(userName);
+	        user.setEmail(email);
+	        user.setMobileNo(mobileNo);
+	        user.setGroupName(userData.get("groupName"));
+	        user.setSwitch_id(userSwitch);
+	        
+	        // Set generation type (default to "1" if not provided)
+	        String generationType = userData.get("generationType");
+	        if (generationType != null && !generationType.trim().isEmpty()) {
+	            user.setGenerationType(generationType);
+	        } else {
+	            user.setGenerationType("1");
+	        }
+	        
+	        // Set default password and confirm password
+	        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	        String defaultPassword = "defaultPassword123";
+	        user.setEncrytedPassword(encoder.encode(defaultPassword));
+	        user.setConfirmPassword(defaultPassword);
+	        
+	        // Set default values
+	        user.setEnabled(true);
+	        user.setIsFirstTimeLogin(true);
+	        user.setStatus("Active");
+	        
+	        // Handle academic fields based on role
+	        Long roleId = Long.parseLong(userData.get("roleId"));
+	        if (roleId == 2L) {
+	            setAcademicFields(user, userData);
+	        } else {
+	            user.setDepartmentName(null);
+	            user.setCourseName(null);
+	            user.setSemesterName(null);
+	            user.setBatchName(null);
+	        }
+	        
+	        // Save user
+	        AppUser savedUser = userRepository.save(user);
+	        
+	        // Create user role
+	        AppRole appRole = new AppRole();
+	        appRole.setRoleId(roleId);
+	        
+	        UserRole userRole = new UserRole();
+	        userRole.setAppUser(savedUser);
+	        userRole.setAppRole(appRole);
+	        userRoleRepository.save(userRole);
+	        
+	        // Add to success list
+	        Map<String, String> success = new HashMap<>();
+	        success.put("name", savedUser.getName());
+	        success.put("userName", savedUser.getUserName());
+	        success.put("email", savedUser.getEmail());
+	        success.put("generationType", savedUser.getGenerationType());
+	        successUsers.add(success);
+	        
+	    } catch (Exception e) {
+	        Map<String, String> error = new HashMap<>();
+	        error.put("userName", userData.get("userName"));
+	        error.put("error", "Error creating user: " + e.getMessage());
+	        errorUsers.add(error);
+	        e.printStackTrace();
+	    }
+	}
 
-            Switch userSwitch = switchRepository.findById(switchId).orElse(null);
-            if (userSwitch == null) {
-                Map<String, String> error = new HashMap<>();
-                error.put("userName", userData.get("userName"));
-                error.put("error", "Invalid switch ID: " + switchId);
-                errorUsers.add(error);
-                return;
-            }
-            
-            // Create and save user
-            AppUser user = new AppUser();
-            user.setName(userData.get("name"));
-            user.setUserName(userData.get("userName"));
-            user.setEmail(userData.get("email"));
-            user.setMobileNo(userData.get("mobileNo"));
-            user.setGroupName(userData.get("groupName"));
-            user.setSwitch_id(userSwitch);
-            
-            // Set generation type (default to "1" if not provided)
-            String generationType = userData.get("generationType");
-            if (generationType != null && !generationType.trim().isEmpty()) {
-                user.setGenerationType(generationType);
-            } else {
-                user.setGenerationType("1");
-            }
-            
-            // Set default password and confirm password
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            String defaultPassword = "defaultPassword123";
-            user.setEncrytedPassword(encoder.encode(defaultPassword));
-            user.setConfirmPassword(defaultPassword);
-            
-            // Set default values
-            user.setEnabled(true);
-            user.setIsFirstTimeLogin(true);
-            user.setStatus("Active");
-            
-            // Handle academic fields based on role
-            Long roleId = Long.parseLong(userData.get("roleId"));
-            if (roleId == 2L) {
-                setAcademicFields(user, userData);
-            } else {
-                user.setDepartmentName(null);
-                user.setCourseName(null);
-                user.setSemesterName(null);
-                user.setBatchName(null);
-            }
-            
-            // Save user
-            AppUser savedUser = userRepository.save(user);
-            
-            // Create user role
-            AppRole appRole = new AppRole();
-            appRole.setRoleId(roleId);
-            
-            UserRole userRole = new UserRole();
-            userRole.setAppUser(savedUser);
-            userRole.setAppRole(appRole);
-            userRoleRepository.save(userRole);
-            
-            // Add to success list
-            Map<String, String> success = new HashMap<>();
-            success.put("name", savedUser.getName());
-            success.put("userName", savedUser.getUserName());
-            success.put("email", savedUser.getEmail());
-            success.put("generationType", savedUser.getGenerationType());
-            successUsers.add(success);
-            
-        } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("userName", userData.get("userName"));
-            error.put("error", "Error creating user: " + e.getMessage());
-            errorUsers.add(error);
-            e.printStackTrace();
-        }
-    }
+	private String checkForDuplicateUser(String userName, String email, String mobileNo) {
+	    // Check for duplicate username
+	    if (userRepository.existsByUserName(userName)) {
+	        return "Username '" + userName + "' already exists";
+	    }
+	    
+	    // Check for duplicate email
+	    if (userRepository.existsByEmail(email)) {
+	        return "Email '" + email + "' already exists";
+	    }
+	    
+	    // Check for duplicate mobile number
+	    if (userRepository.existsByMobileNo(mobileNo)) {
+	        return "Mobile number '" + mobileNo + "' already exists";
+	    }
+	    
+	    return null;
+	}
 
-    private boolean isValidUserData(Map<String, String> userData) {
-        return userData.get("name") != null && !userData.get("name").trim().isEmpty() &&
-               userData.get("userName") != null && !userData.get("userName").trim().isEmpty() &&
-               userData.get("email") != null && !userData.get("email").trim().isEmpty() &&
-               userData.get("mobileNo") != null && !userData.get("mobileNo").trim().isEmpty() &&
-               userData.get("roleId") != null && !userData.get("roleId").trim().isEmpty() &&
-               userData.get("groupName") != null && !userData.get("groupName").trim().isEmpty() &&
-               userData.get("switchId") != null && !userData.get("switchId").trim().isEmpty() &&
-               userData.get("generationType") != null && !userData.get("generationType").trim().isEmpty();
-    }
+	private boolean isValidUserData(Map<String, String> userData) {
+	    return userData.get("name") != null && !userData.get("name").trim().isEmpty() &&
+	           userData.get("userName") != null && !userData.get("userName").trim().isEmpty() &&
+	           userData.get("email") != null && !userData.get("email").trim().isEmpty() &&
+	           userData.get("mobileNo") != null && !userData.get("mobileNo").trim().isEmpty() &&
+	           userData.get("roleId") != null && !userData.get("roleId").trim().isEmpty() &&
+	           userData.get("groupName") != null && !userData.get("groupName").trim().isEmpty() &&
+	           userData.get("switchId") != null && !userData.get("switchId").trim().isEmpty() &&
+	           userData.get("generationType") != null && !userData.get("generationType").trim().isEmpty();
+	}
 
-    private void setAcademicFields(AppUser user, Map<String, String> userData) {
-        try {
-            // Set department if provided
-            if (userData.get("departmentName") != null && !userData.get("departmentName").trim().isEmpty()) {
-                DepartmentMaster dept = DepartmentMasterRepository.findByDepartmentName(userData.get("departmentName"));
-                if (dept != null) {
-                    user.setDepartmentName(dept);
-                } else {
-                    System.out.println("Warning: Department not found: " + userData.get("departmentName"));
-                    // You might want to add this to error list or handle differently
-                }
-            }
-            
-            // Set course if provided
-            if (userData.get("courseName") != null && !userData.get("courseName").trim().isEmpty()) {
-                CourseMaster course = CourseMasterRepository.findByCourseName(userData.get("courseName"));
-                if (course != null) {
-                    user.setCourseName(course);
-                } else {
-                    System.out.println("Warning: Course not found: " + userData.get("courseName"));
-                }
-            }
-            
-            // Set semester if provided
-            if (userData.get("semesterName") != null && !userData.get("semesterName").trim().isEmpty()) {
-                SemesterMaster semester = SemesterMasterRepository.findBySemesterName(userData.get("semesterName"));
-                if (semester != null) {
-                    user.setSemesterName(semester);
-                } else {
-                    System.out.println("Warning: Semester not found: " + userData.get("semesterName"));
-                }
-            }
-            
-            // Set batch if provided
-            if (userData.get("batchName") != null && !userData.get("batchName").trim().isEmpty()) {
-                BatchMaster batch = BatchMasterRepository.findByBatchName(userData.get("batchName"));
-                if (batch != null) {
-                    user.setBatchName(batch);
-                } else {
-                    System.out.println("Warning: Batch not found: " + userData.get("batchName"));
-                }
-            }
-            
-        } catch (Exception e) {
-            System.out.println("Error setting academic fields: " + e.getMessage());
-            e.printStackTrace();
-            // Continue without academic fields if there's an error
-        }
-    }
+	private void setAcademicFields(AppUser user, Map<String, String> userData) {
+	    try {
+	        // Set department if provided
+	        if (userData.get("departmentName") != null && !userData.get("departmentName").trim().isEmpty()) {
+	            DepartmentMaster dept = DepartmentMasterRepository.findByDepartmentName(userData.get("departmentName"));
+	            if (dept != null) {
+	                user.setDepartmentName(dept);
+	            } else {
+	                System.out.println("Warning: Department not found: " + userData.get("departmentName"));
+	            }
+	        }
+	        
+	        // Set course if provided
+	        if (userData.get("courseName") != null && !userData.get("courseName").trim().isEmpty()) {
+	            CourseMaster course = CourseMasterRepository.findByCourseName(userData.get("courseName"));
+	            if (course != null) {
+	                user.setCourseName(course);
+	            } else {
+	                System.out.println("Warning: Course not found: " + userData.get("courseName"));
+	            }
+	        }
+	        
+	        // Set semester if provided
+	        if (userData.get("semesterName") != null && !userData.get("semesterName").trim().isEmpty()) {
+	            SemesterMaster semester = SemesterMasterRepository.findBySemesterName(userData.get("semesterName"));
+	            if (semester != null) {
+	                user.setSemesterName(semester);
+	            } else {
+	                System.out.println("Warning: Semester not found: " + userData.get("semesterName"));
+	            }
+	        }
+	        
+	        // Set batch if provided
+	        if (userData.get("batchName") != null && !userData.get("batchName").trim().isEmpty()) {
+	            BatchMaster batch = BatchMasterRepository.findByBatchName(userData.get("batchName"));
+	            if (batch != null) {
+	                user.setBatchName(batch);
+	            } else {
+	                System.out.println("Warning: Batch not found: " + userData.get("batchName"));
+	            }
+	        }
+	        
+	    } catch (Exception e) {
+	        System.out.println("Error setting academic fields: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	}
 
 }
