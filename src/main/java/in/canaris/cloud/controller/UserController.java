@@ -773,7 +773,7 @@ public class UserController {
     @GetMapping("/download-excel-template")
     public void downloadExcelTemplate(HttpServletResponse response) throws IOException {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=user_upload_template.xlsx");
+        response.setHeader("Content-Disposition", "attachment; filename=user_upload.xlsx");
         
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("User Template");
@@ -939,6 +939,10 @@ public class UserController {
 
     private void processUserRecord(Map<String, String> userData, List<Map<String, String>> successUsers, List<Map<String, String>> errorUsers) {
         try {
+            // Debug: Print all received data
+            System.out.println("Processing record for user: " + userData.get("userName"));
+            userData.forEach((key, value) -> System.out.println(key + ": '" + value + "'"));
+            
             // Validate required fields
             if (!isValidUserData(userData)) {
                 Map<String, String> error = new HashMap<>();
@@ -957,13 +961,33 @@ public class UserController {
                 return;
             }
             
-            // Validate switch exists
-            Switch userSwitch = switchRepository.findById(Integer.parseInt(userData.get("switchId")))
-                    .orElse(null);
+            // Validate switch exists with proper error handling
+            String switchIdStr = userData.get("switchId");
+            Integer switchId = null;
+
+            try {
+                if (switchIdStr != null && !switchIdStr.trim().isEmpty()) {
+                    switchId = Integer.parseInt(switchIdStr.trim());
+                } else {
+                    Map<String, String> error = new HashMap<>();
+                    error.put("userName", userData.get("userName"));
+                    error.put("error", "Switch ID is required");
+                    errorUsers.add(error);
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                Map<String, String> error = new HashMap<>();
+                error.put("userName", userData.get("userName"));
+                error.put("error", "Invalid switch ID format: '" + switchIdStr + "'. Must be a number.");
+                errorUsers.add(error);
+                return;
+            }
+
+            Switch userSwitch = switchRepository.findById(switchId).orElse(null);
             if (userSwitch == null) {
                 Map<String, String> error = new HashMap<>();
                 error.put("userName", userData.get("userName"));
-                error.put("error", "Invalid switch ID: " + userData.get("switchId"));
+                error.put("error", "Invalid switch ID: " + switchId);
                 errorUsers.add(error);
                 return;
             }
@@ -975,21 +999,21 @@ public class UserController {
             user.setEmail(userData.get("email"));
             user.setMobileNo(userData.get("mobileNo"));
             user.setGroupName(userData.get("groupName"));
-            user.setSwitch_id(userSwitch); // Set the switch
+            user.setSwitch_id(userSwitch);
             
             // Set generation type (default to "1" if not provided)
             String generationType = userData.get("generationType");
             if (generationType != null && !generationType.trim().isEmpty()) {
                 user.setGenerationType(generationType);
             } else {
-                user.setGenerationType("1"); // Default to Generation 1
+                user.setGenerationType("1");
             }
             
             // Set default password and confirm password
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             String defaultPassword = "defaultPassword123";
             user.setEncrytedPassword(encoder.encode(defaultPassword));
-            user.setConfirmPassword(defaultPassword); // Set confirm password
+            user.setConfirmPassword(defaultPassword);
             
             // Set default values
             user.setEnabled(true);
@@ -998,9 +1022,9 @@ public class UserController {
             
             // Handle academic fields based on role
             Long roleId = Long.parseLong(userData.get("roleId"));
-            if (roleId == 2L) { // Regular User - set academic fields
+            if (roleId == 2L) {
                 setAcademicFields(user, userData);
-            } else { // Admin, Super Admin, Teacher - clear academic fields
+            } else {
                 user.setDepartmentName(null);
                 user.setCourseName(null);
                 user.setSemesterName(null);
@@ -1032,7 +1056,7 @@ public class UserController {
             error.put("userName", userData.get("userName"));
             error.put("error", "Error creating user: " + e.getMessage());
             errorUsers.add(error);
-            e.printStackTrace(); // Add this for debugging
+            e.printStackTrace();
         }
     }
 
