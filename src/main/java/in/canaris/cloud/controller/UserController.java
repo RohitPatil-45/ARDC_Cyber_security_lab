@@ -741,7 +741,6 @@ public class UserController {
 	//upload csv code start
 	
 	
-
 	@GetMapping("/upload")
 	public String showUploadPage(Model model) {
 	    model.addAttribute("pageTitle", "Bulk User Upload");
@@ -753,16 +752,15 @@ public class UserController {
 	    response.setContentType("text/csv");
 	    response.setHeader("Content-Disposition", "attachment; filename=user_upload.csv");
 	    
-	    String csvContent = "name,userName,email,mobileNo,roleId,groupName,switchId,generationType,departmentName,courseName,semesterName,batchName\n" +
-	                       "John Doe,john.doe,john@example.com,9876543210,2,Students,1,1,Computer Science,B.Tech CS,Semester 1,Batch A\n" +
-	                       "Jane Smith,jane.smith,jane@example.com,9876543211,4,Faculty,1,1,Computer Science,B.Tech CS,Semester 1,Batch A\n" +
-	                       "Admin User,admin,admin@example.com,9876543212,1,Administrators,1,1,,,,\n" +
-	                       "Super Admin,superadmin,super@example.com,9876543213,3,SuperAdmins,1,1,,,,\n\n" +
+	    String csvContent = "name,userName,email,mobileNo,roleId,groupName,departmentName,courseName,semesterName,batchName\n" +
+	                       "John Doe,john.doe,john@example.com,9876543210,2,Students,Computer Science,B.Tech CS,Semester 1,Batch A\n" +
+	                       "Jane Smith,jane.smith,jane@example.com,9876543211,4,Faculty,Computer Science,B.Tech CS,Semester 1,Batch A\n" +
+	                       "Admin User,admin,admin@example.com,9876543212,1,Administrators,,,,\n" +
+	                       "Super Admin,superadmin,super@example.com,9876543213,3,SuperAdmins,,,,\n\n" +
 	                       "Note:\n" +
-	                       "- Required fields: name, userName, email, mobileNo, roleId, groupName, switchId, generationType\n" +
+	                       "- Required fields: name, userName, email, mobileNo, roleId, groupName\n" +
 	                       "- Role IDs: 1=Admin, 2=User, 3=Super Admin, 4=Teacher\n" +
-	                       "- Generation Type: 1=Generation 1, 2=Generation 2\n" +
-	                       "- Switch ID: Must be a valid switch ID from the system\n" +
+	                       "- Switch ID and Generation Type will be set to default values (1)\n" +
 	                       "- For Admin, Super Admin, Teacher roles: leave academic fields empty\n" +
 	                       "- For User role: fill academic fields (departmentName, courseName, semesterName, batchName)\n" +
 	                       "- Username, Email, and Mobile Number must be unique across the system";
@@ -780,7 +778,7 @@ public class UserController {
 	    
 	    // Create header row
 	    Row headerRow = sheet.createRow(0);
-	    String[] headers = {"name", "userName", "email", "mobileNo", "roleId", "groupName", "switchId", "generationType", "departmentName", "courseName", "semesterName", "batchName"};
+	    String[] headers = {"name", "userName", "email", "mobileNo", "roleId", "groupName", "departmentName", "courseName", "semesterName", "batchName"};
 	    for (int i = 0; i < headers.length; i++) {
 	        Cell cell = headerRow.createCell(i);
 	        cell.setCellValue(headers[i]);
@@ -788,10 +786,10 @@ public class UserController {
 	    
 	    // Create sample data rows
 	    Object[][] sampleData = {
-	        {"John Doe", "john.doe", "john@example.com", "9876543210", "2", "Students", "1", "1", "Computer Science", "B.Tech CS", "Semester 1", "Batch A"},
-	        {"Jane Smith", "jane.smith", "jane@example.com", "9876543211", "4", "Faculty", "1", "1", "Computer Science", "B.Tech CS", "Semester 1", "Batch A"},
-	        {"Admin User", "admin", "admin@example.com", "9876543212", "1", "Administrators", "1", "1", "", "", "", ""},
-	        {"Super Admin", "superadmin", "super@example.com", "9876543213", "3", "SuperAdmins", "1", "1", "", "", "", ""}
+	        {"John Doe", "john.doe", "john@example.com", "9876543210", "2", "Students", "Computer Science", "B.Tech CS", "Semester 1", "Batch A"},
+	        {"Jane Smith", "jane.smith", "jane@example.com", "9876543211", "4", "Faculty", "Computer Science", "B.Tech CS", "Semester 1", "Batch A"},
+	        {"Admin User", "admin", "admin@example.com", "9876543212", "1", "Administrators", "", "", "", ""},
+	        {"Super Admin", "superadmin", "super@example.com", "9876543213", "3", "SuperAdmins", "", "", "", ""}
 	    };
 	    
 	    for (int i = 0; i < sampleData.length; i++) {
@@ -805,7 +803,7 @@ public class UserController {
 	    // Add note row
 	    Row noteRow = sheet.createRow(sampleData.length + 2);
 	    Cell noteCell = noteRow.createCell(0);
-	    noteCell.setCellValue("Note: Required fields - name, userName, email, mobileNo, roleId, groupName, switchId, generationType. Role IDs: 1=Admin, 2=User, 3=Super Admin, 4=Teacher. Generation Type: 1=Generation 1, 2=Generation 2. Username, Email, and Mobile Number must be unique.");
+	    noteCell.setCellValue("Note: Required fields - name, userName, email, mobileNo, roleId, groupName. Switch ID and Generation Type will be set to default values (1). Role IDs: 1=Admin, 2=User, 3=Super Admin, 4=Teacher. Username, Email, and Mobile Number must be unique.");
 	    
 	    // Auto-size columns
 	    for (int i = 0; i < headers.length; i++) {
@@ -886,7 +884,7 @@ public class UserController {
 	        Row row = rowIterator.next();
 	        Map<String, String> userData = new HashMap<>();
 	        
-	        String[] headers = {"name", "userName", "email", "mobileNo", "roleId", "groupName", "switchId", "generationType", "departmentName", "courseName", "semesterName", "batchName"};
+	        String[] headers = {"name", "userName", "email", "mobileNo", "roleId", "groupName", "departmentName", "courseName", "semesterName", "batchName"};
 	        
 	        for (int i = 0; i < headers.length && i < row.getLastCellNum(); i++) {
 	            Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
@@ -966,33 +964,13 @@ public class UserController {
 	            return;
 	        }
 	        
-	        // Validate switch exists with proper error handling
-	        String switchIdStr = userData.get("switchId");
-	        Integer switchId = null;
-
-	        try {
-	            if (switchIdStr != null && !switchIdStr.trim().isEmpty()) {
-	                switchId = Integer.parseInt(switchIdStr.trim());
-	            } else {
-	                Map<String, String> error = new HashMap<>();
-	                error.put("userName", userName);
-	                error.put("error", "Switch ID is required");
-	                errorUsers.add(error);
-	                return;
-	            }
-	        } catch (NumberFormatException e) {
-	            Map<String, String> error = new HashMap<>();
-	            error.put("userName", userName);
-	            error.put("error", "Invalid switch ID format: '" + switchIdStr + "'. Must be a number.");
-	            errorUsers.add(error);
-	            return;
-	        }
-
+	        // Set default switch ID (1) and validate if it exists
+	        Integer switchId = 1; // Default value
 	        Switch userSwitch = switchRepository.findById(switchId).orElse(null);
 	        if (userSwitch == null) {
 	            Map<String, String> error = new HashMap<>();
 	            error.put("userName", userName);
-	            error.put("error", "Invalid switch ID: " + switchId);
+	            error.put("error", "Default switch with ID " + switchId + " not found in system");
 	            errorUsers.add(error);
 	            return;
 	        }
@@ -1006,13 +984,8 @@ public class UserController {
 	        user.setGroupName(userData.get("groupName"));
 	        user.setSwitch_id(userSwitch);
 	        
-	        // Set generation type (default to "1" if not provided)
-	        String generationType = userData.get("generationType");
-	        if (generationType != null && !generationType.trim().isEmpty()) {
-	            user.setGenerationType(generationType);
-	        } else {
-	            user.setGenerationType("1");
-	        }
+	        // Set default generation type (1)
+	        user.setGenerationType("1");
 	        
 	        // Set default password and confirm password
 	        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -1054,6 +1027,7 @@ public class UserController {
 	        success.put("userName", savedUser.getUserName());
 	        success.put("email", savedUser.getEmail());
 	        success.put("generationType", savedUser.getGenerationType());
+	        success.put("switchId", String.valueOf(switchId));
 	        successUsers.add(success);
 	        
 	    } catch (Exception e) {
@@ -1090,9 +1064,7 @@ public class UserController {
 	           userData.get("email") != null && !userData.get("email").trim().isEmpty() &&
 	           userData.get("mobileNo") != null && !userData.get("mobileNo").trim().isEmpty() &&
 	           userData.get("roleId") != null && !userData.get("roleId").trim().isEmpty() &&
-	           userData.get("groupName") != null && !userData.get("groupName").trim().isEmpty() &&
-	           userData.get("switchId") != null && !userData.get("switchId").trim().isEmpty() &&
-	           userData.get("generationType") != null && !userData.get("generationType").trim().isEmpty();
+	           userData.get("groupName") != null && !userData.get("groupName").trim().isEmpty();
 	}
 
 	private void setAcademicFields(AppUser user, Map<String, String> userData) {

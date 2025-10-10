@@ -55,6 +55,7 @@
                                                     <li>Select the file and click Submit Upload</li>
                                                     <li>Maximum file size: 10MB</li>
                                                     <li>Supported formats: .csv, .xlsx, .xls</li>
+                                                    <li><strong>Switch ID and Generation Type will be set to default values (1)</strong></li>
                                                     <li><strong>Username, Email, and Mobile Number must be unique</strong></li>
                                                 </ul>
                                             </div>
@@ -87,10 +88,10 @@
                                                 </div>
                                                 <div class="card-body">
                                                     <small>
-                                                        <strong>Required Fields:</strong> name, userName, email, mobileNo, roleId, groupName, switchId, generationType<br>
+                                                        <strong>Required Fields:</strong> name, userName, email, mobileNo, roleId, groupName<br>
                                                         <strong>Optional Fields:</strong> departmentName, courseName, semesterName, batchName<br>
                                                         <strong>Role IDs:</strong> 1=Admin, 2=User, 3=Super Admin, 4=Teacher<br>
-                                                        <strong>Switch ID:</strong> Must be a valid switch ID from the system<br>
+<!--                                                         <strong>Default Values:</strong> Switch ID = 1, Generation Type = 1<br> -->
                                                         <strong class="text-danger">Username, Email, and Mobile Number must be unique</strong>
                                                     </small>
                                                 </div>
@@ -353,12 +354,14 @@
             
             if (response.successUsers && response.successUsers.length > 0) {
                 $('#successResults').show();
-                let successHtml = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Status</th></tr></thead><tbody>';
+                let successHtml = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Switch ID</th><th>Generation Type</th><th>Status</th></tr></thead><tbody>';
                 response.successUsers.forEach(user => {
                     successHtml += `<tr>
                         <td>${user.name || 'N/A'}</td>
                         <td>${user.userName || 'N/A'}</td>
                         <td>${user.email || 'N/A'}</td>
+                        <td>${user.switchId || '1 (Default)'}</td>
+                        <td>${user.generationType || '1 (Default)'}</td>
                         <td><span class="badge badge-success">Success</span></td>
                     </tr>`;
                 });
@@ -435,6 +438,7 @@
                         <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
                         <h4>All users uploaded successfully!</h4>
                         <p><strong>${successCount}</strong> users were created successfully.</p>
+                        <p class="text-muted"><small>Switch ID and Generation Type set to default values (1)</small></p>
                     </div>`,
                     confirmButtonColor: '#28a745',
                     confirmButtonText: 'Great!'
@@ -445,7 +449,8 @@
                     <h4>Upload Completed with Results</h4>
                     <p><strong>Total Processed:</strong> ${total}</p>
                     <p class="text-success"><strong>Successful:</strong> ${successCount}</p>
-                    <p class="text-danger"><strong>Errors:</strong> ${errorCount}</p>`;
+                    <p class="text-danger"><strong>Errors:</strong> ${errorCount}</p>
+                    <p class="text-info"><small>Switch ID and Generation Type set to default values (1) for successful users</small></p>`;
                 
                 if (duplicateErrors > 0) {
                     htmlContent += `<p class="text-warning"><i class="fas fa-exclamation-triangle"></i> <strong>Duplicate Records:</strong> ${duplicateErrors}</p>`;

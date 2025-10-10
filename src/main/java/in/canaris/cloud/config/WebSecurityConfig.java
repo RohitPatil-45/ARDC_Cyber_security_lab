@@ -116,6 +116,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 					landingpageURl = "/guac/SuperAdmin_Dashboard";
 				} else if (roles.contains("ROLE_USER")) {
 					landingpageURl = "/guac/UserWise_Dashboard";
+				} else if (roles.contains("ROLE_TEACHER")) {
+					landingpageURl = "/guac/teacher-dashboard";
 				}
 
 				getRedirectStrategy().sendRedirect(request, response, landingpageURl);
