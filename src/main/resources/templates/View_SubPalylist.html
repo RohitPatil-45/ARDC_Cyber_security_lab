@@ -89,9 +89,6 @@
 	letter-spacing: 0.5px;
 }
 
-
-
-
 .custom-control {
 	width: 70px;
 	height: 70px;
@@ -126,6 +123,179 @@
 .carousel-control-prev.disabled, .carousel-control-next.disabled {
 	pointer-events: none;
 	opacity: 0.3;
+}
+
+/* Professional Search Section - Matching Page Design */
+.search-section {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    border-radius: 12px;
+    padding: 25px 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.search-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite linear;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.search-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.search-header i {
+    font-size: 28px;
+    margin-right: 15px;
+    color: #60a5fa;
+}
+
+.search-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+}
+
+.search-container {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    flex: 1;
+    min-width: 300px;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 14px 50px 14px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-radius: 10px;
+    color: #1f2937;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+    transform: translateY(-2px);
+}
+
+.search-input::placeholder {
+    color: #6b7280;
+    font-weight: 400;
+}
+
+.search-icon {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #3b82f6;
+    font-size: 20px;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus + .search-icon {
+    color: #1d4ed8;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.search-stats {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px 20px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.search-stats i {
+    margin-right: 8px;
+    color: #60a5fa;
+}
+
+/* No Results Styling */
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    border: 2px solid #2d4fa6;
+    margin: 20px 0;
+}
+
+.no-results i {
+    font-size: 64px;
+    margin-bottom: 20px;
+    color: #3b82f6;
+    opacity: 0.7;
+}
+
+.no-results h3 {
+    color: #e0e0e0;
+    font-size: 24px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.no-results p {
+    color: #b0b0b0;
+    font-size: 16px;
+    margin: 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .search-section {
+        padding: 20px;
+    }
+    
+    .search-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-box {
+        min-width: auto;
+    }
+    
+    .search-stats {
+        text-align: center;
+    }
 }
 </style>
 
@@ -162,6 +332,25 @@
 			<section class="content">
 				<div class="container-fluid">
 
+					<!-- Professional Search Section -->
+					<div class="search-section">
+						<div class="search-header">
+							<i class="fas fa-search"></i>
+							<h3>Find Your Sub Playlist</h3>
+						</div>
+						<div class="search-container">
+							<div class="search-box">
+								<input type="text" id="searchInput" class="search-input" 
+									placeholder="Search by sub playlist name, tag, description...">
+								<i class="fas fa-search search-icon"></i>
+							</div>
+							<div class="search-stats">
+								<i class="fas fa-layer-group"></i>
+								<span id="resultsCount">Loading sub playlists...</span>
+							</div>
+						</div>
+					</div>
+
 					<!-- Playlist Wrapper Card -->
 					<div class="card mb-4">
 						<div class="card-header">
@@ -171,6 +360,13 @@
 						</div>
 
 						<div class="card-body">
+							<!-- No Results Message -->
+							<div id="noResults" class="no-results hidden">
+								<i class="fas fa-search"></i>
+								<h3>No matching sub playlists found</h3>
+								<p>Try adjusting your search criteria or browse all sub playlists</p>
+							</div>
+
 							<div class="row" id="playlistContainer"></div>
 						</div>
 					</div>
@@ -189,18 +385,77 @@
 	<script
 		src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
 
-
-
 	<script>
+// Global variable to store all sub playlists data
+let allSubPlaylistsData = [];
+let totalSubPlaylists = 0;
+
 $(function () {
     let rawData = '[[${listObj}]]';
     rawData = rawData.replace(/&quot;/g, '"');
     let jsonData = JSON.parse(rawData);
+    
+    // Store the original data globally
+    allSubPlaylistsData = jsonData;
+    totalSubPlaylists = jsonData.length;
 
+    updateResultsCount(totalSubPlaylists, totalSubPlaylists);
+    renderSubPlaylists(jsonData);
+
+    // Search functionality
+    $('#searchInput').on('input', function() {
+        const searchTerm = $(this).val().toLowerCase().trim();
+        filterSubPlaylists(searchTerm);
+    });
+});
+
+function filterSubPlaylists(searchTerm) {
+    if (!searchTerm) {
+        // If search is empty, show all sub playlists
+        updateResultsCount(totalSubPlaylists, totalSubPlaylists);
+        renderSubPlaylists(allSubPlaylistsData);
+        return;
+    }
+
+    const filteredData = allSubPlaylistsData.filter(item => {
+        return (
+            (item.PlaylistName && item.PlaylistName.toLowerCase().includes(searchTerm)) ||
+            (item.PlaylistTitle && item.PlaylistTitle.toLowerCase().includes(searchTerm)) ||
+            (item.Tag && item.Tag.toLowerCase().includes(searchTerm)) ||
+            (item.Description && item.Description.toLowerCase().includes(searchTerm))
+        );
+    });
+
+    updateResultsCount(filteredData.length, totalSubPlaylists);
+    renderSubPlaylists(filteredData);
+}
+
+function updateResultsCount(filteredCount, totalCount) {
+    const resultsText = filteredCount === totalCount ? 
+        `${totalCount} sub playlists available` : 
+        `${filteredCount} of ${totalCount} sub playlists match your search`;
+    
+    $('#resultsCount').text(resultsText);
+}
+
+function renderSubPlaylists(jsonData) {
     const playlistContainer = document.getElementById("playlistContainer");
+    const noResults = document.getElementById("noResults");
+
+    // Clear previous content
+    playlistContainer.innerHTML = '';
+
+    // Show no results message if no data
+    if (!jsonData || jsonData.length === 0) {
+        noResults.classList.remove("hidden");
+        return;
+    }
+
+    noResults.classList.add("hidden");
+
     const fragment = document.createDocumentFragment();
 
-    // Loop through playlists and build cards
+    // Loop through sub playlists and build cards
     jsonData.forEach((item, index) => {
         const cardHtml = `
             <div class="col-md-4 mb-4">
@@ -210,9 +465,9 @@ $(function () {
                     </div>
                     <div class="card-content">
                         <h3 class="card-title">${item.PlaylistName}</h3>
-                      
+                       
                         <div class="card-tags">
-                            <span class="tag">${item.Tag || ''}</span>
+                            ${item.Tag ? `<span class="tag">${item.Tag}</span>` : ''}
                         </div>
                     </div>
                 </div>
@@ -227,13 +482,12 @@ $(function () {
 
     // Append all cards to container
     playlistContainer.appendChild(fragment);
-});
+}
 
 function PlaylistCardClick(id) {
     window.location.href = "/guac/View_Particular_SubPlaylist?Id=" + id;
 }
 </script>
-
 
 </body>
 </html>

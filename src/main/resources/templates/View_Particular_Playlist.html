@@ -18,30 +18,31 @@
 
 <style>
 body {
-	background-color: #121212;
-	color: #e0e0e0;
+	background-color: #ffffff;
+	color: #333333;
 	font-family: 'Roboto', sans-serif;
 }
 
 .content-wrapper {
-	background-color: #121212;
+	background-color: #f8f9fa;
 }
 
 /* Playlist Card */
 .playlist-card {
-	background-color: #1e1e1e;
-	border: 2px solid #2d4fa6;
+	background-color: #ffffff;
+	border: 2px solid #e0e0e0;
 	border-radius: 12px;
 	overflow: hidden;
-	color: #e0e0e0;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+	color: #333333;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+	transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .card-image img {
 	width: 100%;
 	height: 280px;
 	object-fit: cover;
-	border-bottom: 2px solid #444;
+	border-bottom: 2px solid #e9ecef;
 }
 
 .card-content {
@@ -53,7 +54,7 @@ body {
 	font-family: 'Poppins', sans-serif;
 	font-size: 1.6rem;
 	font-weight: 700;
-	color: #3b82f6;
+	color: #2d4fa6;
 	margin: 0;
 }
 
@@ -69,8 +70,8 @@ body {
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	background: #2d2d2d;
-	color: #3b82f6;
+	background: #f1f5f9;
+	color: #2d4fa6;
 	font-size: 0.85rem;
 	font-weight: 500;
 	padding: 6px 12px;
@@ -81,26 +82,27 @@ body {
 /* Playlist Info */
 .playlist-info {
 	margin-top: 20px;
-	background-color: #1a1a1a;
-	border: 1px solid #333;
+	background-color: #ffffff;
+	border: 1px solid #e0e0e0;
 	border-radius: 12px;
 	padding: 20px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .playlist-info h4 {
-	color: #3b82f6;
+	color: #2d4fa6;
 	margin-bottom: 10px;
 }
 
 .playlist-info p {
-	color: #e0e0e0;
+	color: #333333;
 	margin-bottom: 6px;
 	font-size: 0.95rem;
 }
 
 /* Add Scenario Button */
 .add-btn {
-	background: linear-gradient(90deg, #2563eb, #3b82f6);
+	background: linear-gradient(90deg, #16a34a, #22c55e);
 	color: #fff;
 	padding: 8px 18px;
 	border-radius: 20px;
@@ -110,15 +112,15 @@ body {
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 	transition: all 0.3s ease;
 	border: none;
 }
 
 .add-btn:hover {
-	background: linear-gradient(90deg, #1e40af, #2563eb);
+	background: linear-gradient(90deg, #15803d, #16a34a);
 	transform: translateY(-2px);
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
 	color: #fff;
 	text-decoration: none;
 }
@@ -134,14 +136,14 @@ body {
 	padding: 4px 10px;
 }
 
-/* Dropdown menu styling for dark theme */
+/* Dropdown menu styling for light theme */
 .dropdown-menu {
-	background-color: #1e1e1e;
-	border: 1px solid #333;
+	background-color: #ffffff;
+	border: 1px solid #e0e0e0;
 }
 
 .dropdown-item {
-	color: #e0e0e0;
+	color: #333333;
 }
 
 .dropdown-item:hover {
@@ -151,18 +153,20 @@ body {
 
 /* Sub-playlist card styling */
 .sub-playlist-card {
-	background-color: #2a2a2a;
-	border: 1px solid #3b82f6;
+	background-color: #ffffff;
+	border: 1px solid #e0e0e0;
 	border-radius: 8px;
 	padding: 15px;
 	margin-bottom: 15px;
 	cursor: pointer;
 	transition: all 0.3s ease;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 .sub-playlist-card:hover {
-	background-color: #333;
+	background-color: #f8f9fa;
 	transform: translateY(-2px);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .sub-playlist-content {
@@ -174,7 +178,7 @@ body {
 .sub-playlist-scenarios {
 	margin-top: 10px;
 	padding: 10px;
-	background-color: #1a1a1a;
+	background-color: #f8f9fa;
 	border-radius: 6px;
 	display: none;
 }
@@ -182,9 +186,111 @@ body {
 .sub-playlist-scenarios.show {
 	display: block;
 }
+
+/* Scenario card styling */
+.scenario-card {
+	background-color: #ffffff;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	padding: 15px;
+	margin-bottom: 15px;
+	transition: all 0.3s ease;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.scenario-card:hover {
+	background-color: #f8f9fa;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.scenario-content {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+/* Form controls */
+.form-control {
+	background-color: #ffffff;
+	border: 1px solid #ced4da;
+	color: #333333;
+}
+
+.form-control:focus {
+	border-color: #2d4fa6;
+	box-shadow: 0 0 0 2px rgba(45, 79, 166, 0.2);
+}
+
+.btn-outline-primary {
+	color: #2d4fa6;
+	border-color: #2d4fa6;
+}
+
+.btn-outline-primary:hover {
+	background-color: #2d4fa6;
+	border-color: #2d4fa6;
+	color: white;
+}
+
+/* Primary button */
+.btn-primary {
+	background-color: #2d4fa6;
+	border-color: #2d4fa6;
+}
+
+.btn-primary:hover {
+	background-color: #1e3a8a;
+	border-color: #1e3a8a;
+}
+
+/* Success button */
+.btn-success {
+	background-color: #22c55e;
+	border-color: #22c55e;
+}
+
+.btn-success:hover {
+	background-color: #16a34a;
+	border-color: #16a34a;
+}
+
+/* Modal styling for light theme */
+.modal-content {
+	background-color: #ffffff;
+	color: #333333;
+}
+
+.modal-header {
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-footer {
+	border-top: 1px solid #e0e0e0;
+}
+
+/* Content header */
+.content-header h1 {
+	color: #2d4fa6;
+}
+
+/* Breadcrumb styling */
+.breadcrumb {
+	background-color: transparent;
+}
+
+.breadcrumb-item a {
+	color: #2d4fa6;
+	text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+	color: #1e3a8a;
+	text-decoration: underline;
+}
 </style>
 
-<body class="hold-transition sidebar-mini layout-fixed dark-mode">
+<body class="hold-transition sidebar-mini layout-fixed">
 	<div class="wrapper">
 		<div th:replace="fragments/header :: header"></div>
 		<div th:replace="fragments/sidebar :: aside"></div>
@@ -226,11 +332,11 @@ body {
 		role="dialog" aria-labelledby="addScenarioModalLabel"
 		aria-hidden="true">
 		<div class="modal-dialog modal-lg" role="document">
-			<div class="modal-content bg-dark text-light">
+			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title" id="addScenarioModalLabel">Add
 						Scenario to Playlist</h5>
-					<button type="button" class="close text-light" data-dismiss="modal"
+					<button type="button" class="close" data-dismiss="modal"
 						aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
@@ -261,11 +367,11 @@ body {
 		role="dialog" aria-labelledby="addSubPlaylistModalLabel"
 		aria-hidden="true">
 		<div class="modal-dialog modal-lg" role="document">
-			<div class="modal-content bg-dark text-light">
+			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title" id="addSubPlaylistModalLabel">Add Sub
 						Playlist</h5>
-					<button type="button" class="close text-light" data-dismiss="modal"
+					<button type="button" class="close" data-dismiss="modal"
 						aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
@@ -385,10 +491,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Add scenarios
     if (scenarioItems.length > 0) {
-        contentHTML += `<h5 class="mt-3 mb-3">Scenarios</h5>`;
+        contentHTML += `<h5 class="mt-3 mb-3" style="color: #2d4fa6;">Scenarios</h5>`;
         scenarioItems.forEach(scenario => {
             contentHTML += `
-                <div class="scenario-card d-flex align-items-center p-3 mb-3" style="background:#1e2533; border-radius:8px;">
+                <div class="scenario-card d-flex align-items-center p-3 mb-3">
                     <!-- Left Image -->
                     <div class="scenario-image" style="flex:0 0 120px; margin-right:15px;">
                         <img src="/guac/Scenarioimage/${scenario.Id}" alt="${scenario.Scenario_Title}" 
@@ -397,18 +503,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     <!-- Middle Content -->
                     <div class="scenario-content flex-grow-1">
-                        <h5 class="mb-1" style="color:#fff;">${scenario.Scenario_Title}</h5>
+                        <h5 class="mb-1" style="color:#333;">${scenario.Scenario_Title}</h5>
                         <div class="d-flex flex-wrap text-muted small mb-1">
                             <span class="mr-3">${scenario.Scenario_Type || 'N/A'} (${scenario.Mode || 'N/A'})</span>
                             <span class="mr-3">${scenario.Difficulty_Level || 'N/A'}</span>
                             <span>${scenario.Duration || 'N/A'}</span>
                         </div>
-                        <p class="mb-0 text-light small">${scenario.Description || ''}</p>
+                        <p class="mb-0 text-muted small">${scenario.Description || ''}</p>
                     </div>
 
                     <!-- Right Buttons -->
                     <div class="scenario-actions ml-3 text-right">
-                        <button class="btn btn-sm btn-primary" style="background:#1a73e8; border:none;" onclick='ScenerioCardClick("${scenario.Id}")'>
+                        <button class="btn btn-sm btn-primary" onclick='ScenerioCardClick("${scenario.Id}")'>
                             <i class="fas fa-play"></i> START
                         </button>
                         <button class="btn btn-sm btn-link text-muted ml-2" onclick='removeItem("scenario", "${scenario.Id}")'>
@@ -422,7 +528,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Add sub-playlists
     if (subPlaylistItems.length > 0) {
-        contentHTML += `<h5 class="mt-4 mb-3">Sub Playlists</h5>`;
+        contentHTML += `<h5 class="mt-4 mb-3" style="color: #2d4fa6;">Sub Playlists</h5>`;
         subPlaylistItems.forEach(subPlaylist => {
             contentHTML += `
             	<div class="sub-playlist-card mb-3" onclick="toggleSubPlaylist('${subPlaylist.Id}')">
@@ -436,7 +542,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     <!-- SubPlaylist Content -->
                     <div class="sub-playlist-content flex-grow-1">
-                        <h5 class="mb-1" style="color:#3b82f6;">${subPlaylist.Playlist_Name}</h5>
+                        <h5 class="mb-1" style="color:#2d4fa6;">${subPlaylist.Playlist_Name}</h5>
                         <p class="mb-0 text-muted small">${subPlaylist.Playlist_Title}</p>
                     </div>
 
@@ -496,13 +602,13 @@ function loadSubPlaylistScenarios(subPlaylistId) {
             if (response && response.length > 0) {
                 response.forEach(scenario => {
                     scenariosHTML += `
-                        <div class="scenario-card d-flex align-items-center p-3 mb-2" style="background:#2a2a2a; border-radius:6px;">
+                        <div class="scenario-card d-flex align-items-center p-3 mb-2">
                             <div class="scenario-image" style="flex:0 0 80px; margin-right:10px;">
                                 <img src="/guac/Scenarioimage/${scenario.id}" alt="${scenario.title}" 
                                      style="width:80px; height:60px; object-fit:cover; border-radius:4px;">
                             </div>
                             <div class="scenario-content flex-grow-1">
-                                <h6 class="mb-1" style="color:#fff;">${scenario.title}</h6>
+                                <h6 class="mb-1" style="color:#333;">${scenario.title}</h6>
                                 <div class="d-flex flex-wrap text-muted small">
                                     <span class="mr-2">${scenario.type || 'N/A'}</span>
                                     <span class="mr-2">${scenario.difficulty || 'N/A'}</span>

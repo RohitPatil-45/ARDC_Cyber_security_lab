@@ -772,7 +772,7 @@ function getPercenetageParticularScenerio() {
         },
         success: function(result) {
             result = result.trim();
-            
+            alert(result)
             if (!isNaN(result)) {
                 let percentage = parseFloat(result);
                 const el = document.getElementById("Complete_Per");
@@ -791,7 +791,7 @@ function getPercenetageParticularScenerio() {
                 if (percentage == 100) {
                     // Hide Create Lab and View Lab buttons
                     $('#createLab_btn').hide();
-                    $('#viewLab_btn').hide();
+//                     $('#viewLab_btn').hide();
                     
                     // Check if assessment lab exists
                     checkAssessmentLabStatus();

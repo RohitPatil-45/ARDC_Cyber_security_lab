@@ -3865,7 +3865,7 @@ public class CloudInstanceController {
 
 	            maxLabId++;
 
-	            String newInstanceName = instance.getInstance_name() + maxLabId;
+	            String newInstanceName = instance.getInstance_name() + "Assessment" + maxLabId;
 	            System.out.println("Inside__newInstanceName : " + newInstanceName);
 
 	            String newIp = proxmoxAssignedIpAddressRepository.findMaxIp();

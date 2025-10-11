@@ -451,6 +451,53 @@ h3 {
 	color: #6c757d !important;
 }
 
+/* CSS for page loader */
+.loader-overlay {
+	position: fixed;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	background: rgba(255, 255, 255, 0.9);
+	backdrop-filter: blur(2px);
+	z-index: 9999;
+}
+
+.spinner {
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+	border: 6px solid #e6e6e6;
+	border-top-color: #2d4fa6;
+	animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+	to { 
+		transform:rotate(360deg);
+	}
+}
+
+.loader-text {
+	margin-top: 14px;
+	color: #2d4fa6;
+	font: 500 14px/1.2 system-ui, -apple-system, Segoe UI, Roboto,
+		sans-serif;
+	letter-spacing: .2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.spinner {
+		animation: none;
+		border-top-color: #2d4fa6;
+	}
+}
+
+.page-content {
+	min-height: 100vh;
+	display: grid;
+	place-items: center;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
 	.content-wrapper {
@@ -636,6 +683,16 @@ h3 {
 		<div th:replace="fragments/footer :: footer"></div>
 	</div>
 
+	<!-- Page Loader -->
+	<div id="pageLoader" class="loader-overlay" role="status"
+		aria-live="polite" style="display: none" aria-label="Page loading">
+		<div>
+			<div class="spinner" aria-hidden="true"></div>
+			<div class="loader-text">Loading…</div>
+		</div>
+	</div>
+	<!-- End Page Loader -->
+
 	<div th:replace="template :: jsscript"></div>
 
 	<!-- Bootstrap JS for dropdowns -->
@@ -704,6 +761,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    function showLoader() {
+        document.getElementById("pageLoader").style.display = "grid";
+    }
+    
+    function hideLoader() {
+        document.getElementById("pageLoader").style.display = "none";
+    }
     
     function startLab(containerName) {
         swalWithCyberTheme.fire({
@@ -715,13 +779,15 @@ document.addEventListener('DOMContentLoaded', function() {
             cancelButtonText: 'Cancel'
         }).then((result) => {
             if (result.isConfirmed) {
+                showLoader();
                 $.ajax({
                     type: "POST",
-                    url: '/guac/start_lab', // Make sure your backend supports this
+                    url: '/guac/start_lab',
                     data: {
                         "containerName": containerName
                     },
                     success: function(result) {
+                        hideLoader();
                         if (result === 'success') {
                             swalWithCyberTheme.fire({
                                 icon: 'success',
@@ -740,6 +806,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     },
                     error: function() {
+                        hideLoader();
                         swalWithCyberTheme.fire({
                             icon: 'error',
                             title: 'Oops...',
@@ -751,7 +818,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-
     function stopLab(containerName) {
         swalWithCyberTheme.fire({
             title: 'Stop Lab?',
@@ -762,6 +828,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cancelButtonText: 'Cancel'
         }).then((result) => {
             if (result.isConfirmed) {
+                showLoader();
                 $.ajax({
                     type: "POST",
                     url: '/guac/stop_lab',
@@ -769,6 +836,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         "containerName": containerName
                     },
                     success: function(result) {
+                        hideLoader();
                         if (result === 'success') {
                             swalWithCyberTheme.fire({
                                 icon: 'success',
@@ -787,6 +855,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     },
                     error: function() {
+                        hideLoader();
                         swalWithCyberTheme.fire({
                             icon: 'error',
                             title: 'Oops...',
@@ -809,6 +878,7 @@ document.addEventListener('DOMContentLoaded', function() {
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
+                showLoader();
                 $.ajax({
                     type: "POST",
                     url: '/guac/remove_lab',
@@ -816,6 +886,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         "containerName": containerName
                     },
                     success: function(result) {
+                        hideLoader();
                         if (result === 'success') {
                             swalWithCyberTheme.fire({
                                 icon: 'success',
@@ -834,6 +905,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     },
                     error: function() {
+                        hideLoader();
                         swalWithCyberTheme.fire({
                             icon: 'error',
                             title: 'Oops...',
@@ -855,6 +927,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cancelButtonText: 'Cancel'
         }).then((result) => {
             if (result.isConfirmed) {
+                showLoader();
                 $.ajax({
                     type: "POST",
                     url: '/guac/reset_lab',
@@ -862,6 +935,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         "containerName": containerName
                     },
                     success: function(result) {
+                        hideLoader();
                         if (result === 'success') {
                             swalWithCyberTheme.fire({
                                 icon: 'success',
@@ -880,6 +954,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     },
                     error: function() {
+                        hideLoader();
                         swalWithCyberTheme.fire({
                             icon: 'error',
                             title: 'Oops...',
@@ -919,5 +994,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 </body>
-
 </html>

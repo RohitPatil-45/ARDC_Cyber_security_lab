@@ -104,47 +104,93 @@ public class UserController {
 //	@Autowired
 //	private SwitchRepository switchRepository;
 
+//	@GetMapping("/view")
+//	public String getAll(Model model, Principal principal) {
+//		// System.out.println("user controller :");
+//		if (principal == null) {
+//			// Redirect to login page if the principal is null
+//			return "redirect:/";
+//		}
+//		Authentication authentication = (Authentication) principal;
+//		User loginedUser = (User) ((Authentication) principal).getPrincipal();
+//		String groupName = "";
+//		try {
+//			List<AppUser> users = new ArrayList<AppUser>();
+//			boolean isSuperAdmin = authentication.getAuthorities().stream()
+//					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+//
+//			boolean isAdmin = authentication.getAuthorities().stream()
+//					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+//
+//			List<AppUser> user1 = userRepository.findByuserName(loginedUser.getUsername());
+//			for (AppUser appUser : user1) {
+//				groupName = appUser.getGroupName();
+//			}
+//
+//			if (isSuperAdmin) {
+//				userRepository.findAll().forEach(users::add);
+//				model.addAttribute("listObj", users);
+//			} else if (isAdmin) {
+//				System.out.println("group = " + groupName);
+//				List<String> groups = new ArrayList<>();
+//				StringTokenizer token = new StringTokenizer(groupName, ",");
+//				while (token.hasMoreTokens()) {
+//					groups.add(token.nextToken());
+//				}
+//				userRepository.findBygroups(groups).forEach(users::add);
+//				model.addAttribute("listObj", users);
+//			}
+//
+//		} catch (Exception e) {
+//			model.addAttribute("message", e.getMessage());
+//		}
+//		return "user_view";
+//	}
 	@GetMapping("/view")
 	public String getAll(Model model, Principal principal) {
-		// System.out.println("user controller :");
-		if (principal == null) {
-			// Redirect to login page if the principal is null
-			return "redirect:/";
-		}
-		Authentication authentication = (Authentication) principal;
-		User loginedUser = (User) ((Authentication) principal).getPrincipal();
-		String groupName = "";
-		try {
-			List<AppUser> users = new ArrayList<AppUser>();
-			boolean isSuperAdmin = authentication.getAuthorities().stream()
-					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+	    if (principal == null) {
+	        return "redirect:/";
+	    }
+	    
+	    Authentication authentication = (Authentication) principal;
+	    User loginedUser = (User) authentication.getPrincipal();
+	    String groupName = "";
+	    
+	    try {
+	        List<AppUser> users = new ArrayList<AppUser>();
+	        boolean isSuperAdmin = authentication.getAuthorities().stream()
+	                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
 
-			boolean isAdmin = authentication.getAuthorities().stream()
-					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+	        boolean isAdmin = authentication.getAuthorities().stream()
+	                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
 
-			List<AppUser> user1 = userRepository.findByuserName(loginedUser.getUsername());
-			for (AppUser appUser : user1) {
-				groupName = appUser.getGroupName();
-			}
+	        List<AppUser> user1 = userRepository.findByuserName(loginedUser.getUsername());
+	        for (AppUser appUser : user1) {
+	            groupName = appUser.getGroupName();
+	        }
 
-			if (isSuperAdmin) {
-				userRepository.findAll().forEach(users::add);
-				model.addAttribute("listObj", users);
-			} else if (isAdmin) {
-				System.out.println("group = " + groupName);
-				List<String> groups = new ArrayList<>();
-				StringTokenizer token = new StringTokenizer(groupName, ",");
-				while (token.hasMoreTokens()) {
-					groups.add(token.nextToken());
-				}
-				userRepository.findBygroups(groups).forEach(users::add);
-				model.addAttribute("listObj", users);
-			}
+	        if (isSuperAdmin) {
+	            userRepository.findAll().stream()
+	                .filter(AppUser::isEnabled) // Filter enabled users
+	                .forEach(users::add);
+	            model.addAttribute("listObj", users);
+	        } else if (isAdmin) {
+	            System.out.println("group = " + groupName);
+	            List<String> groups = new ArrayList<>();
+	            StringTokenizer token = new StringTokenizer(groupName, ",");
+	            while (token.hasMoreTokens()) {
+	                groups.add(token.nextToken());
+	            }
+	            userRepository.findBygroups(groups).stream()
+	                .filter(AppUser::isEnabled) // Filter enabled users
+	                .forEach(users::add);
+	            model.addAttribute("listObj", users);
+	        }
 
-		} catch (Exception e) {
-			model.addAttribute("message", e.getMessage());
-		}
-		return "user_view";
+	    } catch (Exception e) {
+	        model.addAttribute("message", e.getMessage());
+	    }
+	    return "user_view";
 	}
 
 //	@GetMapping("/new")
@@ -418,16 +464,39 @@ public class UserController {
 	}
 
 
+//	@GetMapping("/delete/{id}")
+//	public String deleteTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+//		try {
+//			userRepository.deleteById(id);
+//			redirectAttributes.addFlashAttribute("message",
+//					"The User with id=" + id + " has been deleted successfully!");
+//		} catch (Exception e) {
+//			redirectAttributes.addFlashAttribute("message", e.getMessage());
+//		}
+//		return "redirect:/users/view";
+//	}
+	
 	@GetMapping("/delete/{id}")
 	public String deleteTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-		try {
-			userRepository.deleteById(id);
-			redirectAttributes.addFlashAttribute("message",
-					"The User with id=" + id + " has been deleted successfully!");
-		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("message", e.getMessage());
-		}
-		return "redirect:/users/view";
+	    try {
+	        // Instead of deleting, find the user and set enabled to false
+	        Optional<AppUser> userOptional = userRepository.findById(id);
+	        
+	        if (userOptional.isPresent()) {
+	            AppUser user = userOptional.get();
+	            user.setEnabled(false); // Set enabled to 0 (false)
+	            userRepository.save(user); // Update the user
+	            
+	            redirectAttributes.addFlashAttribute("message",
+	                    "The User with id=" + id + " has been deactivated successfully!");
+	        } else {
+	            redirectAttributes.addFlashAttribute("message",
+	                    "User with id=" + id + " not found!");
+	        }
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("message", e.getMessage());
+	    }
+	    return "redirect:/users/view";
 	}
 
 	@GetMapping("/resetPassForm")

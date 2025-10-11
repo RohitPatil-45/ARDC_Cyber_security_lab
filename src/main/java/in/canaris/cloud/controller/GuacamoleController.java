@@ -34,7 +34,11 @@ import org.glassfish.jersey.internal.inject.ParamConverters.TypeValueOf;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -42,6 +46,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -4708,47 +4713,165 @@ public class GuacamoleController {
 //		}
 //	}
 
+//	@PostMapping("/remove_lab")
+//	@ResponseBody
+//	public String remove_lab(@RequestParam("containerName") String containerName, Principal principal) {
+//		try {
+//			Authentication auth = (Authentication) principal;
+//			String username = auth.getName();
+//
+//			System.out.println("Inside_remove_lab containerName: " + containerName);
+//
+//			// remove container from docker
+//			dockerService.removeContainerByName(containerName);
+//			System.out.println("Container removed successfully: " + containerName);
+//
+//			// find lab by instance name
+//			List<UserLab> labs = UserLabRepository.findByInstnaceName(containerName);
+//
+//			if (!labs.isEmpty()) {
+//				UserLab lab = labs.get(0); // take first record
+//				String getUsername = lab.getUsername();
+//				Integer scenarioId = lab.getScenarioId();
+//
+//				String scenarioIdStr = String.valueOf(scenarioId);
+//
+//				// delete related records
+//				CommandHistoryRepository.deleteByContainerName(containerName);
+//				instructionTemplateRepository.deleteByLabName(containerName);
+//				UserLabRepository.deleteByInstanceName(containerName);
+//
+////				if (scenarioId != null) {
+////					UserScenerioRepository.deleteByScenarioIdAndUsername(getUsername, scenarioIdStr);
+////				}
+//			} else {
+//				System.out.println("No UserLab found for instanceName: " + containerName);
+//			}
+//
+//			return "success";
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			System.out.println("Exception Inside_remove_lab : " + e);
+//			return "fail";
+//		}
+//	}
+	
 	@PostMapping("/remove_lab")
 	@ResponseBody
 	public String remove_lab(@RequestParam("containerName") String containerName, Principal principal) {
-		try {
-			Authentication auth = (Authentication) principal;
-			String username = auth.getName();
+	    try {
+	        Authentication auth = (Authentication) principal;
+	        String username = auth.getName();
 
-			System.out.println("Inside_remove_lab containerName: " + containerName);
+	        System.out.println("Inside_remove_lab containerName: " + containerName);
 
-			// remove container from docker
-			dockerService.removeContainerByName(containerName);
-			System.out.println("Container removed successfully: " + containerName);
+	        // Find lab by instance name first to get Guacamole connection details
+	        List<UserLab> labs = UserLabRepository.findByInstnaceName(containerName);
+	        
+	        String guacamoleConnectionId = null;
+	        Integer scenarioId = null;
+	        String getUsername = null;
 
-			// find lab by instance name
-			List<UserLab> labs = UserLabRepository.findByInstnaceName(containerName);
+	        if (!labs.isEmpty()) {
+	            UserLab lab = labs.get(0); // take first record
+	            getUsername = lab.getUsername();
+	            scenarioId = lab.getScenarioId();
+	            
+	            // Convert integer Guacamole ID to string
+	            Integer guacamoleId = lab.getGuacamoleId();
+	            if (guacamoleId != null) {
+	                guacamoleConnectionId = String.valueOf(guacamoleId);
+	            }
 
-			if (!labs.isEmpty()) {
-				UserLab lab = labs.get(0); // take first record
-				String getUsername = lab.getUsername();
-				Integer scenarioId = lab.getScenarioId();
+	            // Delete Guacamole connection if connection ID exists
+	            if (guacamoleConnectionId != null && !guacamoleConnectionId.isEmpty()) {
+	                try {
+	                    // Get Guacamole token first (you might need to store this or get it dynamically)
+	                    String guacamoleToken = guacService.getAuthToken(); // You'll need to implement this method
+	                    
+	                    if (guacamoleToken != null) {
+	                        // Construct the Guacamole API URL with connection ID and token
+	                        String guacamoleApiUrl = "http://localhost:8080/guacamole/api/session/data/mysql/connections/" + 
+	                                                guacamoleConnectionId + "?token=" + guacamoleToken;
+	                        
+	                        // Delete the connection from Guacamole
+	                        boolean guacamoleDeleted = deleteConnection(guacamoleConnectionId, guacamoleToken);
+	                        
+	                        if (guacamoleDeleted) {
+	                            System.out.println("Guacamole connection deleted successfully: " + guacamoleConnectionId);
+	                        } else {
+	                            System.out.println("Failed to delete Guacamole connection: " + guacamoleConnectionId);
+	                        }
+	                    }
+	                } catch (Exception e) {
+	                    System.out.println("Error deleting Guacamole connection: " + e.getMessage());
+	                    // Continue with other cleanup even if Guacamole deletion fails
+	                }
+	            }
+	        }
 
-				String scenarioIdStr = String.valueOf(scenarioId);
+	        // Remove container from docker
+	        dockerService.removeContainerByName(containerName);
+	        System.out.println("Container removed successfully: " + containerName);
 
-				// delete related records
-				CommandHistoryRepository.deleteByContainerName(containerName);
-				instructionTemplateRepository.deleteByLabName(containerName);
-				UserLabRepository.deleteByInstanceName(containerName);
+	        if (!labs.isEmpty()) {
+	            String scenarioIdStr = String.valueOf(scenarioId);
 
-//				if (scenarioId != null) {
-//					UserScenerioRepository.deleteByScenarioIdAndUsername(getUsername, scenarioIdStr);
-//				}
-			} else {
-				System.out.println("No UserLab found for instanceName: " + containerName);
-			}
+	            // Delete related records
+	            CommandHistoryRepository.deleteByContainerName(containerName);
+	            instructionTemplateRepository.deleteByLabName(containerName);
+	            UserLabRepository.deleteByInstanceName(containerName);
 
-			return "success";
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Exception Inside_remove_lab : " + e);
-			return "fail";
-		}
+	            // Optional: Uncomment if you want to delete user scenario
+	            // if (scenarioId != null) {
+	            //     UserScenerioRepository.deleteByScenarioIdAndUsername(getUsername, scenarioIdStr);
+	            // }
+	        } else {
+	            System.out.println("No UserLab found for instanceName: " + containerName);
+	        }
+
+	        return "success";
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        System.out.println("Exception Inside_remove_lab : " + e);
+	        return "fail";
+	    }
+	}
+	
+	
+	// In GuacService class
+	public String getAuthToken() {
+	    try {
+	        // This depends on how your Guacamole authentication is set up
+	        // You might need to store the token when you authenticate, or authenticate here
+	        String authUrl = "http://localhost:8080/guacamole/api/tokens";
+	        // Implement authentication logic to get token
+	        // This is a simplified example - adjust based on your auth setup
+	        return "YOUR_GUACAMOLE_TOKEN_HERE";
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return null;
+	    }
+	}
+
+	public boolean deleteConnection(String connectionId, String token) {
+	    try {
+	        String url = "http://localhost:8080/guacamole/api/session/data/mysql/connections/" + 
+	                     connectionId + "?token=" + token;
+	        
+	        RestTemplate restTemplate = new RestTemplate();
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setContentType(MediaType.APPLICATION_JSON);
+	        
+	        HttpEntity<String> entity = new HttpEntity<>(headers);
+	        
+	        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.DELETE, entity, String.class);
+	        
+	        return response.getStatusCode().is2xxSuccessful();
+	    } catch (Exception e) {
+	        System.out.println("Error deleting Guacamole connection: " + e.getMessage());
+	        return false;
+	    }
 	}
 
 	@PostMapping("/reset_lab")
@@ -4773,40 +4896,108 @@ public class GuacamoleController {
 	}
 
 
+//	@PostMapping("/getPercentageParticularScenario")
+//	@ResponseBody
+//	public String getPercentageParticularScenario(Principal principal, @RequestParam("scenarioId") int scenarioId,
+//	        @RequestParam("scenarioName") String scenarioName) {
+////	    Map<String, Object> response = new HashMap<>();
+//	    
+//	    try {
+//	        String username = principal.getName();
+//	        System.out.println("scenarioId : " + scenarioId);
+//
+//	        // Get user's lab for this scenario
+//	        UserLab userLab = UserLabRepository.findByUsernameAndScenarioId(username, scenarioId);
+//	        
+//	        if (userLab == null) {
+//	        	return "fail";
+//	        }
+//
+//	        Long labId = userLab.getLabId();
+//	        int LABID = Math.toIntExact(labId);
+//	        
+//	    
+//	        Integer trueCount = instructionTemplateRepository
+//	                .getTrueCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
+//	        Integer falseCount = instructionTemplateRepository
+//	                .getFalseCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
+//
+//	        trueCount = (trueCount != null) ? trueCount : 0;
+//	        falseCount = (falseCount != null) ? falseCount : 0;
+//
+//	        int totalCommands = trueCount + falseCount;
+//	        int percentage = 0;
+//
+//	        if (totalCommands > 0) {
+//	            percentage = (trueCount * 100) / totalCommands;
+//	        }
+//
+//	        // Determine status based on percentage
+//	        String status;
+//	        if (percentage == 0) {
+//	            status = "Not Started";
+//	        } else if (percentage < 100) {
+//	            status = "In Progress";
+//	        } else {
+//	            status = "Completed";
+//	        }
+//
+//	        
+//	        System.out.println("percentage : " + percentage);
+//
+//	    
+//
+//	        return String.valueOf(percentage);
+//
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	      
+//	        return "fail";
+//	    }
+//	}
+	
 	@PostMapping("/getPercentageParticularScenario")
 	@ResponseBody
 	public String getPercentageParticularScenario(Principal principal, @RequestParam("scenarioId") int scenarioId,
 	        @RequestParam("scenarioName") String scenarioName) {
-//	    Map<String, Object> response = new HashMap<>();
 	    
 	    try {
 	        String username = principal.getName();
 	        System.out.println("scenarioId : " + scenarioId);
 
-	        // Get user's lab for this scenario
-	        UserLab userLab = UserLabRepository.findByUsernameAndScenarioId(username, scenarioId);
+	        // Get ALL user's labs for this scenario (returns List)
+	        List<UserLab> userLabs = UserLabRepository.findByUsernameAndScenarioId(username, scenarioId);
 	        
-	        if (userLab == null) {
-	        	return "fail";
+	        if (userLabs == null || userLabs.isEmpty()) {
+	            return "fail";
 	        }
 
-	        Long labId = userLab.getLabId();
-	        int LABID = Math.toIntExact(labId);
-	        
-	        // Get completion counts
-	        Integer trueCount = instructionTemplateRepository
-	                .getTrueCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
-	        Integer falseCount = instructionTemplateRepository
-	                .getFalseCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
+	        int totalTrueCount = 0;
+	        int totalFalseCount = 0;
 
-	        trueCount = (trueCount != null) ? trueCount : 0;
-	        falseCount = (falseCount != null) ? falseCount : 0;
+	        // Iterate through all labs for this user and scenario
+	        for (UserLab userLab : userLabs) {
+	            Long labId = userLab.getLabId();
+	            int LABID = Math.toIntExact(labId);
+	            
+	            // Check if this lab has any records in instruction template
+	            Integer trueCount = instructionTemplateRepository
+	                    .getTrueCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
+	            Integer falseCount = instructionTemplateRepository
+	                    .getFalseCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
 
-	        int totalCommands = trueCount + falseCount;
+	            trueCount = (trueCount != null) ? trueCount : 0;
+	            falseCount = (falseCount != null) ? falseCount : 0;
+
+	            totalTrueCount += trueCount;
+	            totalFalseCount += falseCount;
+	        }
+
+	        int totalCommands = totalTrueCount + totalFalseCount;
 	        int percentage = 0;
 
 	        if (totalCommands > 0) {
-	            percentage = (trueCount * 100) / totalCommands;
+	            percentage = (totalTrueCount * 100) / totalCommands;
 	        }
 
 	        // Determine status based on percentage
@@ -4819,16 +5010,11 @@ public class GuacamoleController {
 	            status = "Completed";
 	        }
 
-	        
 	        System.out.println("percentage : " + percentage);
-
-	    
-
 	        return String.valueOf(percentage);
 
 	    } catch (Exception e) {
 	        e.printStackTrace();
-	      
 	        return "fail";
 	    }
 	}
@@ -6228,7 +6414,7 @@ public class GuacamoleController {
 
 	@GetMapping("/SemesterWisePlaylist")
 	public String showForm(Model model) {
-		model.addAttribute("pageTitle", "Add User Wise Playlist");
+		model.addAttribute("pageTitle", "Add Subject Wise");
 
 		// All departments
 		List<DepartmentMaster> depts = DepartmentMasterRepository.findAll();
@@ -7667,22 +7853,25 @@ public class GuacamoleController {
 	        int totalCommands = 0;
 	        
 	        for (Integer scenarioId : scenarioIds) {
-	            UserLab userLab = UserLabRepository.findByUsernameAndScenarioId(username, scenarioId);
+	            // Get ALL labs for this user and scenario (returns List)
+	            List<UserLab> userLabs = UserLabRepository.findByUsernameAndScenarioId(username, scenarioId);
 	            
-	            if (userLab != null) {
-	                Long labId = userLab.getLabId();
-	                int LABID = Math.toIntExact(labId);
-	                
-	                Integer trueCount = instructionTemplateRepository
-	                    .getTrueCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
-	                Integer falseCount = instructionTemplateRepository
-	                    .getFalseCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
-	                
-	                trueCount = (trueCount != null) ? trueCount : 0;
-	                falseCount = (falseCount != null) ? falseCount : 0;
-	                
-	                totalCompletedCommands += trueCount;
-	                totalCommands += (trueCount + falseCount);
+	            if (userLabs != null && !userLabs.isEmpty()) {
+	                for (UserLab userLab : userLabs) {
+	                    Long labId = userLab.getLabId();
+	                    int LABID = Math.toIntExact(labId);
+	                    
+	                    Integer trueCount = instructionTemplateRepository
+	                        .getTrueCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
+	                    Integer falseCount = instructionTemplateRepository
+	                        .getFalseCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
+	                    
+	                    trueCount = (trueCount != null) ? trueCount : 0;
+	                    falseCount = (falseCount != null) ? falseCount : 0;
+	                    
+	                    totalCompletedCommands += trueCount;
+	                    totalCommands += (trueCount + falseCount);
+	                }
 	            }
 	        }
 	        

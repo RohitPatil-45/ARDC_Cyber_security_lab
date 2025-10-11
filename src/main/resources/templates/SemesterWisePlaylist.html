@@ -77,7 +77,7 @@ body {
 }
 
 .hidden {
-    display: none;
+	display: none;
 }
 </style>
 </head>
@@ -109,25 +109,46 @@ body {
 				<div class="container-fluid">
 					<div class="row justify-content-center">
 						<div class="col-md-12">
-							<div class="card">
+							<div class="card card-secondary">
+								<!-- 								<div class="card-header"> -->
+								<!-- 									<h3 class="card-title"> -->
+								<!-- 										<i class="fas fa-list"></i>  -->
+								<!-- 										<span th:if="${subject != null}">Edit</span> -->
+								<!-- 										<span th:unless="${subject != null}">Add</span>  -->
+								<!-- 										Subject Wise Playlist -->
+								<!-- 									</h3> -->
+								<!-- 								</div> -->
+
 								<div class="card-header">
-									<h3 class="card-title">
-										<i class="fas fa-list"></i> 
-										<span th:if="${subject != null}">Edit</span>
-										<span th:unless="${subject != null}">Add</span> 
-										Subject Wise Playlist
-									</h3>
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title">
+												<i class="fas fa-list"></i> <span th:if="${subject != null}">Edit</span>
+												<span th:unless="${subject != null}">Add</span> Subject Wise
+												
+											</h3>
+										</div>
+										<div class="col-md-2">
+											<a href="/guac/View_SubjectWisePlaylist"
+												class="btn btn-block bg-gradient-primary">View</a>
+										</div>
+									</div>
+
+
 								</div>
-								<form th:action="@{/guac/save_SubjectWisePlaylist}" method="post">
+								<form th:action="@{/guac/save_SubjectWisePlaylist}"
+									method="post">
 									<!-- Hidden field for subject ID when editing -->
-									<input type="hidden" id="subjectId" name="subjectId" th:value="${currentSubjectId}" />
-									
+									<input type="hidden" id="subjectId" name="subjectId"
+										th:value="${currentSubjectId}" />
+
 									<div class="card-body">
 										<div class="row">
 											<div class="col-md-6">
 												<div class="form-group">
-													<label class="required-field">Department</label> 
-													<select id="departmentSelect" name="departmentId" class="form-control" required
+													<label class="required-field">Department</label> <select
+														id="departmentSelect" name="departmentId"
+														class="form-control" required
 														th:disabled="${subject != null}">
 														<option value="">-- Select Department --</option>
 														<option th:each="d : ${departments}"
@@ -137,9 +158,9 @@ body {
 													</select>
 												</div>
 												<div class="form-group">
-													<label class="required-field">Semester</label> 
-													<select id="semesterSelect" name="semesterId" class="form-control" required
-														th:disabled="${subject != null}">
+													<label class="required-field">Semester</label> <select
+														id="semesterSelect" name="semesterId" class="form-control"
+														required th:disabled="${subject != null}">
 														<option value="">-- Select Semester --</option>
 													</select>
 												</div>
@@ -147,15 +168,15 @@ body {
 
 											<div class="col-md-6">
 												<div class="form-group">
-													<label class="required-field">Course</label> 
-													<select id="courseSelect" name="courseId" class="form-control" required
-														th:disabled="${subject != null}">
+													<label class="required-field">Course</label> <select
+														id="courseSelect" name="courseId" class="form-control"
+														required th:disabled="${subject != null}">
 														<option value="">-- Select Course --</option>
 													</select>
 												</div>
 												<div class="form-group">
-													<label>Subject</label> 
-													<select id="subjectSelect" name="subjectId" class="form-control"
+													<label>Subject</label> <select id="subjectSelect"
+														name="subjectId" class="form-control"
 														th:disabled="${subject != null}">
 														<option value="">-- Select Subject --</option>
 													</select>
@@ -167,8 +188,9 @@ body {
 												<div class="row">
 													<div class="col-md-4">
 														<div class="form-group">
-															<label for="playlistIds">Select Playlists</label> 
-															<select id="playlistIds" name="playlistIds" class="form-control" multiple>
+															<label for="playlistIds">Select Playlists</label> <select
+																id="playlistIds" name="playlistIds" class="form-control"
+																multiple>
 																<option th:each="pl : ${playlists}" th:value="${pl.id}"
 																	th:text="${pl.playlistName}"></option>
 															</select>
@@ -178,7 +200,8 @@ body {
 													<div class="col-md-4">
 														<div class="form-group">
 															<label for="subplaylistIds">Select Sub Playlists</label>
-															<select id="subplaylistIds" name="subplaylistIds" class="form-control" multiple>
+															<select id="subplaylistIds" name="subplaylistIds"
+																class="form-control" multiple>
 																<option th:each="subpl : ${subplaylists}"
 																	th:value="${subpl.id}" th:text="${subpl.playlistName}"></option>
 															</select>
@@ -187,8 +210,9 @@ body {
 
 													<div class="col-md-4">
 														<div class="form-group">
-															<label for="scenarioIds">Select Scenario</label> 
-															<select id="scenarioIds" name="scenarioIds" class="form-control" multiple>
+															<label for="scenarioIds">Select Scenario</label> <select
+																id="scenarioIds" name="scenarioIds" class="form-control"
+																multiple>
 																<option th:each="scenario : ${scenarios}"
 																	th:value="${scenario.id}"
 																	th:text="${scenario.scenarioName}"></option>
@@ -209,10 +233,11 @@ body {
 											<i class="fas fa-undo mr-1"></i> Reset
 										</button>
 										<button type="submit" class="btn btn-primary">
-											<i class="fas fa-save mr-1"></i> 
-											<span th:if="${subject != null}">Update</span>
-											<span th:unless="${subject != null}">Save</span>
-											<span id="spinner" class="spinner-border spinner-border-sm ml-2 d-none"></span>
+											<i class="fas fa-save mr-1"></i> <span
+												th:if="${subject != null}">Update</span> <span
+												th:unless="${subject != null}">Save</span> <span
+												id="spinner"
+												class="spinner-border spinner-border-sm ml-2 d-none"></span>
 										</button>
 									</div>
 								</form>
@@ -230,7 +255,8 @@ body {
 	<!-- Load jQuery first -->
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<!-- Then load Bootstrap Multiselect -->
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/js/bootstrap-multiselect.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/js/bootstrap-multiselect.min.js"></script>
 
 	<script type="text/javascript">
     // Store current values for initialization
