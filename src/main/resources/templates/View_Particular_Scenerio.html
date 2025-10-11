@@ -772,7 +772,7 @@ function getPercenetageParticularScenerio() {
         },
         success: function(result) {
             result = result.trim();
-            alert(result)
+//             alert(result)
             if (!isNaN(result)) {
                 let percentage = parseFloat(result);
                 const el = document.getElementById("Complete_Per");
@@ -803,7 +803,7 @@ function getPercenetageParticularScenerio() {
                 }
             } else {
                 const el = document.getElementById("Complete_Per");
-                el.innerText = "Completion: N/A";
+                el.innerText = "Completion: 0%";
                 el.style.color = "gray";
                 
                 // Default to normal lab buttons

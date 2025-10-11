@@ -272,11 +272,10 @@ public class GuacamoleController {
 
 	@Autowired
 	BatchMasterRepository BatchMasterRepository;
-	
-	
+
 	@Autowired
 	private AssessmentUserLabRepository assessmentUserLabRepository;
-	
+
 	@Autowired
 	private AssessmentUserWiseChatBoatInstructionTemplateRepository assessmentInstructionTemplateRepository;
 
@@ -1582,7 +1581,6 @@ public class GuacamoleController {
 		return isLinuxMatch || isWindowsMatch;
 	}
 
-
 	@PostMapping("/InstructionCompleted")
 	@ResponseBody
 	public String instructionCompleted(@RequestParam("LabId") String labId, Principal principal) {
@@ -1673,7 +1671,6 @@ public class GuacamoleController {
 
 		return response;
 	}
-
 
 	@PostMapping("/chatloadInitialInstruction")
 	@ResponseBody
@@ -4559,8 +4556,7 @@ public class GuacamoleController {
 //			return "fail";
 //		}
 //	}
-	
-	
+
 //	@PostMapping("/getPercentageParticularScenario")
 //	@ResponseBody
 //	public String getPercentageParticularScenario(Principal principal, @RequestParam("scenarioId") int scenarioId,
@@ -4607,44 +4603,45 @@ public class GuacamoleController {
 	@PostMapping("/checkAssessmentLabStatus")
 	@ResponseBody
 	public String checkAssessmentLabStatus(Principal principal, @RequestParam("scenarioId") Integer scenarioId) {
-	    try {
-	        String username = principal.getName();
-	        
-	        // Check if assessment lab exists for this user and scenario
-	        List<AssessmentUserLab> assessmentLabs = assessmentUserLabRepository.findByScenarioIdAndUsername(scenarioId, username);
-	        
-	        if (!assessmentLabs.isEmpty()) {
-	            return "available";
-	        } else {
-	            return "notavailable";
-	        }
-	        
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return "notavailable";
-	    }
+		try {
+			String username = principal.getName();
+
+			// Check if assessment lab exists for this user and scenario
+			List<AssessmentUserLab> assessmentLabs = assessmentUserLabRepository.findByScenarioIdAndUsername(scenarioId,
+					username);
+
+			if (!assessmentLabs.isEmpty()) {
+				return "available";
+			} else {
+				return "notavailable";
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "notavailable";
+		}
 	}
 
 	@PostMapping("/showLabButtonOn_Check")
 	@ResponseBody
 	public String showLabButtonOn_Check(@RequestParam("scenarioId") Integer scenarioId,
-	        @RequestParam("scenarioName") String scenarioName, Principal principal) {
-	    try {
-	        User loginedUser = (User) ((Authentication) principal).getPrincipal();
-	        String username = loginedUser.getUsername();
+			@RequestParam("scenarioName") String scenarioName, Principal principal) {
+		try {
+			User loginedUser = (User) ((Authentication) principal).getPrincipal();
+			String username = loginedUser.getUsername();
 
-	        List<UserLab> labs = UserLabRepository.findByScenarioIdAndUsername(scenarioId, username);
+			List<UserLab> labs = UserLabRepository.findByScenarioIdAndUsername(scenarioId, username);
 
-	        if (!labs.isEmpty()) {
-	            return "available";
-	        } else {
-	            return "notavailable";
-	        }
+			if (!labs.isEmpty()) {
+				return "available";
+			} else {
+				return "notavailable";
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return "notavailable";
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "notavailable";
+		}
 	}
 
 	@PostMapping("/start_lab")
@@ -4755,123 +4752,125 @@ public class GuacamoleController {
 //			return "fail";
 //		}
 //	}
-	
+
 	@PostMapping("/remove_lab")
 	@ResponseBody
 	public String remove_lab(@RequestParam("containerName") String containerName, Principal principal) {
-	    try {
-	        Authentication auth = (Authentication) principal;
-	        String username = auth.getName();
+		try {
+			Authentication auth = (Authentication) principal;
+			String username = auth.getName();
 
-	        System.out.println("Inside_remove_lab containerName: " + containerName);
+			System.out.println("Inside_remove_lab containerName: " + containerName);
 
-	        // Find lab by instance name first to get Guacamole connection details
-	        List<UserLab> labs = UserLabRepository.findByInstnaceName(containerName);
-	        
-	        String guacamoleConnectionId = null;
-	        Integer scenarioId = null;
-	        String getUsername = null;
+			// Find lab by instance name first to get Guacamole connection details
+			List<UserLab> labs = UserLabRepository.findByInstnaceName(containerName);
 
-	        if (!labs.isEmpty()) {
-	            UserLab lab = labs.get(0); // take first record
-	            getUsername = lab.getUsername();
-	            scenarioId = lab.getScenarioId();
-	            
-	            // Convert integer Guacamole ID to string
-	            Integer guacamoleId = lab.getGuacamoleId();
-	            if (guacamoleId != null) {
-	                guacamoleConnectionId = String.valueOf(guacamoleId);
-	            }
+			String guacamoleConnectionId = null;
+			Integer scenarioId = null;
+			String getUsername = null;
 
-	            // Delete Guacamole connection if connection ID exists
-	            if (guacamoleConnectionId != null && !guacamoleConnectionId.isEmpty()) {
-	                try {
-	                    // Get Guacamole token first (you might need to store this or get it dynamically)
-	                    String guacamoleToken = guacService.getAuthToken(); // You'll need to implement this method
-	                    
-	                    if (guacamoleToken != null) {
-	                        // Construct the Guacamole API URL with connection ID and token
-	                        String guacamoleApiUrl = "http://localhost:8080/guacamole/api/session/data/mysql/connections/" + 
-	                                                guacamoleConnectionId + "?token=" + guacamoleToken;
-	                        
-	                        // Delete the connection from Guacamole
-	                        boolean guacamoleDeleted = deleteConnection(guacamoleConnectionId, guacamoleToken);
-	                        
-	                        if (guacamoleDeleted) {
-	                            System.out.println("Guacamole connection deleted successfully: " + guacamoleConnectionId);
-	                        } else {
-	                            System.out.println("Failed to delete Guacamole connection: " + guacamoleConnectionId);
-	                        }
-	                    }
-	                } catch (Exception e) {
-	                    System.out.println("Error deleting Guacamole connection: " + e.getMessage());
-	                    // Continue with other cleanup even if Guacamole deletion fails
-	                }
-	            }
-	        }
+			if (!labs.isEmpty()) {
+				UserLab lab = labs.get(0); // take first record
+				getUsername = lab.getUsername();
+				scenarioId = lab.getScenarioId();
 
-	        // Remove container from docker
-	        dockerService.removeContainerByName(containerName);
-	        System.out.println("Container removed successfully: " + containerName);
+				// Convert integer Guacamole ID to string
+				Integer guacamoleId = lab.getGuacamoleId();
+				if (guacamoleId != null) {
+					guacamoleConnectionId = String.valueOf(guacamoleId);
+				}
 
-	        if (!labs.isEmpty()) {
-	            String scenarioIdStr = String.valueOf(scenarioId);
+				// Delete Guacamole connection if connection ID exists
+				if (guacamoleConnectionId != null && !guacamoleConnectionId.isEmpty()) {
+					try {
+						// Get Guacamole token first (you might need to store this or get it
+						// dynamically)
+						String guacamoleToken = guacService.getAuthToken(); // You'll need to implement this method
 
-	            // Delete related records
-	            CommandHistoryRepository.deleteByContainerName(containerName);
-	            instructionTemplateRepository.deleteByLabName(containerName);
-	            UserLabRepository.deleteByInstanceName(containerName);
+						if (guacamoleToken != null) {
+							// Construct the Guacamole API URL with connection ID and token
+							String guacamoleApiUrl = "http://localhost:8080/guacamole/api/session/data/mysql/connections/"
+									+ guacamoleConnectionId + "?token=" + guacamoleToken;
 
-	            // Optional: Uncomment if you want to delete user scenario
-	            // if (scenarioId != null) {
-	            //     UserScenerioRepository.deleteByScenarioIdAndUsername(getUsername, scenarioIdStr);
-	            // }
-	        } else {
-	            System.out.println("No UserLab found for instanceName: " + containerName);
-	        }
+							// Delete the connection from Guacamole
+							boolean guacamoleDeleted = deleteConnection(guacamoleConnectionId, guacamoleToken);
 
-	        return "success";
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        System.out.println("Exception Inside_remove_lab : " + e);
-	        return "fail";
-	    }
+							if (guacamoleDeleted) {
+								System.out
+										.println("Guacamole connection deleted successfully: " + guacamoleConnectionId);
+							} else {
+								System.out.println("Failed to delete Guacamole connection: " + guacamoleConnectionId);
+							}
+						}
+					} catch (Exception e) {
+						System.out.println("Error deleting Guacamole connection: " + e.getMessage());
+						// Continue with other cleanup even if Guacamole deletion fails
+					}
+				}
+			}
+
+			// Remove container from docker
+			dockerService.removeContainerByName(containerName);
+			System.out.println("Container removed successfully: " + containerName);
+
+			if (!labs.isEmpty()) {
+				String scenarioIdStr = String.valueOf(scenarioId);
+
+				// Delete related records
+				CommandHistoryRepository.deleteByContainerName(containerName);
+				instructionTemplateRepository.deleteByLabName(containerName);
+				UserLabRepository.deleteByInstanceName(containerName);
+
+				// Optional: Uncomment if you want to delete user scenario
+				// if (scenarioId != null) {
+				// UserScenerioRepository.deleteByScenarioIdAndUsername(getUsername,
+				// scenarioIdStr);
+				// }
+			} else {
+				System.out.println("No UserLab found for instanceName: " + containerName);
+			}
+
+			return "success";
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Exception Inside_remove_lab : " + e);
+			return "fail";
+		}
 	}
-	
-	
+
 	// In GuacService class
 	public String getAuthToken() {
-	    try {
-	        // This depends on how your Guacamole authentication is set up
-	        // You might need to store the token when you authenticate, or authenticate here
-	        String authUrl = "http://localhost:8080/guacamole/api/tokens";
-	        // Implement authentication logic to get token
-	        // This is a simplified example - adjust based on your auth setup
-	        return "YOUR_GUACAMOLE_TOKEN_HERE";
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return null;
-	    }
+		try {
+			// This depends on how your Guacamole authentication is set up
+			// You might need to store the token when you authenticate, or authenticate here
+			String authUrl = "http://localhost:8080/guacamole/api/tokens";
+			// Implement authentication logic to get token
+			// This is a simplified example - adjust based on your auth setup
+			return "YOUR_GUACAMOLE_TOKEN_HERE";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public boolean deleteConnection(String connectionId, String token) {
-	    try {
-	        String url = "http://localhost:8080/guacamole/api/session/data/mysql/connections/" + 
-	                     connectionId + "?token=" + token;
-	        
-	        RestTemplate restTemplate = new RestTemplate();
-	        HttpHeaders headers = new HttpHeaders();
-	        headers.setContentType(MediaType.APPLICATION_JSON);
-	        
-	        HttpEntity<String> entity = new HttpEntity<>(headers);
-	        
-	        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.DELETE, entity, String.class);
-	        
-	        return response.getStatusCode().is2xxSuccessful();
-	    } catch (Exception e) {
-	        System.out.println("Error deleting Guacamole connection: " + e.getMessage());
-	        return false;
-	    }
+		try {
+			String url = "http://localhost:8080/guacamole/api/session/data/mysql/connections/" + connectionId
+					+ "?token=" + token;
+
+			RestTemplate restTemplate = new RestTemplate();
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+
+			HttpEntity<String> entity = new HttpEntity<>(headers);
+
+			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.DELETE, entity, String.class);
+
+			return response.getStatusCode().is2xxSuccessful();
+		} catch (Exception e) {
+			System.out.println("Error deleting Guacamole connection: " + e.getMessage());
+			return false;
+		}
 	}
 
 	@PostMapping("/reset_lab")
@@ -4894,7 +4893,6 @@ public class GuacamoleController {
 			return "fail";
 		}
 	}
-
 
 //	@PostMapping("/getPercentageParticularScenario")
 //	@ResponseBody
@@ -4955,68 +4953,68 @@ public class GuacamoleController {
 //	        return "fail";
 //	    }
 //	}
-	
+
 	@PostMapping("/getPercentageParticularScenario")
 	@ResponseBody
 	public String getPercentageParticularScenario(Principal principal, @RequestParam("scenarioId") int scenarioId,
-	        @RequestParam("scenarioName") String scenarioName) {
-	    
-	    try {
-	        String username = principal.getName();
-	        System.out.println("scenarioId : " + scenarioId);
+			@RequestParam("scenarioName") String scenarioName) {
 
-	        // Get ALL user's labs for this scenario (returns List)
-	        List<UserLab> userLabs = UserLabRepository.findByUsernameAndScenarioId(username, scenarioId);
-	        
-	        if (userLabs == null || userLabs.isEmpty()) {
-	            return "fail";
-	        }
+		try {
+			String username = principal.getName();
+			System.out.println("scenarioId : " + scenarioId);
 
-	        int totalTrueCount = 0;
-	        int totalFalseCount = 0;
+			// Get ALL user's labs for this scenario (returns List)
+			List<UserLab> userLabs = UserLabRepository.findByUsernameAndScenarioId(username, scenarioId);
 
-	        // Iterate through all labs for this user and scenario
-	        for (UserLab userLab : userLabs) {
-	            Long labId = userLab.getLabId();
-	            int LABID = Math.toIntExact(labId);
-	            
-	            // Check if this lab has any records in instruction template
-	            Integer trueCount = instructionTemplateRepository
-	                    .getTrueCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
-	            Integer falseCount = instructionTemplateRepository
-	                    .getFalseCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
+			if (userLabs == null || userLabs.isEmpty()) {
+				return "fail";
+			}
 
-	            trueCount = (trueCount != null) ? trueCount : 0;
-	            falseCount = (falseCount != null) ? falseCount : 0;
+			int totalTrueCount = 0;
+			int totalFalseCount = 0;
 
-	            totalTrueCount += trueCount;
-	            totalFalseCount += falseCount;
-	        }
+			// Iterate through all labs for this user and scenario
+			for (UserLab userLab : userLabs) {
+				Long labId = userLab.getLabId();
+				int LABID = Math.toIntExact(labId);
 
-	        int totalCommands = totalTrueCount + totalFalseCount;
-	        int percentage = 0;
+				// Check if this lab has any records in instruction template
+				Integer trueCount = instructionTemplateRepository.getTrueCompletionCountsByLabIdAndScenarioId(LABID,
+						scenarioId);
+				Integer falseCount = instructionTemplateRepository.getFalseCompletionCountsByLabIdAndScenarioId(LABID,
+						scenarioId);
 
-	        if (totalCommands > 0) {
-	            percentage = (totalTrueCount * 100) / totalCommands;
-	        }
+				trueCount = (trueCount != null) ? trueCount : 0;
+				falseCount = (falseCount != null) ? falseCount : 0;
 
-	        // Determine status based on percentage
-	        String status;
-	        if (percentage == 0) {
-	            status = "Not Started";
-	        } else if (percentage < 100) {
-	            status = "In Progress";
-	        } else {
-	            status = "Completed";
-	        }
+				totalTrueCount += trueCount;
+				totalFalseCount += falseCount;
+			}
 
-	        System.out.println("percentage : " + percentage);
-	        return String.valueOf(percentage);
+			int totalCommands = totalTrueCount + totalFalseCount;
+			int percentage = 0;
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return "fail";
-	    }
+			if (totalCommands > 0) {
+				percentage = (totalTrueCount * 100) / totalCommands;
+			}
+
+			// Determine status based on percentage
+			String status;
+			if (percentage == 0) {
+				status = "Not Started";
+			} else if (percentage < 100) {
+				status = "In Progress";
+			} else {
+				status = "Completed";
+			}
+
+			System.out.println("percentage : " + percentage);
+			return String.valueOf(percentage);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
+		}
 	}
 
 	@PostMapping("/savediscoverdokcerIpaddress")
@@ -6482,71 +6480,255 @@ public class GuacamoleController {
 //		return "redirect:/guac/View_SubjectWisePlaylist";
 //	}
 
+//	@PostMapping("/save_SubjectWisePlaylist")
+//	public String save_SubjectWisePlaylist(@RequestParam(required = false) String groupId,
+//			@RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
+//			@RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
+//			@RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds,
+//			@RequestParam(value = "subjectId", required = false) Integer subjectId) {
+//
+//		try {
+//			if (subjectId != null) {
+//				System.out.println("Saving for Subject ID: " + subjectId);
+//
+//				// Get existing mappings
+//				List<SubjectPlaylistMapping> existingPlaylists = SubjectPlaylistMappingRepository
+//						.findBySubject(subjectId);
+//				List<SubjectSubplaylistMapping> existingSubplaylists = SubjectSubplaylistMappingRepository
+//						.findBySubject(subjectId);
+//				List<SubjectScenarioMapping> existingScenarios = SubjectScenarioMappingRepository
+//						.findBySubject(subjectId);
+//
+//				// Delete existing mappings
+//				SubjectPlaylistMappingRepository.deleteAll(existingPlaylists);
+//				SubjectSubplaylistMappingRepository.deleteAll(existingSubplaylists);
+//				SubjectScenarioMappingRepository.deleteAll(existingScenarios);
+//
+//				// Save new playlist mappings
+//				if (playlistIds != null && !playlistIds.isEmpty()) {
+//					for (Integer playlistId : playlistIds) {
+//						SubjectPlaylistMapping sp = new SubjectPlaylistMapping();
+//						sp.setSubject(subjectId);
+//						sp.setPlaylistId(playlistId);
+//						SubjectPlaylistMappingRepository.save(sp);
+//					}
+//				}
+//
+//				// Save new subplaylist mappings
+//				if (subplaylistIds != null && !subplaylistIds.isEmpty()) {
+//					for (Integer subplaylistId : subplaylistIds) {
+//						SubjectSubplaylistMapping ssp = new SubjectSubplaylistMapping();
+//						ssp.setSubject(subjectId);
+//						ssp.setSubPlaylistId(subplaylistId);
+//						SubjectSubplaylistMappingRepository.save(ssp);
+//					}
+//				}
+//
+//				// Save new scenario mappings
+//				if (scenarioIds != null && !scenarioIds.isEmpty()) {
+//					for (Integer scenarioId : scenarioIds) {
+//						SubjectScenarioMapping ssm = new SubjectScenarioMapping();
+//						ssm.setSubject(subjectId);
+//						ssm.setScenarioId(scenarioId);
+//						SubjectScenarioMappingRepository.save(ssm);
+//					}
+//				}
+//
+//				System.out.println("Successfully updated mappings for Subject ID: " + subjectId);
+//			} else {
+//				System.err.println("⚠ Subject ID is null. Skipping subject-wise saving.");
+//			}
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			System.err.println("Error saving subject-wise playlist: " + e.getMessage());
+//		}
+//
+//		return "redirect:/guac/View_SubjectWisePlaylist";
+//	}
+
+//	@PostMapping("/save_SubjectWisePlaylist")
+//	public String save_SubjectWisePlaylist(
+//			@RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
+//			@RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
+//			@RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds,
+//			@RequestParam(value = "subjectId", required = true) String subjectIdParam) { // Changed to String
+//
+//		try {
+//			System.out.println("Received subjectIdParam: '" + subjectIdParam + "'");
+//
+//			Integer subjectId = null;
+//
+//			if (subjectIdParam != null && !subjectIdParam.trim().isEmpty()) {
+//				
+//				String[] subjectIdValues = subjectIdParam.split(",");
+//				String firstSubjectId = subjectIdValues[0].trim();
+//
+//				try {
+//					subjectId = Integer.parseInt(firstSubjectId);
+//					System.out.println("Parsed subjectId: " + subjectId);
+//				} catch (NumberFormatException e) {
+//					System.err.println("❌ Invalid subject ID format: " + firstSubjectId);
+//					return "redirect:/guac/SemesterWisePlaylist?error=Invalid+subject+ID";
+//				}
+//			}
+//
+//			if (subjectId == null) {
+//				System.err.println("❌ Subject ID is null or empty. Cannot save mappings.");
+//				return "redirect:/guac/SemesterWisePlaylist?error=Subject+is+required";
+//			}
+//
+//			System.out.println("Saving for Subject ID: " + subjectId);
+//
+//			// Verify subject exists
+//			Optional<SubjectMaster> subjectOpt = SubjectMasterRepository.findById(subjectId);
+//			if (!subjectOpt.isPresent()) {
+//				System.err.println("❌ Subject not found with ID: " + subjectId);
+//				return "redirect:/guac/SemesterWisePlaylist?error=Subject+not+found";
+//			}
+//
+//			// Get existing mappings
+//			List<SubjectPlaylistMapping> existingPlaylists = SubjectPlaylistMappingRepository.findBySubject(subjectId);
+//			List<SubjectSubplaylistMapping> existingSubplaylists = SubjectSubplaylistMappingRepository
+//					.findBySubject(subjectId);
+//			List<SubjectScenarioMapping> existingScenarios = SubjectScenarioMappingRepository.findBySubject(subjectId);
+//
+//			// Delete existing mappings
+//			SubjectPlaylistMappingRepository.deleteAll(existingPlaylists);
+//			SubjectSubplaylistMappingRepository.deleteAll(existingSubplaylists);
+//			SubjectScenarioMappingRepository.deleteAll(existingScenarios);
+//
+//			// Save new playlist mappings
+//			if (playlistIds != null && !playlistIds.isEmpty()) {
+//				for (Integer playlistId : playlistIds) {
+//					SubjectPlaylistMapping sp = new SubjectPlaylistMapping();
+//					sp.setSubject(subjectId);
+//					sp.setPlaylistId(playlistId);
+//					SubjectPlaylistMappingRepository.save(sp);
+//				}
+//			}
+//
+//			// Save new subplaylist mappings
+//			if (subplaylistIds != null && !subplaylistIds.isEmpty()) {
+//				for (Integer subplaylistId : subplaylistIds) {
+//					SubjectSubplaylistMapping ssp = new SubjectSubplaylistMapping();
+//					ssp.setSubject(subjectId);
+//					ssp.setSubPlaylistId(subplaylistId);
+//					SubjectSubplaylistMappingRepository.save(ssp);
+//				}
+//			}
+//
+//			// Save new scenario mappings
+//			if (scenarioIds != null && !scenarioIds.isEmpty()) {
+//				for (Integer scenarioId : scenarioIds) {
+//					SubjectScenarioMapping ssm = new SubjectScenarioMapping();
+//					ssm.setSubject(subjectId);
+//					ssm.setScenarioId(scenarioId);
+//					SubjectScenarioMappingRepository.save(ssm);
+//				}
+//			}
+//
+//			System.out.println("✅ Successfully saved mappings for Subject ID: " + subjectId);
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			System.err.println("❌ Error saving subject-wise playlist: " + e.getMessage());
+//			return "redirect:/guac/SemesterWisePlaylist?error=Save+failed";
+//		}
+//
+//		return "redirect:/guac/View_SubjectWisePlaylist";
+//	}
+	
+	
 	@PostMapping("/save_SubjectWisePlaylist")
-	public String save_SubjectWisePlaylist(@RequestParam(required = false) String groupId,
-			@RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
-			@RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
-			@RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds,
-			@RequestParam(value = "subjectId", required = false) Integer subjectId) {
+	public String save_SubjectWisePlaylist(
+	        @RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
+	        @RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
+	        @RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds,
+	        @RequestParam(value = "subjectId", required = true) String subjectIdParam) {
 
-		try {
-			if (subjectId != null) {
-				System.out.println("Saving for Subject ID: " + subjectId);
+	    try {
+	     
+	        Integer subjectId = null;
+	        
+	        if (subjectIdParam != null && !subjectIdParam.trim().isEmpty()) {
+	         
+	            String cleanedSubjectId = subjectIdParam.replaceAll("[^0-9-]", "").trim();
+	            
+	            if (!cleanedSubjectId.isEmpty()) {
+	                try {
+	                    subjectId = Integer.parseInt(cleanedSubjectId);
+//	                    System.out.println("Cleaned and parsed subjectId: " + subjectId);
+	                } catch (NumberFormatException e) {
+	                    System.err.println("❌ Invalid subject ID after cleaning: " + cleanedSubjectId);
+	                    return "redirect:/guac/SemesterWisePlaylist?error=Invalid+subject+ID";
+	                }
+	            }
+	        }
 
-				// Get existing mappings
-				List<SubjectPlaylistMapping> existingPlaylists = SubjectPlaylistMappingRepository
-						.findBySubject(subjectId);
-				List<SubjectSubplaylistMapping> existingSubplaylists = SubjectSubplaylistMappingRepository
-						.findBySubject(subjectId);
-				List<SubjectScenarioMapping> existingScenarios = SubjectScenarioMappingRepository
-						.findBySubject(subjectId);
+	        if (subjectId == null) {
+	            System.err.println("❌ Subject ID is null or empty. Cannot save mappings.");
+	            return "redirect:/guac/SemesterWisePlaylist?error=Subject+is+required";
+	        }
 
-				// Delete existing mappings
-				SubjectPlaylistMappingRepository.deleteAll(existingPlaylists);
-				SubjectSubplaylistMappingRepository.deleteAll(existingSubplaylists);
-				SubjectScenarioMappingRepository.deleteAll(existingScenarios);
+	
 
-				// Save new playlist mappings
-				if (playlistIds != null && !playlistIds.isEmpty()) {
-					for (Integer playlistId : playlistIds) {
-						SubjectPlaylistMapping sp = new SubjectPlaylistMapping();
-						sp.setSubject(subjectId);
-						sp.setPlaylistId(playlistId);
-						SubjectPlaylistMappingRepository.save(sp);
-					}
-				}
-
-				// Save new subplaylist mappings
-				if (subplaylistIds != null && !subplaylistIds.isEmpty()) {
-					for (Integer subplaylistId : subplaylistIds) {
-						SubjectSubplaylistMapping ssp = new SubjectSubplaylistMapping();
-						ssp.setSubject(subjectId);
-						ssp.setSubPlaylistId(subplaylistId);
-						SubjectSubplaylistMappingRepository.save(ssp);
-					}
-				}
-
-				// Save new scenario mappings
-				if (scenarioIds != null && !scenarioIds.isEmpty()) {
-					for (Integer scenarioId : scenarioIds) {
-						SubjectScenarioMapping ssm = new SubjectScenarioMapping();
-						ssm.setSubject(subjectId);
-						ssm.setScenarioId(scenarioId);
-						SubjectScenarioMappingRepository.save(ssm);
-					}
-				}
-
-				System.out.println("Successfully updated mappings for Subject ID: " + subjectId);
-			} else {
-				System.err.println("⚠ Subject ID is null. Skipping subject-wise saving.");
+		
+			Optional<SubjectMaster> subjectOpt = SubjectMasterRepository.findById(subjectId);
+			if (!subjectOpt.isPresent()) {
+				System.err.println("❌ Subject not found with ID: " + subjectId);
+				return "redirect:/guac/SemesterWisePlaylist?error=Subject+not+found";
 			}
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("Error saving subject-wise playlist: " + e.getMessage());
-		}
+			
+			List<SubjectPlaylistMapping> existingPlaylists = SubjectPlaylistMappingRepository.findBySubject(subjectId);
+			List<SubjectSubplaylistMapping> existingSubplaylists = SubjectSubplaylistMappingRepository
+					.findBySubject(subjectId);
+			List<SubjectScenarioMapping> existingScenarios = SubjectScenarioMappingRepository.findBySubject(subjectId);
 
-		return "redirect:/guac/View_SubjectWisePlaylist";
+			// Delete existing mappings
+			SubjectPlaylistMappingRepository.deleteAll(existingPlaylists);
+			SubjectSubplaylistMappingRepository.deleteAll(existingSubplaylists);
+			SubjectScenarioMappingRepository.deleteAll(existingScenarios);
+
+			// Save new playlist mappings
+			if (playlistIds != null && !playlistIds.isEmpty()) {
+				for (Integer playlistId : playlistIds) {
+					SubjectPlaylistMapping sp = new SubjectPlaylistMapping();
+					sp.setSubject(subjectId);
+					sp.setPlaylistId(playlistId);
+					SubjectPlaylistMappingRepository.save(sp);
+				}
+			}
+
+			// Save new subplaylist mappings
+			if (subplaylistIds != null && !subplaylistIds.isEmpty()) {
+				for (Integer subplaylistId : subplaylistIds) {
+					SubjectSubplaylistMapping ssp = new SubjectSubplaylistMapping();
+					ssp.setSubject(subjectId);
+					ssp.setSubPlaylistId(subplaylistId);
+					SubjectSubplaylistMappingRepository.save(ssp);
+				}
+			}
+
+			// Save new scenario mappings
+			if (scenarioIds != null && !scenarioIds.isEmpty()) {
+				for (Integer scenarioId : scenarioIds) {
+					SubjectScenarioMapping ssm = new SubjectScenarioMapping();
+					ssm.setSubject(subjectId);
+					ssm.setScenarioId(scenarioId);
+					SubjectScenarioMappingRepository.save(ssm);
+				}
+			}
+
+//			System.out.println("✅ Successfully saved mappings for Subject ID: " + subjectId);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return "redirect:/guac/SemesterWisePlaylist?error=Save+failed";
+	    }
+
+	    return "redirect:/guac/View_SubjectWisePlaylist";
 	}
 
 	@GetMapping("/View_SubjectWisePlaylist")
@@ -6879,26 +7061,26 @@ public class GuacamoleController {
 //		}
 //		return new ArrayList<>();
 //	}
-	
+
 	private List<SubPlaylist> getSubPlaylistsForSubject(Integer subjectId) {
-	    // Get sub-playlist IDs from mapping table - call on the autowired instance
-	    List<Integer> subPlaylistIds = SubjectSubplaylistMappingRepository.findSubPlaylistIdsBySubjectId(subjectId);
+		// Get sub-playlist IDs from mapping table - call on the autowired instance
+		List<Integer> subPlaylistIds = SubjectSubplaylistMappingRepository.findSubPlaylistIdsBySubjectId(subjectId);
 
-	    System.out.println("SubPlaylist IDs for subject " + subjectId + ": " + subPlaylistIds);
+		System.out.println("SubPlaylist IDs for subject " + subjectId + ": " + subPlaylistIds);
 
-	    if (subPlaylistIds != null && !subPlaylistIds.isEmpty()) {
-	        List<SubPlaylist> subPlaylists = SubPlaylistRepository.findAllById(subPlaylistIds);
-	        System.out.println("SubPlaylists retrieved: " + subPlaylists.size());
+		if (subPlaylistIds != null && !subPlaylistIds.isEmpty()) {
+			List<SubPlaylist> subPlaylists = SubPlaylistRepository.findAllById(subPlaylistIds);
+			System.out.println("SubPlaylists retrieved: " + subPlaylists.size());
 
-	        // Debug each subplaylist
-	        for (SubPlaylist subplaylist : subPlaylists) {
-	            System.out.println(
-	                    "SubPlaylist ID: " + subplaylist.getId() + ", Title: " + subplaylist.getPlaylistTitle());
-	        }
+			// Debug each subplaylist
+			for (SubPlaylist subplaylist : subPlaylists) {
+				System.out.println(
+						"SubPlaylist ID: " + subplaylist.getId() + ", Title: " + subplaylist.getPlaylistTitle());
+			}
 
-	        return subPlaylists;
-	    }
-	    return new ArrayList<>();
+			return subPlaylists;
+		}
+		return new ArrayList<>();
 	}
 
 	private List<Add_Scenario> getScenariosForSubject(Integer subjectId) {
@@ -7701,465 +7883,464 @@ public class GuacamoleController {
 //	        return 0.0;
 //	    }
 //	}
-	
-	
+
 	@GetMapping("/subject-students/{subjectId}")
 	public String viewSubjectStudents(@PathVariable("subjectId") int subjectId, Model model, Principal principal) {
-	    try {
-	        Optional<SubjectMaster> subjectOpt = SubjectMasterRepository.findBysubjectId(subjectId);
-	        if (!subjectOpt.isPresent()) {
-	            model.addAttribute("error", "Subject not found!");
-	            return "subject-students";
-	        }
-	        
-	        SubjectMaster subject = subjectOpt.get();
-	        model.addAttribute("subject", subject);
-	        model.addAttribute("pageTitle", "Students - " + subject.getSubjectName());
-	        
-	        List<AppUser> students = new ArrayList<>();
-	        if (subject.getSemester() != null) {
-	            students = AppUserRepository.findOnlyStudentsBySemesterId(subject.getSemester().getSemesterId());
-	        }
-	        
-	        Map<String, Double> studentProgressMap = calculateStudentProgress(subjectId, students);
-	        model.addAttribute("studentProgressMap", studentProgressMap);
-	        
-	        // Calculate progress statistics
-	        Map<String, Object> progressStats = calculateProgressStatistics(studentProgressMap, students);
-	        model.addAllAttributes(progressStats);
-	        
-	        model.addAttribute("students", students != null ? students : new ArrayList<>());
-	        model.addAttribute("studentCount", students != null ? students.size() : 0);
-	        
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        model.addAttribute("error", "Error loading students: " + e.getMessage());
-	        model.addAttribute("students", new ArrayList<>());
-	        model.addAttribute("studentCount", 0);
-	        model.addAttribute("studentProgressMap", new HashMap<>());
-	        
-	        // Set default values for progress stats in case of error
-	        setDefaultProgressStats(model);
-	    }
-	    return "subject-students";
+		try {
+			Optional<SubjectMaster> subjectOpt = SubjectMasterRepository.findBysubjectId(subjectId);
+			if (!subjectOpt.isPresent()) {
+				model.addAttribute("error", "Subject not found!");
+				return "subject-students";
+			}
+
+			SubjectMaster subject = subjectOpt.get();
+			model.addAttribute("subject", subject);
+			model.addAttribute("pageTitle", "Students - " + subject.getSubjectName());
+
+			List<AppUser> students = new ArrayList<>();
+			if (subject.getSemester() != null) {
+				students = AppUserRepository.findOnlyStudentsBySemesterId(subject.getSemester().getSemesterId());
+			}
+
+			Map<String, Double> studentProgressMap = calculateStudentProgress(subjectId, students);
+			model.addAttribute("studentProgressMap", studentProgressMap);
+
+			// Calculate progress statistics
+			Map<String, Object> progressStats = calculateProgressStatistics(studentProgressMap, students);
+			model.addAllAttributes(progressStats);
+
+			model.addAttribute("students", students != null ? students : new ArrayList<>());
+			model.addAttribute("studentCount", students != null ? students.size() : 0);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			model.addAttribute("error", "Error loading students: " + e.getMessage());
+			model.addAttribute("students", new ArrayList<>());
+			model.addAttribute("studentCount", 0);
+			model.addAttribute("studentProgressMap", new HashMap<>());
+
+			// Set default values for progress stats in case of error
+			setDefaultProgressStats(model);
+		}
+		return "subject-students";
 	}
 
-	private Map<String, Object> calculateProgressStatistics(Map<String, Double> studentProgressMap, List<AppUser> students) {
-	    Map<String, Object> stats = new HashMap<>();
-	    
-	    if (students == null || students.isEmpty()) {
-	        stats.put("overallProgress", 0.0);
-	        stats.put("averageProgress", 0.0);
-	        stats.put("completionRate", 0.0);
-	        stats.put("completedStudents", 0);
-	        stats.put("goodProgressStudents", 0);
-	        stats.put("needsWorkStudents", 0);
-	        stats.put("notStartedStudents", 0);
-	        return stats;
-	    }
-	    
-	    double totalProgress = 0.0;
-	    int completedCount = 0;
-	    int goodProgressCount = 0;
-	    int needsWorkCount = 0;
-	    int notStartedCount = 0;
-	    
-	    for (AppUser student : students) {
-	        String username = student.getUserName();
-	        Double progress = studentProgressMap.getOrDefault(username, 0.0);
-	        totalProgress += progress;
-	        
-	        // Categorize students based on progress
-	        if (progress >= 100.0) {
-	            completedCount++;
-	        } else if (progress >= 50.0) {
-	            goodProgressCount++;
-	        } else if (progress > 0.0) {
-	            needsWorkCount++;
-	        } else {
-	            notStartedCount++;
-	        }
-	    }
-	    
-	    // Calculate overall progress (average of all students)
-	    double averageProgress = totalProgress / students.size();
-	    double roundedAverage = Math.round(averageProgress * 100.0) / 100.0;
-	    
-	    // Calculate completion rate (percentage of students who completed)
-	    double completionRate = ((double) completedCount / students.size()) * 100;
-	    double roundedCompletionRate = Math.round(completionRate * 100.0) / 100.0;
-	    
-	    // Overall progress (weighted or same as average for now)
-	    double overallProgress = roundedAverage;
-	    
-	    stats.put("overallProgress", overallProgress);
-	    stats.put("averageProgress", roundedAverage);
-	    stats.put("completionRate", roundedCompletionRate);
-	    stats.put("completedStudents", completedCount);
-	    stats.put("goodProgressStudents", goodProgressCount);
-	    stats.put("needsWorkStudents", needsWorkCount);
-	    stats.put("notStartedStudents", notStartedCount);
-	    
-	    return stats;
+	private Map<String, Object> calculateProgressStatistics(Map<String, Double> studentProgressMap,
+			List<AppUser> students) {
+		Map<String, Object> stats = new HashMap<>();
+
+		if (students == null || students.isEmpty()) {
+			stats.put("overallProgress", 0.0);
+			stats.put("averageProgress", 0.0);
+			stats.put("completionRate", 0.0);
+			stats.put("completedStudents", 0);
+			stats.put("goodProgressStudents", 0);
+			stats.put("needsWorkStudents", 0);
+			stats.put("notStartedStudents", 0);
+			return stats;
+		}
+
+		double totalProgress = 0.0;
+		int completedCount = 0;
+		int goodProgressCount = 0;
+		int needsWorkCount = 0;
+		int notStartedCount = 0;
+
+		for (AppUser student : students) {
+			String username = student.getUserName();
+			Double progress = studentProgressMap.getOrDefault(username, 0.0);
+			totalProgress += progress;
+
+			// Categorize students based on progress
+			if (progress >= 100.0) {
+				completedCount++;
+			} else if (progress >= 50.0) {
+				goodProgressCount++;
+			} else if (progress > 0.0) {
+				needsWorkCount++;
+			} else {
+				notStartedCount++;
+			}
+		}
+
+		// Calculate overall progress (average of all students)
+		double averageProgress = totalProgress / students.size();
+		double roundedAverage = Math.round(averageProgress * 100.0) / 100.0;
+
+		// Calculate completion rate (percentage of students who completed)
+		double completionRate = ((double) completedCount / students.size()) * 100;
+		double roundedCompletionRate = Math.round(completionRate * 100.0) / 100.0;
+
+		// Overall progress (weighted or same as average for now)
+		double overallProgress = roundedAverage;
+
+		stats.put("overallProgress", overallProgress);
+		stats.put("averageProgress", roundedAverage);
+		stats.put("completionRate", roundedCompletionRate);
+		stats.put("completedStudents", completedCount);
+		stats.put("goodProgressStudents", goodProgressCount);
+		stats.put("needsWorkStudents", needsWorkCount);
+		stats.put("notStartedStudents", notStartedCount);
+
+		return stats;
 	}
 
 	private void setDefaultProgressStats(Model model) {
-	    model.addAttribute("overallProgress", 0.0);
-	    model.addAttribute("averageProgress", 0.0);
-	    model.addAttribute("completionRate", 0.0);
-	    model.addAttribute("completedStudents", 0);
-	    model.addAttribute("goodProgressStudents", 0);
-	    model.addAttribute("needsWorkStudents", 0);
-	    model.addAttribute("notStartedStudents", 0);
+		model.addAttribute("overallProgress", 0.0);
+		model.addAttribute("averageProgress", 0.0);
+		model.addAttribute("completionRate", 0.0);
+		model.addAttribute("completedStudents", 0);
+		model.addAttribute("goodProgressStudents", 0);
+		model.addAttribute("needsWorkStudents", 0);
+		model.addAttribute("notStartedStudents", 0);
 	}
 
 	// Your existing methods remain the same...
 	private Map<String, Double> calculateStudentProgress(int subjectId, List<AppUser> students) {
-	    Map<String, Double> progressMap = new HashMap<>();
-	    
-	    try {
-	        List<SubjectScenarioMapping> subjectScenarios = SubjectScenarioMappingRepository.findBySubject(subjectId);
-	        
-	        if (subjectScenarios == null || subjectScenarios.isEmpty()) {
-	            for (AppUser student : students) {
-	                progressMap.put(student.getUserName(), 0.0);
-	            }
-	            return progressMap;
-	        }
-	        
-	        List<Integer> scenarioIds = subjectScenarios.stream()
-	                .map(SubjectScenarioMapping::getScenarioId)
-	                .collect(Collectors.toList());
-	        
-	        for (AppUser student : students) {
-	            String username = student.getUserName();
-	            double progress = calculateProgressForStudent(username, scenarioIds);
-	            progressMap.put(username, progress);
-	        }
-	        
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        for (AppUser student : students) {
-	            progressMap.put(student.getUserName(), 0.0);
-	        }
-	    }
-	    
-	    return progressMap;
+		Map<String, Double> progressMap = new HashMap<>();
+
+		try {
+			List<SubjectScenarioMapping> subjectScenarios = SubjectScenarioMappingRepository.findBySubject(subjectId);
+
+			if (subjectScenarios == null || subjectScenarios.isEmpty()) {
+				for (AppUser student : students) {
+					progressMap.put(student.getUserName(), 0.0);
+				}
+				return progressMap;
+			}
+
+			List<Integer> scenarioIds = subjectScenarios.stream().map(SubjectScenarioMapping::getScenarioId)
+					.collect(Collectors.toList());
+
+			for (AppUser student : students) {
+				String username = student.getUserName();
+				double progress = calculateProgressForStudent(username, scenarioIds);
+				progressMap.put(username, progress);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			for (AppUser student : students) {
+				progressMap.put(student.getUserName(), 0.0);
+			}
+		}
+
+		return progressMap;
 	}
 
 	private double calculateProgressForStudent(String username, List<Integer> scenarioIds) {
-	    try {
-	        int totalCompletedCommands = 0;
-	        int totalCommands = 0;
-	        
-	        for (Integer scenarioId : scenarioIds) {
-	            // Get ALL labs for this user and scenario (returns List)
-	            List<UserLab> userLabs = UserLabRepository.findByUsernameAndScenarioId(username, scenarioId);
-	            
-	            if (userLabs != null && !userLabs.isEmpty()) {
-	                for (UserLab userLab : userLabs) {
-	                    Long labId = userLab.getLabId();
-	                    int LABID = Math.toIntExact(labId);
-	                    
-	                    Integer trueCount = instructionTemplateRepository
-	                        .getTrueCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
-	                    Integer falseCount = instructionTemplateRepository
-	                        .getFalseCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
-	                    
-	                    trueCount = (trueCount != null) ? trueCount : 0;
-	                    falseCount = (falseCount != null) ? falseCount : 0;
-	                    
-	                    totalCompletedCommands += trueCount;
-	                    totalCommands += (trueCount + falseCount);
-	                }
-	            }
-	        }
-	        
-	        double progress = 0.0;
-	        if (totalCommands > 0) {
-	            progress = (double) totalCompletedCommands / totalCommands * 100;
-	        }
-	        
-	        return Math.round(progress * 100.0) / 100.0;
-	        
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return 0.0;
-	    }
+		try {
+			int totalCompletedCommands = 0;
+			int totalCommands = 0;
+
+			for (Integer scenarioId : scenarioIds) {
+				// Get ALL labs for this user and scenario (returns List)
+				List<UserLab> userLabs = UserLabRepository.findByUsernameAndScenarioId(username, scenarioId);
+
+				if (userLabs != null && !userLabs.isEmpty()) {
+					for (UserLab userLab : userLabs) {
+						Long labId = userLab.getLabId();
+						int LABID = Math.toIntExact(labId);
+
+						Integer trueCount = instructionTemplateRepository
+								.getTrueCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
+						Integer falseCount = instructionTemplateRepository
+								.getFalseCompletionCountsByLabIdAndScenarioId(LABID, scenarioId);
+
+						trueCount = (trueCount != null) ? trueCount : 0;
+						falseCount = (falseCount != null) ? falseCount : 0;
+
+						totalCompletedCommands += trueCount;
+						totalCommands += (trueCount + falseCount);
+					}
+				}
+			}
+
+			double progress = 0.0;
+			if (totalCommands > 0) {
+				progress = (double) totalCompletedCommands / totalCommands * 100;
+			}
+
+			return Math.round(progress * 100.0) / 100.0;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0.0;
+		}
 	}
-	
-	
+
 	@GetMapping("/assessmentView_Vm_Listing")
-	public ModelAndView viewAssessmentVmListing(@RequestParam("Id") int scenarioId, 
-	                                          @RequestParam(value = "duration", defaultValue = "60") int durationMinutes,
-	                                          Model model, Principal principal) {
-	    System.out.println("Requested assessment scenario Id = " + scenarioId);
+	public ModelAndView viewAssessmentVmListing(@RequestParam("Id") int scenarioId,
+			@RequestParam(value = "duration", defaultValue = "60") int durationMinutes, Model model,
+			Principal principal) {
+		System.out.println("Requested assessment scenario Id = " + scenarioId);
 
-	    Authentication auth = (Authentication) principal;
-	    String username = auth.getName();
+		Authentication auth = (Authentication) principal;
+		String username = auth.getName();
 
-	    ModelAndView mav = new ModelAndView("assessment_vm_listing");
+		ModelAndView mav = new ModelAndView("assessment_vm_listing");
 
-	    // Use AssessmentUserLabRepository instead of UserLabRepository
-	    List<AssessmentUserLab> labs = assessmentUserLabRepository.findByScenarioIdAndUsername(scenarioId, username);
+		// Use AssessmentUserLabRepository instead of UserLabRepository
+		List<AssessmentUserLab> labs = assessmentUserLabRepository.findByScenarioIdAndUsername(scenarioId, username);
 
-	    // Add percentage for each lab
-	    List<Map<String, Object>> labData = new ArrayList<>();
-	    for (AssessmentUserLab lab : labs) {
-	        Map<String, Object> map = new HashMap<>();
-	        map.put("lab", lab);
+		// Add percentage for each lab
+		List<Map<String, Object>> labData = new ArrayList<>();
+		for (AssessmentUserLab lab : labs) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("lab", lab);
 
-	        // Fetch CloudInstance by instance name
-	        String instanceName = lab.getTemplateName();
-	        List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
+			// Fetch CloudInstance by instance name
+			String instanceName = lab.getTemplateName();
+			List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
 
-	        if (!cloudInstances.isEmpty()) {
-	            CloudInstance instance = cloudInstances.get(0);
-	            String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
-	            map.put("os", os);
-	        } else {
-	            System.out.println("No CloudInstance found for name: " + instanceName);
-	        }
+			if (!cloudInstances.isEmpty()) {
+				CloudInstance instance = cloudInstances.get(0);
+				String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+				map.put("os", os);
+			} else {
+				System.out.println("No CloudInstance found for name: " + instanceName);
+			}
 
-	        // Handle LabId
-	        Long labIdLong = lab.getLabId();
-	        int labId = labIdLong.intValue();
+			// Handle LabId
+			Long labIdLong = lab.getLabId();
+			int labId = labIdLong.intValue();
 
-	        // Use AssessmentInstructionTemplateRepository
-	        Integer falseCountObj = assessmentInstructionTemplateRepository.getfalseCompletionCountsByTemplateName(labId);
-	        Integer trueCountObj = assessmentInstructionTemplateRepository.gettrueCompletionCountsByTemplateName(labId);
+			// Use AssessmentInstructionTemplateRepository
+			Integer falseCountObj = assessmentInstructionTemplateRepository
+					.getfalseCompletionCountsByTemplateName(labId);
+			Integer trueCountObj = assessmentInstructionTemplateRepository.gettrueCompletionCountsByTemplateName(labId);
 
-	        // Handle null values
-	        int falseCount = (falseCountObj != null) ? falseCountObj : 0;
-	        int trueCount = (trueCountObj != null) ? trueCountObj : 0;
+			// Handle null values
+			int falseCount = (falseCountObj != null) ? falseCountObj : 0;
+			int trueCount = (trueCountObj != null) ? trueCountObj : 0;
 
-	        int total = trueCount + falseCount;
+			int total = trueCount + falseCount;
 
-	        // Calculate percentage (avoid division by zero)
-	        int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
-	        map.put("percentage", percentage);
+			// Calculate percentage (avoid division by zero)
+			int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
+			map.put("percentage", percentage);
 
-	        labData.add(map);
-	        System.out.println("Assessment labData ::" + labData);
-	    }
+			labData.add(map);
+			System.out.println("Assessment labData ::" + labData);
+		}
 
-	    // Set assessment timer (convert minutes to MM:SS format)
-	    String assessmentTime = String.format("%02d:00", durationMinutes);
-	    model.addAttribute("assessmentTime", assessmentTime);
-	    model.addAttribute("labData", labData);
-	    model.addAttribute("pageTitle", "Assessment Lab - Scenario " + scenarioId);
-	    
-	    return mav;
+		// Set assessment timer (convert minutes to MM:SS format)
+		String assessmentTime = String.format("%02d:00", durationMinutes);
+		model.addAttribute("assessmentTime", assessmentTime);
+		model.addAttribute("labData", labData);
+		model.addAttribute("pageTitle", "Assessment Lab - Scenario " + scenarioId);
+
+		return mav;
 	}
-	
-	
+
 	@GetMapping("/assessmentviewPlaylistConnection/{id}")
-	public String assessmentViewPlaylistConnection(@PathVariable String id, 
-	                                             @RequestParam(value = "duration", defaultValue = "60") int durationMinutes,
-	                                             Model model) {
-	    String url = null;
-	    try {
-	        // Use AssessmentUserLab instead of UserLab
-	        AssessmentUserLab lab = assessmentUserLabRepository.getByProxmoxId(Integer.valueOf(id));
-	        CloudInstance inst = repository.findByInstance(lab.getTemplateName());
+	public String assessmentViewPlaylistConnection(@PathVariable String id,
+			@RequestParam(value = "duration", defaultValue = "60") int durationMinutes, Model model) {
+		String url = null;
+		try {
+			// Use AssessmentUserLab instead of UserLab
+			AssessmentUserLab lab = assessmentUserLabRepository.getByProxmoxId(Integer.valueOf(id));
+			CloudInstance inst = repository.findByInstance(lab.getTemplateName());
 
-	        String identifier = GuacIdentifierUtil.encode(id, "mysql");
-	        url = guacService.getEmbedUrl(identifier);
+			String identifier = GuacIdentifierUtil.encode(id, "mysql");
+			url = guacService.getEmbedUrl(identifier);
 
-	        model.addAttribute("embedUrl", url);
+			model.addAttribute("embedUrl", url);
 
-	        // Set assessment timer (convert minutes to MM:SS format)
-	        String assessmentTime = String.format("%02d:00", durationMinutes);
-	        model.addAttribute("assessmentTime", assessmentTime);
+			// Set assessment timer (convert minutes to MM:SS format)
+			String assessmentTime = String.format("%02d:00", durationMinutes);
+			model.addAttribute("assessmentTime", assessmentTime);
 
-	        // ✅ Add OS to the model
-	        if (inst != null) {
-	            String os = inst.getSubproduct_id().getProduct_id().getProduct_name();
-	            model.addAttribute("os", os);
-	        }
+			// ✅ Add OS to the model
+			if (inst != null) {
+				String os = inst.getSubproduct_id().getProduct_id().getProduct_name();
+				model.addAttribute("os", os);
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	    return "assessment_view_connection";
+		return "assessment_view_connection";
 	}
 
 	@PostMapping("/assessmentgetConnectionDeatils")
 	@ResponseBody
-	public Map<String, Object> assessmentGetConnectionDeatils(@RequestParam("LabId") String LabId, Principal principal) {
-	    Map<String, Object> response = new HashMap<>();
+	public Map<String, Object> assessmentGetConnectionDeatils(@RequestParam("LabId") String LabId,
+			Principal principal) {
+		Map<String, Object> response = new HashMap<>();
 
-	    try {
-	        User loginedUser = (User) ((Authentication) principal).getPrincipal();
-	        String username = loginedUser.getUsername();
+		try {
+			User loginedUser = (User) ((Authentication) principal).getPrincipal();
+			String username = loginedUser.getUsername();
 
-	        // Fetch lab details from AssessmentUserLab
-	        int temp = Integer.parseInt(LabId);
+			// Fetch lab details from AssessmentUserLab
+			int temp = Integer.parseInt(LabId);
 
-	        List<AssessmentUserLab> labDetails = assessmentUserLabRepository.findByguacamoleId(temp);
+			List<AssessmentUserLab> labDetails = assessmentUserLabRepository.findByguacamoleId(temp);
 
-	        if (!labDetails.isEmpty()) {
-	            AssessmentUserLab userLab = labDetails.get(0);
+			if (!labDetails.isEmpty()) {
+				AssessmentUserLab userLab = labDetails.get(0);
 
-	            String instanceName = userLab.getTemplateName();
+				String instanceName = userLab.getTemplateName();
 
-	            List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
-	            String password = "";
-	            if (!cloudInstances.isEmpty()) {
-	                CloudInstance instance = cloudInstances.get(0);
-	                password = instance.getInstance_password();
-	            }
+				List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
+				String password = "";
+				if (!cloudInstances.isEmpty()) {
+					CloudInstance instance = cloudInstances.get(0);
+					password = instance.getInstance_password();
+				}
 
-	            response.put("success", true);
-	            response.put("username", userLab.getInstanceUser());
-	            response.put("password", password);
-	            response.put("labName", userLab.getInstanceName());
-	            response.put("ipAddress", userLab.getIpAddress());
-	        } else {
-	            response.put("success", false);
-	            response.put("error", "No assessment lab details found for LabId " + LabId);
-	        }
+				response.put("success", true);
+				response.put("username", userLab.getInstanceUser());
+				response.put("password", password);
+				response.put("labName", userLab.getInstanceName());
+				response.put("ipAddress", userLab.getIpAddress());
+			} else {
+				response.put("success", false);
+				response.put("error", "No assessment lab details found for LabId " + LabId);
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        response.put("success", false);
-	        response.put("error", "Exception occurred: " + e.getMessage());
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("success", false);
+			response.put("error", "Exception occurred: " + e.getMessage());
+		}
 
-	    return response;
+		return response;
 	}
 
 	@PostMapping("/assessment/getMandatoryCommand")
 	@ResponseBody
 	public Map<String, Object> getAssessmentMandatoryCommand(@RequestParam("labId") String labId, Principal principal) {
-	    Map<String, Object> response = new HashMap<>();
-	    
-	    try {
-	        int temp = Integer.parseInt(labId);
-	        List<AssessmentUserLab> labDetails = assessmentUserLabRepository.findByguacamoleId(temp);
-	        
-	        if (!labDetails.isEmpty()) {
-	            AssessmentUserLab userLab = labDetails.get(0);
-	            String labName = userLab.getInstanceName();
-	            
-	            // Determine OS type
-	            String osType = determineOS(userLab.getTemplateName(), labName);
-	            
-	            // Get mandatory command based on OS
-	            String mandatoryCommand = getMandatoryCommand(osType, labName);
-	            
-	            response.put("success", true);
-	            response.put("command", mandatoryCommand);
-	            response.put("osType", osType);
-	        } else {
-	            response.put("success", false);
-	            response.put("error", "Lab not found");
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        response.put("success", false);
-	        response.put("error", "Failed to get mandatory command");
-	    }
-	    
-	    return response;
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			int temp = Integer.parseInt(labId);
+			List<AssessmentUserLab> labDetails = assessmentUserLabRepository.findByguacamoleId(temp);
+
+			if (!labDetails.isEmpty()) {
+				AssessmentUserLab userLab = labDetails.get(0);
+				String labName = userLab.getInstanceName();
+
+				// Determine OS type
+				String osType = determineOS(userLab.getTemplateName(), labName);
+
+				// Get mandatory command based on OS
+				String mandatoryCommand = getMandatoryCommand(osType, labName);
+
+				response.put("success", true);
+				response.put("command", mandatoryCommand);
+				response.put("osType", osType);
+			} else {
+				response.put("success", false);
+				response.put("error", "Lab not found");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("success", false);
+			response.put("error", "Failed to get mandatory command");
+		}
+
+		return response;
 	}
 
 	@PostMapping("/assessment/checkMandatoryCommand")
 	@ResponseBody
-	public Map<String, Object> checkAssessmentMandatoryCommand(@RequestParam("labId") String labId, Principal principal) {
-	    Map<String, Object> response = new HashMap<>();
-	    
-	    try {
-	        int temp = Integer.parseInt(labId);
-	        List<AssessmentUserLab> labDetails = assessmentUserLabRepository.findByguacamoleId(temp);
-	        
-	        if (labDetails.isEmpty()) {
-	            response.put("success", false);
-	            response.put("error", "Lab not found");
-	            return response;
-	        }
-	        
-	        AssessmentUserLab userLab = labDetails.get(0);
-	        
-	        // Get container name from lab
-	        String containerName = userLab.getInstanceName();
-	        
-	        // Get mandatory command for this lab
-	        String labName = userLab.getInstanceName();
-	        String osType = determineOS(userLab.getTemplateName(), labName);
-	        String mandatoryCommand = getMandatoryCommand(osType, labName);
-	        
-	        // Check command history for this container and command
-	        List<CommandHistory> commandHistory = CommandHistoryRepository.findByContainerNameAndCommand(containerName, mandatoryCommand);
-	        
-	        boolean foundInHistory = !commandHistory.isEmpty();
-	        
-	        response.put("success", true);
-	        response.put("executed", foundInHistory);
-	        
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        response.put("success", false);
-	        response.put("error", "Failed to check mandatory command");
-	    }
-	    
-	    return response;
+	public Map<String, Object> checkAssessmentMandatoryCommand(@RequestParam("labId") String labId,
+			Principal principal) {
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			int temp = Integer.parseInt(labId);
+			List<AssessmentUserLab> labDetails = assessmentUserLabRepository.findByguacamoleId(temp);
+
+			if (labDetails.isEmpty()) {
+				response.put("success", false);
+				response.put("error", "Lab not found");
+				return response;
+			}
+
+			AssessmentUserLab userLab = labDetails.get(0);
+
+			// Get container name from lab
+			String containerName = userLab.getInstanceName();
+
+			// Get mandatory command for this lab
+			String labName = userLab.getInstanceName();
+			String osType = determineOS(userLab.getTemplateName(), labName);
+			String mandatoryCommand = getMandatoryCommand(osType, labName);
+
+			// Check command history for this container and command
+			List<CommandHistory> commandHistory = CommandHistoryRepository.findByContainerNameAndCommand(containerName,
+					mandatoryCommand);
+
+			boolean foundInHistory = !commandHistory.isEmpty();
+
+			response.put("success", true);
+			response.put("executed", foundInHistory);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("success", false);
+			response.put("error", "Failed to check mandatory command");
+		}
+
+		return response;
 	}
 
 	@PostMapping("/assessment/markCompleted")
 	@ResponseBody
-	public Map<String, Object> markAssessmentCompleted(@RequestParam("labId") String labId, 
-	                                                  @RequestParam("reason") String reason,
-	                                                  Principal principal) {
-	    Map<String, Object> response = new HashMap<>();
-	    
-	    try {
-	        int temp = Integer.parseInt(labId);
-	        List<AssessmentUserLab> labDetails = assessmentUserLabRepository.findByguacamoleId(temp);
-	        
-	        if (!labDetails.isEmpty()) {
-	            AssessmentUserLab userLab = labDetails.get(0);
-	            
-	            // Update assessment status
-	            userLab.setStatus("Completed");
+	public Map<String, Object> markAssessmentCompleted(@RequestParam("labId") String labId,
+			@RequestParam("reason") String reason, Principal principal) {
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			int temp = Integer.parseInt(labId);
+			List<AssessmentUserLab> labDetails = assessmentUserLabRepository.findByguacamoleId(temp);
+
+			if (!labDetails.isEmpty()) {
+				AssessmentUserLab userLab = labDetails.get(0);
+
+				// Update assessment status
+				userLab.setStatus("Completed");
 //	            userLab.setVmState("completed");
-	            assessmentUserLabRepository.save(userLab);
-	            
-	            // Log completion reason
-	            System.out.println("Assessment completed for lab " + labId + ". Reason: " + reason);
-	            
-	            response.put("success", true);
-	            response.put("message", "Assessment marked as completed");
-	        } else {
-	            response.put("success", false);
-	            response.put("error", "Lab not found");
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        response.put("success", false);
-	        response.put("error", "Failed to mark assessment completed");
-	    }
-	    
-	    return response;
+				assessmentUserLabRepository.save(userLab);
+
+				// Log completion reason
+				System.out.println("Assessment completed for lab " + labId + ". Reason: " + reason);
+
+				response.put("success", true);
+				response.put("message", "Assessment marked as completed");
+			} else {
+				response.put("success", false);
+				response.put("error", "Lab not found");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("success", false);
+			response.put("error", "Failed to mark assessment completed");
+		}
+
+		return response;
 	}
 
 	// Helper method to determine OS based on template name or lab name
 	private String determineOS(String templateName, String labName) {
-	    String value = "";
-	    
-	    if (labName != null) {
-	        String lab = labName.toLowerCase();
-	        
-	        if (lab.contains("windows")) {
-	            value = "windows";
-	        } else if (lab.contains("kali") || lab.contains("linux")) {
-	            value = "linux";
-	        }
-	    }
-	    
-	    // Default to linux
-	    return value.isEmpty() ? "linux" : value;
+		String value = "";
+
+		if (labName != null) {
+			String lab = labName.toLowerCase();
+
+			if (lab.contains("windows")) {
+				value = "windows";
+			} else if (lab.contains("kali") || lab.contains("linux")) {
+				value = "linux";
+			}
+		}
+
+		// Default to linux
+		return value.isEmpty() ? "linux" : value;
 	}
 
 	// Helper method to get mandatory command based on OS
@@ -8181,6 +8362,5 @@ public class GuacamoleController {
 //
 //	    return normalizedHistory.equals(normalizedCurrent);
 //	}
-	
-	
+
 }
