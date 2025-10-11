@@ -6638,49 +6638,58 @@ public class GuacamoleController {
 //
 //		return "redirect:/guac/View_SubjectWisePlaylist";
 //	}
-	
-	
+
 	@PostMapping("/save_SubjectWisePlaylist")
 	public String save_SubjectWisePlaylist(
-	        @RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
-	        @RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
-	        @RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds,
-	        @RequestParam(value = "subjectId", required = true) String subjectIdParam) {
+			@RequestParam(value = "playlistIds", required = false) List<Integer> playlistIds,
+			@RequestParam(value = "subplaylistIds", required = false) List<Integer> subplaylistIds,
+			@RequestParam(value = "scenarioIds", required = false) List<Integer> scenarioIds,
+			@RequestParam(value = "subjectId", required = true) String subjectIdParam) {
 
-	    try {
-	     
-	        Integer subjectId = null;
-	        
-	        if (subjectIdParam != null && !subjectIdParam.trim().isEmpty()) {
-	         
-	            String cleanedSubjectId = subjectIdParam.replaceAll("[^0-9-]", "").trim();
-	            
-	            if (!cleanedSubjectId.isEmpty()) {
-	                try {
-	                    subjectId = Integer.parseInt(cleanedSubjectId);
+		try {
+
+			Integer subjectId = null;
+
+			if (subjectIdParam != null && !subjectIdParam.trim().isEmpty()) {
+				System.err.println("subjectIdParam: " + subjectIdParam);
+
+				String[] parts = subjectIdParam.split(",");
+				String lastPart = parts[parts.length - 1].trim();
+
+				if (!lastPart.isEmpty()) {
+					try {
+						subjectId = Integer.parseInt(lastPart);
+					} catch (NumberFormatException e) {
+						System.err.println("❌ Invalid subject ID after parsing last part: " + lastPart);
+						return "redirect:/guac/SemesterWisePlaylist?error=Invalid+subject+ID";
+					}
+				}
+
+				String cleanedSubjectId = lastPart;
+//	            String cleanedSubjectId = subjectIdParam.replaceAll("[^0-9-]", "").trim();
+
+				if (!cleanedSubjectId.isEmpty()) {
+					try {
+						subjectId = Integer.parseInt(cleanedSubjectId);
 //	                    System.out.println("Cleaned and parsed subjectId: " + subjectId);
-	                } catch (NumberFormatException e) {
-	                    System.err.println("❌ Invalid subject ID after cleaning: " + cleanedSubjectId);
-	                    return "redirect:/guac/SemesterWisePlaylist?error=Invalid+subject+ID";
-	                }
-	            }
-	        }
+					} catch (NumberFormatException e) {
+						System.err.println("❌ Invalid subject ID after cleaning: " + cleanedSubjectId);
+						return "redirect:/guac/SemesterWisePlaylist?error=Invalid+subject+ID";
+					}
+				}
+			}
 
-	        if (subjectId == null) {
-	            System.err.println("❌ Subject ID is null or empty. Cannot save mappings.");
-	            return "redirect:/guac/SemesterWisePlaylist?error=Subject+is+required";
-	        }
+			if (subjectId == null) {
+				System.err.println("❌ Subject ID is null or empty. Cannot save mappings.");
+				return "redirect:/guac/SemesterWisePlaylist?error=Subject+is+required";
+			}
 
-	
-
-		
 			Optional<SubjectMaster> subjectOpt = SubjectMasterRepository.findById(subjectId);
 			if (!subjectOpt.isPresent()) {
 				System.err.println("❌ Subject not found with ID: " + subjectId);
 				return "redirect:/guac/SemesterWisePlaylist?error=Subject+not+found";
 			}
 
-			
 			List<SubjectPlaylistMapping> existingPlaylists = SubjectPlaylistMappingRepository.findBySubject(subjectId);
 			List<SubjectSubplaylistMapping> existingSubplaylists = SubjectSubplaylistMappingRepository
 					.findBySubject(subjectId);
@@ -6723,12 +6732,12 @@ public class GuacamoleController {
 
 //			System.out.println("✅ Successfully saved mappings for Subject ID: " + subjectId);
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return "redirect:/guac/SemesterWisePlaylist?error=Save+failed";
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "redirect:/guac/SemesterWisePlaylist?error=Save+failed";
+		}
 
-	    return "redirect:/guac/View_SubjectWisePlaylist";
+		return "redirect:/guac/View_SubjectWisePlaylist";
 	}
 
 	@GetMapping("/View_SubjectWisePlaylist")

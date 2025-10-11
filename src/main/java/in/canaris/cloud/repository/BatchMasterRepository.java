@@ -18,6 +18,8 @@ public interface BatchMasterRepository extends JpaRepository<BatchMaster, Intege
 
 	List<BatchMaster> findBySemesterSemesterId(int semesterId);
 
+	
+
 	BatchMaster findByBatchName(String string);
 
 	

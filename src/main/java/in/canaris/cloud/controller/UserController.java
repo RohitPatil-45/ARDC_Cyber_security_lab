@@ -1159,14 +1159,36 @@ public class UserController {
 	        }
 	        
 	        // Set semester if provided
+//	        if (userData.get("semesterName") != null && !userData.get("semesterName").trim().isEmpty()) {
+//	            SemesterMaster semester = SemesterMasterRepository.findBySemesterNameAndCourseName(userData.get("semesterName"),userData.get("courseName"));
+//	            if (semester != null) {
+//	                user.setSemesterName(semester);
+//	            } else {
+//	                System.out.println("Warning: Semester not found: " + userData.get("semesterName"));
+//	            }
+//	        }
+	        
 	        if (userData.get("semesterName") != null && !userData.get("semesterName").trim().isEmpty()) {
-	            SemesterMaster semester = SemesterMasterRepository.findBySemesterName(userData.get("semesterName"));
-	            if (semester != null) {
-	                user.setSemesterName(semester);
+	            String semesterName = userData.get("semesterName").trim();
+	            String courseName = userData.get("courseName") != null ? userData.get("courseName").trim() : null;
+
+	            if (courseName != null && !courseName.isEmpty()) {
+	                CourseMaster course = CourseMasterRepository.findByCourseName(courseName);
+	                if (course != null) {
+	                    SemesterMaster semester = SemesterMasterRepository.findBySemesterNameAndCourse(semesterName, course);
+	                    if (semester != null) {
+	                        user.setSemesterName(semester);
+	                    } else {
+	                        System.out.println("⚠️ Warning: Semester not found for name: " + semesterName + " and course: " + courseName);
+	                    }
+	                } else {
+	                    System.out.println("⚠️ Warning: Course not found with name: " + courseName);
+	                }
 	            } else {
-	                System.out.println("Warning: Semester not found: " + userData.get("semesterName"));
+	                System.out.println("⚠️ Warning: Course name is missing for semester: " + semesterName);
 	            }
 	        }
+
 	        
 	        // Set batch if provided
 	        if (userData.get("batchName") != null && !userData.get("batchName").trim().isEmpty()) {
