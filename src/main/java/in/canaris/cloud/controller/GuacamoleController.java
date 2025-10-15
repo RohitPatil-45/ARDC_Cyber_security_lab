@@ -1,5 +1,6 @@
 package in.canaris.cloud.controller;
 
+import java.awt.Menu;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -17,6 +18,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -77,8 +79,10 @@ import in.canaris.cloud.openstack.entity.Discover_Docker_Network;
 import in.canaris.cloud.openstack.entity.ElectiveSubject;
 import in.canaris.cloud.openstack.entity.ElectvieSubjectUserMapping;
 import in.canaris.cloud.openstack.entity.InstructionCommand;
+import in.canaris.cloud.openstack.entity.MenuChart;
 import in.canaris.cloud.openstack.entity.Playlist;
 import in.canaris.cloud.openstack.entity.PlaylistItem;
+import in.canaris.cloud.openstack.entity.RoleMenuTemplate;
 import in.canaris.cloud.openstack.entity.ScenarioComments;
 import in.canaris.cloud.openstack.entity.ScenarioLabTemplate;
 import in.canaris.cloud.openstack.entity.SemesterMaster;
@@ -135,6 +139,8 @@ import in.canaris.cloud.repository.SubjectScenarioMappingRepository;
 import in.canaris.cloud.repository.ElectiveSubjectRepository;
 import in.canaris.cloud.repository.ElectvieSubjectUserMappingRepository;
 import in.canaris.cloud.repository.BatchMasterRepository;
+import in.canaris.cloud.repository.RoleMenuTemplateRepository;
+import in.canaris.cloud.repository.MenuRepository;
 
 import in.canaris.cloud.repository.SubPlaylistRepository;
 import in.canaris.cloud.repository.UserLabRepository;
@@ -278,6 +284,12 @@ public class GuacamoleController {
 
 	@Autowired
 	private AssessmentUserWiseChatBoatInstructionTemplateRepository assessmentInstructionTemplateRepository;
+	
+	@Autowired
+	private RoleMenuTemplateRepository RoleMenuTemplateRepository;
+	
+	@Autowired
+	private MenuRepository MenuRepository;
 
 	@GetMapping("/")
 	public String home() {
@@ -656,13 +668,160 @@ public class GuacamoleController {
 //		return "SuperAdmin_Dashboard";
 //	}
 
+//	@GetMapping("/SuperAdmin_Dashboard")
+//	public String dashboard(Model model, Principal principal) {
+//
+//		Authentication auth = (Authentication) principal;
+//		String username = auth.getName();
+//		try {
+//			// Your existing virtualization and health monitoring code
+//			List<Object[]> results = AddPhysicalServerRepository.findVirtualizationTypeCounts();
+//			Map<String, Map<String, Long>> typeStats = new HashMap<>();
+//			Map<String, Long> totalCountByType = new HashMap<>();
+//
+//			long overallUp = 0;
+//			long overallDown = 0;
+//
+//			for (Object[] row : results) {
+//				String type = (String) row[0];
+//				String rawStatus = (String) row[1];
+//				Long count = ((Number) row[2]).longValue();
+//
+//				String status = (rawStatus != null) ? rawStatus.toLowerCase() : "unknown";
+//
+//				typeStats.putIfAbsent(type, new HashMap<>());
+//				totalCountByType.putIfAbsent(type, 0L);
+//
+//				typeStats.get(type).put(status, count);
+//				totalCountByType.put(type, totalCountByType.get(type) + count);
+//
+//				if ("up".equals(status)) {
+//					overallUp += count;
+//				} else {
+//					overallDown += count;
+//				}
+//			}
+//
+//			for (Map<String, Long> map : typeStats.values()) {
+//				map.putIfAbsent("up", 0L);
+//				map.putIfAbsent("down", 0L);
+//				map.putIfAbsent("unknown", 0L);
+//			}
+//
+//			List<Object[]> userStatusCounts = AppUserRepository.countByStatus();
+//			long userOnline = 0;
+//			long userOffline = 0;
+//			for (Object[] ur : userStatusCounts) {
+//				String st = (String) ur[0];
+//				Long c = ((Number) ur[1]).longValue();
+//				String lower = (st != null) ? st.toLowerCase() : "unknown";
+//				if ("online".equalsIgnoreCase(lower)) {
+//					userOnline += c;
+//				} else {
+//					userOffline += c;
+//				}
+//			}
+//
+//			// NEW: Add health monitoring data
+//			List<Object[]> healthResults = AddPhysicalServerRepository.findHealthDataByVirtualizationType();
+//			Map<String, Map<String, Double>> healthStats = new HashMap<>();
+//
+//			for (Object[] row : healthResults) {
+//				String type = (String) row[0];
+//				Double usedCpu = ((Number) row[1]).doubleValue();
+//				Double totalCpu = ((Number) row[2]).doubleValue();
+//				Double usedRam = ((Number) row[3]).doubleValue();
+//				Double totalRam = ((Number) row[4]).doubleValue();
+//				Double usedDisk = ((Number) row[5]).doubleValue();
+//				Double totalDisk = ((Number) row[6]).doubleValue();
+//
+//				healthStats.putIfAbsent(type, new HashMap<>());
+//
+//				// Calculate usage percentages
+//				double cpuUsage = totalCpu > 0 ? (usedCpu / totalCpu) * 100 : 0;
+//				double ramUsage = totalRam > 0 ? (usedRam / totalRam) * 100 : 0;
+//				double diskUsage = totalDisk > 0 ? (usedDisk / totalDisk) * 100 : 0;
+//
+//				healthStats.get(type).put("cpuUsage", cpuUsage);
+//				healthStats.get(type).put("ramUsage", ramUsage);
+//				healthStats.get(type).put("diskUsage", diskUsage);
+//				healthStats.get(type).put("cpuFree", 100 - cpuUsage);
+//				healthStats.get(type).put("ramFree", 100 - ramUsage);
+//				healthStats.get(type).put("diskFree", 100 - diskUsage);
+//			}
+//
+//			List<Object[]> subProductDetails = repository.getSubProductDetails();
+//			List<Map<String, Object>> subProductList = new ArrayList<>();
+//			for (Object[] row : subProductDetails) {
+//				Map<String, Object> map = new HashMap<>();
+//				map.put("productName", row[0]);
+//				map.put("subProductName", row[1]);
+//				map.put("instanceCount", row[2]);
+//				subProductList.add(map);
+//			}
+//			model.addAttribute("subProductList", subProductList);
+//
+//			// NEW: Get all users for SuperAdmin with their subjects
+//			List<AppUser> allUsers = AppUserRepository.findAll();
+//
+//			// Create a map to store user subjects (key: userId, value: list of subjects)
+//			Map<Long, List<SubjectMaster>> userSubjectsMap = new HashMap<>();
+//
+//			// For each user, find their subjects based on semester ID
+//			for (AppUser user : allUsers) {
+//				if (user.getSemesterName() != null) {
+//					Integer semesterId = user.getSemesterName().getSemesterId();
+//					List<SubjectMaster> userSubjects = SubjectMasterRepository.findBysemester_SemesterId(semesterId);
+//					userSubjectsMap.put(user.getUserId(), userSubjects);
+//
+//					System.out.println("User: " + user.getUserName() + ", Semester ID: " + semesterId + ", Subjects: "
+//							+ userSubjects.size());
+//				}
+//			}
+//
+//			// Other counts
+//			long playlistCount = PlaylistRepository.count();
+//			long subPlaylistCount = SubPlaylistRepository.count();
+//			long scenarioCount = ScenarioRepository.count();
+//			long templateCount = repository.count();
+//
+//			// Add all attributes to model
+//			model.addAttribute("healthStats", healthStats);
+//			model.addAttribute("typeStats", typeStats);
+//			model.addAttribute("totalCountByType", totalCountByType);
+//
+//			model.addAttribute("overallUp", overallUp);
+//			model.addAttribute("overallDown", overallDown);
+//
+//			model.addAttribute("userOnline", userOnline);
+//			model.addAttribute("userOffline", userOffline);
+//
+//			model.addAttribute("playlistCount", playlistCount);
+//			model.addAttribute("subPlaylistCount", subPlaylistCount);
+//			model.addAttribute("scenarioCount", scenarioCount);
+//			model.addAttribute("templateCount", templateCount);
+//
+//			// NEW: Add users and userSubjectsMap for the table
+//			model.addAttribute("users", allUsers);
+//			model.addAttribute("userSubjectsMap", userSubjectsMap);
+//
+//			model.addAttribute("pageTitle", "Super Admin Dashboard");
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			System.err.println("Exception_SuperAdmin_Dashboard");
+//		}
+//
+//		return "SuperAdmin_Dashboard";
+//	}
+
 	@GetMapping("/SuperAdmin_Dashboard")
 	public String dashboard(Model model, Principal principal) {
-
 		Authentication auth = (Authentication) principal;
 		String username = auth.getName();
+
 		try {
-			// Your existing virtualization and health monitoring code
+			// 1. Virtualization Type Status Counts
 			List<Object[]> results = AddPhysicalServerRepository.findVirtualizationTypeCounts();
 			Map<String, Map<String, Long>> typeStats = new HashMap<>();
 			Map<String, Long> totalCountByType = new HashMap<>();
@@ -671,140 +830,428 @@ public class GuacamoleController {
 			long overallDown = 0;
 
 			for (Object[] row : results) {
-				String type = (String) row[0];
-				String rawStatus = (String) row[1];
-				Long count = ((Number) row[2]).longValue();
+				if (row.length >= 3 && row[0] != null && row[1] != null && row[2] != null) {
+					String type = row[0].toString();
+					String rawStatus = row[1].toString();
+					Long count = ((Number) row[2]).longValue();
 
-				String status = (rawStatus != null) ? rawStatus.toLowerCase() : "unknown";
+					String status = rawStatus.toLowerCase();
 
-				typeStats.putIfAbsent(type, new HashMap<>());
-				totalCountByType.putIfAbsent(type, 0L);
+					typeStats.putIfAbsent(type, new HashMap<>());
+					totalCountByType.put(type, totalCountByType.getOrDefault(type, 0L) + count);
 
-				typeStats.get(type).put(status, count);
-				totalCountByType.put(type, totalCountByType.get(type) + count);
+					// Update status counts
+					typeStats.get(type).put(status, typeStats.get(type).getOrDefault(status, 0L) + count);
 
-				if ("up".equals(status)) {
-					overallUp += count;
-				} else if ("down".equals(status)) {
-					overallDown += count;
+					// Update overall counts
+					if ("up".equals(status)) {
+						overallUp += count;
+					} else if ("down".equals(status)) {
+						overallDown += count;
+					}
 				}
 			}
 
-			for (Map<String, Long> map : typeStats.values()) {
-				map.putIfAbsent("up", 0L);
-				map.putIfAbsent("down", 0L);
-				map.putIfAbsent("unknown", 0L);
+			// Ensure all types have up/down entries
+			for (String type : typeStats.keySet()) {
+				Map<String, Long> statusMap = typeStats.get(type);
+				statusMap.putIfAbsent("up", 0L);
+				statusMap.putIfAbsent("down", 0L);
+				statusMap.putIfAbsent("unknown", 0L);
 			}
 
+			// 2. User Status Counts
 			List<Object[]> userStatusCounts = AppUserRepository.countByStatus();
 			long userOnline = 0;
 			long userOffline = 0;
+
 			for (Object[] ur : userStatusCounts) {
-				String st = (String) ur[0];
-				Long c = ((Number) ur[1]).longValue();
-				String lower = (st != null) ? st.toLowerCase() : "unknown";
-				if ("online".equals(lower) || "up".equals(lower)) {
-					userOnline += c;
-				} else if ("offline".equals(lower) || "down".equals(lower)) {
-					userOffline += c;
+				if (ur.length >= 2 && ur[0] != null && ur[1] != null) {
+					String st = ur[0].toString();
+					Long c = ((Number) ur[1]).longValue();
+
+					if ("online".equalsIgnoreCase(st)) {
+						userOnline += c;
+					} else if ("offline".equalsIgnoreCase(st)) {
+						userOffline += c;
+					}
 				}
 			}
 
-			// NEW: Add health monitoring data
+			// 3. Health Data
 			List<Object[]> healthResults = AddPhysicalServerRepository.findHealthDataByVirtualizationType();
 			Map<String, Map<String, Double>> healthStats = new HashMap<>();
 
 			for (Object[] row : healthResults) {
-				String type = (String) row[0];
-				Double usedCpu = ((Number) row[1]).doubleValue();
-				Double totalCpu = ((Number) row[2]).doubleValue();
-				Double usedRam = ((Number) row[3]).doubleValue();
-				Double totalRam = ((Number) row[4]).doubleValue();
-				Double usedDisk = ((Number) row[5]).doubleValue();
-				Double totalDisk = ((Number) row[6]).doubleValue();
+				if (row.length >= 7) {
+					String type = row[0] != null ? row[0].toString() : "Unknown";
 
-				healthStats.putIfAbsent(type, new HashMap<>());
+					// Safely parse numeric values with defaults
+					double usedCpu = safeParseDouble(row[1]);
+					double totalCpu = safeParseDouble(row[2]);
+					double usedRam = safeParseDouble(row[3]);
+					double totalRam = safeParseDouble(row[4]);
+					double usedDisk = safeParseDouble(row[5]);
+					double totalDisk = safeParseDouble(row[6]);
 
-				// Calculate usage percentages
-				double cpuUsage = totalCpu > 0 ? (usedCpu / totalCpu) * 100 : 0;
-				double ramUsage = totalRam > 0 ? (usedRam / totalRam) * 100 : 0;
-				double diskUsage = totalDisk > 0 ? (usedDisk / totalDisk) * 100 : 0;
+					Map<String, Double> typeHealth = new HashMap<>();
 
-				healthStats.get(type).put("cpuUsage", cpuUsage);
-				healthStats.get(type).put("ramUsage", ramUsage);
-				healthStats.get(type).put("diskUsage", diskUsage);
-				healthStats.get(type).put("cpuFree", 100 - cpuUsage);
-				healthStats.get(type).put("ramFree", 100 - ramUsage);
-				healthStats.get(type).put("diskFree", 100 - diskUsage);
+					// Calculate percentages with safety checks
+					double cpuUsage = totalCpu > 0 ? (usedCpu / totalCpu) * 100.0 : 0.0;
+					double ramUsage = totalRam > 0 ? (usedRam / totalRam) * 100.0 : 0.0;
+					double diskUsage = totalDisk > 0 ? (usedDisk / totalDisk) * 100.0 : 0.0;
+
+					// Ensure percentages are within valid range
+					cpuUsage = Math.max(0, Math.min(100, cpuUsage));
+					ramUsage = Math.max(0, Math.min(100, ramUsage));
+					diskUsage = Math.max(0, Math.min(100, diskUsage));
+
+					typeHealth.put("cpuUsage", Math.round(cpuUsage * 10.0) / 10.0);
+					typeHealth.put("ramUsage", Math.round(ramUsage * 10.0) / 10.0);
+					typeHealth.put("diskUsage", Math.round(diskUsage * 10.0) / 10.0);
+
+					healthStats.put(type, typeHealth);
+				}
 			}
 
+			// 4. Sub Product Details
 			List<Object[]> subProductDetails = repository.getSubProductDetails();
 			List<Map<String, Object>> subProductList = new ArrayList<>();
 			for (Object[] row : subProductDetails) {
-				Map<String, Object> map = new HashMap<>();
-				map.put("productName", row[0]);
-				map.put("subProductName", row[1]);
-				map.put("instanceCount", row[2]);
-				subProductList.add(map);
+				if (row.length >= 3) {
+					Map<String, Object> map = new HashMap<>();
+					map.put("productName", row[0] != null ? row[0].toString() : "N/A");
+					map.put("subProductName", row[1] != null ? row[1].toString() : "N/A");
+					map.put("instanceCount", row[2] != null ? ((Number) row[2]).longValue() : 0L);
+					subProductList.add(map);
+				}
 			}
-			model.addAttribute("subProductList", subProductList);
 
-			// NEW: Get all users for SuperAdmin with their subjects
+			// 5. Group Users by Department, Course, Semester, and Batch
 			List<AppUser> allUsers = AppUserRepository.findAll();
 
-			// Create a map to store user subjects (key: userId, value: list of subjects)
-			Map<Long, List<SubjectMaster>> userSubjectsMap = new HashMap<>();
+			// Create a map to group users by department, course, semester, and batch
+			Map<String, Map<String, Object>> userGroups = new LinkedHashMap<>();
 
-			// For each user, find their subjects based on semester ID
+			for (AppUser user : allUsers) {
+				String deptName = user.getDepartmentName() != null ? user.getDepartmentName().getDepartmentName()
+						: "Not Assigned";
+				Long deptId = user.getDepartmentName() != null ? user.getDepartmentName().getDepartmentId() : 0L;
+
+				String courseName = user.getCourseName() != null ? user.getCourseName().getCourseName()
+						: "Not Assigned";
+				Long courseId = user.getCourseName() != null ? user.getCourseName().getCourseId() : 0L;
+
+				String semesterName = user.getSemesterName() != null ? user.getSemesterName().getSemesterName()
+						: "Not Assigned";
+				Long semesterId = user.getSemesterName() != null ? user.getSemesterName().getSemesterId() : 0L;
+
+				String batchName = user.getBatchName() != null ? user.getBatchName().getBatchName() : "Not Assigned";
+				Long batchId = user.getBatchName() != null ? user.getBatchName().getBatchId() : 0L;
+
+				// Create a unique key for the group
+				String groupKey = deptName + "|" + courseName + "|" + semesterName + "|" + batchName;
+
+				userGroups.computeIfAbsent(groupKey, k -> {
+					Map<String, Object> group = new HashMap<>();
+					group.put("departmentName", deptName);
+					group.put("departmentId", deptId);
+					group.put("courseName", courseName);
+					group.put("courseId", courseId);
+					group.put("semesterName", semesterName);
+					group.put("semesterId", semesterId);
+					group.put("batchName", batchName);
+					group.put("batchId", batchId);
+					group.put("userCount", 0);
+					group.put("userIds", new ArrayList<Long>());
+					return group;
+				});
+
+				// Update the count and user IDs for this group
+				Map<String, Object> group = userGroups.get(groupKey);
+				group.put("userCount", (Integer) group.get("userCount") + 1);
+				((List<Long>) group.get("userIds")).add(user.getUserId());
+			}
+
+			// Convert the map to a list for the template
+			List<Map<String, Object>> userGroupsList = new ArrayList<>(userGroups.values());
+
+			// Sort by department, course, semester, batch
+			userGroupsList.sort((g1, g2) -> {
+				int deptCompare = ((String) g1.get("departmentName")).compareTo((String) g2.get("departmentName"));
+				if (deptCompare != 0)
+					return deptCompare;
+
+				int courseCompare = ((String) g1.get("courseName")).compareTo((String) g2.get("courseName"));
+				if (courseCompare != 0)
+					return courseCompare;
+
+				int semCompare = ((String) g1.get("semesterName")).compareTo((String) g2.get("semesterName"));
+				if (semCompare != 0)
+					return semCompare;
+
+				return ((String) g1.get("batchName")).compareTo((String) g2.get("batchName"));
+			});
+
+			// 6. User Subjects Map (for individual user view if needed)
+			Map<Long, List<SubjectMaster>> userSubjectsMap = new HashMap<>();
 			for (AppUser user : allUsers) {
 				if (user.getSemesterName() != null) {
 					Integer semesterId = user.getSemesterName().getSemesterId();
 					List<SubjectMaster> userSubjects = SubjectMasterRepository.findBysemester_SemesterId(semesterId);
 					userSubjectsMap.put(user.getUserId(), userSubjects);
-
-					System.out.println("User: " + user.getUserName() + ", Semester ID: " + semesterId + ", Subjects: "
-							+ userSubjects.size());
+				} else {
+					userSubjectsMap.put(user.getUserId(), new ArrayList<>());
 				}
 			}
 
-			// Other counts
+			// 7. Other counts
 			long playlistCount = PlaylistRepository.count();
 			long subPlaylistCount = SubPlaylistRepository.count();
 			long scenarioCount = ScenarioRepository.count();
 			long templateCount = repository.count();
 
+			// Debug logging
+////			System.out.println("=== DEBUG STATS ===");
+//			System.out.println("Overall - Up: " + overallUp + ", Down: " + overallDown);
+//			System.out.println("Users - Online: " + userOnline + ", Offline: " + userOffline);
+//			System.out.println("Type Stats: " + typeStats);
+//			System.out.println("Health Stats: " + healthStats);
+//			System.out.println("User Groups Count: " + userGroupsList.size());
+
 			// Add all attributes to model
 			model.addAttribute("healthStats", healthStats);
 			model.addAttribute("typeStats", typeStats);
 			model.addAttribute("totalCountByType", totalCountByType);
-
 			model.addAttribute("overallUp", overallUp);
 			model.addAttribute("overallDown", overallDown);
-
 			model.addAttribute("userOnline", userOnline);
 			model.addAttribute("userOffline", userOffline);
-
 			model.addAttribute("playlistCount", playlistCount);
 			model.addAttribute("subPlaylistCount", subPlaylistCount);
 			model.addAttribute("scenarioCount", scenarioCount);
 			model.addAttribute("templateCount", templateCount);
-
-			// NEW: Add users and userSubjectsMap for the table
+			model.addAttribute("subProductList", subProductList);
 			model.addAttribute("users", allUsers);
+			model.addAttribute("userGroups", userGroupsList);
 			model.addAttribute("userSubjectsMap", userSubjectsMap);
-
 			model.addAttribute("pageTitle", "Super Admin Dashboard");
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.err.println("Exception_SuperAdmin_Dashboard");
+			System.err.println("Exception in SuperAdmin_Dashboard: " + e.getMessage());
+
+			// Add default values to prevent template errors
+			model.addAttribute("typeStats", new HashMap<>());
+			model.addAttribute("healthStats", new HashMap<>());
+			model.addAttribute("overallUp", 0);
+			model.addAttribute("overallDown", 0);
+			model.addAttribute("userOnline", 0);
+			model.addAttribute("userOffline", 0);
+			model.addAttribute("playlistCount", 0);
+			model.addAttribute("subPlaylistCount", 0);
+			model.addAttribute("scenarioCount", 0);
+			model.addAttribute("templateCount", 0);
+			model.addAttribute("subProductList", new ArrayList<>());
+			model.addAttribute("users", new ArrayList<>());
+			model.addAttribute("userGroups", new ArrayList<>());
+			model.addAttribute("userSubjectsMap", new HashMap<>());
 		}
 
 		return "SuperAdmin_Dashboard";
 	}
 
-	private Double getDoubleValue(Object obj) {
-		return (obj != null) ? ((Number) obj).doubleValue() : 0.0;
+	// Helper method to safely parse double values
+	private double safeParseDouble(Object value) {
+		if (value == null)
+			return 0.0;
+		try {
+			if (value instanceof Number) {
+				return ((Number) value).doubleValue();
+			} else {
+				return Double.parseDouble(value.toString());
+			}
+		} catch (NumberFormatException e) {
+			return 0.0;
+		}
+	}
+	@GetMapping("/groupUsers/{deptId}/{courseId}/{semesterId}/{batchId}")
+	public String viewGroupUsers(@PathVariable Long deptId, 
+	                           @PathVariable Long courseId, 
+	                           @PathVariable Long semesterId, 
+	                           @PathVariable Long batchId, 
+	                           Model model) {
+	    
+	    System.out.println("=== GROUP USERS REQUEST ===");
+	    System.out.println("Dept: " + deptId + ", Course: " + courseId + ", Semester: " + semesterId + ", Batch: " + batchId);
+	    
+	    try {
+	        // Convert parameters with proper null handling
+	        Long actualDeptId = (deptId != null && deptId > 0) ? deptId : 0L;
+	        Long actualCourseId = (courseId != null && courseId > 0) ? courseId : 0L;
+	        Long actualBatchId = (batchId != null && batchId > 0) ? batchId : 0L;
+	        
+	        // For semesterId, we need to handle the Integer/Long conversion
+	        Integer actualSemesterId = 0;
+	        if (semesterId != null && semesterId > 0) {
+	            actualSemesterId = semesterId.intValue();
+	        }
+	        
+	        List<AppUser> groupUsers;
+	        
+	        try {
+	            // Try using the repository method
+	            System.out.println("Calling repository method with: Dept=" + actualDeptId + 
+	                             ", Course=" + actualCourseId + ", Semester=" + actualSemesterId + 
+	                             ", Batch=" + actualBatchId);
+	            
+	            groupUsers = AppUserRepository.findByDepartmentCourseSemesterBatch(
+	                actualDeptId, actualCourseId, actualSemesterId, actualBatchId);
+	            
+	            System.out.println("Repository method returned: " + groupUsers.size() + " users");
+	            
+	        } catch (Exception e) {
+	            System.out.println("Repository method failed, using manual filter: " + e.getMessage());
+	            // Fallback: manually filter the users
+	            groupUsers = manualFilterUsers(actualDeptId, actualCourseId, semesterId, actualBatchId);
+	        }
+	        
+	        // Create user subjects map for this group
+	        Map<Long, List<SubjectMaster>> userSubjectsMap = createUserSubjectsMap(groupUsers);
+	        
+	        // Fetch actual names for display (even if no users found)
+	        String deptName = "Not Assigned";
+	        String courseName = "Not Assigned"; 
+	        String semesterName = "Not Assigned";
+	        String batchName = "Not Assigned";
+	        
+	        if (actualDeptId > 0) {
+	            DepartmentMaster dept = DepartmentMasterRepository.findById(actualDeptId.intValue()).orElse(null);
+	            if (dept != null) deptName = dept.getDepartmentName();
+	        }
+	        
+	        if (actualCourseId > 0) {
+	            CourseMaster course = CourseMasterRepository.findById(actualCourseId.intValue()).orElse(null);
+	            if (course != null) courseName = course.getCourseName();
+	        }
+	        
+	        if (semesterId > 0) {
+	            SemesterMaster semester = SemesterMasterRepository.findById(semesterId.intValue()).orElse(null);
+	            if (semester != null) semesterName = semester.getSemesterName();
+	        }
+	        
+	        if (actualBatchId > 0) {
+	            BatchMaster batch = BatchMasterRepository.findById(actualBatchId.intValue()).orElse(null);
+	            if (batch != null) batchName = batch.getBatchName();
+	        }
+	        
+	        // Debug: Print user details
+	        System.out.println("=== FINAL DATA ===");
+	        System.out.println("Department: " + deptName);
+	        System.out.println("Course: " + courseName);
+	        System.out.println("Semester: " + semesterName);
+	        System.out.println("Batch: " + batchName);
+	        System.out.println("Total Users: " + groupUsers.size());
+	        System.out.println("User Subjects Map Size: " + userSubjectsMap.size());
+	        
+	        if (!groupUsers.isEmpty()) {
+	            for (int i = 0; i < Math.min(3, groupUsers.size()); i++) {
+	                AppUser user = groupUsers.get(i);
+	                System.out.println("User " + i + ": ID=" + user.getUserId() + 
+	                                 ", Name=" + user.getName() + 
+	                                 ", Username=" + user.getUserName() +
+	                                 ", Subjects Count=" + (userSubjectsMap.get(user.getUserId()) != null ? userSubjectsMap.get(user.getUserId()).size() : 0));
+	            }
+	        }
+	        
+	        model.addAttribute("groupUsers", groupUsers);
+	        model.addAttribute("userSubjectsMap", userSubjectsMap);
+	        model.addAttribute("deptId", actualDeptId);
+	        model.addAttribute("courseId", actualCourseId);
+	        model.addAttribute("semesterId", semesterId);
+	        model.addAttribute("batchId", actualBatchId);
+	        model.addAttribute("deptName", deptName);
+	        model.addAttribute("courseName", courseName);
+	        model.addAttribute("semesterName", semesterName);
+	        model.addAttribute("batchName", batchName);
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        System.out.println("ERROR in controller: " + e.getMessage());
+	        model.addAttribute("groupUsers", new ArrayList<>());
+	        model.addAttribute("userSubjectsMap", new HashMap<>());
+	        model.addAttribute("error", "Failed to load group users: " + e.getMessage());
+	    }
+	    
+	    return "group_users";
+	}
+
+	// Manual filtering fallback method
+	private List<AppUser> manualFilterUsers(Long deptId, Long courseId, Long semesterId, Long batchId) {
+	    System.out.println("Using manual filter method");
+	    List<AppUser> allUsers = AppUserRepository.findAll();
+	    List<AppUser> filteredUsers = new ArrayList<>();
+	    
+	    System.out.println("Total users in system: " + allUsers.size());
+	    
+	    for (AppUser user : allUsers) {
+	        boolean matches = true;
+	        
+	        // Check department
+	        if (deptId > 0) {
+	            if (user.getDepartmentName() == null || 
+	                user.getDepartmentName().getDepartmentId() != deptId.intValue()) {
+	                matches = false;
+	            }
+	        }
+	        
+	        // Check course
+	        if (matches && courseId > 0) {
+	            if (user.getCourseName() == null || 
+	                user.getCourseName().getCourseId() != courseId.intValue()) {
+	                matches = false;
+	            }
+	        }
+	        
+	        // Check semester (with Long to Integer conversion)
+	        if (matches && semesterId > 0) {
+	            if (user.getSemesterName() == null || 
+	                user.getSemesterName().getSemesterId() != semesterId.intValue()) {
+	                matches = false;
+	            }
+	        }
+	        
+	        // Check batch
+	        if (matches && batchId > 0) {
+	            if (user.getBatchName() == null || 
+	                user.getBatchName().getBatchId() != batchId.intValue()) {
+	                matches = false;
+	            }
+	        }
+	        
+	        if (matches) {
+	            filteredUsers.add(user);
+	        }
+	    }
+	    
+	    System.out.println("Manual filter found: " + filteredUsers.size() + " users");
+	    return filteredUsers;
+	}
+
+	private Map<Long, List<SubjectMaster>> createUserSubjectsMap(List<AppUser> users) {
+	    Map<Long, List<SubjectMaster>> userSubjectsMap = new HashMap<>();
+	    
+	    for (AppUser user : users) {
+	        if (user.getSemesterName() != null) {
+	            Integer semesterId = user.getSemesterName().getSemesterId();
+	            List<SubjectMaster> userSubjects = SubjectMasterRepository.findBysemester_SemesterId(semesterId);
+	            userSubjectsMap.put(user.getUserId(), userSubjects);
+	        } else {
+	            userSubjectsMap.put(user.getUserId(), new ArrayList<>());
+	        }
+	    }
+	    
+	    return userSubjectsMap;
 	}
 
 //	@GetMapping("/SuperAdmin_Dashboard")
@@ -6401,7 +6848,14 @@ public class GuacamoleController {
 		for (Object[] user : users) {
 			Map<String, Object> map = new HashMap<>();
 			map.put("username", user[0].toString());
-			map.put("status", user[1].toString());
+
+			String statusValue = user[1] != null ? user[1].toString() : "offline";
+			if ("online".equalsIgnoreCase(statusValue)) {
+				map.put("status", statusValue);
+			} else {
+				map.put("status", "offline");
+			}
+
 			result.add(map);
 		}
 
@@ -8371,5 +8825,79 @@ public class GuacamoleController {
 //
 //	    return normalizedHistory.equals(normalizedCurrent);
 //	}
+	
+	
+	
 
+
+	@GetMapping("/manage")
+	public String showTemplateManagementPage(Model model) {
+	    try {
+	        // Get all menus grouped by module
+	        List<MenuChart> allMenus = MenuRepository.findAll();
+	        
+	        // Group menus by module name
+	        Map<String, List<MenuChart>> menusByModule = allMenus.stream()
+	                .collect(Collectors.groupingBy(menu -> 
+	                    menu.getModuleName() != null ? menu.getModuleName() : "Other"
+	                ));
+	        
+	        // Get existing templates to show selected items
+	        List<RoleMenuTemplate> existingTemplates = RoleMenuTemplateRepository.findAll();
+	        Set<Integer> selectedMenuIds = existingTemplates.stream()
+	                .map(template -> template.getMenu().getMenuId())
+	                .collect(Collectors.toSet());
+	        
+	        model.addAttribute("menusByModule", menusByModule);
+	        model.addAttribute("selectedMenuIds", selectedMenuIds);
+	        model.addAttribute("templateName", "");
+	        
+	    } catch (Exception e) {
+	        model.addAttribute("error", "Error loading menus: " + e.getMessage());
+	    }
+	    
+	    return "sidebar-template-management";
+	}
+
+	@PostMapping("/sidebar-templates-save")
+	public String saveTemplate(@RequestParam String templateName,
+	                         @RequestParam(required = false) List<Integer> menuIds,
+	                         RedirectAttributes redirectAttributes) {
+	    try {
+	        // Validate inputs
+	        if (templateName == null || templateName.trim().isEmpty()) {
+	            redirectAttributes.addFlashAttribute("error", "Template name is required");
+	            return "redirect:/sidebar-templates/manage";
+	        }
+	        
+	        if (menuIds == null || menuIds.isEmpty()) {
+	            redirectAttributes.addFlashAttribute("error", "Please select at least one menu item");
+	            return "redirect:/guac/manage";
+	        }
+	        
+	        // Save selected menus as templates
+	        List<RoleMenuTemplate> templatesToSave = new ArrayList<>();
+	        
+	        for (Integer menuId : menuIds) {
+	            Optional<MenuChart> menuOptional = MenuRepository.findById(menuId);
+	            if (menuOptional.isPresent()) {
+	                RoleMenuTemplate template = new RoleMenuTemplate();
+	                template.setTemplateName(templateName.trim());
+	                template.setMenu(menuOptional.get());
+	                templatesToSave.add(template);
+	            }
+	        }
+	        
+	        if (!templatesToSave.isEmpty()) {
+	            RoleMenuTemplateRepository.saveAll(templatesToSave);
+	            redirectAttributes.addFlashAttribute("success", 
+	                "Template '" + templateName + "' saved successfully with " + templatesToSave.size() + " menu items!");
+	        }
+	        
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("error", "Error saving template: " + e.getMessage());
+	    }
+	    
+	    return "redirect:/guac/manage";
+	}
 }

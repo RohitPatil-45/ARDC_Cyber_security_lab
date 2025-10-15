@@ -803,16 +803,26 @@ keyframes float { 0% {
 50
 
 
+
+
 %
 {
 transform
 
 
+
+
 :
 
 
+
+
 translate
+
+
 (
+
+
 
 
 10px
@@ -820,24 +830,36 @@ translate
 10px
 
 
+
+
 )
+
+
 ;
-
-
 }
 100
 
 
+
+
 %
 {
 transform
 
 
+
+
 :
 
 
+
+
 translate
+
+
 (
+
+
 
 
 0
@@ -845,10 +867,12 @@ translate
 0
 
 
+
+
 )
+
+
 ;
-
-
 }
 }
 </style>
@@ -1200,127 +1224,126 @@ translate
 
 				<!-- Sub Product Details Section -->
 				<div class="row mt-4">
-    <div class="col-12">
-        <div class="card shadow-sm border-0 rounded">
-            <div class="card-header bg-white border-bottom">
-                <h5 class="mb-0 text-dark">
-                    <i class="fas fa-cube me-2"></i>Product Details
-                </h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th><i class="fas fa-box me-2"></i>Product Name</th>
-                                <th><i class="fas fa-layer-group me-2"></i>Sub Product Name</th>
-                                <th class="text-center"><i class="fas fa-server me-2"></i>Instance Count</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="item, status : ${subProductList}">
-                                <td th:text="${item.productName}">Product Name</td>
-                                <td th:text="${item.subProductName}">Sub Product Name</td>
-                                <td class="text-center">
-                                    <span class="badge bg-primary px-3 py-2" th:text="${item.instanceCount}">0</span>
-                                </td>
-                            </tr>
+					<div class="col-12">
+						<div class="card shadow-sm border-0 rounded">
+							<div class="card-header bg-white border-bottom">
+								<h5 class="mb-0 text-dark">
+									<i class="fas fa-cube me-2"></i>Product Details
+								</h5>
+							</div>
+							<div class="card-body p-0">
+								<div class="table-responsive">
+									<table class="table table-bordered table-striped mb-0">
+										<thead class="table-light">
+											<tr>
+												<th><i class="fas fa-box me-2"></i>Product Name</th>
+												<th><i class="fas fa-layer-group me-2"></i>Sub Product
+													Name</th>
+												<th class="text-center"><i class="fas fa-server me-2"></i>Instance
+													Count</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="item, status : ${subProductList}">
+												<td th:text="${item.productName}">Product Name</td>
+												<td th:text="${item.subProductName}">Sub Product Name</td>
+												<td class="text-center"><span
+													class="badge bg-primary px-3 py-2"
+													th:text="${item.instanceCount}">0</span></td>
+											</tr>
 
-                            <!-- Show message if no data -->
-                            <tr th:if="${subProductList.empty}">
-                                <td colspan="3" class="text-center py-5 text-muted">
-                                    <i class="fas fa-inbox fa-2x mb-2"></i>
-                                    <div>
-                                        <strong>No Data Available</strong>
-                                        <p class="mb-0">No sub product details found in the system.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+											<!-- Show message if no data -->
+											<tr th:if="${subProductList.empty}">
+												<td colspan="3" class="text-center py-5 text-muted"><i
+													class="fas fa-inbox fa-2x mb-2"></i>
+													<div>
+														<strong>No Data Available</strong>
+														<p class="mb-0">No sub product details found in the
+															system.</p>
+													</div></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 
 
 
-<!-- Users Table Section -->
-<div class="card mt-4">
-    <div class="card-header bg-primary text-white">
-        <h3 class="card-title mb-0">
-            <i class="fas fa-users"></i> All Users
-        </h3>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table id="usersTable" class="table table-hover">
-    <thead>
-        <tr>
-            <th>Sr No.</th>
-            <th>User Name</th>
-            <th>Full Name</th>
-            <th>Department</th>
-            <th>Course</th>
-            <th>Semester</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr th:each="user, stat : ${users}">
-            <td th:text="${stat.count}">1</td>
-            <td>
-                <strong th:text="${user.userName}">Username</strong>
-            </td>
-            <td th:text="${user.name} ?: 'N/A'">Full Name</td>
-            
-            <!-- Department -->
-            <td>
-                <span th:if="${user.departmentName != null}" th:text="${user.departmentName.departmentName}"></span>
-                <span th:if="${user.departmentName == null}" class="text-muted">Not Assigned</span>
-            </td>
-            
-            <!-- Course -->
-            <td>
-                <span th:if="${user.courseName != null}" th:text="${user.courseName.courseName}"></span>
-                <span th:if="${user.courseName == null}" class="text-muted">Not Assigned</span>
-            </td>
-            
-            <!-- Semester -->
-            <td>
-                <span th:if="${user.semesterName != null}" th:text="${user.semesterName.semesterName}"></span>
-                <span th:if="${user.semesterName == null}" class="text-muted">Not Assigned</span>
-            </td>
+				<!-- Users Table Section -->
+				<!-- Users Table Section -->
+				<div class="card mt-4">
+					<div class="card-header bg-primary text-white">
+						<h3 class="card-title mb-0">
+							<i class="fas fa-users"></i> Batch Wise Details
+						</h3>
+					</div>
+					<div class="card-body">
+						<div class="table-responsive">
+							<table id="usersTable" class="table table-hover">
+								<thead>
+									<tr>
+										<th>Sr No.</th>
+										<th>Department</th>
+										<th>Course</th>
+										<th>Semester</th>
+										<th>Batch</th>
+										<th class="text-center">User Count</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="group, stat : ${userGroups}">
+										<td th:text="${stat.count}">1</td>
 
-            <!-- Status -->
-            <td>
-                <span th:if="${user.enabled}">Active</span>
-                <span th:unless="${user.enabled}">Inactive</span>
-            </td>
+										<!-- Department -->
+										<td><strong
+											th:text="${group.departmentName} ?: 'Not Assigned'">Department</strong>
+										</td>
 
-            <!-- Action - View Tasks Button -->
-            <td>
-                <div th:if="${userSubjectsMap != null and userSubjectsMap.get(user.userId) != null and !userSubjectsMap.get(user.userId).empty}">
-                    <a th:href="@{/guac/subjectView/{userId}(userId=${user.userId})}" 
-                       class="btn btn-primary btn-sm" 
-                       target="_blank">
-                        <i class="fas fa-tasks"></i> View Subjects
-                    </a>
-                </div>
-                <span th:if="${userSubjectsMap == null or userSubjectsMap.get(user.userId) == null or userSubjectsMap.get(user.userId).empty}">
-                    <span class="text-muted">-</span>
-                </span>
-            </td>
-        </tr>
-    </tbody>
-</table>
-            
-        </div>
-    </div>
-</div>
-				
+										<!-- Course -->
+										<td><span th:text="${group.courseName} ?: 'Not Assigned'">Course</span>
+										</td>
+
+										<!-- Semester -->
+										<td><span
+											th:text="${group.semesterName} ?: 'Not Assigned'">Semester</span>
+										</td>
+
+										<!-- Batch -->
+										<td><span th:text="${group.batchName} ?: 'Not Assigned'">Batch</span>
+										</td>
+
+										<!-- User Count -->
+										<td class="text-center"><span
+											class="badge bg-primary px-3 py-2"
+											th:text="${group.userCount}">0</span></td>
+
+										<!-- Action - View Users in this group -->
+										<td><a
+											th:href="@{/guac/groupUsers/{deptId}/{courseId}/{semesterId}/{batchId}(deptId=${group.departmentId ?: 0}, courseId=${group.courseId ?: 0}, semesterId=${group.semesterId ?: 0}, batchId=${group.batchId ?: 0})}"
+											class="btn btn-primary btn-sm" target="_blank"> <i
+												class="fas fa-eye"></i> View Users
+										</a></td>
+									</tr>
+
+									<!-- Show message if no data -->
+									<tr th:if="${userGroups.empty}">
+										<td colspan="7" class="text-center py-5 text-muted"><i
+											class="fas fa-inbox fa-2x mb-2"></i>
+											<div>
+												<strong>No User Groups Available</strong>
+												<p class="mb-0">No users found with department, course,
+													semester, and batch assignments.</p>
+											</div></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
 		</div>
 		</section>
 
@@ -1383,7 +1406,7 @@ translate
 							class="table table-bordered table-striped" width="100%">
 							<thead>
 								<tr>
-									<th>Sr</th>
+									<th>Sr11</th>
 									<th>Server Name</th>
 									<th>IP Address</th>
 									<th>Total</th>
@@ -1399,34 +1422,37 @@ translate
 				</div>
 			</div>
 		</div>
-		
-		
-		
+
+
+
 		<!-- User Status Modal -->
-<div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">User Details</h5>
-                <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <table id="userDetailsTable" class="table table-bordered table-striped" width="100%">
-                    <thead>
-                        <tr>
-                            <th>Sr</th>
-                            <th>Username</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+		<div class="modal fade" id="userModal" tabindex="-1" role="dialog"
+			aria-hidden="true">
+			<div class="modal-dialog modal-xl" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">User Details</h5>
+						<button type="button" class="btn" data-bs-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<table id="userDetailsTable"
+							class="table table-bordered table-striped" width="100%">
+							<thead>
+								<tr>
+									<th>Sr</th>
+									<th>Username</th>
+									<th>Status</th>
+								</tr>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
 
 
 
@@ -1843,6 +1869,73 @@ function handleUserLegendClick(status) {
 }
         
         // Function to handle health metric clicks
+// function handleHealthClick(type, resource) {
+//     $.ajax({
+//         url: '/guac/gethealthdetails',
+//         method: 'POST',
+//         data: {
+//             type: type,
+//             resource: resource
+//         },
+//         success: function (response) {
+//             const resourceLabel = resource.toUpperCase(); // CPU / RAM / DISK
+//             $('#healthModal .modal-title').text(`${type} - ${resourceLabel} Usage Details`);
+//             $('#healthModal').modal('show');
+
+//             setTimeout(function () {
+//                 let table = $('#healthDetailsTable').DataTable({
+//                     responsive: true,
+//                     paging: true,
+//                     searching: true,
+//                     ordering: true,
+//                     destroy: true,
+//                     autoWidth: false,
+//                     pageLength: 10,
+//                     lengthChange: true,
+//                     language: {
+//                         search: "Search:",
+//                         lengthMenu: "Show _MENU_ entries",
+//                         info: "Showing _START_ to _END_ of _TOTAL_ entries",
+//                     },
+//                     columnDefs: [
+//                         { targets: 0, className: 'text-center', width: "5%" }, // Sr No
+//                         { targets: 4, className: 'text-center' } // Usage %
+//                     ],
+//                     dom: 'Bfrtip',
+//                     buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+//                 });
+
+//                 table.clear();
+
+//                 response.forEach((entry, index) => {
+//                     const usage = `${entry.usagePercent.toFixed(2)}%`;
+//                     table.row.add([
+//                         index + 1,
+//                         entry.serverName || '-',
+//                         entry.ip || '-',
+//                         entry.total || '-',
+//                         entry.used || '-',
+//                         entry.free || '-',
+                        
+//                         usage
+//                     ]);
+//                 });
+
+//                 table.draw();
+//             }, 100);
+//         },
+//         error: function () {
+//             Swal.fire({
+//                 title: 'Error',
+//                 text: 'Failed to fetch health details.',
+//                 icon: 'error'
+//             });
+//         }
+//     });
+// }
+        
+        
+        // Function to handle health metric clicks
 function handleHealthClick(type, resource) {
     $.ajax({
         url: '/guac/gethealthdetails',
@@ -1852,17 +1945,51 @@ function handleHealthClick(type, resource) {
             resource: resource
         },
         success: function (response) {
-            const resourceLabel = resource.toUpperCase(); // CPU / RAM / DISK
-            $('#healthModal .modal-title').text(`${type} - ${resourceLabel} Usage Details`);
+            const resourceLabels = {
+                'cpu': 'CPU Usage',
+                'ram': 'RAM Usage', 
+                'disk': 'Disk Usage'
+            };
+            
+            const columnHeaders = {
+                'cpu': ['Sr', 'Server Name', 'IP Address', 'Total CPU(cores)', 'Used CPU', 'Free CPU', 'Usage %'],
+                'ram': ['Sr', 'Server Name', 'IP Address', 'Total RAM(MB)', 'Used RAM(MB)', 'Free RAM(MB)', 'Usage %'],
+                'disk': ['Sr', 'Server Name', 'IP Address', 'Total Disk(GB)', 'Used Disk(GB)', 'Free Disk(GB)', 'Usage %']
+            };
+            
+            const resourceLabel = resourceLabels[resource] || resource.toUpperCase();
+            $('#healthModal .modal-title').text(`${type} - ${resourceLabel} Details`);
+            
+            // Destroy existing DataTable instance if it exists
+            if ($.fn.DataTable.isDataTable('#healthDetailsTable')) {
+                $('#healthDetailsTable').DataTable().destroy();
+            }
+            
+            // Clear the table body completely
+            $('#healthDetailsTable tbody').empty();
+            
+            // Get the table header and update column names
+            const table = $('#healthDetailsTable');
+            const thead = table.find('thead tr');
+            
+            // Clear existing headers
+            thead.empty();
+            
+            // Add new headers based on resource type
+            columnHeaders[resource].forEach(headerText => {
+                thead.append(`<th>${headerText}</th>`);
+            });
+
             $('#healthModal').modal('show');
 
+            // Initialize DataTable after a short delay to ensure DOM is updated
             setTimeout(function () {
-                let table = $('#healthDetailsTable').DataTable({
+                let dataTable = $('#healthDetailsTable').DataTable({
                     responsive: true,
                     paging: true,
                     searching: true,
                     ordering: true,
-                    destroy: true,
+                    destroy: true, // This ensures it can be reinitialized
                     autoWidth: false,
                     pageLength: 10,
                     lengthChange: true,
@@ -1873,29 +2000,27 @@ function handleHealthClick(type, resource) {
                     },
                     columnDefs: [
                         { targets: 0, className: 'text-center', width: "5%" }, // Sr No
-                        { targets: 4, className: 'text-center' } // Usage %
+                        { targets: 6, className: 'text-center' } // Usage %
                     ],
                     dom: 'Bfrtip',
                     buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
                 });
 
-                table.clear();
-
+                // Add rows from response
                 response.forEach((entry, index) => {
-                    const usage = `${entry.usagePercent.toFixed(2)}%`;
-                    table.row.add([
+                    const usage = `${entry.usagePercent ? entry.usagePercent.toFixed(2) : '0.00'}%`;
+                    dataTable.row.add([
                         index + 1,
                         entry.serverName || '-',
                         entry.ip || '-',
                         entry.total || '-',
                         entry.used || '-',
                         entry.free || '-',
-                        
                         usage
                     ]);
                 });
 
-                table.draw();
+                dataTable.draw();
             }, 100);
         },
         error: function () {

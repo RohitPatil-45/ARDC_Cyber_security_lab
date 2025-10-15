@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:include="template :: headFragment(${pageTitle})">
+<title>[[${pageTitle}]]</title>
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/css/bootstrap-multiselect.css">
+
+<style>
+:root {
+	--primary: #3498db;
+	--secondary: #2c3e50;
+	--light: #ecf0f1;
+	--danger: #e74c3c;
+}
+
+body {
+	background-color: #f5f7fa;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+	border-radius: 8px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+	border: none;
+}
+
+.card-header {
+	background-color: white;
+	padding: 20px;
+	border-radius: 8px 8px 0 0 !important;
+}
+
+.card-title {
+	font-weight: 600;
+	color: var(--secondary);
+}
+
+.form-control {
+	border-radius: 6px;
+	border: 1px solid #ddd;
+	padding: 10px 15px;
+}
+
+.btn-primary {
+	background-color: var(--primary);
+	border-color: var(--primary);
+	border-radius: 6px;
+	padding: 10px 20px;
+	font-weight: 500;
+}
+
+.required-field::after {
+	content: "*";
+	color: var(--danger);
+	margin-left: 4px;
+}
+
+/* Sidebar Preview Styles */
+.sidebar-preview {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    max-height: 600px;
+    overflow-y: auto;
+}
+.module-section {
+    background-color: #ffffff;
+    margin-bottom: 1rem;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+.module-header {
+    background-color: #e9ecef;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #dee2e6;
+    font-weight: 600;
+    color: #495057;
+}
+.menu-items {
+    padding: 1rem;
+}
+.menu-item {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.15s ease-in-out;
+}
+.menu-item:hover {
+    background-color: #f8f9fa;
+}
+.form-check-input:checked + .form-check-label {
+    font-weight: 600;
+    color: #0d6efd;
+}
+.template-section {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 1.5rem;
+}
+
+/* Fix for multiselect dropdowns */
+.multiselect-container {
+	z-index: 1050 !important;
+}
+
+.btn-group {
+	width: 100%;
+}
+
+.multiselect {
+	text-align: left;
+	width: 100%;
+}
+
+.hidden {
+	display: none;
+}
+
+/* New layout styles */
+.template-name-row {
+    margin-bottom: 2rem;
+}
+
+.sidebar-content-row {
+    margin-bottom: 2rem;
+}
+
+.submit-row {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+}
+</style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Sidebar Template Management</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#"><i
+										class="fas fa-home"></i> Home</a></li>
+								<li class="breadcrumb-item active">Sidebar Templates</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<!-- Success/Error Messages -->
+					<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+						<span th:text="${success}"></span>
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+					<div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+						<span th:text="${error}"></span>
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+
+					<div class="row justify-content-center">
+						<div class="col-md-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title">
+												<i class="fas fa-sliders-h"></i> Sidebar Template Management
+											</h3>
+										</div>
+									</div>
+								</div>
+
+								<div class="card-body">
+									<form th:action="@{/guac/sidebar-templates-save}" method="post" id="templateForm">
+										<!-- First Row: Template Name -->
+										<div class="row template-name-row">
+											<div class="col-md-12">
+												<div class="template-section">
+													<h5 class="mb-3">
+														<i class="fas fa-plus-circle me-2"></i>Template Information
+													</h5>
+													<div class="row">
+														<div class="col-md-6">
+															<div class="form-group">
+																<label for="templateName" class="form-label required-field">Template Name</label>
+																<input type="text" class="form-control" id="templateName" name="templateName" 
+																	   th:value="${templateName}" required placeholder="Enter template name">
+																<small class="form-text text-muted">Enter a unique name for your sidebar template</small>
+															</div>
+														</div>
+														<div class="col-md-6">
+															<div class="form-group">
+																<label class="form-label">Instructions</label>
+																<div class="alert alert-info">
+																	<small>
+																		<i class="fas fa-info-circle me-2"></i>
+																		Select the menu items you want to include in this template by checking the boxes below.
+																	</small>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<!-- Second Row: Sidebar Menu Items -->
+										<div class="row sidebar-content-row">
+											<div class="col-md-12">
+												<div class="sidebar-preview">
+													<div class="p-3 border-bottom bg-light">
+														<h5 class="mb-0">
+															<i class="fas fa-eye me-2"></i>Sidebar Menu Items
+														</h5>
+														<small class="text-muted">Select menu items to include in your template</small>
+													</div>
+													
+													<div class="p-3">
+														<div th:each="module : ${menusByModule}">
+															<div class="module-section">
+																<div class="module-header">
+																	<i class="fas fa-folder me-2"></i>
+																	<span th:text="${module.key}">Module Name</span>
+																</div>
+																<div class="menu-items">
+																	<div class="row">
+																		<div th:each="menu : ${module.value}" class="col-md-3 menu-item">
+																			<div class="form-check">
+																				<input class="form-check-input" type="checkbox" 
+																					   th:id="'menu_' + ${menu.menuId}"
+																					   th:name="menuIds" 
+																					   th:value="${menu.menuId}"
+																					   th:checked="${selectedMenuIds.contains(menu.menuId)}">
+																				<label class="form-check-label" th:for="'menu_' + ${menu.menuId}">
+																					<span th:text="${menu.subModuleName} ?: 'Unnamed Item'">Sub Module</span>
+																					<small th:if="${menu.url}" class="text-muted d-block" th:text="${menu.url}">URL</small>
+																				</label>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+														
+														<div th:if="${menusByModule.isEmpty()}" class="text-center text-muted py-4">
+															<i class="fas fa-inbox fa-2x mb-2"></i>
+															<p>No menu items found</p>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<!-- Third Row: Submit Buttons -->
+										<div class="row submit-row">
+											<div class="col-md-12">
+												<div class="d-flex justify-content-between align-items-center">
+													<button type="button" class="btn btn-outline-secondary" onclick="clearSelection()">
+														<i class="fas fa-times me-2"></i>Clear All Selection
+													</button>
+													<div>
+														<button type="button" class="btn btn-outline-secondary me-2" onclick="selectAll()">
+															<i class="fas fa-check-square me-2"></i>Select All
+														</button>
+														<button type="submit" class="btn btn-primary">
+															<i class="fas fa-save me-2"></i>Save Template
+														</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+
+	<!-- Load jQuery first -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<!-- Then load Bootstrap Multiselect -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/js/bootstrap-multiselect.min.js"></script>
+
+	<script type="text/javascript">
+        // Load existing templates
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTemplates();
+        });
+
+        function loadTemplates() {
+            fetch('/sidebar-templates/templates')
+                .then(response => response.json())
+                .then(data => {
+                    const templatesList = document.getElementById('templatesList');
+                    
+                    if (!data.success) {
+                        templatesList.innerHTML = `
+                            <div class="alert alert-danger">
+                                Error loading templates: ${data.error}
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    const templates = data.templates || [];
+                    
+                    if (templates.length === 0) {
+                        templatesList.innerHTML = `
+                            <div class="text-center text-muted py-3">
+                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                <p>No templates found</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    let html = '';
+                    templates.forEach(template => {
+                        html += `
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="card-title mb-2">${template.templateName}</h6>
+                                            <p class="card-text mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-list me-1"></i> ${template.menuCount} menu items
+                                                </small>
+                                            </p>
+                                            <div class="mt-2">
+                                                ${template.menus.map(menu => `
+                                                    <span class="badge bg-light text-dark me-1 mb-1">${menu}</span>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-danger ms-3" onclick="deleteTemplate('${template.templateName}')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    templatesList.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error loading templates:', error);
+                    document.getElementById('templatesList').innerHTML = `
+                        <div class="alert alert-danger">
+                            Error loading templates
+                        </div>
+                    `;
+                });
+        }
+
+        function clearSelection() {
+            const checkboxes = document.querySelectorAll('input[name="menuIds"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        function selectAll() {
+            const checkboxes = document.querySelectorAll('input[name="menuIds"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
+
+        function deleteTemplate(templateName) {
+            if (confirm(`Are you sure you want to delete template "${templateName}"?`)) {
+                fetch('/sidebar-templates/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `templateName=${encodeURIComponent(templateName)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        loadTemplates(); // Reload the templates list
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting template:', error);
+                    alert('Error deleting template');
+                });
+            }
+        }
+
+        // Form submission handling
+        document.getElementById('templateForm').addEventListener('submit', function(e) {
+            const selectedMenus = document.querySelectorAll('input[name="menuIds"]:checked');
+            const templateName = document.getElementById('templateName').value.trim();
+            
+            if (!templateName) {
+                e.preventDefault();
+                alert('Please enter a template name');
+                return;
+            }
+            
+            if (selectedMenus.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one menu item');
+                return;
+            }
+        });
+    </script>
+</body>
+</html>

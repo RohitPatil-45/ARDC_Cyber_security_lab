@@ -26,4 +26,5 @@ public interface SubjectMasterRepository extends JpaRepository<SubjectMaster, In
 
 
 
+
 }

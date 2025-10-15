@@ -1,23 +1,32 @@
 package in.canaris.cloud.openstack.entity;
 
 public class InstructionDto {
-	 private String instructionText;
-	    private String commandText;
+    private Integer id;
+    private String instructionText;
+    private String commandText;
 
-	    // Getters and Setters
-	    public String getInstructionText() {
-	        return instructionText;
-	    }
+    // Getters and Setters
+    public Integer getId() {
+        return id;
+    }
 
-	    public void setInstructionText(String instructionText) {
-	        this.instructionText = instructionText;
-	    }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	    public String getCommandText() {
-	        return commandText;
-	    }
+    public String getInstructionText() {
+        return instructionText;
+    }
 
-	    public void setCommandText(String commandText) {
-	        this.commandText = commandText;
-	    }
-	}
+    public void setInstructionText(String instructionText) {
+        this.instructionText = instructionText;
+    }
+
+    public String getCommandText() {
+        return commandText;
+    }
+
+    public void setCommandText(String commandText) {
+        this.commandText = commandText;
+    }
+}

@@ -8,12 +8,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,19 +39,22 @@ import in.canaris.cloud.entity.UserRole;
 import in.canaris.cloud.openstack.entity.BatchMaster;
 import in.canaris.cloud.openstack.entity.CourseMaster;
 import in.canaris.cloud.openstack.entity.DepartmentMaster;
+import in.canaris.cloud.openstack.entity.MenuChart;
+import in.canaris.cloud.openstack.entity.RoleMenuTemplate;
 import in.canaris.cloud.openstack.entity.SemesterMaster;
 import in.canaris.cloud.repository.AppRoleRepository;
 import in.canaris.cloud.repository.BatchMasterRepository;
 import in.canaris.cloud.repository.CourseMasterRepository;
 import in.canaris.cloud.repository.DepartmentMasterRepository;
 import in.canaris.cloud.repository.GroupRepository;
+import in.canaris.cloud.repository.MenuRepository;
+import in.canaris.cloud.repository.RoleMenuTemplateRepository;
 import in.canaris.cloud.repository.SemesterMasterRepository;
 import in.canaris.cloud.repository.SwitchRepository;
 import in.canaris.cloud.repository.UserRepository;
 
 import in.canaris.cloud.repository.UserRoleRepository;
 import in.canaris.cloud.service.UserDetailsServiceImpl;
-
 
 import org.springframework.web.multipart.MultipartFile;
 import org.apache.commons.csv.CSVFormat;
@@ -84,22 +89,27 @@ public class UserController {
 
 	@Autowired
 	private SwitchRepository switchRepository;
-	
+
 	@Autowired
 	private UserDetailsServiceImpl userDetailsServiceImpl;
-	
-	
+
 	@Autowired
 	DepartmentMasterRepository DepartmentMasterRepository;
-	
+
 	@Autowired
 	CourseMasterRepository CourseMasterRepository;
 
 	@Autowired
 	SemesterMasterRepository SemesterMasterRepository;
-	
+
 	@Autowired
 	BatchMasterRepository BatchMasterRepository;
+
+	@Autowired
+	private RoleMenuTemplateRepository RoleMenuTemplateRepository;
+
+	@Autowired
+	private MenuRepository MenuRepository;
 
 //	@Autowired
 //	private SwitchRepository switchRepository;
@@ -148,49 +158,47 @@ public class UserController {
 //	}
 	@GetMapping("/view")
 	public String getAll(Model model, Principal principal) {
-	    if (principal == null) {
-	        return "redirect:/";
-	    }
-	    
-	    Authentication authentication = (Authentication) principal;
-	    User loginedUser = (User) authentication.getPrincipal();
-	    String groupName = "";
-	    
-	    try {
-	        List<AppUser> users = new ArrayList<AppUser>();
-	        boolean isSuperAdmin = authentication.getAuthorities().stream()
-	                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+		if (principal == null) {
+			return "redirect:/";
+		}
 
-	        boolean isAdmin = authentication.getAuthorities().stream()
-	                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+		Authentication authentication = (Authentication) principal;
+		User loginedUser = (User) authentication.getPrincipal();
+		String groupName = "";
 
-	        List<AppUser> user1 = userRepository.findByuserName(loginedUser.getUsername());
-	        for (AppUser appUser : user1) {
-	            groupName = appUser.getGroupName();
-	        }
+		try {
+			List<AppUser> users = new ArrayList<AppUser>();
+			boolean isSuperAdmin = authentication.getAuthorities().stream()
+					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
 
-	        if (isSuperAdmin) {
-	            userRepository.findAll().stream()
-	                .filter(AppUser::isEnabled) // Filter enabled users
-	                .forEach(users::add);
-	            model.addAttribute("listObj", users);
-	        } else if (isAdmin) {
-	            System.out.println("group = " + groupName);
-	            List<String> groups = new ArrayList<>();
-	            StringTokenizer token = new StringTokenizer(groupName, ",");
-	            while (token.hasMoreTokens()) {
-	                groups.add(token.nextToken());
-	            }
-	            userRepository.findBygroups(groups).stream()
-	                .filter(AppUser::isEnabled) // Filter enabled users
-	                .forEach(users::add);
-	            model.addAttribute("listObj", users);
-	        }
+			boolean isAdmin = authentication.getAuthorities().stream()
+					.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
 
-	    } catch (Exception e) {
-	        model.addAttribute("message", e.getMessage());
-	    }
-	    return "user_view";
+			List<AppUser> user1 = userRepository.findByuserName(loginedUser.getUsername());
+			for (AppUser appUser : user1) {
+				groupName = appUser.getGroupName();
+			}
+
+			if (isSuperAdmin) {
+				userRepository.findAll().stream().filter(AppUser::isEnabled) // Filter enabled users
+						.forEach(users::add);
+				model.addAttribute("listObj", users);
+			} else if (isAdmin) {
+				System.out.println("group = " + groupName);
+				List<String> groups = new ArrayList<>();
+				StringTokenizer token = new StringTokenizer(groupName, ",");
+				while (token.hasMoreTokens()) {
+					groups.add(token.nextToken());
+				}
+				userRepository.findBygroups(groups).stream().filter(AppUser::isEnabled) // Filter enabled users
+						.forEach(users::add);
+				model.addAttribute("listObj", users);
+			}
+
+		} catch (Exception e) {
+			model.addAttribute("message", e.getMessage());
+		}
+		return "user_view";
 	}
 
 //	@GetMapping("/new")
@@ -202,8 +210,7 @@ public class UserController {
 //		model.addAttribute("switchList", switchRepository.getAllSwitch());
 //		return "user_add";
 //	}
-	
-	
+
 //	@GetMapping("/new")
 //	public String addUser(Model model) {
 //	    UserMasterRole user = new UserMasterRole();
@@ -286,7 +293,7 @@ public class UserController {
 //
 //		return "redirect:/users/view";
 //	}
-	
+
 //	@GetMapping("/edit/{id}")
 //	public String editTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
 //	    try {
@@ -321,148 +328,257 @@ public class UserController {
 //	        return "redirect:/users/view";
 //	    }
 //	}
-	
-	
+
+//	@GetMapping("/new")
+//	public String addUser(Model model) {
+//	    UserMasterRole user = new UserMasterRole();
+//	    model.addAttribute("objEnt", user);
+//	    model.addAttribute("pageTitle", "Create new User");
+//
+//	    model.addAttribute("groupList", groupRepository.getAllGroups());
+//	    model.addAttribute("switchList", switchRepository.getAllSwitch());
+//
+//	    // Also send departments for the first dropdown
+//	    List<DepartmentMaster> depts = DepartmentMasterRepository.findAll();
+//	    model.addAttribute("departments", depts);
+//
+//	    return "user_add";
+//	}
+//
+//	@PostMapping("/save")
+//	public String saveUser(UserMasterRole userRole, RedirectAttributes redirectAttributes, BindingResult result,
+//	        Model model) {
+//	    System.out.println("App User save: controller ");
+//
+//	    if (result.hasErrors()) {
+//	        System.out.println("App User save: error ");
+//	    }
+//	    
+//	    AppUser user = userRole.getAppUser();
+//	    System.out.println("Group: " + user.getGroupName());
+//	    System.out.println("user id = " + user.getUserId());
+//
+//	    // For Admin, Super Admin, Teacher - clear academic fields
+//	    Long roleId = userRole.getAppRole().getRoleId();
+//	    if (roleId == 1L || roleId == 3L || roleId == 4L) { // Admin, Super Admin, Teacher
+//	        user.setDepartmentName(null);
+//	        user.setCourseName(null);
+//	        user.setSemesterName(null);
+//	        user.setBatchName(null);
+//	    }
+//
+//	    if (user.getUserId() == null) {
+//	        try {
+//	            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//	            user.setEncrytedPassword(encoder.encode(user.getEncrytedPassword()));
+//	            user.setEnabled(true);
+//	            System.out.println("Group: " + user.getGroupName());
+//	            userRepository.save(user);
+//	            redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
+//	        } catch (Exception e) {
+//	            System.out.println("Exception e1:" + e);
+//	            UserMasterRole user2 = new UserMasterRole();
+//	            user2.setAppUser(user);
+//	            model.addAttribute("objEnt", user2);
+//	            model.addAttribute("pageTitle", "Create new User");
+//	            model.addAttribute("groupList", groupRepository.getAllGroups());
+//	            model.addAttribute("departments", DepartmentMasterRepository.findAll());
+//	            return "user_add";
+//	        }
+//
+//	        try {
+//	            Long role_id = userRole.getAppRole().getRoleId();
+//	            AppRole aprole = new AppRole();
+//	            aprole.setRoleId(role_id);
+//
+//	            UserRole userRole2 = new UserRole();
+//	            userRole2.setAppUser(user);
+//	            userRole2.setAppRole(aprole);
+//	            userRoleRepository.save(userRole2);
+//	            
+//	            userDetailsServiceImpl.sendSimpleMail(user.getUserName(), user.getConfirmPassword(), user.getEmail());
+//	            
+//	            redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
+//	        } catch (Exception e) {
+//	            System.out.println("Exception e2:" + e);
+//	        }
+//	    } else {
+//	        try {
+//	            // Update user with academic fields
+//	            userRepository.updateUserWithAcademic(user.getName(), user.getEmail(), user.getMobileNo(), 
+//	                    user.getGroupName(), user.getSwitch_id(), user.getGenerationType(), 
+//	                    user.getDepartmentName(), user.getCourseName(), user.getSemesterName(), 
+//	                    user.getBatchName(), user.getUserId());
+//	                    
+//	            userRoleRepository.updateUserRole(user.getUserId(), userRole.getAppRole().getRoleId());
+//	            redirectAttributes.addFlashAttribute("message", "The User has been updated successfully!");
+//	        } catch (Exception e) {
+//	            System.out.println("Exception occurred while updating user:" + e);
+//	            // Reload necessary data for the form
+//	            model.addAttribute("groupList", groupRepository.getAllGroups());
+//	            model.addAttribute("switchList", switchRepository.getAllSwitch());
+//	            model.addAttribute("departments", DepartmentMasterRepository.findAll());
+//	            return "user_add";
+//	        }
+//	    }
+//
+//	    return "redirect:/users/view";
+//	}
+
 	@GetMapping("/new")
 	public String addUser(Model model) {
-	    UserMasterRole user = new UserMasterRole();
-	    model.addAttribute("objEnt", user);
-	    model.addAttribute("pageTitle", "Create new User");
+		UserMasterRole user = new UserMasterRole();
+		model.addAttribute("objEnt", user);
+		model.addAttribute("pageTitle", "Create new User");
 
-	    model.addAttribute("groupList", groupRepository.getAllGroups());
-	    model.addAttribute("switchList", switchRepository.getAllSwitch());
+		model.addAttribute("groupList", groupRepository.getAllGroups());
+		model.addAttribute("switchList", switchRepository.getAllSwitch());
 
-	    // Also send departments for the first dropdown
-	    List<DepartmentMaster> depts = DepartmentMasterRepository.findAll();
-	    model.addAttribute("departments", depts);
+		// Also send departments for the first dropdown
+		List<DepartmentMaster> depts = DepartmentMasterRepository.findAll();
+		model.addAttribute("departments", depts);
 
-	    return "user_add";
+		// Get unique template names from RoleMenuTemplate
+		List<String> templateNames = RoleMenuTemplateRepository.findDistinctTemplateNames();
+		model.addAttribute("templateList", templateNames);
+
+		return "user_add";
 	}
 
 	@PostMapping("/save")
 	public String saveUser(UserMasterRole userRole, RedirectAttributes redirectAttributes, BindingResult result,
-	        Model model) {
-	    System.out.println("App User save: controller ");
+			Model model) {
+		System.out.println("App User save: controller ");
 
-	    if (result.hasErrors()) {
-	        System.out.println("App User save: error ");
-	    }
-	    
-	    AppUser user = userRole.getAppUser();
-	    System.out.println("Group: " + user.getGroupName());
-	    System.out.println("user id = " + user.getUserId());
+		if (result.hasErrors()) {
+			System.out.println("App User save: error ");
+		}
 
-	    // For Admin, Super Admin, Teacher - clear academic fields
-	    Long roleId = userRole.getAppRole().getRoleId();
-	    if (roleId == 1L || roleId == 3L || roleId == 4L) { // Admin, Super Admin, Teacher
-	        user.setDepartmentName(null);
-	        user.setCourseName(null);
-	        user.setSemesterName(null);
-	        user.setBatchName(null);
-	    }
+		AppUser user = userRole.getAppUser();
+		System.out.println("Group: " + user.getGroupName());
+		System.out.println("Template: " + user.getTemplateName());
+		System.out.println("user id = " + user.getUserId());
 
-	    if (user.getUserId() == null) {
-	        try {
-	            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-	            user.setEncrytedPassword(encoder.encode(user.getEncrytedPassword()));
-	            user.setEnabled(true);
-	            System.out.println("Group: " + user.getGroupName());
-	            userRepository.save(user);
-	            redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
-	        } catch (Exception e) {
-	            System.out.println("Exception e1:" + e);
-	            UserMasterRole user2 = new UserMasterRole();
-	            user2.setAppUser(user);
-	            model.addAttribute("objEnt", user2);
-	            model.addAttribute("pageTitle", "Create new User");
-	            model.addAttribute("groupList", groupRepository.getAllGroups());
-	            model.addAttribute("departments", DepartmentMasterRepository.findAll());
-	            return "user_add";
-	        }
+		// For Admin, Super Admin, Teacher - clear academic fields
+		Long roleId = userRole.getAppRole().getRoleId();
+		if (roleId == 1L || roleId == 3L || roleId == 4L) { // Admin, Super Admin, Teacher
+			user.setDepartmentName(null);
+			user.setCourseName(null);
+			user.setSemesterName(null);
+			user.setBatchName(null);
+		}
 
-	        try {
-	            Long role_id = userRole.getAppRole().getRoleId();
-	            AppRole aprole = new AppRole();
-	            aprole.setRoleId(role_id);
+		if (user.getUserId() == null) {
+			try {
+				BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+				user.setEncrytedPassword(encoder.encode(user.getEncrytedPassword()));
+				user.setEnabled(true);
+				System.out.println("Group: " + user.getGroupName());
+				userRepository.save(user);
+				redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
+			} catch (Exception e) {
+				System.out.println("Exception e1:" + e);
+				UserMasterRole user2 = new UserMasterRole();
+				user2.setAppUser(user);
+				model.addAttribute("objEnt", user2);
+				model.addAttribute("pageTitle", "Create new User");
+				model.addAttribute("groupList", groupRepository.getAllGroups());
+				model.addAttribute("departments", DepartmentMasterRepository.findAll());
 
-	            UserRole userRole2 = new UserRole();
-	            userRole2.setAppUser(user);
-	            userRole2.setAppRole(aprole);
-	            userRoleRepository.save(userRole2);
-	            
-	            userDetailsServiceImpl.sendSimpleMail(user.getUserName(), user.getConfirmPassword(), user.getEmail());
-	            
-	            redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
-	        } catch (Exception e) {
-	            System.out.println("Exception e2:" + e);
-	        }
-	    } else {
-	        try {
-	            // Update user with academic fields
-	            userRepository.updateUserWithAcademic(user.getName(), user.getEmail(), user.getMobileNo(), 
-	                    user.getGroupName(), user.getSwitch_id(), user.getGenerationType(), 
-	                    user.getDepartmentName(), user.getCourseName(), user.getSemesterName(), 
-	                    user.getBatchName(), user.getUserId());
-	                    
-	            userRoleRepository.updateUserRole(user.getUserId(), userRole.getAppRole().getRoleId());
-	            redirectAttributes.addFlashAttribute("message", "The User has been updated successfully!");
-	        } catch (Exception e) {
-	            System.out.println("Exception occurred while updating user:" + e);
-	            // Reload necessary data for the form
-	            model.addAttribute("groupList", groupRepository.getAllGroups());
-	            model.addAttribute("switchList", switchRepository.getAllSwitch());
-	            model.addAttribute("departments", DepartmentMasterRepository.findAll());
-	            return "user_add";
-	        }
-	    }
+				// Reload template names
+				List<String> templateNames = RoleMenuTemplateRepository.findDistinctTemplateNames();
+				model.addAttribute("templateList", templateNames);
 
-	    return "redirect:/users/view";
+				return "user_add";
+			}
+
+			try {
+				Long role_id = userRole.getAppRole().getRoleId();
+				AppRole aprole = new AppRole();
+				aprole.setRoleId(role_id);
+
+				UserRole userRole2 = new UserRole();
+				userRole2.setAppUser(user);
+				userRole2.setAppRole(aprole);
+				userRoleRepository.save(userRole2);
+
+				userDetailsServiceImpl.sendSimpleMail(user.getUserName(), user.getConfirmPassword(), user.getEmail());
+
+				redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
+			} catch (Exception e) {
+				System.out.println("Exception e2:" + e);
+			}
+		} else {
+			try {
+				// Update user with academic fields and template name
+				userRepository.updateUserWithAcademicAndTemplate(user.getName(), user.getEmail(), user.getMobileNo(),
+						user.getGroupName(), user.getSwitch_id(), user.getGenerationType(), user.getDepartmentName(),
+						user.getCourseName(), user.getSemesterName(), user.getBatchName(), user.getTemplateName(),
+						user.getUserId());
+
+				userRoleRepository.updateUserRole(user.getUserId(), userRole.getAppRole().getRoleId());
+				redirectAttributes.addFlashAttribute("message", "The User has been updated successfully!");
+			} catch (Exception e) {
+				System.out.println("Exception occurred while updating user:" + e);
+				// Reload necessary data for the form
+				model.addAttribute("groupList", groupRepository.getAllGroups());
+				model.addAttribute("switchList", switchRepository.getAllSwitch());
+				model.addAttribute("departments", DepartmentMasterRepository.findAll());
+
+				// Reload template names
+				List<String> templateNames = RoleMenuTemplateRepository.findDistinctTemplateNames();
+				model.addAttribute("templateList", templateNames);
+
+				return "user_add";
+			}
+		}
+
+		return "redirect:/users/view";
 	}
 
 	@GetMapping("/edit/{id}")
 	public String editTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-	    try {
-	        AppUser user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-	        
-	        UserMasterRole usermasterRole = new UserMasterRole();
-	        usermasterRole.setAppUser(user);
+		try {
+			AppUser user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
 
-	        long roleID = userRoleRepository.findRole(id);
-	        AppRole role = appRoleRepository.findByRoleId(roleID);
-	        usermasterRole.setAppRole(role);
+			UserMasterRole usermasterRole = new UserMasterRole();
+			usermasterRole.setAppUser(user);
 
-	        model.addAttribute("user", user);
-	        model.addAttribute("pageTitle", "Edit User (ID: " + id + ")");
-	        model.addAttribute("userID", id);
-	        model.addAttribute("objEnt", usermasterRole);
-	        model.addAttribute("groupList", groupRepository.getAllGroups());
-	        model.addAttribute("switchList", switchRepository.getAllSwitch());
+			long roleID = userRoleRepository.findRole(id);
+			AppRole role = appRoleRepository.findByRoleId(roleID);
+			usermasterRole.setAppRole(role);
 
-	        // Add Departments
-	        List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
-	        model.addAttribute("departments", departments);
+			model.addAttribute("user", user);
+			model.addAttribute("pageTitle", "Edit User (ID: " + id + ")");
+			model.addAttribute("userID", id);
+			model.addAttribute("objEnt", usermasterRole);
+			model.addAttribute("groupList", groupRepository.getAllGroups());
+			model.addAttribute("switchList", switchRepository.getAllSwitch());
 
-	        // Get selected values for preselection
-	        if (user.getDepartmentName() != null) {
-	            model.addAttribute("selectedDepartmentId", user.getDepartmentName().getDepartmentId());
-	        }
-	        if (user.getCourseName() != null) {
-	            model.addAttribute("selectedCourseId", user.getCourseName().getCourseId());
-	        }
-	        if (user.getSemesterName() != null) {
-	            model.addAttribute("selectedSemesterId", user.getSemesterName().getSemesterId());
-	        }
-	        if (user.getBatchName() != null) {
-	            model.addAttribute("selectedBatchId", user.getBatchName().getBatchId());
-	        }
+			// Add Departments
+			List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+			model.addAttribute("departments", departments);
 
-	        return "user_add";
-	    } catch (Exception e) {
-	        redirectAttributes.addFlashAttribute("message", e.getMessage());
-	        return "redirect:/users/view";
-	    }
+			// Get selected values for preselection
+			if (user.getDepartmentName() != null) {
+				model.addAttribute("selectedDepartmentId", user.getDepartmentName().getDepartmentId());
+			}
+			if (user.getCourseName() != null) {
+				model.addAttribute("selectedCourseId", user.getCourseName().getCourseId());
+			}
+			if (user.getSemesterName() != null) {
+				model.addAttribute("selectedSemesterId", user.getSemesterName().getSemesterId());
+			}
+			if (user.getBatchName() != null) {
+				model.addAttribute("selectedBatchId", user.getBatchName().getBatchId());
+			}
+
+			return "user_add";
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("message", e.getMessage());
+			return "redirect:/users/view";
+		}
 	}
-
 
 //	@GetMapping("/delete/{id}")
 //	public String deleteTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
@@ -475,28 +591,27 @@ public class UserController {
 //		}
 //		return "redirect:/users/view";
 //	}
-	
+
 	@GetMapping("/delete/{id}")
 	public String deleteTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-	    try {
-	        // Instead of deleting, find the user and set enabled to false
-	        Optional<AppUser> userOptional = userRepository.findById(id);
-	        
-	        if (userOptional.isPresent()) {
-	            AppUser user = userOptional.get();
-	            user.setEnabled(false); // Set enabled to 0 (false)
-	            userRepository.save(user); // Update the user
-	            
-	            redirectAttributes.addFlashAttribute("message",
-	                    "The User with id=" + id + " has been deactivated successfully!");
-	        } else {
-	            redirectAttributes.addFlashAttribute("message",
-	                    "User with id=" + id + " not found!");
-	        }
-	    } catch (Exception e) {
-	        redirectAttributes.addFlashAttribute("message", e.getMessage());
-	    }
-	    return "redirect:/users/view";
+		try {
+			// Instead of deleting, find the user and set enabled to false
+			Optional<AppUser> userOptional = userRepository.findById(id);
+
+			if (userOptional.isPresent()) {
+				AppUser user = userOptional.get();
+				user.setEnabled(false); // Set enabled to 0 (false)
+				userRepository.save(user); // Update the user
+
+				redirectAttributes.addFlashAttribute("message",
+						"The User with id=" + id + " has been deactivated successfully!");
+			} else {
+				redirectAttributes.addFlashAttribute("message", "User with id=" + id + " not found!");
+			}
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("message", e.getMessage());
+		}
+		return "redirect:/users/view";
 	}
 
 	@GetMapping("/resetPassForm")
@@ -509,14 +624,14 @@ public class UserController {
 	@RequestMapping("/resetloginpassword")
 	public String reset(Model model, HttpServletRequest request) {
 		AppUser user = new AppUser();
-		
+
 		String resetPasswordMessage = (String) request.getSession().getAttribute("resetPasswordMessage");
 
-	    if (resetPasswordMessage != null) {
-	        model.addAttribute("resetPasswordMessage", resetPasswordMessage);
-	        request.getSession().removeAttribute("resetPasswordMessage"); // Remove the attribute
-	    }
-	    
+		if (resetPasswordMessage != null) {
+			model.addAttribute("resetPasswordMessage", resetPasswordMessage);
+			request.getSession().removeAttribute("resetPasswordMessage"); // Remove the attribute
+		}
+
 		model.addAttribute("objEnt", user);
 		return "firstLoginPasswordReset";
 	}
@@ -565,7 +680,7 @@ public class UserController {
 			user1.setConfirmPassword(user.getConfirmPassword());
 			user1.setPasswordChangedTime(new Date());
 			userRepository.save(user1);
-			
+
 			redirectAttributes.addFlashAttribute("message", "success");
 		} catch (Exception e) {
 			System.out.println("Exception occured while resetting password = " + e);
@@ -598,7 +713,7 @@ public class UserController {
 
 		return "redirect:/";
 	}
-	
+
 	@RequestMapping("/resetuserpassword/{id}")
 	public String resetuserpassword(Model model, @PathVariable("id") Long id) {
 		AppUser user = new AppUser();
@@ -606,10 +721,11 @@ public class UserController {
 		model.addAttribute("userId", id);
 		return "resetUserPasswordForm";
 	}
-	
+
 	@PostMapping("/userpasswordreset")
-	public String userpasswordreset(AppUser user, @RequestParam("userId") long userId, RedirectAttributes redirectAttributes, Model model) {
-		
+	public String userpasswordreset(AppUser user, @RequestParam("userId") long userId,
+			RedirectAttributes redirectAttributes, Model model) {
+
 		try {
 			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 			AppUser user1 = userRepository.findById(userId).get();
@@ -617,7 +733,7 @@ public class UserController {
 			user1.setConfirmPassword(user.getConfirmPassword());
 			user1.setPasswordChangedTime(new Date());
 			userRepository.save(user1);
-			
+
 			redirectAttributes.addFlashAttribute("userPasswordResetMsg", "success");
 		} catch (Exception e) {
 			System.out.println("Exception occured while resetting password = " + e);
@@ -806,359 +922,366 @@ public class UserController {
 		}
 		return "CustomeUser_view";
 	}
-	
-	//upload csv code start
-	
-	
+
+	// upload csv code start
+
 	@GetMapping("/upload")
 	public String showUploadPage(Model model) {
-	    model.addAttribute("pageTitle", "Bulk User Upload");
-	    return "user_upload";
+		model.addAttribute("pageTitle", "Bulk User Upload");
+		return "user_upload";
 	}
 
 	@GetMapping("/download-csv-template")
 	public void downloadCsvTemplate(HttpServletResponse response) throws IOException {
-	    response.setContentType("text/csv");
-	    response.setHeader("Content-Disposition", "attachment; filename=user_upload.csv");
-	    
-	    String csvContent = "name,userName,email,mobileNo,roleId,groupName,departmentName,courseName,semesterName,batchName\n" +
-	                       "John Doe,john.doe,john@example.com,9876543210,2,Students,Computer Science,B.Tech CS,Semester 1,Batch A\n" +
-	                       "Jane Smith,jane.smith,jane@example.com,9876543211,4,Faculty,Computer Science,B.Tech CS,Semester 1,Batch A\n" +
-	                       "Admin User,admin,admin@example.com,9876543212,1,Administrators,,,,\n" +
-	                       "Super Admin,superadmin,super@example.com,9876543213,3,SuperAdmins,,,,\n\n" +
-	                       "Note:\n" +
-	                       "- Required fields: name, userName, email, mobileNo, roleId, groupName\n" +
-	                       "- Role IDs: 1=Admin, 2=User, 3=Super Admin, 4=Teacher\n" +
-	                       "- Switch ID and Generation Type will be set to default values (1)\n" +
-	                       "- For Admin, Super Admin, Teacher roles: leave academic fields empty\n" +
-	                       "- For User role: fill academic fields (departmentName, courseName, semesterName, batchName)\n" +
-	                       "- Username, Email, and Mobile Number must be unique across the system";
-	    
-	    response.getWriter().write(csvContent);
+		response.setContentType("text/csv");
+		response.setHeader("Content-Disposition", "attachment; filename=user_upload.csv");
+
+		String csvContent = "name,userName,email,mobileNo,roleId,groupName,departmentName,courseName,semesterName,batchName\n"
+				+ "John Doe,john.doe,john@example.com,9876543210,2,Students,Computer Science,B.Tech CS,Semester 1,Batch A\n"
+				+ "Jane Smith,jane.smith,jane@example.com,9876543211,4,Faculty,Computer Science,B.Tech CS,Semester 1,Batch A\n"
+				+ "Admin User,admin,admin@example.com,9876543212,1,Administrators,,,,\n"
+				+ "Super Admin,superadmin,super@example.com,9876543213,3,SuperAdmins,,,,\n\n" + "Note:\n"
+				+ "- Required fields: name, userName, email, mobileNo, roleId, groupName\n"
+				+ "- Role IDs: 1=Admin, 2=User, 3=Super Admin, 4=Teacher\n"
+				+ "- Switch ID and Generation Type will be set to default values (1)\n"
+				+ "- For Admin, Super Admin, Teacher roles: leave academic fields empty\n"
+				+ "- For User role: fill academic fields (departmentName, courseName, semesterName, batchName)\n"
+				+ "- Username, Email, and Mobile Number must be unique across the system";
+
+		response.getWriter().write(csvContent);
 	}
 
 	@GetMapping("/download-excel-template")
 	public void downloadExcelTemplate(HttpServletResponse response) throws IOException {
-	    response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-	    response.setHeader("Content-Disposition", "attachment; filename=user_upload.xlsx");
-	    
-	    Workbook workbook = new XSSFWorkbook();
-	    Sheet sheet = workbook.createSheet("User Template");
-	    
-	    // Create header row
-	    Row headerRow = sheet.createRow(0);
-	    String[] headers = {"name", "userName", "email", "mobileNo", "roleId", "groupName", "departmentName", "courseName", "semesterName", "batchName"};
-	    for (int i = 0; i < headers.length; i++) {
-	        Cell cell = headerRow.createCell(i);
-	        cell.setCellValue(headers[i]);
-	    }
-	    
-	    // Create sample data rows
-	    Object[][] sampleData = {
-	        {"John Doe", "john.doe", "john@example.com", "9876543210", "2", "Students", "Computer Science", "B.Tech CS", "Semester 1", "Batch A"},
-	        {"Jane Smith", "jane.smith", "jane@example.com", "9876543211", "4", "Faculty", "Computer Science", "B.Tech CS", "Semester 1", "Batch A"},
-	        {"Admin User", "admin", "admin@example.com", "9876543212", "1", "Administrators", "", "", "", ""},
-	        {"Super Admin", "superadmin", "super@example.com", "9876543213", "3", "SuperAdmins", "", "", "", ""}
-	    };
-	    
-	    for (int i = 0; i < sampleData.length; i++) {
-	        Row row = sheet.createRow(i + 1);
-	        for (int j = 0; j < sampleData[i].length; j++) {
-	            Cell cell = row.createCell(j);
-	            cell.setCellValue(sampleData[i][j].toString());
-	        }
-	    }
-	    
-	    // Add note row
-	    Row noteRow = sheet.createRow(sampleData.length + 2);
-	    Cell noteCell = noteRow.createCell(0);
-	    noteCell.setCellValue("Note: Required fields - name, userName, email, mobileNo, roleId, groupName. Switch ID and Generation Type will be set to default values (1). Role IDs: 1=Admin, 2=User, 3=Super Admin, 4=Teacher. Username, Email, and Mobile Number must be unique.");
-	    
-	    // Auto-size columns
-	    for (int i = 0; i < headers.length; i++) {
-	        sheet.autoSizeColumn(i);
-	    }
-	    
-	    workbook.write(response.getOutputStream());
-	    workbook.close();
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		response.setHeader("Content-Disposition", "attachment; filename=user_upload.xlsx");
+
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("User Template");
+
+		// Create header row
+		Row headerRow = sheet.createRow(0);
+		String[] headers = { "name", "userName", "email", "mobileNo", "roleId", "groupName", "departmentName",
+				"courseName", "semesterName", "batchName" };
+		for (int i = 0; i < headers.length; i++) {
+			Cell cell = headerRow.createCell(i);
+			cell.setCellValue(headers[i]);
+		}
+
+		// Create sample data rows
+		Object[][] sampleData = {
+				{ "John Doe", "john.doe", "john@example.com", "9876543210", "2", "Students", "Computer Science",
+						"B.Tech CS", "Semester 1", "Batch A" },
+				{ "Jane Smith", "jane.smith", "jane@example.com", "9876543211", "4", "Faculty", "Computer Science",
+						"B.Tech CS", "Semester 1", "Batch A" },
+				{ "Admin User", "admin", "admin@example.com", "9876543212", "1", "Administrators", "", "", "", "" },
+				{ "Super Admin", "superadmin", "super@example.com", "9876543213", "3", "SuperAdmins", "", "", "",
+						"" } };
+
+		for (int i = 0; i < sampleData.length; i++) {
+			Row row = sheet.createRow(i + 1);
+			for (int j = 0; j < sampleData[i].length; j++) {
+				Cell cell = row.createCell(j);
+				cell.setCellValue(sampleData[i][j].toString());
+			}
+		}
+
+		// Add note row
+		Row noteRow = sheet.createRow(sampleData.length + 2);
+		Cell noteCell = noteRow.createCell(0);
+		noteCell.setCellValue(
+				"Note: Required fields - name, userName, email, mobileNo, roleId, groupName. Switch ID and Generation Type will be set to default values (1). Role IDs: 1=Admin, 2=User, 3=Super Admin, 4=Teacher. Username, Email, and Mobile Number must be unique.");
+
+		// Auto-size columns
+		for (int i = 0; i < headers.length; i++) {
+			sheet.autoSizeColumn(i);
+		}
+
+		workbook.write(response.getOutputStream());
+		workbook.close();
 	}
 
 	@PostMapping("/bulk-upload")
 	@ResponseBody
 	public Map<String, Object> bulkUpload(@RequestParam("file") MultipartFile file) {
-	    Map<String, Object> response = new HashMap<>();
-	    List<Map<String, String>> successUsers = new ArrayList<>();
-	    List<Map<String, String>> errorUsers = new ArrayList<>();
-	    
-	    try {
-	        String fileName = file.getOriginalFilename();
-	        
-	        if (fileName == null || fileName.isEmpty()) {
-	            throw new RuntimeException("File name is empty");
-	        }
-	        
-	        if (fileName.toLowerCase().endsWith(".csv")) {
-	            processCsvFile(file, successUsers, errorUsers);
-	        } else if (fileName.toLowerCase().endsWith(".xlsx") || fileName.toLowerCase().endsWith(".xls")) {
-	            processExcelFile(file, successUsers, errorUsers);
-	        } else {
-	            throw new RuntimeException("Unsupported file format. Please upload CSV or Excel file.");
-	        }
-	        
-	        response.put("success", true);
-	        response.put("message", "File processed successfully");
-	        response.put("successUsers", successUsers);
-	        response.put("errorUsers", errorUsers);
-	        response.put("totalProcessed", successUsers.size() + errorUsers.size());
-	        response.put("successCount", successUsers.size());
-	        response.put("errorCount", errorUsers.size());
-	        
-	    } catch (Exception e) {
-	        response.put("success", false);
-	        response.put("message", "Error processing file: " + e.getMessage());
-	    }
-	    
-	    return response;
+		Map<String, Object> response = new HashMap<>();
+		List<Map<String, String>> successUsers = new ArrayList<>();
+		List<Map<String, String>> errorUsers = new ArrayList<>();
+
+		try {
+			String fileName = file.getOriginalFilename();
+
+			if (fileName == null || fileName.isEmpty()) {
+				throw new RuntimeException("File name is empty");
+			}
+
+			if (fileName.toLowerCase().endsWith(".csv")) {
+				processCsvFile(file, successUsers, errorUsers);
+			} else if (fileName.toLowerCase().endsWith(".xlsx") || fileName.toLowerCase().endsWith(".xls")) {
+				processExcelFile(file, successUsers, errorUsers);
+			} else {
+				throw new RuntimeException("Unsupported file format. Please upload CSV or Excel file.");
+			}
+
+			response.put("success", true);
+			response.put("message", "File processed successfully");
+			response.put("successUsers", successUsers);
+			response.put("errorUsers", errorUsers);
+			response.put("totalProcessed", successUsers.size() + errorUsers.size());
+			response.put("successCount", successUsers.size());
+			response.put("errorCount", errorUsers.size());
+
+		} catch (Exception e) {
+			response.put("success", false);
+			response.put("message", "Error processing file: " + e.getMessage());
+		}
+
+		return response;
 	}
 
-	private void processCsvFile(MultipartFile file, List<Map<String, String>> successUsers, List<Map<String, String>> errorUsers) throws IOException {
-	    try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-	         CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
-	        
-	        for (CSVRecord record : csvParser) {
-	            processUserRecord(record.toMap(), successUsers, errorUsers);
-	        }
-	    }
+	private void processCsvFile(MultipartFile file, List<Map<String, String>> successUsers,
+			List<Map<String, String>> errorUsers) throws IOException {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+				CSVParser csvParser = new CSVParser(reader,
+						CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
+
+			for (CSVRecord record : csvParser) {
+				processUserRecord(record.toMap(), successUsers, errorUsers);
+			}
+		}
 	}
 
-	private void processExcelFile(MultipartFile file, List<Map<String, String>> successUsers, List<Map<String, String>> errorUsers) throws IOException {
-	    Workbook workbook;
-	    String fileName = file.getOriginalFilename();
-	    
-	    if (fileName.toLowerCase().endsWith(".xlsx")) {
-	        workbook = new XSSFWorkbook(file.getInputStream());
-	    } else {
-	        workbook = new HSSFWorkbook(file.getInputStream());
-	    }
-	    
-	    Sheet sheet = workbook.getSheetAt(0);
-	    Iterator<Row> rowIterator = sheet.iterator();
-	    
-	    // Skip header row
-	    if (rowIterator.hasNext()) {
-	        rowIterator.next();
-	    }
-	    
-	    while (rowIterator.hasNext()) {
-	        Row row = rowIterator.next();
-	        Map<String, String> userData = new HashMap<>();
-	        
-	        String[] headers = {"name", "userName", "email", "mobileNo", "roleId", "groupName", "departmentName", "courseName", "semesterName", "batchName"};
-	        
-	        for (int i = 0; i < headers.length && i < row.getLastCellNum(); i++) {
-	            Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-	            String value = getCellValueAsString(cell);
-	            userData.put(headers[i], value);
-	        }
-	        
-	        processUserRecord(userData, successUsers, errorUsers);
-	    }
-	    
-	    workbook.close();
+	private void processExcelFile(MultipartFile file, List<Map<String, String>> successUsers,
+			List<Map<String, String>> errorUsers) throws IOException {
+		Workbook workbook;
+		String fileName = file.getOriginalFilename();
+
+		if (fileName.toLowerCase().endsWith(".xlsx")) {
+			workbook = new XSSFWorkbook(file.getInputStream());
+		} else {
+			workbook = new HSSFWorkbook(file.getInputStream());
+		}
+
+		Sheet sheet = workbook.getSheetAt(0);
+		Iterator<Row> rowIterator = sheet.iterator();
+
+		// Skip header row
+		if (rowIterator.hasNext()) {
+			rowIterator.next();
+		}
+
+		while (rowIterator.hasNext()) {
+			Row row = rowIterator.next();
+			Map<String, String> userData = new HashMap<>();
+
+			String[] headers = { "name", "userName", "email", "mobileNo", "roleId", "groupName", "departmentName",
+					"courseName", "semesterName", "batchName" };
+
+			for (int i = 0; i < headers.length && i < row.getLastCellNum(); i++) {
+				Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+				String value = getCellValueAsString(cell);
+				userData.put(headers[i], value);
+			}
+
+			processUserRecord(userData, successUsers, errorUsers);
+		}
+
+		workbook.close();
 	}
 
 	private String getCellValueAsString(Cell cell) {
-	    if (cell == null) {
-	        return "";
-	    }
-	    
-	    switch (cell.getCellType()) {
-	        case STRING:
-	            return cell.getStringCellValue().trim();
-	        case NUMERIC:
-	            if (DateUtil.isCellDateFormatted(cell)) {
-	                return cell.getDateCellValue().toString();
-	            } else {
-	                // Check if it's an integer value
-	                double numericValue = cell.getNumericCellValue();
-	                if (numericValue == Math.floor(numericValue)) {
-	                    return String.valueOf((long) numericValue);
-	                } else {
-	                    return String.valueOf(numericValue);
-	                }
-	            }
-	        case BOOLEAN:
-	            return String.valueOf(cell.getBooleanCellValue());
-	        case FORMULA:
-	            try {
-	                return cell.getStringCellValue();
-	            } catch (Exception e) {
-	                try {
-	                    return String.valueOf(cell.getNumericCellValue());
-	                } catch (Exception ex) {
-	                    return cell.getCellFormula();
-	                }
-	            }
-	        default:
-	            return "";
-	    }
+		if (cell == null) {
+			return "";
+		}
+
+		switch (cell.getCellType()) {
+		case STRING:
+			return cell.getStringCellValue().trim();
+		case NUMERIC:
+			if (DateUtil.isCellDateFormatted(cell)) {
+				return cell.getDateCellValue().toString();
+			} else {
+				// Check if it's an integer value
+				double numericValue = cell.getNumericCellValue();
+				if (numericValue == Math.floor(numericValue)) {
+					return String.valueOf((long) numericValue);
+				} else {
+					return String.valueOf(numericValue);
+				}
+			}
+		case BOOLEAN:
+			return String.valueOf(cell.getBooleanCellValue());
+		case FORMULA:
+			try {
+				return cell.getStringCellValue();
+			} catch (Exception e) {
+				try {
+					return String.valueOf(cell.getNumericCellValue());
+				} catch (Exception ex) {
+					return cell.getCellFormula();
+				}
+			}
+		default:
+			return "";
+		}
 	}
 
-	private void processUserRecord(Map<String, String> userData, List<Map<String, String>> successUsers, List<Map<String, String>> errorUsers) {
-	    try {
-	        // Debug: Print all received data
-	        System.out.println("Processing record for user: " + userData.get("userName"));
-	        userData.forEach((key, value) -> System.out.println(key + ": '" + value + "'"));
-	        
-	        // Validate required fields
-	        if (!isValidUserData(userData)) {
-	            Map<String, String> error = new HashMap<>();
-	            error.put("userName", userData.get("userName"));
-	            error.put("error", "Missing required fields");
-	            errorUsers.add(error);
-	            return;
-	        }
-	        
-	        String userName = userData.get("userName");
-	        String email = userData.get("email");
-	        String mobileNo = userData.get("mobileNo");
-	        
-	        // Check for duplicate username, email, and mobile number
-	        String duplicateError = checkForDuplicateUser(userName, email, mobileNo);
-	        if (duplicateError != null) {
-	            Map<String, String> error = new HashMap<>();
-	            error.put("userName", userName);
-	            error.put("error", duplicateError);
-	            errorUsers.add(error);
-	            return;
-	        }
-	        
-	        // Set default switch ID (1) and validate if it exists
-	        Integer switchId = 1; // Default value
-	        Switch userSwitch = switchRepository.findById(switchId).orElse(null);
-	        if (userSwitch == null) {
-	            Map<String, String> error = new HashMap<>();
-	            error.put("userName", userName);
-	            error.put("error", "Default switch with ID " + switchId + " not found in system");
-	            errorUsers.add(error);
-	            return;
-	        }
-	        
-	        // Create and save user
-	        AppUser user = new AppUser();
-	        user.setName(userData.get("name"));
-	        user.setUserName(userName);
-	        user.setEmail(email);
-	        user.setMobileNo(mobileNo);
-	        user.setGroupName(userData.get("groupName"));
-	        user.setSwitch_id(userSwitch);
-	        
-	        // Set default generation type (1)
-	        user.setGenerationType("1");
-	        
-	        // Set default password and confirm password
-	        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-	        String defaultPassword = "defaultPassword123";
-	        user.setEncrytedPassword(encoder.encode(defaultPassword));
-	        user.setConfirmPassword(defaultPassword);
-	        
-	        // Set default values
-	        user.setEnabled(true);
-	        user.setIsFirstTimeLogin(true);
-	        user.setStatus("Active");
-	        
-	        // Handle academic fields based on role
-	        Long roleId = Long.parseLong(userData.get("roleId"));
-	        if (roleId == 2L) {
-	            setAcademicFields(user, userData);
-	        } else {
-	            user.setDepartmentName(null);
-	            user.setCourseName(null);
-	            user.setSemesterName(null);
-	            user.setBatchName(null);
-	        }
-	        
-	        // Save user
-	        AppUser savedUser = userRepository.save(user);
-	        
-	        // Create user role
-	        AppRole appRole = new AppRole();
-	        appRole.setRoleId(roleId);
-	        
-	        UserRole userRole = new UserRole();
-	        userRole.setAppUser(savedUser);
-	        userRole.setAppRole(appRole);
-	        userRoleRepository.save(userRole);
-	        
-	        // Add to success list
-	        Map<String, String> success = new HashMap<>();
-	        success.put("name", savedUser.getName());
-	        success.put("userName", savedUser.getUserName());
-	        success.put("email", savedUser.getEmail());
-	        success.put("generationType", savedUser.getGenerationType());
-	        success.put("switchId", String.valueOf(switchId));
-	        successUsers.add(success);
-	        
-	    } catch (Exception e) {
-	        Map<String, String> error = new HashMap<>();
-	        error.put("userName", userData.get("userName"));
-	        error.put("error", "Error creating user: " + e.getMessage());
-	        errorUsers.add(error);
-	        e.printStackTrace();
-	    }
+	private void processUserRecord(Map<String, String> userData, List<Map<String, String>> successUsers,
+			List<Map<String, String>> errorUsers) {
+		try {
+			// Debug: Print all received data
+			System.out.println("Processing record for user: " + userData.get("userName"));
+			userData.forEach((key, value) -> System.out.println(key + ": '" + value + "'"));
+
+			// Validate required fields
+			if (!isValidUserData(userData)) {
+				Map<String, String> error = new HashMap<>();
+				error.put("userName", userData.get("userName"));
+				error.put("error", "Missing required fields");
+				errorUsers.add(error);
+				return;
+			}
+
+			String userName = userData.get("userName");
+			String email = userData.get("email");
+			String mobileNo = userData.get("mobileNo");
+
+			// Check for duplicate username, email, and mobile number
+			String duplicateError = checkForDuplicateUser(userName, email, mobileNo);
+			if (duplicateError != null) {
+				Map<String, String> error = new HashMap<>();
+				error.put("userName", userName);
+				error.put("error", duplicateError);
+				errorUsers.add(error);
+				return;
+			}
+
+			// Set default switch ID (1) and validate if it exists
+			Integer switchId = 1; // Default value
+			Switch userSwitch = switchRepository.findById(switchId).orElse(null);
+			if (userSwitch == null) {
+				Map<String, String> error = new HashMap<>();
+				error.put("userName", userName);
+				error.put("error", "Default switch with ID " + switchId + " not found in system");
+				errorUsers.add(error);
+				return;
+			}
+
+			// Create and save user
+			AppUser user = new AppUser();
+			user.setName(userData.get("name"));
+			user.setUserName(userName);
+			user.setEmail(email);
+			user.setMobileNo(mobileNo);
+			user.setGroupName(userData.get("groupName"));
+			user.setSwitch_id(userSwitch);
+
+			// Set default generation type (1)
+			user.setGenerationType("1");
+
+			// Set default password and confirm password
+			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+			String defaultPassword = "defaultPassword123";
+			user.setEncrytedPassword(encoder.encode(defaultPassword));
+			user.setConfirmPassword(defaultPassword);
+
+			// Set default values
+			user.setEnabled(true);
+			user.setIsFirstTimeLogin(true);
+			user.setStatus("Active");
+
+			// Handle academic fields based on role
+			Long roleId = Long.parseLong(userData.get("roleId"));
+			if (roleId == 2L) {
+				setAcademicFields(user, userData);
+			} else {
+				user.setDepartmentName(null);
+				user.setCourseName(null);
+				user.setSemesterName(null);
+				user.setBatchName(null);
+			}
+
+			// Save user
+			AppUser savedUser = userRepository.save(user);
+
+			// Create user role
+			AppRole appRole = new AppRole();
+			appRole.setRoleId(roleId);
+
+			UserRole userRole = new UserRole();
+			userRole.setAppUser(savedUser);
+			userRole.setAppRole(appRole);
+			userRoleRepository.save(userRole);
+
+			// Add to success list
+			Map<String, String> success = new HashMap<>();
+			success.put("name", savedUser.getName());
+			success.put("userName", savedUser.getUserName());
+			success.put("email", savedUser.getEmail());
+			success.put("generationType", savedUser.getGenerationType());
+			success.put("switchId", String.valueOf(switchId));
+			successUsers.add(success);
+
+		} catch (Exception e) {
+			Map<String, String> error = new HashMap<>();
+			error.put("userName", userData.get("userName"));
+			error.put("error", "Error creating user: " + e.getMessage());
+			errorUsers.add(error);
+			e.printStackTrace();
+		}
 	}
 
 	private String checkForDuplicateUser(String userName, String email, String mobileNo) {
-	    // Check for duplicate username
-	    if (userRepository.existsByUserName(userName)) {
-	        return "Username '" + userName + "' already exists";
-	    }
-	    
-	    // Check for duplicate email
-	    if (userRepository.existsByEmail(email)) {
-	        return "Email '" + email + "' already exists";
-	    }
-	    
-	    // Check for duplicate mobile number
-	    if (userRepository.existsByMobileNo(mobileNo)) {
-	        return "Mobile number '" + mobileNo + "' already exists";
-	    }
-	    
-	    return null;
+		// Check for duplicate username
+		if (userRepository.existsByUserName(userName)) {
+			return "Username '" + userName + "' already exists";
+		}
+
+		// Check for duplicate email
+		if (userRepository.existsByEmail(email)) {
+			return "Email '" + email + "' already exists";
+		}
+
+		// Check for duplicate mobile number
+		if (userRepository.existsByMobileNo(mobileNo)) {
+			return "Mobile number '" + mobileNo + "' already exists";
+		}
+
+		return null;
 	}
 
 	private boolean isValidUserData(Map<String, String> userData) {
-	    return userData.get("name") != null && !userData.get("name").trim().isEmpty() &&
-	           userData.get("userName") != null && !userData.get("userName").trim().isEmpty() &&
-	           userData.get("email") != null && !userData.get("email").trim().isEmpty() &&
-	           userData.get("mobileNo") != null && !userData.get("mobileNo").trim().isEmpty() &&
-	           userData.get("roleId") != null && !userData.get("roleId").trim().isEmpty() &&
-	           userData.get("groupName") != null && !userData.get("groupName").trim().isEmpty();
+		return userData.get("name") != null && !userData.get("name").trim().isEmpty()
+				&& userData.get("userName") != null && !userData.get("userName").trim().isEmpty()
+				&& userData.get("email") != null && !userData.get("email").trim().isEmpty()
+				&& userData.get("mobileNo") != null && !userData.get("mobileNo").trim().isEmpty()
+				&& userData.get("roleId") != null && !userData.get("roleId").trim().isEmpty()
+				&& userData.get("groupName") != null && !userData.get("groupName").trim().isEmpty();
 	}
 
 	private void setAcademicFields(AppUser user, Map<String, String> userData) {
-	    try {
-	        // Set department if provided
-	        if (userData.get("departmentName") != null && !userData.get("departmentName").trim().isEmpty()) {
-	            DepartmentMaster dept = DepartmentMasterRepository.findByDepartmentName(userData.get("departmentName"));
-	            if (dept != null) {
-	                user.setDepartmentName(dept);
-	            } else {
-	                System.out.println("Warning: Department not found: " + userData.get("departmentName"));
-	            }
-	        }
-	        
-	        // Set course if provided
-	        if (userData.get("courseName") != null && !userData.get("courseName").trim().isEmpty()) {
-	            CourseMaster course = CourseMasterRepository.findByCourseName(userData.get("courseName"));
-	            if (course != null) {
-	                user.setCourseName(course);
-	            } else {
-	                System.out.println("Warning: Course not found: " + userData.get("courseName"));
-	            }
-	        }
-	        
-	        // Set semester if provided
+		try {
+			// Set department if provided
+			if (userData.get("departmentName") != null && !userData.get("departmentName").trim().isEmpty()) {
+				DepartmentMaster dept = DepartmentMasterRepository.findByDepartmentName(userData.get("departmentName"));
+				if (dept != null) {
+					user.setDepartmentName(dept);
+				} else {
+					System.out.println("Warning: Department not found: " + userData.get("departmentName"));
+				}
+			}
+
+			// Set course if provided
+			if (userData.get("courseName") != null && !userData.get("courseName").trim().isEmpty()) {
+				CourseMaster course = CourseMasterRepository.findByCourseName(userData.get("courseName"));
+				if (course != null) {
+					user.setCourseName(course);
+				} else {
+					System.out.println("Warning: Course not found: " + userData.get("courseName"));
+				}
+			}
+
+			// Set semester if provided
 //	        if (userData.get("semesterName") != null && !userData.get("semesterName").trim().isEmpty()) {
 //	            SemesterMaster semester = SemesterMasterRepository.findBySemesterNameAndCourseName(userData.get("semesterName"),userData.get("courseName"));
 //	            if (semester != null) {
@@ -1167,43 +1290,215 @@ public class UserController {
 //	                System.out.println("Warning: Semester not found: " + userData.get("semesterName"));
 //	            }
 //	        }
-	        
-	        if (userData.get("semesterName") != null && !userData.get("semesterName").trim().isEmpty()) {
-	            String semesterName = userData.get("semesterName").trim();
-	            String courseName = userData.get("courseName") != null ? userData.get("courseName").trim() : null;
 
-	            if (courseName != null && !courseName.isEmpty()) {
-	                CourseMaster course = CourseMasterRepository.findByCourseName(courseName);
-	                if (course != null) {
-	                    SemesterMaster semester = SemesterMasterRepository.findBySemesterNameAndCourse(semesterName, course);
-	                    if (semester != null) {
-	                        user.setSemesterName(semester);
-	                    } else {
-	                        System.out.println("⚠️ Warning: Semester not found for name: " + semesterName + " and course: " + courseName);
-	                    }
-	                } else {
-	                    System.out.println("⚠️ Warning: Course not found with name: " + courseName);
-	                }
-	            } else {
-	                System.out.println("⚠️ Warning: Course name is missing for semester: " + semesterName);
-	            }
-	        }
+			if (userData.get("semesterName") != null && !userData.get("semesterName").trim().isEmpty()) {
+				String semesterName = userData.get("semesterName").trim();
+				String courseName = userData.get("courseName") != null ? userData.get("courseName").trim() : null;
 
-	        
-	        // Set batch if provided
-	        if (userData.get("batchName") != null && !userData.get("batchName").trim().isEmpty()) {
-	            BatchMaster batch = BatchMasterRepository.findByBatchName(userData.get("batchName"));
-	            if (batch != null) {
-	                user.setBatchName(batch);
-	            } else {
-	                System.out.println("Warning: Batch not found: " + userData.get("batchName"));
-	            }
-	        }
-	        
-	    } catch (Exception e) {
-	        System.out.println("Error setting academic fields: " + e.getMessage());
-	        e.printStackTrace();
-	    }
+				if (courseName != null && !courseName.isEmpty()) {
+					CourseMaster course = CourseMasterRepository.findByCourseName(courseName);
+					if (course != null) {
+						SemesterMaster semester = SemesterMasterRepository.findBySemesterNameAndCourse(semesterName,
+								course);
+						if (semester != null) {
+							user.setSemesterName(semester);
+						} else {
+							System.out.println("⚠️ Warning: Semester not found for name: " + semesterName
+									+ " and course: " + courseName);
+						}
+					} else {
+						System.out.println("⚠️ Warning: Course not found with name: " + courseName);
+					}
+				} else {
+					System.out.println("⚠️ Warning: Course name is missing for semester: " + semesterName);
+				}
+			}
+
+			// Set batch if provided
+			if (userData.get("batchName") != null && !userData.get("batchName").trim().isEmpty()) {
+				BatchMaster batch = BatchMasterRepository.findByBatchName(userData.get("batchName"));
+				if (batch != null) {
+					user.setBatchName(batch);
+				} else {
+					System.out.println("Warning: Batch not found: " + userData.get("batchName"));
+				}
+			}
+
+		} catch (Exception e) {
+			System.out.println("Error setting academic fields: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+//start Sidebar code
+	
+	// Method to get current logged-in user using Principal
+	private AppUser getCurrentUser(Principal principal) {
+		if (principal == null) {
+			return null;
+		}
+
+		Authentication auth = (Authentication) principal;
+		String username = auth.getName();
+		
+		System.out.println("username_sidebar :"+username);
+
+		return userRepository.findByUsername(username);
+	}
+
+	// Method to get menu items based on user's template
+	private List<Map<String, Object>> getUserMenuItems(Principal principal) {
+		AppUser currentUser = getCurrentUser(principal);
+		if (currentUser == null) {
+			return new ArrayList<>();
+		}
+
+		String templateName = currentUser.getTemplateName();
+
+		if (templateName == null || templateName.trim().isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		return getMenuItemsByTemplateName(templateName);
+	}
+
+	// Get menu items by template name using repository
+	private List<Map<String, Object>> getMenuItemsByTemplateName(String templateName) {
+		List<RoleMenuTemplate> roleMenuTemplates = RoleMenuTemplateRepository
+				.findByTemplateNameOrderByMenuSortOrder(templateName);
+
+		List<Object[]> menuData = roleMenuTemplates.stream()
+				.map(rmt -> new Object[] { rmt.getMenu().getMenuId(), rmt.getMenu().getModuleId(),
+						rmt.getMenu().getModuleName(), rmt.getMenu().getSubModuleId(), rmt.getMenu().getSubModuleName(),
+						rmt.getMenu().getUrl(), rmt.getMenu().getSortOrder() })
+				.collect(Collectors.toList());
+
+		return organizeMenuItems(menuData);
+	}
+
+	// Organize menu items into hierarchical structure
+	private List<Map<String, Object>> organizeMenuItems(List<Object[]> menuData) {
+		Map<Integer, Map<String, Object>> modules = new LinkedHashMap<>();
+
+		for (Object[] row : menuData) {
+			Integer menuId = (Integer) row[0];
+			Integer moduleId = (Integer) row[1];
+			String moduleName = (String) row[2];
+			Integer subModuleId = (Integer) row[3];
+			String subModuleName = (String) row[4];
+			String url = (String) row[5];
+			Integer sortOrder = (Integer) row[6];
+
+			// Create module if it doesn't exist
+			if (!modules.containsKey(moduleId)) {
+				Map<String, Object> module = new HashMap<>();
+				module.put("moduleId", moduleId);
+				module.put("moduleName", moduleName);
+				module.put("subModules", new ArrayList<Map<String, Object>>());
+				modules.put(moduleId, module);
+			}
+
+			// Add submodule to the module
+			Map<String, Object> subModule = new HashMap<>();
+			subModule.put("menuId", menuId);
+			subModule.put("subModuleId", subModuleId);
+			subModule.put("subModuleName", subModuleName);
+			subModule.put("url", url);
+			subModule.put("sortOrder", sortOrder);
+
+			@SuppressWarnings("unchecked")
+			List<Map<String, Object>> subModules = (List<Map<String, Object>>) modules.get(moduleId).get("subModules");
+			subModules.add(subModule);
+		}
+
+		return new ArrayList<>(modules.values());
+	}
+
+	// Controller method to serve dynamic sidebar
+	@GetMapping("/dynamic-sidebar")
+	public String getDynamicSidebar(Model model, Principal principal) {
+		List<Map<String, Object>> menuItems = getUserMenuItems(principal);
+		 System.out.println("=== getUserMenuItems START ===");
+		model.addAttribute("menuItems", menuItems);
+
+		// Add debug information
+		AppUser currentUser = getCurrentUser(principal);
+		if (currentUser != null) {
+			
+			 System.out.println("Current user is NULL");
+			 
+			model.addAttribute("username", currentUser.getUserName());
+			model.addAttribute("templateName", currentUser.getTemplateName());
+		}
+
+		return "fragments/dynamic-sidebar";
+	}
+
+	// Complete dynamic sidebar with role-based logic
+	@GetMapping("/complete-dynamic-sidebar")
+	public String getCompleteDynamicSidebar(Model model, Principal principal) {
+		List<Map<String, Object>> menuItems;
+
+		if (hasRole("ROLE_SUPERADMIN")) {
+			menuItems = getAllMenusForSuperAdmin();
+		} else {
+			menuItems = getUserMenuItems(principal);
+		}
+
+		model.addAttribute("menuItems", menuItems);
+
+		// Add user info for debugging
+		AppUser currentUser = getCurrentUser(principal);
+		if (currentUser != null) {
+			model.addAttribute("username", currentUser.getUserName());
+			model.addAttribute("templateName", currentUser.getTemplateName());
+		}
+
+		return "fragments/dynamic-sidebar-complete";
+	}
+
+	// Method to get all menus for SuperAdmin
+	private List<Map<String, Object>> getAllMenusForSuperAdmin() {
+		List<MenuChart> allMenus = MenuRepository.findAllOrderBySortOrder();
+
+		List<Object[]> menuData = allMenus.stream()
+				.map(menu -> new Object[] { menu.getMenuId(), menu.getModuleId(), menu.getModuleName(),
+						menu.getSubModuleId(), menu.getSubModuleName(), menu.getUrl(), menu.getSortOrder() })
+				.collect(Collectors.toList());
+
+		return organizeMenuItems(menuData);
+	}
+
+	// Method to check if user has specific role
+	private boolean hasRole(String role) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null && auth.getAuthorities() != null) {
+			return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(role));
+		}
+		return false;
+	}
+
+	// Model attribute for role checks in templates
+	@ModelAttribute("hasRole")
+	public boolean hasRoleAttribute(String role) {
+		return hasRole(role);
+	}
+
+	// Utility methods for testing
+	@GetMapping("/current-user-info")
+	@ResponseBody
+	public Map<String, Object> getCurrentUserInfo(Principal principal) {
+		Map<String, Object> response = new HashMap<>();
+
+		if (principal != null) {
+			AppUser user = getCurrentUser(principal);
+			if (user != null) {
+				response.put("username", user.getUserName());
+				response.put("templateName", user.getTemplateName());
+				response.put("menuItemsCount", getUserMenuItems(principal).size());
+			}
+		}
+
+		return response;
 	}
 
 }

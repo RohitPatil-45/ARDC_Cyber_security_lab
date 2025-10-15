@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Group Users</title>
+    <head th:include="templateListing :: headFragment"></head>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+    <style>
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4361ee, #4cc9f0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-details {
+            line-height: 1.2;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: #2b2d42;
+            font-size: 0.9rem;
+        }
+        
+        .user-email {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .subject-count-badge {
+            background: rgba(67, 97, 238, 0.1);
+            color: #4361ee;
+            border: 1px solid rgba(67, 97, 238, 0.3);
+            font-size: 0.8rem;
+        }
+        
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        
+        .status-active {
+            background: rgba(76, 201, 240, 0.15);
+            color: #4cc9f0;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+        
+        .status-inactive {
+            background: rgba(108, 117, 125, 0.15);
+            color: #6c757d;
+            border: 1px solid rgba(108, 117, 125, 0.3);
+        }
+        
+        .action-buttons .btn {
+            border-radius: 6px;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            margin: 0.1rem;
+        }
+        
+        .group-info-card {
+            background: linear-gradient(135deg, #4361ee, #3f37c9);
+            color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-item i {
+            width: 16px;
+            opacity: 0.9;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div th:replace="fragments/header_bk :: header"></div>
+        <div th:replace="fragments/sidebar :: aside"></div>
+        
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Group Users</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a th:href="@{/SuperAdmin_Dashboard}">Home</a></li>
+                                <li class="breadcrumb-item active">Group Users</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card card-secondary">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-10">
+                                            <h3 class="card-title" style="padding-top: 10px">User Details - <span th:text="${deptName} + ' | ' + ${courseName} + ' | ' + ${semesterName} + ' | ' + ${batchName}">Group Information</span></h3>
+                                        </div>
+                                        <div class="col-md-2 text-right">
+                                            <a th:href="@{/guac/SuperAdmin_Dashboard}" class="btn btn-block bg-gradient-primary back-btn">
+                                                <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+                                            </a>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Group Information Card -->
+                                    <div class="group-info-card mt-3">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="info-item">
+                                                    <i class="fas fa-building"></i>
+                                                    <span><strong>Department:</strong> <span th:text="${deptName}">Not Assigned</span></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="info-item">
+                                                    <i class="fas fa-graduation-cap"></i>
+                                                    <span><strong>Course:</strong> <span th:text="${courseName}">Not Assigned</span></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="info-item">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                    <span><strong>Semester:</strong> <span th:text="${semesterName}">Not Assigned</span></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="info-item">
+                                                    <i class="fas fa-layer-group"></i>
+                                                    <span><strong>Batch:</strong> <span th:text="${batchName}">Not Assigned</span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                <div class="info-item">
+                                                    <i class="fas fa-users"></i>
+                                                    <span><strong>Total Users:</strong> <span th:text="${groupUsers.size()}">0</span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Error Message -->
+                                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show text-center message" role="alert">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <span th:text="${error}"></span>
+                                        <button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="groupUsersTable" class="table table-bordered table-striped">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th scope="col">Sr</th>
+                                                    <th scope="col">User</th>
+                                                    <th scope="col">Username</th>
+                                                    <th scope="col">Email Id</th>
+                                                    <th scope="col">Mobile No</th>
+                                                    <th scope="col">Subjects</th>
+                                                    <th scope="col">Status</th>
+                                                    <th scope="col">Login Status</th>
+                                                    <th scope="col">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <thead class="thead-light" id="searchHeader" style="display: none;">
+                                                <tr>
+                                                    <th scope="col"></th>
+                                                    <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search user" data-column="1"></th>
+                                                    <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search username" data-column="2"></th>
+                                                    <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search email" data-column="3"></th>
+                                                    <th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search mobile" data-column="4"></th>
+                                                    <th scope="col"></th>
+                                                    <th scope="col"></th>
+                                                    <th scope="col"></th>
+                                                    <th scope="col"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="user, stat : ${groupUsers}">
+                                                    <th scope="row" th:text="${stat.count}">1</th>
+                                                    <td>
+                                                        <div class="user-info">
+                                                            <div class="user-avatar" 
+                                                                 th:text="${user.name != null ? user.name.substring(0,1).toUpperCase() : 'U'}">
+                                                                U
+                                                            </div>
+                                                            <div class="user-details">
+                                                                <div class="user-name" th:text="${user.name != null ? user.name : 'N/A'}">Full Name</div>
+                                                                <div class="user-email" th:text="${user.email != null ? user.email : 'No email'}">Email</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>[[${user.userName}]]</td>
+                                                    <td>[[${user.email != null ? user.email : 'N/A'}]]</td>
+                                                    <td>[[${user.mobileNo != null ? user.mobileNo : 'N/A'}]]</td>
+                                                    <td>
+                                                        <span th:if="${userSubjectsMap != null and userSubjectsMap.get(user.userId) != null and not userSubjectsMap.get(user.userId).empty}"
+                                                              class="badge subject-count-badge">
+                                                            <i class="fas fa-book me-1"></i>
+                                                            <span th:text="${userSubjectsMap.get(user.userId).size()}">0</span> Subjects
+                                                        </span>
+                                                        <span th:if="${userSubjectsMap == null or userSubjectsMap.get(user.userId) == null or userSubjectsMap.get(user.userId).empty}"
+                                                              class="text-muted">
+                                                            No Subjects
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span th:if="${user.enabled}" class="badge badge-success">Active</span>
+                                                        <span th:if="${!user.enabled}" class="badge badge-danger">Inactive</span>
+                                                    </td>
+                                                    <td>
+                                                        <span th:if="${user.status == 'online'}" class="status-badge status-active">
+                                                            <i class="fas fa-circle me-1"></i> Online
+                                                        </span>
+                                                        <span th:if="${user.status == 'offline'}" class="status-badge status-inactive">
+                                                            <i class="fas fa-circle me-1"></i> Offline
+                                                        </span>
+                                                        <span th:if="${user.status == null}" class="status-badge status-inactive">
+                                                            <i class="fas fa-question-circle me-1"></i> Unknown
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="action-buttons">
+                                                            <a th:href="@{/guac/subjectView/{userId}(userId=${user.userId})}" 
+                                                               class="btn btn-primary btn-sm"
+                                                               th:if="${userSubjectsMap != null and userSubjectsMap.get(user.userId) != null and not userSubjectsMap.get(user.userId).empty}"
+                                                               target="_blank"
+                                                               title="View Subjects">
+                                                                <i class="fas fa-tasks"></i>
+                                                            </a>
+                                                           
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                
+                                                <!-- No Data Message -->
+                                                <tr th:if="${groupUsers.empty}">
+                                                    <td colspan="9">
+                                                        <div class="text-center py-5 text-muted">
+                                                            <i class="fas fa-users fa-3x mb-3" style="opacity: 0.3;"></i>
+                                                            <h4>No Users Found</h4>
+                                                            <p class="mb-0">There are no users in this group with the specified criteria.</p>
+                                                            <small>Department: <span th:text="${deptName}">Not Assigned</span> | 
+                                                                   Course: <span th:text="${courseName}">Not Assigned</span> | 
+                                                                   Semester: <span th:text="${semesterName}">Not Assigned</span> | 
+                                                                   Batch: <span th:text="${batchName}">Not Assigned</span></small>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
+    
+    <div th:replace="templateListing :: jsscript"></div>
+    
+    <!-- DataTables Scripts -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Initialize DataTable
+            var table = $('#groupUsersTable').DataTable({
+                "responsive": true,
+                "lengthChange": true,
+                "autoWidth": false,
+                "pageLength": 10,
+                "dom": '<"row"<"col-md-6"B><"col-md-6"f>><"row"<"col-md-12"tr>><"row"<"col-md-5"i><"col-md-7"p>>',
+                "buttons": [
+                    {
+                        extend: 'collection',
+                        className: 'btn btn-secondary',
+                        text: '<i class="fas fa-cog"></i> Options',
+                        buttons: [
+                            {
+                                extend: 'copy',
+                                className: 'btn btn-secondary',
+                                text: '<i class="fas fa-copy"></i> Copy'
+                            },
+                            {
+                                extend: 'excel',
+                                className: 'btn btn-success',
+                                text: '<i class="fas fa-file-excel"></i> Excel'
+                            },
+                            {
+                                extend: 'pdf',
+                                className: 'btn btn-danger',
+                                text: '<i class="fas fa-file-pdf"></i> PDF'
+                            },
+                            {
+                                extend: 'print',
+                                className: 'btn btn-info',
+                                text: '<i class="fas fa-print"></i> Print'
+                            },
+                            {
+                                text: '<i class="fas fa-search"></i> Toggle Search',
+                                className: 'btn btn-warning',
+                                action: function ( e, dt, node, config ) {
+                                    $('#searchHeader').toggle();
+                                    // Adjust table header if needed
+                                    table.columns.adjust();
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "language": {
+                    "search": "Global Search:",
+                    "lengthMenu": "Show _MENU_ entries",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ users",
+                    "emptyTable": "No users found in this group"
+                },
+                "columnDefs": [
+                    { "width": "5%", "targets": 0 }, // Sr No
+                    { "width": "20%", "targets": 1 }, // User
+                    { "width": "10%", "targets": 2 }, // Username
+                    { "width": "15%", "targets": 3 }, // Email
+                    { "width": "10%", "targets": 4 }, // Mobile
+                    { "width": "10%", "targets": 5 }, // Subjects
+                    { "width": "10%", "targets": 6 }, // Status
+                    { "width": "10%", "targets": 7 }, // Login Status
+                    { "width": "10%", "targets": 8 }  // Actions
+                ]
+            });
+            
+            // Individual column search
+            $('#groupUsersTable thead').on('keyup', '.column-search', function() {
+                var columnIndex = $(this).data('column');
+                table.column(columnIndex).search(this.value).draw();
+            });
+        });
+        
+    });
+        }
+    </script>
+</body>
+</html>

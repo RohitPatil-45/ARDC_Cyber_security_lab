@@ -97,8 +97,10 @@ public class AppUser implements Serializable {
 //	@Column(name = "semester_name")
 //	private String semesterName;
 //	
-//	@Column(name = "subject_name")
-//	private String subjectName;
+	@Column(name = "template_name")
+	private String templateName;
+	
+	
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "batch_name")
@@ -284,6 +286,16 @@ public class AppUser implements Serializable {
 	public void setUserRoles(Set<UserRole> userRoles) {
 		this.userRoles = userRoles;
 	}
+
+	public String getTemplateName() {
+		return templateName;
+	}
+
+	public void setTemplateName(String templateName) {
+		this.templateName = templateName;
+	}
+	
+	
 	
 	
 

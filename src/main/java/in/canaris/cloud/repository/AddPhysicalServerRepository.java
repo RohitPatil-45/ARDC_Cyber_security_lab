@@ -42,6 +42,10 @@ public interface AddPhysicalServerRepository extends JpaRepository<AddPhysicalSe
 			+ "WHERE a.server_ip IS NOT NULL AND h.physical_server_ip IS NOT NULL", nativeQuery = true)
 	List<Object[]> findHealthDataByVirtualizationType();
 
+//	@Query("SELECT a.virtualization_type, " + "SUM(a.used_cpu), SUM(a.total_cpu), " + "SUM(a.used_ram), SUM(a.total_ram), "
+//			+ "SUM(a.used_disk), SUM(a.total_disk) " + "FROM add_physical_server a " + "GROUP BY a.virtualization_type")
+//	List<Object[]> findHealthDataByVirtualizationType();
+
 	@Query(value = "SELECT hostname, server_ip, status " + "FROM add_physical_server "
 			+ "WHERE virtualization_type = :type AND status = :status", nativeQuery = true)
 	List<Object[]> findServerDetailsByTypeAndStatus(@Param("type") String type, @Param("status") String status);

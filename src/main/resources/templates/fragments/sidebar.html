@@ -1,84 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Magicbox Sidebar</title>
-<!-- Bootstrap CSS -->
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-	rel="stylesheet">
-<!-- Font Awesome -->
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- AdminLTE CSS (for treeview functionality) -->
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-<style>
-.main-sidebar {
-	background-color: #ffffff !important;
-	color: #2c3e50;
-}
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Magicbox Sidebar</title>
+	<!-- Bootstrap CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<!-- AdminLTE CSS (for treeview functionality) -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+	<style>
+		.main-sidebar {
+			background-color: #ffffff !important;
+			color: #2c3e50;
+		}
 
-.sidebar-dark-primary {
-	--bs-light: #f8f9fa;
-}
+		.sidebar-dark-primary {
+			--bs-light: #f8f9fa;
+		}
 
-.nav-sidebar>.nav-item>.nav-link, .nav-sidebar .nav-link>p, .nav-sidebar .nav-link>i
-	{
-	color: #2c3e50 !important;
-}
+		.nav-sidebar>.nav-item>.nav-link,
+		.nav-sidebar .nav-link>p,
+		.nav-sidebar .nav-link>i {
+			color: #2c3e50 !important;
+		}
 
-.nav-sidebar>.nav-item .nav-treeview .nav-link {
-	color: #6c757d !important;
-}
+		.nav-sidebar>.nav-item .nav-treeview .nav-link {
+			color: #6c757d !important;
+		}
 
-.nav-sidebar>.nav-item .nav-treeview .nav-link:hover {
-	color: #2c3e50 !important;
-	background-color: #f8f9fa;
-}
+		.nav-sidebar>.nav-item .nav-treeview .nav-link:hover {
+			color: #2c3e50 !important;
+			background-color: #f8f9fa;
+		}
 
-.nav-sidebar>.nav-item .nav-link.active, .nav-sidebar>.nav-item .nav-link:hover
-	{
-	background-color: #e9ecef;
-	color: #2c3e50 !important;
-}
+		.nav-sidebar>.nav-item .nav-link.active,
+		.nav-sidebar>.nav-item .nav-link:hover {
+			background-color: #e9ecef;
+			color: #2c3e50 !important;
+		}
 
-.brand-link {
-	border-bottom: 1px solid #dee2e6;
-}
+		.brand-link {
+			border-bottom: 1px solid #dee2e6;
+		}
 
-.logo-admin {
-	display: flex;
-	justify-content: center;
-	padding: 15px 0;
-}
+		.logo-admin {
+			display: flex;
+			justify-content: center;
+			padding: 15px 0;
+		}
 
-.form-control-sidebar {
-	border: 1px solid #dee2e6;
-	background-color: #fff;
-}
+		.form-control-sidebar {
+			border: 1px solid #dee2e6;
+			background-color: #fff;
+		}
 
-.sidebar {
-	height: 100vh;
-	overflow-y: auto;
-}
+		.sidebar {
+			height: 100vh;
+			overflow-y: auto;
+		}
 
-.nav-header {
-	color: #6c757d !important;
-	font-weight: 600;
-}
-</style>
+		.nav-header {
+			color: #6c757d !important;
+			font-weight: 600;
+		}
+	</style>
 </head>
+
 <body>
 	<!-- Main Sidebar Container -->
 	<aside class="main-sidebar sidebar-light-primary elevation-4">
 		<!-- Brand Logo -->
 		<div>
-			<a href="javascript:void(0);" id="logo" class="logo logo-admin"
-				style="margin-left: 11px;"> <img
-				src="/webtemplate/dist/img/Magicbox-logo.png" width="100px"
-				alt="Magicbox logo" style="width: 90%;">
+			<a href="javascript:void(0);" id="logo" class="logo logo-admin" style="margin-left: 11px;"> <img
+					src="/webtemplate/dist/img/Magicbox-logo.png" width="100px" alt="Magicbox logo" style="width: 90%;">
 			</a>
 		</div>
 
@@ -87,8 +84,8 @@
 			<!-- SidebarSearch Form -->
 			<div class="form-inline">
 				<div class="input-group" data-widget="sidebar-search">
-					<input class="form-control form-control-sidebar" type="search"
-						placeholder="Search" aria-label="Search">
+					<input class="form-control form-control-sidebar" type="search" placeholder="Search"
+						aria-label="Search">
 					<div class="input-group-append">
 						<button class="btn btn-sidebar">
 							<i class="fas fa-search fa-fw"></i>
@@ -99,597 +96,478 @@
 
 			<!-- Sidebar Menu -->
 			<nav class="mt-2">
-				<ul class="nav nav-pills nav-sidebar flex-column"
-					data-widget="treeview" role="menu" data-accordion="false">
-					
-					
-					
+				<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+					data-accordion="false">
 
-					
-					<!-- Add icons to the links using the .nav-icon class
-                   with font-awesome or any other icon font library -->
 
-					<!-- Openstack -->
-					<!-- 					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
-					<!-- 						class="nav-item"><a href="#" class="nav-link"> <i -->
-					<!-- 							class="nav-icon fas fa-table"></i> -->
-					<!-- 							<p> -->
-					<!-- 								Openstack <i class="right fas fa-angle-left"></i> -->
-					<!-- 							</p> -->
-					<!-- 					</a> -->
-					<!-- 						<ul class="nav nav-treeview"> -->
-					<!-- 							<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a -->
-					<!-- 								href="/openstack/Projectview" class="nav-link"> <i -->
-					<!-- 									class="far fa-circle nav-icon"></i> -->
-					<!-- 									<p>Create Project</p> -->
-					<!-- 							</a></li> -->
-					<!-- 							<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a -->
-					<!-- 								href="/openstack/new" class="nav-link"> <i -->
-					<!-- 									class="far fa-circle nav-icon"></i> -->
-					<!-- 									<p>Create VM (Openstack)</p> -->
-					<!-- 							</a></li> -->
 
-					<!-- 							<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a -->
-					<!-- 								href="/OpenStackDiscover/view" class="nav-link"> <i -->
-					<!-- 									class="far fa-circle nav-icon"></i> -->
-					<!-- 									<p>Discover</p> -->
-					<!-- 							</a></li> -->
-
-					<!-- 							<li class="nav-item"><a href="/openstack/viewProjects" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
-					<!-- 									<p>View Projects</p> -->
-					<!-- 							</a></li> -->
-					<!-- 							<li class="nav-item"><a href="/InstanceVm/view" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
-					<!-- 									<p>View VMs</p> -->
-					<!-- 							</a></li> -->
-					<!-- 							<li class="nav-item"><a href="/image/view" class="nav-link"> -->
-					<!-- 									<i class="far fa-circle nav-icon"></i> -->
-					<!-- 									<p>Image</p> -->
-					<!-- 							</a></li> -->
-					<!-- 							<li class="nav-item"><a href="/flavor/view" class="nav-link"> -->
-					<!-- 									<i class="far fa-circle nav-icon"></i> -->
-					<!-- 									<p>Flavor</p> -->
-					<!-- 							</a></li> -->
-					<!-- 							<li class="nav-item"><a href="/keyPair/view" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
-					<!-- 									<p>Key Pair</p> -->
-					<!-- 							</a></li> -->
-					<!-- 							<li class="nav-item"><a href="/network/view" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
-					<!-- 									<p>Networks</p> -->
-					<!-- 							</a></li> -->
-					<!-- 							<li class="nav-item"><a href="/securityGroup/view" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
-					<!-- 									<p>Security Group</p> -->
-					<!-- 							</a></li> -->
-					<!-- 							<li class="nav-item"><a href="/availabilityZoneInfo/view" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
-					<!-- 									<p>Availability Zone Info</p> -->
-					<!-- 							</a></li> -->
-					<!-- 							<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
-					<!-- 								class="nav-item"><a href="#" class="nav-link"> <i -->
-					<!-- 									class="nav-icon fas fa-check-circle"></i> -->
-					<!-- 									<p> -->
-					<!-- 										Approval <i class="fas fa-angle-left right"></i> -->
-					<!-- 									</p> -->
-					<!-- 							</a> -->
-					<!-- 								<ul class="nav nav-treeview"> -->
-					<!-- 									<li class="nav-item"><a href="/openstack/allRequests" -->
-					<!-- 										class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
-					<!-- 											<p>Openstack Approval Request</p> -->
-					<!-- 									</a></li> -->
-					<!-- 								</ul></li> -->
-					<!-- 						</ul></li> -->
-
-					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
-						class="nav-item"><a href="#" class="nav-link"> <i
-							class="nav-icon fas fa-table"></i>
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="#" class="nav-link"> <i
+								class="nav-icon fas fa-table"></i>
 							<p>
 								Master <i class="right fas fa-angle-left"></i>
 							</p>
-					</a>
+						</a>
 						<ul class="nav nav-treeview">
-							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a
-								href="/group/view" class="nav-link"> <i
-									class="far fa-circle nav-icon"></i>
+							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a href="/group/view"
+									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 									<p>Group Master</p>
-							</a></li>
-							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a
-								href="/location/view" class="nav-link"> <i
-									class="far fa-circle nav-icon"></i>
+								</a></li>
+							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a href="/location/view"
+									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 									<p>Location Master</p>
-							</a></li>
-							<li class="nav-item"><a href="/users/view" class="nav-link">
-									<i class="far fa-circle nav-icon"></i>
-									<p>User Master</p>
-							</a></li>
+								</a></li>
 
-							<li class="nav-item"><a href="/guac/View_Category"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
+							<li class="nav-item"><a href="/guac/View_Category" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
 									<p>Category</p>
-							</a></li>
+								</a></li>
 
-
-
-							<li class="nav-item"><a href="/discount/view"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
+							<li class="nav-item"><a href="/discount/view" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
 									<p>Discount Master</p>
-							</a></li>
-							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a
-								href="/emailConfig/view" class="nav-link"> <i
-									class="far fa-circle nav-icon"></i>
+								</a></li>
+							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a href="/emailConfig/view"
+									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 									<p>Mail Master</p>
-							</a></li>
+								</a></li>
 							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a
-								href="/physicalServer/view" class="nav-link"> <i
-									class="far fa-circle nav-icon"></i>
+									href="/physicalServer/view" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
 									<p>Physical Server Master</p>
-							</a></li>
+								</a></li>
 
 							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a
-								href="/vmLocationPath/view" class="nav-link"> <i
-									class="far fa-circle nav-icon"></i>
+									href="/vmLocationPath/view" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
 									<p>VM Location Path Master</p>
-							</a></li>
+								</a></li>
 
-							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a
-								href="/switchmaster/view" class="nav-link"> <i
-									class="far fa-circle nav-icon"></i>
+							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a href="/switchmaster/view"
+									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 									<p>Switch</p>
-							</a></li>
+								</a></li>
 
-							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a
-								href="/discover/view" class="nav-link"> <i
-									class="far fa-circle nav-icon"></i>
+							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a href="/discover/view"
+									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 									<p>Discover</p>
-							</a></li>
+								</a></li>
 
-							<li class="nav-item"><a href="/billing/view"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
+							<li class="nav-item"><a href="/billing/view" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
 									<p>Billing</p>
-							</a></li>
-
-						</ul></li>
-
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item">
-						<a href="#" class="nav-link"> <i
-							class="nav-icon fas fa-money-check"></i>
-							<p>
-								SuperAdmin <i class="right fas fa-angle-left"></i>
-							</p>
-					</a>
-						<ul class="nav nav-treeview">
-
-
-
-							<li class="nav-item"><a href="/guac/SuperAdmin_Dashboard"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Dashboard</p>
-							</a></li>
-							
-							<li class="nav-item"><a href="/guac/teacher-dashboard"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>Teacher Dashboard</p>
-							</a></li>
-							
-							
-
-							<!-- Templates -->
-							<li class="nav-item has-treeview"><a href="#"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>
-										Templates <i class="right fas fa-angle-left"></i>
-									</p>
-							</a>
-								<ul class="nav nav-treeview">
-									<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item">
-										<a href="/cloud_instance/new" class="nav-link"> <i
-											class="far fa-dot-circle nav-icon"></i>
-											<p>Create Template</p>
-									</a>
-									</li>
-									<li class="nav-item"><a href="/cloud_instance/view"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>View Template</p>
-									</a></li>
-								</ul></li>
-
-							<!-- Scenarios -->
-							<li class="nav-item has-treeview"><a href="#"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>
-										Scenarios <i class="right fas fa-angle-left"></i>
-									</p>
-							</a>
-								<ul class="nav nav-treeview">
-									<li class="nav-item"><a href="/guac/Scenario_Details"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>Create Scenario</p>
-									</a></li>
-									<li class="nav-item"><a href="/guac/View_Scenario"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>View Scenario</p>
-									</a></li>
-
-
-								</ul></li>
-
-							<!-- Playlists -->
-							<li class="nav-item has-treeview"><a href="#"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>
-										Playlists <i class="right fas fa-angle-left"></i>
-									</p>
-							</a>
-								<ul class="nav nav-treeview">
-									<li class="nav-item"><a href="/guac/Add_Playlist"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>Create Playlist</p>
-									</a></li>
-									<li class="nav-item"><a href="/guac/View_Playlist"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>View Playlist</p>
-									</a></li>
-								</ul></li>
-
-							<!-- Sub-Playlists -->
-							<li class="nav-item has-treeview"><a href="#"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>
-										Sub-Playlists <i class="right fas fa-angle-left"></i>
-									</p>
-							</a>
-								<ul class="nav nav-treeview">
-									<li class="nav-item"><a href="/guac/Add_Sub_Playlist"
-										class="nav-link"> <i class="far fa-circle nav-icon"></i>
-											<p>Create Sub Playlist</p>
-									</a></li>
-									<li class="nav-item"><a href="/guac/View_SubPalylist"
-										class="nav-link"> <i class="far fa-circle nav-icon"></i>
-											<p>View Sub Playlist</p>
-									</a></li>
-									<li class="nav-item"><a
-										href="/guac/Add_ScenarioInSub_Playlist" class="nav-link">
-											<i class="far fa-circle nav-icon"></i>
-											<p>Add Scenario Sub Playlist</p>
-									</a></li>
-									<li class="nav-item"><a
-										href="/guac/Add_Scenario_and_Sub_Playlist_In_Playlist"
-										class="nav-link"> <i class="far fa-circle nav-icon"></i>
-											<p>Add Scenario and Sub Playlist In Playlist</p>
-									</a></li>
-								</ul></li>
-
-							<!-- UserWise Playlist -->
-							<li class="nav-item has-treeview"><a href="#"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>
-										UserWise Subscription <i class="right fas fa-angle-left"></i>
-									</p>
-							</a>
-								<ul class="nav nav-treeview">
-<!-- 									<li class="nav-item"><a href="/guac/Add_UserWisePlaylist" -->
-<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-<!-- 											<p>Add Assign</p> -->
-<!-- 									</a></li> -->
-
-<!-- 									<li class="nav-item"><a href="/guac/user_playlist_summary" -->
-<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-<!-- 											<p>User Assign Summary</p> -->
-<!-- 									</a></li> -->
-									
-<!-- 									<li class="nav-item"><a href="/guac/SemesterWisePlaylist" -->
-<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-<!-- 											<p>Subject Wise Playlist</p> -->
-<!-- 									</a></li> -->
-									
-									<li class="nav-item"><a href="/guac/View_SubjectWisePlaylist"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>Subject Wise Listing</p>
-									</a></li>
-									
-									
-									
-									<li class="nav-item"><a href="/guac/EnrollToElectiveSubject"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>Enroll To Elective Subject</p>
-									</a></li>
-									
-									
-									<li class="nav-item"><a href="/guac/teachers"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>Teachers</p>
-									</a></li>
-									
+								</a></li>
 								
-													
-								</ul></li>
+								<li class="nav-item"><a href="/guac/manage" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>Manage Scope</p>
+								</a></li>
+								
+								
 
-							<!-- My Scenario In Progress -->
-							<li class="nav-item has-treeview"><a href="#"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>
-										In Progress Task <i class="right fas fa-angle-left"></i>
-									</p>
-							</a>
-								<ul class="nav nav-treeview">
-									<li class="nav-item"><a
-										href="/guac/My_Scenario_Inprogress" class="nav-link"> <i
-											class="far fa-dot-circle nav-icon"></i>
-											<p>My Scenario Inprogress</p>
-									</a></li>
-									<li class="nav-item"><a href="/guac/My_Scenario_Completed"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>My Scenario Completed</p>
-									</a></li>
-
-
-									<li class="nav-item"><a href="/guac/UserWisePerformance"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>User Wise Performance</p>
-									</a></li>
-
-									<!-- 									<li class="nav-item"><a href="/guac/UserWiseChartBoarView" -->
-									<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-									<!-- 											<p>User Wise Chart Boart View</p> -->
-									<!-- 									</a></li> -->
-
-									<li class="nav-item"><a href="/guac/View_All_Vm_Listing"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>View Lab Listing</p>
-									</a></li>
-
-
-
-
-
-								</ul></li>
-
-							<!-- Docker -->
-							<li class="nav-item has-treeview"><a href="#"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>
-										Docker <i class="right fas fa-angle-left"></i>
-									</p>
-							</a>
-								<ul class="nav nav-treeview">
-									<li class="nav-item"><a href="/guac/Add_Docker"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>Discover Docker</p>
-									</a></li>
-									<li class="nav-item"><a href="/guac/Create_docker_network"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>Create Docker Network</p>
-									</a></li>
-									<li class="nav-item"><a href="/guac/View_DockerListing"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>View Docker Network</p>
-									</a></li>
-
-									<li class="nav-item"><a
-										href="/guac/View_DiscoverContainerListing" class="nav-link">
-											<i class="far fa-dot-circle nav-icon"></i>
-											<p>View Discover Container</p>
-									</a></li>
-
-
-								</ul></li>
-
-							<li class="nav-item has-treeview"><a href="#"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
-									<p>
-										University <i class="right fas fa-angle-left"></i>
-									</p>
-							</a>
-								<ul class="nav nav-treeview">
-									<!-- 									<li class="nav-item"><a href="/guac/Add_Department" -->
-									<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-									<!-- 											<p>Add Department</p> -->
-									<!-- 									</a></li> -->
-									<li class="nav-item"><a href="/guac/View_Department"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p> Department</p>
-									</a></li>
-									<!-- 									<li class="nav-item"><a href="/guac/Add_Course" -->
-									<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-									<!-- 											<p>Add Course</p> -->
-									<!-- 									</a></li> -->
-
-									<li class="nav-item"><a href="/guac/View_Course"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p> Course</p>
-									</a></li>
-
-									<!-- 									<li class="nav-item"><a href="/guac/Add_Semester" -->
-									<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-									<!-- 											<p>Add Semester</p> -->
-									<!-- 									</a></li> -->
-
-									<li class="nav-item"><a href="/guac/View_Semester"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p> Semester</p>
-									</a></li>
-
-									<!-- 									<li class="nav-item"><a href="/guac/Add_Subject" -->
-									<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-									<!-- 											<p>Add_Subject</p> -->
-									<!-- 									</a></li> -->
-
-									<li class="nav-item"><a href="/guac/View_Subject"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p> Subject</p>
-									</a></li>
-									
-									<li class="nav-item"><a href="/guac/Add_batch"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p> Add_batch</p>
-									</a></li>
-									
-									<li class="nav-item"><a href="/guac/View_Batches"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p> View Batch</p>
-									</a></li>
-
-
-
-
-								</ul></li>
-
-
-
-
-							<!-- Connections -->
-							<li class="nav-item"><a href="/guac/" class="nav-link">
-									<i class="far fa-circle nav-icon"></i>
-									<p>Connection</p>
-							</a></li>
 						</ul>
 					</li>
-					
-					
-										
+
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="/guac/SuperAdmin_Dashboard"
+							class="nav-link"> <i class="fas fa-tachometer-alt nav-icon"></i>
+							<p>
+								Dashboard
+							</p>
+						</a>
+
+					</li>
+
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item has-treeview"><a href="#"
+							class="nav-link"> <i class="fas fa-file-edit nav-icon"></i>
+							<p>
+								Templates <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item">
+								<a href="/cloud_instance/new" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>Create Template</p>
+								</a>
+							</li>
+							<li class="nav-item"><a href="/cloud_instance/view" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>View Template</p>
+								</a></li>
+						</ul>
+					</li>
+
+					<!-- Scenarios -->
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item has-treeview"><a href="#" class="nav-link"> <i
+								class="fas fa-exchange-alt nav-icon"></i>
+							<p>
+								Scenarios <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item"><a href="/guac/Scenario_Details" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>Create Scenario</p>
+								</a></li>
+							<li class="nav-item"><a href="/guac/View_Scenario" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>View Scenario</p>
+								</a></li>
+
+
+						</ul>
+					</li>
+
+					<!-- Playlists -->
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item has-treeview"><a href="#" class="nav-link"> <i class="fas fa-play nav-icon"></i>
+							<p>
+								Playlists <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item"><a href="/guac/Add_Playlist" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>Create Playlist</p>
+								</a></li>
+							<li class="nav-item"><a href="/guac/View_Playlist" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>View Playlist</p>
+								</a></li>
+						</ul>
+					</li>
+
+					<!-- Sub-Playlists -->
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item has-treeview"><a href="#" class="nav-link"> <i
+								class="fas fa-music nav-icon"></i>
+							<p>
+								Sub-Playlists <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item"><a href="/guac/Add_Sub_Playlist" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>Create Sub Playlist</p>
+								</a></li>
+							<li class="nav-item"><a href="/guac/View_SubPalylist" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>View Sub Playlist</p>
+								</a></li>
+
+						</ul>
+					</li>
+
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item has-treeview"><a href="#" class="nav-link"> <i
+								class="fas fa-project-diagram nav-icon"></i>
+							<p>
+								Scenario Mapping <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item"><a href="/guac/Add_ScenarioInSub_Playlist" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>Map Scenario in Sub-Playlist</p>
+								</a></li>
+							<li class="nav-item"><a href="/guac/Add_Scenario_and_Sub_Playlist_In_Playlist"
+									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+									<p>Map Scenario & Sub-Playlist In Playlist</p>
+								</a></li>
+							<li class="nav-item"><a href="/guac//guac/View_SubjectWisePlaylist"
+									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+									<p>Map Scenario to Subject</p>
+								</a></li>
+						</ul>
+					</li>
+
+
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item has-treeview"><a href="#"
+							class="nav-link"> <i class="fas fa-hourglass-half nav-icon"></i>
+							<p>
+								In Progress Task <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item"><a href="/guac/My_Scenario_Inprogress" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>My Scenario Inprogress</p>
+								</a></li>
+							<li class="nav-item"><a href="/guac/My_Scenario_Completed" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>My Scenario Completed</p>
+								</a></li>
+
+						</ul>
+					</li>
+
+					<!-- Docker -->
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item has-treeview"><a href="#"
+							class="nav-link"> <i class="fas fa-boxes-stacked nav-icon"></i>
+							<p>
+								Docker Management<i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item"><a href="/guac/Add_Docker" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>Discover Docker</p>
+								</a></li>
+							<li class="nav-item"><a href="/guac/Create_docker_network" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>Create Docker Network</p>
+								</a></li>
+							<li class="nav-item"><a href="/guac/View_DockerListing" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>View Docker Network</p>
+								</a></li>
+
+							<li class="nav-item"><a href="/guac/View_DiscoverContainerListing" class="nav-link">
+									<i class="far fa-dot-circle nav-icon"></i>
+									<p>View Discover Container</p>
+								</a></li>
+
+
+						</ul>
+					</li>
+
+					<!-- Connections -->
+					<!--<li class="nav-item"><a href="/guac/" class="nav-link">
+							<i class="far fa-dot-circle nav-icon"></i>
+							<p>Connection</p>
+						</a></li>-->
+
 					<!-- Teacher Section -->
-					<li sec:authorize="hasAnyRole('ROLE_TEACHER','ROLE_SUPERADMIN','ROLE_ADMIN')" class="nav-item">
-						<a href="#" class="nav-link"> <i
-							class="nav-icon fas fa-chalkboard-teacher"></i>
+					<li sec:authorize="hasRole('ROLE_TEACHER')" class="nav-item">
+						<a href="#" class="nav-link"> <i class="nav-icon fas fa-chalkboard-teacher"></i>
 							<p>
 								Teacher <i class="right fas fa-angle-left"></i>
 							</p>
-					</a>
+						</a>
 						<ul class="nav nav-treeview">
-							<li class="nav-item"><a href="/guac/teacher-dashboard"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
+							<li class="nav-item"><a href="/guac/teacher-dashboard" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
 									<p>Dashboard</p>
-							</a></li>
-							
-							<!-- Teacher's Classes -->
-<!-- 							<li class="nav-item has-treeview"><a href="#" -->
-<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
-<!-- 									<p> -->
-<!-- 										My Classes <i class="right fas fa-angle-left"></i> -->
-<!-- 									</p> -->
-<!-- 							</a> -->
-<!-- 								<ul class="nav nav-treeview"> -->
-<!-- 									<li class="nav-item"><a href="/guac/teacher-classes" -->
-<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-<!-- 											<p>View My Classes</p> -->
-<!-- 									</a></li> -->
-<!-- 									<li class="nav-item"><a href="/guac/create-assignment" -->
-<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-<!-- 											<p>Create Assignment</p> -->
-<!-- 									</a></li> -->
-<!-- 									<li class="nav-item"><a href="/guac/view-assignments" -->
-<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
-<!-- 											<p>View Assignments</p> -->
-<!-- 									</a></li> -->
-<!-- 								</ul></li> -->
-							
-							<!-- Student Management -->
-							
-							
-							<!-- Content Management -->
-							
-								
-							<!-- Assessments -->
-							
+								</a></li>
+
 						</ul>
 					</li>
 
-					<li
-						sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_USER','ROLE_SUPERADMIN','ROLE_TEACHER')"
-						class="nav-item"><a href="#" class="nav-link"> <i
-							class="nav-icon fas fa-cloud"></i>
+					<!--User Sidebar-->
+
+					<li sec:authorize="hasRole('ROLE_USER')" class="nav-item"><a href="#" class="nav-link"> <i
+								class="fas fa-users nav-icon"></i>
 							<p>
 								User <i class="right fas fa-angle-left"></i>
 							</p>
-					</a>
+						</a>
 						<ul class="nav nav-treeview">
-						
-						<li class="nav-item"><a href="/guac/UserWise_Dashboard" class="nav-link">
-									<i class="far fa-circle nav-icon"></i>
+
+							<li class="nav-item"><a href="/guac/UserWise_Dashboard" class="nav-link">
+									<i class="fas fa-tachometer-alt nav-icon"></i>
 									<p>Dashboard</p>
-							</a></li>
+								</a></li>
 
 
-							<li class="nav-item has-treeview"><a href="#"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
+							<li class="nav-item has-treeview"><a href="#" class="nav-link"> <i
+										class="fas fa-folder-open nav-icon"></i>
 									<p>
 										My Programs <i class="right fas fa-angle-left"></i>
 									</p>
-							</a>
+								</a>
 								<ul class="nav nav-treeview">
 
-									<li class="nav-item"><a href="/guac/View_Playlist"
-										class="nav-link"> <i class="far fa-circle nav-icon"></i>
+									<li class="nav-item"><a href="/guac/View_Playlist" class="nav-link"> <i
+												class="far fa-dot-circle nav-icon"></i>
 											<p>View Playlist</p>
-									</a></li>
+										</a></li>
 
-									<li class="nav-item"><a href="/guac/View_SubPalylist"
-										class="nav-link"> <i class="far fa-circle nav-icon"></i>
+									<li class="nav-item"><a href="/guac/View_SubPalylist" class="nav-link"> <i
+												class="far fa-dot-circle nav-icon"></i>
 											<p>View Sub Playlist</p>
-									</a></li>
+										</a></li>
 
-									<li class="nav-item"><a href="/guac/View_Scenario"
-										class="nav-link"> <i class="far fa-circle nav-icon"></i>
+									<li class="nav-item"><a href="/guac/View_Scenario" class="nav-link"> <i
+												class="far fa-dot-circle nav-icon"></i>
 											<p>View Scenario</p>
-									</a></li>
+										</a></li>
 
 
-								</ul></li>
-
-
-
-
-
-
-							<li class="nav-item has-treeview"><a href="#"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
+								</ul>
+							</li>
+							<li class="nav-item has-treeview"><a href="#" class="nav-link"> <i
+										class="fas fa-trophy nav-icon"></i>
 									<p>
 										My performance <i class="right fas fa-angle-left"></i>
 									</p>
-							</a>
+								</a>
 								<ul class="nav nav-treeview">
-									<li class="nav-item"><a
-										href="/guac/My_Scenario_Inprogress" class="nav-link"> <i
-											class="far fa-dot-circle nav-icon"></i>
+									<li class="nav-item"><a href="/guac/My_Scenario_Inprogress" class="nav-link"> <i
+												class="far fa-dot-circle nav-icon"></i>
 											<p>My Scenario Inprogress</p>
-									</a></li>
-									<li class="nav-item"><a href="/guac/My_Scenario_Completed"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+										</a></li>
+									<li class="nav-item"><a href="/guac/My_Scenario_Completed" class="nav-link"> <i
+												class="far fa-dot-circle nav-icon"></i>
 											<p>My Scenario Completed</p>
-									</a></li>
+										</a></li>
 
-									<li class="nav-item"><a href="/guac/UserTaskPerformance"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+									<li class="nav-item"><a href="/guac/UserTaskPerformance" class="nav-link"> <i
+												class="far fa-dot-circle nav-icon"></i>
 											<p>Task Performance</p>
-									</a></li>
-									
-									<li class="nav-item"><a href="/guac/Add_MappingElectiveSubject"
-										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
-											<p>Add Mapping Elective Subject</p>
-									</a></li>
+										</a></li>
+
+								</ul>
+							</li>
+
+						</ul>
+					</li>
+
+					<!--End user Sidebar-->
+
+
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="#" class="nav-link"> <i
+								class="fas fa-users nav-icon"></i>
+							<p>
+								User Management <i class="fas fa-angle-left right"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+
+							<li class="nav-item"><a href="/users/view" class="nav-link">
+									<i class="far fa-dot-circle nav-icon"></i>
+									<p>Users</p>
+								</a></li>
+
+
+							<li class="nav-item"><a href="/guac/teachers" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>Teachers</p>
+								</a></li>
+						</ul>
+					</li>
+
+
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="#" class="nav-link"> <i
+								class="fas fa-university nav-icon"></i>
+							<p>
+								University Management<i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<!-- 									<li class="nav-item"><a href="/guac/Add_Department" -->
+							<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+							<!-- 											<p>Add Department</p> -->
+							<!-- 									</a></li> -->
+							<li class="nav-item"><a href="/guac/View_Department" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p> Department</p>
+								</a></li>
+							<!-- 									<li class="nav-item"><a href="/guac/Add_Course" -->
+							<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+							<!-- 											<p>Add Course</p> -->
+							<!-- 									</a></li> -->
+
+							<li class="nav-item"><a href="/guac/View_Course" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p> Course</p>
+								</a></li>
+
+							<!-- 									<li class="nav-item"><a href="/guac/Add_Semester" -->
+							<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+							<!-- 											<p>Add Semester</p> -->
+							<!-- 									</a></li> -->
+
+							<li class="nav-item"><a href="/guac/View_Semester" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p> Semester</p>
+								</a></li>
+
+							<!-- 									<li class="nav-item"><a href="/guac/Add_Subject" -->
+							<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+							<!-- 											<p>Add_Subject</p> -->
+							<!-- 									</a></li> -->
+
+							<li class="nav-item"><a href="/guac/View_Subject" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p> Subject</p>
+								</a></li>
+
+							<li class="nav-item"><a href="/guac/Add_batch" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p> Add_batch</p>
+								</a></li>
+
+							<li class="nav-item"><a href="/guac/View_Batches" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p> View Batch</p>
+								</a></li>
 
 
 
-								</ul></li>
 
-						</ul></li>
+						</ul>
+					</li>
 
 
-					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')"
-						class="nav-item"><a href="#" class="nav-link"> <i
-							class="nav-icon fas fa-money-check"></i>
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="#" class="nav-link"> <i
+								class="nav-icon fas fa-key"></i>
+							<p>
+								Role Management <i class="fas fa-angle-left right"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+
+							<li class="nav-item"><a href="/users/view" class="nav-link">
+									<i class="far fa-dot-circle nav-icon"></i>
+									<p>Assign Role</p>
+								</a></li>
+
+						</ul>
+					</li>
+
+
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="#" class="nav-link"> <i
+								class="nav-icon fas fa-trophy"></i>
+							<p>
+								Performance Management <i class="fas fa-angle-left right"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+
+							<li class="nav-item"><a href="/guac/UserWisePerformance" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>User Wise Performance</p>
+								</a></li>
+						</ul>
+					</li>
+
+
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="#" class="nav-link"> <i
+								class="nav-icon fas fa-flask"></i>
+							<p>
+								Lab Management <i class="fas fa-angle-left right"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+
+							<li class="nav-item"><a href="/guac/View_All_Vm_Listing" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
+									<p>Labs</p>
+								</a></li>
+
+						</ul>
+					</li>
+
+
+					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" class="nav-item"><a href="#"
+							class="nav-link"> <i class="nav-icon fas fa-money-bill-wave"></i>
 							<p>
 								Price Master <i class="right fas fa-angle-left"></i>
 							</p>
-					</a>
+						</a>
 						<ul class="nav nav-treeview">
 							<li class="nav-item"><a href="/price/view" class="nav-link">
-									<i class="far fa-circle nav-icon"></i>
+									<i class="far fa-dot-circle nav-icon"></i>
 									<p>View Price</p>
-							</a></li>
-						</ul></li>
+								</a></li>
+						</ul>
+					</li>
 
 					<!-- 					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a -->
 					<!-- 						href="#" class="nav-link"> <i class="nav-icon fas fa-laptop"></i> -->
@@ -700,33 +578,34 @@
 					<!-- 						<ul class="nav nav-treeview"> -->
 					<!-- 							<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
 					<!-- 								class="nav-item"><a href="/floating_ip/view" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>Public IP Master</p> -->
 					<!-- 							</a></li> -->
 					<!-- 							<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
 					<!-- 								class="nav-item"><a href="/floating_ip_assign/view" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>Assign Public IP</p> -->
 					<!-- 							</a></li> -->
 					<!-- 						</ul></li> -->
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a
-						href="#" class="nav-link"> <i class="nav-icon fas fa-box"></i>
+					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="#" class="nav-link"> <i
+								class="nav-icon fas fa-tags"></i>
 							<p>
 								Product Master <i class="fas fa-angle-left right"></i>
 							</p>
-					</a>
+						</a>
 						<ul class="nav nav-treeview">
 
-							<li class="nav-item"><a href="/product/view"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
+							<li class="nav-item"><a href="/product/view" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
 									<p>Product Master</p>
-							</a></li>
+								</a></li>
 
-							<li class="nav-item"><a href="/sub_product/view"
-								class="nav-link"> <i class="far fa-circle nav-icon"></i>
+							<li class="nav-item"><a href="/sub_product/view" class="nav-link"> <i
+										class="far fa-dot-circle nav-icon"></i>
 									<p>Sub Product Master</p>
-							</a></li>
-						</ul></li>
+								</a></li>
+						</ul>
+					</li>
 
 					<!-- 					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
 					<!-- 						class="nav-item"><a href="#" class="nav-link"> <i -->
@@ -737,7 +616,7 @@
 					<!-- 					</a> -->
 					<!-- 						<ul class="nav nav-treeview"> -->
 					<!-- 							<li class="nav-item"><a href="/approval/allRequests" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>Approval Request</p> -->
 					<!-- 							</a></li> -->
 					<!-- 						</ul></li> -->
@@ -752,70 +631,70 @@
 					<!-- 						<ul class="nav nav-treeview"> -->
 
 					<!-- 							<li class="nav-item"><a href="/report/groupWise" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>Group wise VM Report</p> -->
 					<!-- 							</a></li> -->
 
 					<!-- 							<li class="nav-item"><a -->
 					<!-- 								href="/report/vmStatusHistoryReport -->
 					<!--                             " -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>VM Status History</p> -->
 					<!-- 							</a></li> -->
 
 					<!-- 							<li class="nav-item"><a href="/report/vmActivityReport" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>VM Activity Report</p> -->
 					<!-- 							</a></li> -->
 
 					<!-- 							<li class="nav-item"><a href="/report/vmAvailability" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>VM Availability Report</p> -->
 					<!-- 							</a></li> -->
 
 					<!-- 							<li class="nav-item"><a href="/report/vmHealthHistoryReport" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>VM Health History Report</p> -->
 					<!-- 							</a></li> -->
 
 					<!-- 							<li class="nav-item"><a href="/report/vmCpuThresholdReport" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>VM CPU Threshold Report</p> -->
 					<!-- 							</a></li> -->
 
 					<!-- 							<li class="nav-item"><a -->
 					<!-- 								href="/report/vmMemoryThresholdReport" class="nav-link"> <i -->
-					<!-- 									class="far fa-circle nav-icon"></i> -->
+					<!-- 									class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>VM Memory Threshold Report</p> -->
 					<!-- 							</a></li> -->
 
 					<!-- 							<li class="nav-item"><a href="/report/vmStartStopReport" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>VM Start/Stop Report</p> -->
 					<!-- 							</a></li> -->
 					<!-- 							<li class="nav-item"><a href="/report/statusWise" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>Current Status VM Report</p> -->
 					<!-- 							</a></li> -->
 
 					<!-- 							<li class="nav-item"><a href="/report/KVMviewPage" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>Disk Utilization (Live)</p> -->
 					<!-- 							</a></li> -->
 
 					<!-- 							<li class="nav-item"><a href="/report/HealthMonitoring" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>Health Monitoring (Live)</p> -->
 					<!-- 							</a></li> -->
 
 					<!-- 							<li class="nav-item"><a href="/report/DiskandHealthviewPage" -->
-					<!-- 								class="nav-link"> <i class="far fa-circle nav-icon"></i> -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>Disk & Health Utilization (Live)</p> -->
 					<!-- 							</a></li> -->
 
 					<!-- 							<li class="nav-item"><a -->
 					<!-- 								href="/report/vmDiskHistorylogReport" class="nav-link"> <i -->
-					<!-- 									class="far fa-circle nav-icon"></i> -->
+					<!-- 									class="far fa-dot-circle nav-icon"></i> -->
 					<!-- 									<p>Disk Utilization (Historical)</p> -->
 					<!-- 							</a></li> -->
 					<!-- 						</ul></li> -->
@@ -835,10 +714,9 @@
 	<!-- jQuery -->
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<!-- Bootstrap 5 JS Bundle -->
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 	<!-- AdminLTE App -->
-	<script
-		src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 </body>
+
 </html>

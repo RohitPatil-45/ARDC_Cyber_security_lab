@@ -642,61 +642,67 @@ keyframes spin {to { transform:rotate(360deg);
 												<th class="text-center">Created on</th>
 												<th class="text-center">Location</th>
 												<th class="text-center">Source Image</th>
+												
 
 												<!-- Separate action columns -->
-<!-- 												<th class="text-center">Edit</th> -->
+												<th class="text-center">Edit</th>
 												<th class="text-center">View Instruction</th>
 												<th class="text-center">Delete</th>
+												
 											</tr>
 										</thead>
 										<tbody>
-											<tr th:each="obj : ${listObj}" class="odd"
-												style="background-color: #fff;">
-												<td><input type="checkbox" class="checkbox" name="id[]"
-													th:value="${obj.Id}"></td>
-												<td>[[${obj.instance_name}]]</td>
-												<td>[[${obj.lab_tag}]]</td>
-												<td>[[${obj.ConsoleUsername}]]</td>
-												<td>[[${obj.instance_password}]]</td>
-												<td>[[${obj.ConsoleProtocol}]]</td>
-												<td>[[${obj.SecurityMode}]]</td>
-												<td>[[${obj.ServerCertificate}]]</td>
-												<td>[[${obj.description}]]</td>
-												<td
-													th:text="${#strings.isEmpty(obj.virtualization_type) ? 'Hyper-V' : obj.virtualization_type}"></td>
-												<td>[[${obj.groupName}]]</td>
-												<td>[[${obj.physicalServerIP}]]</td>
-												<td>[[${obj.switch_id}]]</td>
-												<td>[[${obj.location_id}]]</td>
-												<td>[[${obj.Id}]]</td>
-												<td>[[${obj.getSubproduct_id().getIsSourceCreated()}]]</td>
-												<td>[[${obj.created_on}]]</td>
-												<td>[[${obj.location_id.getLocation_name}]]</td>
-												<td><a class="start-btn"
-													th:if="${obj.getSubproduct_id().getIsSourceCreated() != 'created'}"
-													th:onclick="'importSourceImage(' + ${obj.id} + ')'"> <i
-														class="fas fa-play"></i>Source Image
-												</a></td>
+											<tr th:each="obj : ${listObj}" class="odd" style="background-color: #fff;">
+    <td><input type="checkbox" class="checkbox" name="id[]" th:value="${obj.id}"></td>
+    <td>[[${obj.instance_name}]]</td>
+    <td>[[${obj.lab_tag}]]</td>
+    <td>[[${obj.ConsoleUsername}]]</td>
+    <td>[[${obj.instance_password}]]</td>
+    <td>[[${obj.ConsoleProtocol}]]</td>
+    <td>[[${obj.SecurityMode}]]</td>
+    <td>[[${obj.ServerCertificate}]]</td>
+    <td>[[${obj.description}]]</td>
+    <td th:text="${#strings.isEmpty(obj.virtualization_type) ? 'Hyper-V' : obj.virtualization_type}"></td>
+    <td>[[${obj.groupName}]]</td>
+    <td>[[${obj.physicalServerIP}]]</td>
+    <td>[[${obj.switch_id}]]</td>
+    <td>[[${obj.location_id}]]</td>
+    <td>[[${obj.id}]]</td>
+    <td>[[${obj.getSubproduct_id().getIsSourceCreated()}]]</td>
+    <td>[[${obj.created_on}]]</td>
+    <td>[[${obj.location_id.getLocation_name}]]</td>
+    <td>
+        <a class="start-btn" 
+           th:if="${obj.getSubproduct_id().getIsSourceCreated() != 'created'}"
+           th:onclick="'importSourceImage(' + ${obj.id} + ')'">
+            <i class="fas fa-play"></i>Source Image
+        </a>
+    </td>
 
-												<!-- Separate action buttons -->
-<!-- 												<td class="text-center"><a -->
-<!-- 													class="btn btn-sm btn-primary" -->
-<!-- 													th:onclick="'editVM(' + ${obj.Id} + ')'"> <i -->
-<!-- 														class="fas fa-edit"></i> Edit -->
-<!-- 												</a></td> -->
+    <!-- Edit Button Column -->
+    <td class="text-center">
+        <a class="btn btn-sm btn-primary" 
+           th:href="@{'/cloud_instance/new?id=' + ${obj.id}}">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+    </td>
 
-												<td class="text-center"><a class="btn btn-sm btn-info"
-													th:onclick="'viewInstruction(' + ${obj.Id} + ')'"> <i
-														class="fas fa-eye"></i> View Instruction
-												</a></td>
+    <!-- View Instruction Column -->
+    <td class="text-center">
+        <a class="btn btn-sm btn-info" 
+           th:onclick="'viewInstruction(' + ${obj.id} + ')'">
+            <i class="fas fa-eye"></i> View Instruction
+        </a>
+    </td>
 
-												<td class="text-center"><a
-													class="btn btn-sm btn-danger"
-													th:onclick="'deleteVM(' + ${obj.Id} + ')'"> <i
-														class="fas fa-trash"></i> Delete
-												</a></td>
-
-											</tr>
+    <!-- Delete Column -->
+    <td class="text-center">
+        <a class="btn btn-sm btn-danger" 
+           th:onclick="'deleteVM(' + ${obj.id} + ')'">
+            <i class="fas fa-trash"></i> Delete
+        </a>
+    </td>
+</tr>
 										</tbody>
 									</table>
 

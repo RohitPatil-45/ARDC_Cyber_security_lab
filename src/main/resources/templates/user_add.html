@@ -172,6 +172,37 @@
 												</div>
 											</div>
 
+											<!-- Template Name Field -->
+											<div class="col-md-6">
+<!-- 												<div class="form-group"> -->
+<!-- 													<label for="templateName">Sidebar Template</label>  -->
+<!-- 													<select id="templateName" th:field="*{appUser.templateName}"  -->
+<!-- 														name="templateName" class="form-control select2"  -->
+<!-- 														style="width: 100%;"> -->
+<!-- 														<option value="">-- Select Template --</option> -->
+<!-- 														<option th:each="template : ${templateList}" -->
+<!-- 															th:value="${template}" th:text="${template}"></option> -->
+<!-- 													</select> -->
+<!-- 													<small class="form-text text-muted"> -->
+<!-- 														Select a sidebar template for this user -->
+<!-- 													</small> -->
+<!-- 												</div> -->
+												
+												<div class="form-group">
+													<label for="templateName">Sidebar Template</label> <select
+														id="templateName" th:field="*{appUser.templateName}" required
+														name="templateName" class="form-control select2"
+														 style="width: 100%;">
+														<option value="">-- Select Template --</option>
+														<option th:each="template : ${templateList}"
+															th:value="${template}" th:text="${template}"></option>
+													</select>
+													<small class="form-text text-muted">
+														Select a sidebar template for this user
+													</small>
+												</div>
+											</div>
+
 											<!-- Academic Fields - Conditionally displayed -->
 											<div class="col-md-12 academic-fields" id="academicFields">
 												<h5>Academic Information</h5>

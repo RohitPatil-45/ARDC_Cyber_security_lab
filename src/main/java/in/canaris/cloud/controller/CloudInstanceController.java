@@ -481,27 +481,152 @@ public class CloudInstanceController {
 		return mav;
 	}
 
+//	@GetMapping("/new")
+//	public ModelAndView add(RedirectAttributes redirectAttributes) {
+//		System.out.println("  New COntroller called: ");
+//		ModelAndView mav = new ModelAndView(var_function_name + "_add");
+//		mav.addObject("pageTitle", "Add New " + disp_function_name);
+//		mav.addObject("action_name", var_function_name);
+//		mav.addObject("dcLocationList", repositoryLocation.getAllDClocations());
+//		mav.addObject("vmlocationPathList", repositoryVMLocationPath.getAllVMlocationsPahts());
+//		// mav.addObject("vpcList", repositoryVPC.getAllVPC());
+//		mav.addObject("securityGroupList", firewallRepository.getFirewall());
+//		mav.addObject("sharedCpuPlan", priceRepository.getSharedCpuPlan());
+//		mav.addObject("dedicatedCpuPlan", priceRepository.getDedicatedCpuPlan());
+//		mav.addObject("highMemoryPlan", priceRepository.getHighMemoryPlan());
+//		mav.addObject("switchList", switchRepository.getAllSwitch());
+//		mav.addObject("physicalServerIPList", PhysicalServerRepository.getPhysicalServerIPs());
+//		CloudInstance objEnt = new CloudInstance();
+//		mav.addObject("objEnt", objEnt);
+//		// mav.addObject("result", "success");
+//
+//		// redirectAttributes.addFlashAttribute("result", "success");
+//		return mav;
+//	}
+	
 	@GetMapping("/new")
-	public ModelAndView add(RedirectAttributes redirectAttributes) {
-		System.out.println("  New COntroller called: ");
-		ModelAndView mav = new ModelAndView(var_function_name + "_add");
-		mav.addObject("pageTitle", "Add New " + disp_function_name);
-		mav.addObject("action_name", var_function_name);
-		mav.addObject("dcLocationList", repositoryLocation.getAllDClocations());
-		mav.addObject("vmlocationPathList", repositoryVMLocationPath.getAllVMlocationsPahts());
-		// mav.addObject("vpcList", repositoryVPC.getAllVPC());
-		mav.addObject("securityGroupList", firewallRepository.getFirewall());
-		mav.addObject("sharedCpuPlan", priceRepository.getSharedCpuPlan());
-		mav.addObject("dedicatedCpuPlan", priceRepository.getDedicatedCpuPlan());
-		mav.addObject("highMemoryPlan", priceRepository.getHighMemoryPlan());
-		mav.addObject("switchList", switchRepository.getAllSwitch());
-		mav.addObject("physicalServerIPList", PhysicalServerRepository.getPhysicalServerIPs());
-		CloudInstance objEnt = new CloudInstance();
-		mav.addObject("objEnt", objEnt);
-		// mav.addObject("result", "success");
+	public ModelAndView add(@RequestParam(required = false) Integer id, RedirectAttributes redirectAttributes) {
+	    System.out.println("New/Edit Controller called: " + id);
+	    ModelAndView mav = new ModelAndView(var_function_name + "_add");
+	    mav.addObject("pageTitle", id == null ? "Add New " + disp_function_name : "Edit " + disp_function_name);
+	    mav.addObject("action_name", var_function_name);
+	    mav.addObject("dcLocationList", repositoryLocation.getAllDClocations());
+	    mav.addObject("vmlocationPathList", repositoryVMLocationPath.getAllVMlocationsPahts());
+	    mav.addObject("securityGroupList", firewallRepository.getFirewall());
+	    mav.addObject("sharedCpuPlan", priceRepository.getSharedCpuPlan());
+	    mav.addObject("dedicatedCpuPlan", priceRepository.getDedicatedCpuPlan());
+	    mav.addObject("highMemoryPlan", priceRepository.getHighMemoryPlan());
+	    mav.addObject("switchList", switchRepository.getAllSwitch());
+	    mav.addObject("physicalServerIPList", PhysicalServerRepository.getPhysicalServerIPs());
 
-		// redirectAttributes.addFlashAttribute("result", "success");
-		return mav;
+	    CloudInstance objEnt;
+	    if (id != null) {
+	        // Edit mode - load existing data
+	        objEnt = repository.findById(id).orElse(new CloudInstance());
+	        
+	        // Load existing instructions
+	        int templateId = id; // Safe unboxing since id is not null
+	        List<ChartBoatInstructionTemplate> existingInstructions = 
+	            ChartBoatInstructionTemplateRepository.findBytemplateId(templateId);
+	        mav.addObject("existingInstructions", existingInstructions);
+	    } else {
+	        // Create mode - new object
+	        objEnt = new CloudInstance();
+	    }
+	    
+	    mav.addObject("objEnt", objEnt);
+	    mav.addObject("isEdit", id != null);
+	    mav.addObject("templateId", id);
+
+	    return mav;
+	}
+	
+	@PostMapping("/update")
+	public String update(@ModelAttribute CloudInstanceForm form, 
+	                    @ModelAttribute CloudInstance obj,
+	                    @RequestParam(required = false) MultipartFile uploadedImage,
+	                    @RequestParam(required = false) List<Integer> deletedInstructions,
+	                    RedirectAttributes redirectAttributes,
+	                    Principal principal) {
+
+	    try {
+	        // Load existing instance
+	        CloudInstance existingInstance = repository.findById(obj.getId())
+	                .orElseThrow(() -> new RuntimeException("Instance not found"));
+
+	        // Update fields
+	        existingInstance.setInstance_name(obj.getInstance_name());
+	        existingInstance.setLab_tag(obj.getLab_tag());
+	        existingInstance.setConsoleUsername(obj.getConsoleUsername());
+	        existingInstance.setConsolePassword(obj.getConsolePassword());
+	        existingInstance.setConsoleProtocol(obj.getConsoleProtocol());
+	        existingInstance.setSecurityMode(obj.getSecurityMode());
+	        existingInstance.setServerCertificate(obj.getServerCertificate());
+	        existingInstance.setDescription(obj.getDescription());
+	        existingInstance.setVirtualization_type(obj.getVirtualization_type());
+	        existingInstance.setPhysicalServerIP(obj.getPhysicalServerIP());
+	        existingInstance.setSwitch_id(obj.getSwitch_id());
+	        existingInstance.setLocation_id(obj.getLocation_id());
+	        existingInstance.setSubproduct_id(obj.getSubproduct_id());
+	        existingInstance.setPrice_id(obj.getPrice_id());
+	        existingInstance.setSecurity_group_id(obj.getSecurity_group_id());
+
+	        // Handle image update
+	        if (uploadedImage != null && !uploadedImage.isEmpty()) {
+	            existingInstance.setLab_image(uploadedImage.getBytes());
+	        }
+
+	        // Handle docker network
+	        if (obj.getDocker_network_id() != null && obj.getDocker_network_id().contains("~")) {
+	            String[] parts = obj.getDocker_network_id().split("~", 2);
+	            existingInstance.setDocker_network_id(parts[0]);
+	            existingInstance.setDocker_network_name(parts[1]);
+	        }
+
+	        repository.save(existingInstance);
+
+	        // Handle instructions
+	        List<InstructionDto> instructions = form.getInstructions();
+	        
+	        // Delete removed instructions
+	        if (deletedInstructions != null) {
+	            for (Integer instructionId : deletedInstructions) {
+	                ChartBoatInstructionTemplateRepository.deleteById(instructionId);
+	            }
+	        }
+
+	        // Update or create instructions
+	        for (InstructionDto dto : instructions) {
+	            ChartBoatInstructionTemplate instruction;
+	            
+	            if (dto.getId() != null && dto.getId() > 0) {
+	                // Update existing instruction
+	                instruction = ChartBoatInstructionTemplateRepository.findById(dto.getId())
+	                        .orElse(new ChartBoatInstructionTemplate());
+	            } else {
+	                // Create new instruction
+	                instruction = new ChartBoatInstructionTemplate();
+	            }
+	            
+	            instruction.setTemplateId(existingInstance.getId());
+	            instruction.setTemaplateName(existingInstance.getInstance_name());
+	            instruction.setInstructionCommand(dto.getCommandText());
+	            instruction.setInstructionDetails(
+	                dto.getInstructionText() != null ? dto.getInstructionText().getBytes() : "".getBytes());
+
+	            ChartBoatInstructionTemplateRepository.save(instruction);
+	        }
+
+	        redirectAttributes.addFlashAttribute("result", "success");
+	        redirectAttributes.addFlashAttribute("message", "Template updated successfully!");
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("result", "Error: " + e.getMessage());
+	        redirectAttributes.addFlashAttribute("error", "Failed to update template: " + e.getMessage());
+	    }
+
+	    return "redirect:/" + var_function_name + "/view";
 	}
 
 	@GetMapping("/vm_database")

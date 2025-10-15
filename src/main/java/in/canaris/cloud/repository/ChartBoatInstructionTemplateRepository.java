@@ -10,4 +10,8 @@ public interface ChartBoatInstructionTemplateRepository extends JpaRepository<Ch
 
 	List<ChartBoatInstructionTemplate> findBytemplateId(int tempId);
 
+	
+
+	
+
 }

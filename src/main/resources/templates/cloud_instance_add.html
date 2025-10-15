@@ -40,8 +40,6 @@
 
 <!--End Common CSS  -->
 
-<!-- <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
 <link rel="stylesheet"
 	th:href="@{/webtemplate/css/cloudfont-awesome.min.css}">
 <link rel="stylesheet" type="text/css"
@@ -67,7 +65,6 @@
 <style>
 .glowBtn {
 	background-color: #1c87c9;
-	-webkit-border-radius: 60px;
 	border-radius: 5px;
 	border: none;
 	color: #eeeeee;
@@ -80,38 +77,10 @@
 	text-decoration: none;
 }
 
-@
-keyframes glowing { 0% {
-	background-color: #2ba805;
-	box-shadow: 0 0 5px #2ba805;
-}
-
-50
-%
-{
-background-color
-:
-#49e819;
-box-shadow
-:
-0
-0
-20px
-#49e819;
-}
-100
-%
-{
-background-color
-:
-#2ba805;
-box-shadow
-:
-0
-0
-5px
-#2ba805;
-}
+@keyframes glowing {
+  0% { background-color: #2ba805; box-shadow: 0 0 5px #2ba805; }
+  50% { background-color: #49e819; box-shadow: 0 0 20px #49e819; }
+  100% { background-color: #2ba805; box-shadow: 0 0 5px #2ba805; }
 }
 .glowBtn {
 	animation: glowing 1300ms infinite;
@@ -145,18 +114,24 @@ td {
 			<div class="container-fluid">
 				<div class="row mb-2">
 					<div class="col-sm-6">
-						<h2 class="m-0">Create Template</h2>
+						<h2 class="m-0" th:text="${isEdit ? 'Edit Template' : 'Create Template'}">Create Template</h2>
 					</div>
 				</div>
 			</div>
+
+			<!-- Simple form action - will handle edit/create in controller -->
 			<form th:action="@{'/' + ${action_name} + '/save'}" method="post"
 				enctype="multipart/form-data" th:object="${objEnt}"
 				onsubmit="handleFormSubmit(event)">
 				<input type="hidden" th:field="*{id}" />
+				
+				<!-- Hidden fields for edit mode -->
+				<input type="hidden" name="isEditMode" th:value="${isEdit}" />
+				<input type="hidden" name="templateId" th:value="${templateId}" />
+
 				<!-- Instance Name -->
 				<section class="content">
 					<div class="container-fluid">
-
 						<div class="row">
 							<div class="col-md-12" style="padding-top: 10px">
 								<!-- PIE CHART -->
@@ -335,7 +310,7 @@ td {
 											<select th:field="*{ConsoleProtocol}" required
 												class="form-control" style="width: 100%;">
 												<option value="">SELECT</option>
-												<option value="rdp" selected>RDP</option>
+												<option value="rdp">RDP</option>
 												<option value="ssh">SSH</option>
 												<option value="vnc">VNC</option>
 												<option value="telnet">Telnet</option>
@@ -434,158 +409,72 @@ td {
 					<div class="container-fluid">
 						<div class="row">
 							<div class="col-md-12">
-								<!-- PIE CHART -->
 								<div class="card border-transparent">
 									<div class="card-header">
 										<h3 class="card-title"
 											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
-											<span class="card-title" style="font-weight: bold;">Description
-											</span> <span class="card-title"
-												style="font-size: 1rem !important; color: #b5b5c3 !important">Provide
-												Description</span>
+											<span class="card-title" style="font-weight: bold;">Description</span>
+											<span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Provide Description</span>
 										</h3>
 									</div>
 									<div class="card-body">
 										<div class="form-group">
-											<input tabindex="2" type="text" th:field="*{description}"
-												required id="description" name="description"
-												class="form-control" placeholder="Enter Cloud Description" />
+											<input tabindex="2" type="text" th:field="*{description}" required id="description" 
+												name="description" class="form-control" placeholder="Enter Cloud Description" />
 										</div>
 									</div>
-									<!-- /.card-body -->
 								</div>
-								<!-- /.card -->
 							</div>
 						</div>
 					</div>
 				</section>
 				<!-- End Lab Description -->
 
-				<!-- Main UI -->
+				<!-- Main UI - Simplified Instructions Section -->
 				<section class="content">
 					<div class="container-fluid">
 						<div class="row">
 							<div class="col-md-12">
 								<div class="card border-transparent">
 									<div class="card-header">
-										<h3 class="card-title"
-											style="display: flex; flex-direction: column;">
-											<span style="font-weight: bold;">Setup Instructions</span> <span
-												style="font-size: 1rem; color: #b5b5c3;">Add
-												instructions and commands for this Lab setup</span>
+										<h3 class="card-title" style="display: flex; flex-direction: column;">
+											<span style="font-weight: bold;">Setup Instructions</span>
+											<span style="font-size: 1rem; color: #b5b5c3;">Add instructions and commands for this Lab setup</span>
 										</h3>
 									</div>
 
 									<div class="card-body">
 										<!-- Dynamic Fields Container -->
-										<!-- Wrapper with scroll -->
-										<div id="instructions-wrapper"
-											style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+										<div id="instructions-wrapper" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
 											<div id="instructions-container">
-												<!-- First Instruction-Command Pair -->
-												<div class="instruction-group mb-4 border p-3"
-													data-index="0">
+												<!-- Default empty instruction -->
+												<div class="instruction-group mb-4 border p-3" data-index="0">
 													<label><strong>Instruction</strong></label>
-													<textarea name="instructions[0].instructionText"
-														class="form-control summernote mb-2"
+													<textarea name="instructions[0].instructionText" class="form-control summernote mb-2"
 														placeholder="Enter setup instruction"></textarea>
 
 													<label><strong>Command</strong></label>
-													<textarea name="instructions[0].commandText"
-														class="form-control command" rows="2"
+													<textarea name="instructions[0].commandText" class="form-control command" rows="2"
 														placeholder="Enter command to run"></textarea>
 
-													<button type="button"
-														class="btn btn-sm btn-danger mt-2 remove-btn"
-														style="display: none;">❌ Remove</button>
+													<button type="button" class="btn btn-sm btn-danger mt-2 remove-btn" style="display: none;">
+														❌ Remove
+													</button>
 												</div>
 											</div>
 										</div>
 
 										<!-- Add More Button -->
-										<button type="button" class="btn btn-sm btn-primary mt-3"
-											onclick="addInstructionGroup()">➕ Add Instruction &
-											Command</button>
+										<button type="button" class="btn btn-sm btn-primary mt-3" onclick="addInstructionGroup()">
+											➕ Add Instruction & Command
+										</button>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</section>
-
-				<!-- JavaScript -->
-				<script>
-                let instructionIndex = 1;
-
-                function addInstructionGroup() {
-                    const container = $('#instructions-container');
-
-                    const newGroup = $(`
-                        <div class="instruction-group mb-4 border p-3" data-index="${instructionIndex}">
-                            <label><strong>Instruction</strong></label>
-                            <textarea name="instructions[${instructionIndex}].instructionText" class="form-control summernote mb-2"
-                                placeholder="Enter setup instruction"></textarea>
-
-                            <label><strong>Command</strong></label>
-                            <textarea name="instructions[${instructionIndex}].commandText" class="form-control command" rows="2"
-                                placeholder="Enter command to run"></textarea>
-
-                            <button type="button" class="btn btn-sm btn-danger mt-2 remove-btn">❌ Remove</button>
-                        </div>
-                    `);
-
-                    container.append(newGroup);
-
-                    // Initialize summernote for the new textarea
-                    newGroup.find('.summernote').summernote({
-                        height: 150,
-                        toolbar: [
-                            ['style', ['bold', 'italic', 'underline', 'clear']],
-                            ['fontsize', ['fontsize']],
-                            ['para', ['ul', 'ol', 'paragraph']],
-                            ['insert', ['picture', 'link']],
-                            ['view', ['fullscreen', 'codeview']]
-                        ]
-                    });
-
-                    // Show all remove buttons if more than one group
-                    $('.instruction-group .remove-btn').show();
-
-                    instructionIndex++; // Increase index for next group
-                }
-
-                // Remove button logic
-                $(document).on('click', '.remove-btn', function () {
-                    $(this).closest('.instruction-group').remove();
-
-                    // Recalculate indexes after removal
-                    $('#instructions-container .instruction-group').each(function (idx, el) {
-                        $(el).attr('data-index', idx);
-                        $(el).find('textarea[name*="instructionText"]').attr('name', `instructions[${idx}].instructionText`);
-                        $(el).find('textarea[name*="commandText"]').attr('name', `instructions[${idx}].commandText`);
-                    });
-
-                    instructionIndex = $('#instructions-container .instruction-group').length;
-
-                    if (instructionIndex === 1) {
-                        $('.instruction-group .remove-btn').hide(); // Hide remove if only one left
-                    }
-                });
-
-                // Initialize summernote on page load
-                $(document).ready(function () {
-                    $('.summernote').summernote({
-                        height: 150,
-                        toolbar: [
-                            ['style', ['bold', 'italic', 'underline', 'clear']],
-                            ['fontsize', ['fontsize']],
-                            ['para', ['ul', 'ol', 'paragraph']],
-                            ['insert', ['picture', 'link']],
-                            ['view', ['fullscreen', 'codeview']]
-                        ]
-                    });
-                });
-            </script>
 
 				<!-- virtualization type -->
 				<section class="content">
@@ -617,8 +506,6 @@ td {
 												<option value='Docker'>Docker</option>
 												<option value='OpenStack'>OpenStack</option>
 												<option value='Proxmox'>Proxmox</option>
-												
-												
 											</select>
 										</div>
 									</div>
@@ -771,7 +658,6 @@ td {
 
 				<section class="content">
 					<div class="container-fluid">
-
 						<div class="row">
 							<div class="col-md-12">
 								<div class="card border-transparent">
@@ -935,211 +821,219 @@ td {
 											</ul>
 
 											<div class="tab-content">
-												<div class="tab-pane fade show active" id="shared"
-													role="tabpanel">
-													<div class="pt-4">
-														<section class="content">
-															<div class="container-fluid">
-																<div class="row">
-																	<div class="col-12">
-																		<div class="card">
-																			<div class="card-body">
-																				<table id="sharedPlanTable"
-																					class="table table-bordered table-striped">
-																					<thead>
-																						<tr>
-																							<th></th>
-																							<th>RAM</th>
-																							<th>vPCU</th>
-																							<th>SSD DISK</th>
-																						</tr>
-																					</thead>
-																					<tbody>
-																						<tr th:each="obj : ${sharedCpuPlan}">
-																							<td><input th:field="*{price_id}" required
-																								th:value="${obj[0]}" id="price_id"
-																								name="price_id" type="radio"></td>
-																							<td th:text="${obj[1]}"></td>
-																							<td th:text="${obj[2]}"></td>
-																							<td th:text="${obj[3]}"></td>
-																						</tr>
-																					</tbody>
-																				</table>
-																			</div>
-																			<!-- /.card-body -->
-																		</div>
-																	</div>
-																</div>
-															</div>
-															<!-- /.container-fluid -->
-														</section>
-													</div>
-												</div>
+												
+<!-- Shared CPU Plan -->
+<div class="tab-pane fade show active" id="shared" role="tabpanel">
+    <div class="pt-4">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table id="sharedPlanTable" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>RAM</th>
+                                            <th>vPCU</th>
+                                            <th>SSD DISK</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="obj, stat : ${sharedCpuPlan}">
+                                            <td>
+                                                <input type="radio" th:field="*{price_id}" 
+                                                       th:value="${obj[0]}" 
+                                                       th:id="'price_id_shared_' + ${stat.index}"
+                                                       required />
+                                            </td>
+                                            <td th:text="${obj[1]}"></td>
+                                            <td th:text="${obj[2]}"></td>
+                                            <td th:text="${obj[3]}"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
 
-												<!-- Dedicated Plan -->
-												<div class="tab-pane fade" id="dedicated">
-													<div class="pt-4">
-														<section class="content">
-															<div class="container-fluid">
-																<div class="row">
-																	<div class="col-12">
-																		<div class="card">
-																			<div class="card-body">
-																				<table id="dedicatedPlanTable"
-																					class="table table-bordered table-striped">
-																					<thead>
-																						<tr>
-																							<th></th>
-																							<th>RAM</th>
-																							<th>vPCU</th>
-																							<th>SSD DISK</th>
-																						</tr>
-																					</thead>
-																					<tbody>
-																						<tr th:each="obj : ${dedicatedCpuPlan}">
-																							<td><input th:field="*{price_id}" required
-																								th:value="${obj[0]}" id="price_id"
-																								name="price_id" type="radio"></td>
-																							<td th:text="${obj[1]}"></td>
-																							<td th:text="${obj[2]}"></td>
-																							<td th:text="${obj[3]}"></td>
-																						</tr>
-																					</tbody>
-																				</table>
-																			</div>
-																			<!-- /.card-body -->
-																		</div>
-																	</div>
-																</div>
-															</div>
-															<!-- /.container-fluid -->
-														</section>
-													</div>
-												</div>
+<!-- Dedicated CPU Plan -->
+<div class="tab-pane fade" id="dedicated" role="tabpanel">
+    <div class="pt-4">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table id="dedicatedPlanTable" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>RAM</th>
+                                            <th>vPCU</th>
+                                            <th>SSD DISK</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="obj, stat : ${dedicatedCpuPlan}">
+                                            <td>
+                                                <input type="radio" th:field="*{price_id}" 
+                                                       th:value="${obj[0]}" 
+                                                       th:id="'price_id_dedicated_' + ${stat.index}"
+                                                       required />
+                                            </td>
+                                            <td th:text="${obj[1]}"></td>
+                                            <td th:text="${obj[2]}"></td>
+                                            <td th:text="${obj[3]}"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
 
-												<!-- High Memory Plan -->
-												<div class="tab-pane fade" id="highMemory">
-													<div class="pt-4">
-														<section class="content">
-															<div class="container-fluid">
-																<div class="row">
-																	<div class="col-12">
-																		<div class="card">
-																			<div class="card-body">
-																				<table id="highMemoryPlanTable"
-																					class="table table-bordered table-striped">
-																					<thead>
-																						<tr>
-																							<th></th>
-																							<th>RAM</th>
-																							<th>vPCU</th>
-																							<th>SSD DISK</th>
-																						</tr>
-																					</thead>
-																					<tbody>
-																						<tr th:each="obj : ${highMemoryPlan}">
-																							<td><input th:field="*{price_id}" required
-																								th:value="${obj[0]}" id="price_id"
-																								name="price_id" type="radio"></td>
-																							<td th:text="${obj[1]}"></td>
-																							<td th:text="${obj[2]}"></td>
-																							<td th:text="${obj[3]}"></td>
-																						</tr>
-																					</tbody>
-																				</table>
-																			</div>
-																			<!-- /.card-body -->
-																		</div>
-																	</div>
-																</div>
-															</div>
-															<!-- /.container-fluid -->
-														</section>
-													</div>
-												</div>
+<!-- High Memory Plan -->
+<div class="tab-pane fade" id="highMemory" role="tabpanel">
+    <div class="pt-4">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table id="highMemoryPlanTable" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>RAM</th>
+                                            <th>vPCU</th>
+                                            <th>SSD DISK</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="obj, stat : ${highMemoryPlan}">
+                                            <td>
+                                                <input type="radio" th:field="*{price_id}" 
+                                                       th:value="${obj[0]}" 
+                                                       th:id="'price_id_highmemory_' + ${stat.index}"
+                                                       required />
+                                            </td>
+                                            <td th:text="${obj[1]}"></td>
+                                            <td th:text="${obj[2]}"></td>
+                                            <td th:text="${obj[3]}"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
 											</div>
-											<!-- End Select Plan -->
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Select Plan -->
 
-											<!-- VPC Network -->
-											<section class="content" style="display: none;">
-												<div class="container-fluid">
-													<div class="row">
-														<div class="col-md-12">
-															<!-- PIE CHART -->
-															<div class="card border-transparent">
-																<div class="card-header">
-																	<h3 class="card-title"
-																		style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
-																		<span class="card-title" style="font-weight: bold;">VPC
-																			Network</span> <span class="card-title"
-																			style="font-size: 1rem !important; color: #b5b5c3 !important">Select
-																			VPC for Server</span>
-																	</h3>
-																</div>
-																<div class="card-body">
-																	<div class="form-group">
-																		<input tabindex="2" type="hidden" th:field="*{vpc_id}"
-																			th:value="1" required id="vpc_id" name="vpc_id"
-																			class="form-control" />
-																	</div>
-																</div>
-															</div>
-															<!-- /.card -->
-														</div>
-													</div>
-												</div>
-											</section>
-											<!--End VPC Network -->
+				<!-- VPC Network -->
+				<section class="content" style="display: none;">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">VPC
+												Network</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Select
+												VPC for Server</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<input tabindex="2" type="hidden" th:field="*{vpc_id}"
+												th:value="1" required id="vpc_id" name="vpc_id"
+												class="form-control" />
+										</div>
+									</div>
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!--End VPC Network -->
 
-											<!-- Cloud Firewall -->
-											<section class="content">
-												<div class="container-fluid">
-													<div class="row">
-														<div class="col-md-12">
-															<div class="card border-transparent">
-																<div class="card-header">
-																	<h3 class="card-title"
-																		style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
-																		<span class="card-title" style="font-weight: bold;">Cloud
-																			Firewall</span> <span class="card-title"
-																			style="font-size: 1rem !important; color: #b5b5c3 !important">Select
-																			Firewall</span>
-																	</h3>
-																</div>
-																<div class="card-body">
-																	<div class="form-group">
-																		<select tabindex="1" id="security_group_id"
-																			th:field="*{security_group_id}" required
-																			name="security_group_id" class="form-control"
-																			data-placeholder="Select Firewall for Server"
-																			style="width: 100%;">
-																			<option value='-1'>SELECT</option>
-																			<option th:each="ob:${securityGroupList}"
-																				th:value="${ob[0]}" th:text="${ob[1]}"></option>
-																		</select>
-																	</div>
-																</div>
-																<!-- /.card-body -->
-															</div>
-														</div>
-													</div>
-												</div>
-											</section>
-											<!-- End Cloud Firewall -->
+				<!-- Cloud Firewall -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Cloud
+												Firewall</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Select
+												Firewall</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<select tabindex="1" id="security_group_id"
+												th:field="*{security_group_id}" required
+												name="security_group_id" class="form-control"
+												data-placeholder="Select Firewall for Server"
+												style="width: 100%;">
+												<option value='-1'>SELECT</option>
+												<option th:each="ob:${securityGroupList}"
+													th:value="${ob[0]}" th:text="${ob[1]}"></option>
+											</select>
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Cloud Firewall -->
 
-											<!-- Cloud Instance Password -->
-											<section class="content">
-												<div class="container-fluid">
-													<div class="form-group" style="padding-top: 10px;">
-														<button id="createVMBtn" type="submit" class="glowBtn">
-															Create Lab <i
-																style="margin-left: 10px; color: yellow; display: none"
-																id="vmCreationSpinner" class='fa fa-spinner fa-spin'></i>
-														</button>
-													</div>
-												</div>
-											</section>
-											<!-- End Cloud Instance Password -->
+				<!-- Cloud Instance Password -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="form-group" style="padding-top: 10px;">
+							<button id="createVMBtn" type="submit" class="glowBtn">
+								<span th:text="${isEdit ? 'Update Lab' : 'Create Lab'}">Create Lab</span>
+								<i style="margin-left: 10px; color: yellow; display: none"
+									id="vmCreationSpinner" class='fa fa-spinner fa-spin'></i>
+							</button>
+						</div>
+					</div>
+				</section>
+				<!-- End Cloud Instance Password -->
 			</form>
 		</div>
 	</div>
@@ -1202,6 +1096,7 @@ td {
 
 	<script th:inline="javascript">
     var vm_creationresult = [[${result}]];
+    var isEdit = [[${isEdit}]];
 
     if(vm_creationresult == null) {
         // Do nothing
@@ -1209,7 +1104,7 @@ td {
         Swal.fire({
             position: "top",
             icon: "success",
-            title: 'Lab created successfully',
+            title: isEdit ? 'Template updated successfully' : 'Lab created successfully',
             showConfirmButton: true
         });
     } else {
@@ -1226,6 +1121,85 @@ td {
             var fileName = this.files[0].name;
             var nextSibling = e.target.nextElementSibling;
             nextSibling.innerText = fileName;
+        }
+    });
+
+    // JavaScript for instructions
+    let instructionIndex = 1;
+
+    function addInstructionGroup() {
+        const container = $('#instructions-container');
+        const currentIndex = instructionIndex;
+
+        const newGroup = $(`
+            <div class="instruction-group mb-4 border p-3" data-index="${currentIndex}">
+                <label><strong>Instruction</strong></label>
+                <textarea name="instructions[${currentIndex}].instructionText" class="form-control summernote mb-2"
+                    placeholder="Enter setup instruction"></textarea>
+
+                <label><strong>Command</strong></label>
+                <textarea name="instructions[${currentIndex}].commandText" class="form-control command" rows="2"
+                    placeholder="Enter command to run"></textarea>
+
+                <button type="button" class="btn btn-sm btn-danger mt-2 remove-btn">❌ Remove</button>
+            </div>
+        `);
+
+        container.append(newGroup);
+
+        // Initialize summernote for the new textarea
+        newGroup.find('.summernote').summernote({
+            height: 150,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['fontsize', ['fontsize']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['picture', 'link']],
+                ['view', ['fullscreen', 'codeview']]
+            ]
+        });
+
+        // Show all remove buttons if more than one group
+        $('.instruction-group .remove-btn').show();
+
+        instructionIndex++;
+    }
+
+    // Remove button logic
+    $(document).on('click', '.remove-btn', function () {
+        const group = $(this).closest('.instruction-group');
+        group.remove();
+
+        // Recalculate indexes after removal
+        $('#instructions-container .instruction-group').each(function (idx, el) {
+            $(el).attr('data-index', idx);
+            $(el).find('textarea[name*="instructionText"]').attr('name', `instructions[${idx}].instructionText`);
+            $(el).find('textarea[name*="commandText"]').attr('name', `instructions[${idx}].commandText`);
+        });
+
+        instructionIndex = $('#instructions-container .instruction-group').length;
+
+        if (instructionIndex === 1) {
+            $('.instruction-group .remove-btn').hide();
+        }
+    });
+
+    // Initialize summernote on page load
+    $(document).ready(function () {
+        $('.summernote').summernote({
+            height: 150,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['fontsize', ['fontsize']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['picture', 'link']],
+                ['view', ['fullscreen', 'codeview']]
+            ]
+        });
+        
+        // For edit mode, show remove buttons if there are multiple instructions
+        if ($('.instruction-group').length > 1) {
+            $('.instruction-group .remove-btn').show();
         }
     });
 </script>
