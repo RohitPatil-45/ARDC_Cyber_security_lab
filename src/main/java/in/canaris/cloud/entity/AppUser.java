@@ -100,6 +100,9 @@ public class AppUser implements Serializable {
 	@Column(name = "template_name")
 	private String templateName;
 	
+	@Column(name = "permissions")
+	private String permissions;
+	
 	
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -293,6 +296,14 @@ public class AppUser implements Serializable {
 
 	public void setTemplateName(String templateName) {
 		this.templateName = templateName;
+	}
+
+	public String getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(String permissions) {
+		this.permissions = permissions;
 	}
 	
 	

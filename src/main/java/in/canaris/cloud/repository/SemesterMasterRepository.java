@@ -22,4 +22,12 @@ public interface SemesterMasterRepository extends JpaRepository<SemesterMaster, 
 
 	
 
+	
+
+	
+
+	
+
+	
+
 }

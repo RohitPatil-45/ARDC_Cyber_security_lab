@@ -13,6 +13,9 @@
 .academic-fields {
 	display: none;
 }
+.permission-field {
+	display: none;
+}
 </style>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -121,9 +124,10 @@
 														onchange="roleChange(this.value)" tabindex="1"
 														id="userRole" th:field="*{appRole.roleId}" required
 														name="userRole" class="form-control" style="width: 100%;">
-														<option value="2" selected>User</option>
 														<option value="1">Admin</option>
+														<option value="2" selected>User</option>
 														<option value="3">Super Admin</option>
+														<option value="5">Hod</option>
 														<option value="4">Teacher</option>
 													</select>
 												</div>
@@ -174,20 +178,6 @@
 
 											<!-- Template Name Field -->
 											<div class="col-md-6">
-<!-- 												<div class="form-group"> -->
-<!-- 													<label for="templateName">Sidebar Template</label>  -->
-<!-- 													<select id="templateName" th:field="*{appUser.templateName}"  -->
-<!-- 														name="templateName" class="form-control select2"  -->
-<!-- 														style="width: 100%;"> -->
-<!-- 														<option value="">-- Select Template --</option> -->
-<!-- 														<option th:each="template : ${templateList}" -->
-<!-- 															th:value="${template}" th:text="${template}"></option> -->
-<!-- 													</select> -->
-<!-- 													<small class="form-text text-muted"> -->
-<!-- 														Select a sidebar template for this user -->
-<!-- 													</small> -->
-<!-- 												</div> -->
-												
 												<div class="form-group">
 													<label for="templateName">Sidebar Template</label> <select
 														id="templateName" th:field="*{appUser.templateName}" required
@@ -200,6 +190,29 @@
 													<small class="form-text text-muted">
 														Select a sidebar template for this user
 													</small>
+												</div>
+											</div>
+
+											<!-- Permission Field -->
+											<div class="col-md-6 permission-field" id="permissionField">
+												<div class="form-group">
+													<label>Permission</label>
+													<div class="form-check">
+														<input class="form-check-input" type="radio" 
+															name="permissions" id="permissionRead" value="READ"
+															th:field="*{appUser.permissions}">
+														<label class="form-check-label" for="permissionRead">
+															Read Only
+														</label>
+													</div>
+													<div class="form-check">
+														<input class="form-check-input" type="radio" 
+															name="permissions" id="permissionWrite" value="WRITE"
+															th:field="*{appUser.permissions}">
+														<label class="form-check-label" for="permissionWrite">
+															Read & Write
+														</label>
+													</div>
 												</div>
 											</div>
 
@@ -247,6 +260,34 @@
 													</div>
 												</div>
 											</div>
+
+											<!-- Admin/HOD Fields -->
+											<div class="col-md-12 academic-fields" id="adminHodFields">
+												<h5>Administrative Information</h5>
+												<div class="row">
+													<!-- Department dropdown for Admin/HOD -->
+													<div class="col-md-6">
+														<div class="form-group">
+															<label>Department</label> <select id="adminDepartmentSelect"
+																class="form-control" name="adminDepartmentId">
+																<option value="">-- Select Department --</option>
+																<option th:each="d : ${departments}"
+																	th:value="${d.departmentId}"
+																	th:text="${d.departmentName}"></option>
+															</select>
+														</div>
+													</div>
+													<!-- Course dropdown for HOD only -->
+													<div class="col-md-6" id="hodCourseField">
+														<div class="form-group">
+															<label>Course</label> <select id="hodCourseSelect"
+																class="form-control" name="hodCourseId">
+																<option value="">-- Select Course --</option>
+															</select>
+														</div>
+													</div>
+												</div>
+											</div>
 										</div>
 									</div>
 									<div class="card-footer" id="adduseridd">
@@ -286,7 +327,7 @@
         
         // Initialize role-based field display
         const selectedRole = $('#userRole').val();
-        toggleAcademicFields(selectedRole);
+        toggleRoleBasedFields(selectedRole);
         initializeGroupSelect(selectedRole);
         
         var $groupName = $('#appUser\\.groupName');
@@ -319,27 +360,61 @@
     });
 
     function roleChange(roleId) {
-        toggleAcademicFields(roleId);
+        toggleRoleBasedFields(roleId);
         initializeGroupSelect(roleId);
     }
 
-    function toggleAcademicFields(roleId) {
+    function toggleRoleBasedFields(roleId) {
         const academicFields = $('#academicFields');
-        // Show academic fields only for regular users (roleId = 2)
-        if (roleId == '2') {
-            academicFields.show();
-            // Make fields required
-            $('#departmentSelect').prop('required', true);
-            $('#courseSelect').prop('required', true);
-            $('#semesterSelect').prop('required', true);
-            $('#batchSelect').prop('required', true);
-        } else {
-            academicFields.hide();
-            // Remove required attribute for non-user roles
-            $('#departmentSelect').prop('required', false);
-            $('#courseSelect').prop('required', false);
-            $('#semesterSelect').prop('required', false);
-            $('#batchSelect').prop('required', false);
+        const adminHodFields = $('#adminHodFields');
+        const permissionField = $('#permissionField');
+        const hodCourseField = $('#hodCourseField');
+
+        // Hide all fields first
+        academicFields.hide();
+        adminHodFields.hide();
+        permissionField.hide();
+        
+        // Remove required attributes
+        $('#departmentSelect').prop('required', false);
+        $('#courseSelect').prop('required', false);
+        $('#semesterSelect').prop('required', false);
+        $('#batchSelect').prop('required', false);
+        $('#adminDepartmentSelect').prop('required', false);
+        $('#hodCourseSelect').prop('required', false);
+
+        // Show fields based on role
+        switch(roleId) {
+            case '2': // User
+                academicFields.show();
+                $('#departmentSelect').prop('required', true);
+                $('#courseSelect').prop('required', true);
+                $('#semesterSelect').prop('required', true);
+                $('#batchSelect').prop('required', true);
+                break;
+                
+            case '1': // Admin
+                adminHodFields.show();
+                permissionField.show();
+                $('#adminDepartmentSelect').prop('required', true);
+                hodCourseField.hide(); // Hide course field for Admin
+                break;
+                
+            case '5': // HOD
+                adminHodFields.show();
+                permissionField.show();
+                $('#adminDepartmentSelect').prop('required', true);
+                hodCourseField.show(); // Show course field for HOD
+                $('#hodCourseSelect').prop('required', true);
+                break;
+                
+            case '4': // Teacher
+                permissionField.show();
+                break;
+                
+            case '3': // Super Admin
+                permissionField.show();
+                break;
         }
     }
 
@@ -359,6 +434,34 @@
                 allowClear: true
             });
         }
+    }
+
+    // Load courses when admin/hod department changes
+    $('#adminDepartmentSelect').change(function() {
+        const deptId = $(this).val();
+        if (!deptId) {
+            $('#hodCourseSelect').html('<option value="">-- Select Course --</option>');
+            return;
+        }
+        loadAdminCourses(deptId);
+    });
+
+    function loadAdminCourses(departmentId) {
+        $.ajax({
+            url: '/guac/courses',
+            type: 'GET',
+            data: { departmentId: departmentId },
+            success: function(data) {
+                const courseSelect = $('#hodCourseSelect');
+                courseSelect.empty().append('<option value="">-- Select Course --</option>');
+                data.forEach(c => {
+                    courseSelect.append(`<option value="${c.courseId}">${c.courseName}</option>`);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching courses:', error);
+            }
+        });
     }
 
     function loadCascadingDropdowns() {

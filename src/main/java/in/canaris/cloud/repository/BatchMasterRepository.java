@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import in.canaris.cloud.openstack.entity.BatchMaster;
 import in.canaris.cloud.openstack.entity.CourseMaster;
+import in.canaris.cloud.openstack.entity.SemesterMaster;
 
 public interface BatchMasterRepository extends JpaRepository<BatchMaster, Integer> {
 
@@ -21,6 +22,12 @@ public interface BatchMasterRepository extends JpaRepository<BatchMaster, Intege
 	
 
 	BatchMaster findByBatchName(String string);
+
+	
+
+	
+
+
 
 	
 

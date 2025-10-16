@@ -445,95 +445,215 @@ public class UserController {
 		return "user_add";
 	}
 
+//	@PostMapping("/save")
+//	public String saveUser(UserMasterRole userRole, RedirectAttributes redirectAttributes, BindingResult result,
+//			Model model) {
+//		System.out.println("App User save: controller ");
+//
+//		if (result.hasErrors()) {
+//			System.out.println("App User save: error ");
+//		}
+//
+//		AppUser user = userRole.getAppUser();
+//		System.out.println("Group: " + user.getGroupName());
+//		System.out.println("Template: " + user.getTemplateName());
+//		System.out.println("user id = " + user.getUserId());
+//
+//		// For Admin, Super Admin, Teacher - clear academic fields
+//		Long roleId = userRole.getAppRole().getRoleId();
+//		if (roleId == 1L || roleId == 3L || roleId == 4L) { // Admin, Super Admin, Teacher
+//			user.setDepartmentName(null);
+//			user.setCourseName(null);
+//			user.setSemesterName(null);
+//			user.setBatchName(null);
+//		}
+//
+//		if (user.getUserId() == null) {
+//			try {
+//				BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//				user.setEncrytedPassword(encoder.encode(user.getEncrytedPassword()));
+//				user.setEnabled(true);
+//				System.out.println("Group: " + user.getGroupName());
+//				userRepository.save(user);
+//				redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
+//			} catch (Exception e) {
+//				System.out.println("Exception e1:" + e);
+//				UserMasterRole user2 = new UserMasterRole();
+//				user2.setAppUser(user);
+//				model.addAttribute("objEnt", user2);
+//				model.addAttribute("pageTitle", "Create new User");
+//				model.addAttribute("groupList", groupRepository.getAllGroups());
+//				model.addAttribute("departments", DepartmentMasterRepository.findAll());
+//
+//				// Reload template names
+//				List<String> templateNames = RoleMenuTemplateRepository.findDistinctTemplateNames();
+//				model.addAttribute("templateList", templateNames);
+//
+//				return "user_add";
+//			}
+//
+//			try {
+//				Long role_id = userRole.getAppRole().getRoleId();
+//				AppRole aprole = new AppRole();
+//				aprole.setRoleId(role_id);
+//
+//				UserRole userRole2 = new UserRole();
+//				userRole2.setAppUser(user);
+//				userRole2.setAppRole(aprole);
+//				userRoleRepository.save(userRole2);
+//
+//				userDetailsServiceImpl.sendSimpleMail(user.getUserName(), user.getConfirmPassword(), user.getEmail());
+//
+//				redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
+//			} catch (Exception e) {
+//				System.out.println("Exception e2:" + e);
+//			}
+//		} else {
+//			try {
+//				// Update user with academic fields and template name
+//				userRepository.updateUserWithAcademicAndTemplate(user.getName(), user.getEmail(), user.getMobileNo(),
+//						user.getGroupName(), user.getSwitch_id(), user.getGenerationType(), user.getDepartmentName(),
+//						user.getCourseName(), user.getSemesterName(), user.getBatchName(), user.getTemplateName(),
+//						user.getUserId());
+//
+//				userRoleRepository.updateUserRole(user.getUserId(), userRole.getAppRole().getRoleId());
+//				redirectAttributes.addFlashAttribute("message", "The User has been updated successfully!");
+//			} catch (Exception e) {
+//				System.out.println("Exception occurred while updating user:" + e);
+//				// Reload necessary data for the form
+//				model.addAttribute("groupList", groupRepository.getAllGroups());
+//				model.addAttribute("switchList", switchRepository.getAllSwitch());
+//				model.addAttribute("departments", DepartmentMasterRepository.findAll());
+//
+//				// Reload template names
+//				List<String> templateNames = RoleMenuTemplateRepository.findDistinctTemplateNames();
+//				model.addAttribute("templateList", templateNames);
+//
+//				return "user_add";
+//			}
+//		}
+//
+//		return "redirect:/users/view";
+//	}
+	
 	@PostMapping("/save")
 	public String saveUser(UserMasterRole userRole, RedirectAttributes redirectAttributes, BindingResult result,
-			Model model) {
-		System.out.println("App User save: controller ");
+	        Model model, HttpServletRequest request) {
+	    System.out.println("App User save: controller ");
 
-		if (result.hasErrors()) {
-			System.out.println("App User save: error ");
-		}
+	    if (result.hasErrors()) {
+	        System.out.println("App User save: error ");
+	    }
 
-		AppUser user = userRole.getAppUser();
-		System.out.println("Group: " + user.getGroupName());
-		System.out.println("Template: " + user.getTemplateName());
-		System.out.println("user id = " + user.getUserId());
+	    AppUser user = userRole.getAppUser();
+	    System.out.println("Group: " + user.getGroupName());
+	    System.out.println("Template: " + user.getTemplateName());
+	    System.out.println("Permissions: " + user.getPermissions());
+	    System.out.println("user id = " + user.getUserId());
 
-		// For Admin, Super Admin, Teacher - clear academic fields
-		Long roleId = userRole.getAppRole().getRoleId();
-		if (roleId == 1L || roleId == 3L || roleId == 4L) { // Admin, Super Admin, Teacher
-			user.setDepartmentName(null);
-			user.setCourseName(null);
-			user.setSemesterName(null);
-			user.setBatchName(null);
-		}
+	    // Get role ID
+	    Long roleId = userRole.getAppRole().getRoleId();
 
-		if (user.getUserId() == null) {
-			try {
-				BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-				user.setEncrytedPassword(encoder.encode(user.getEncrytedPassword()));
-				user.setEnabled(true);
-				System.out.println("Group: " + user.getGroupName());
-				userRepository.save(user);
-				redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
-			} catch (Exception e) {
-				System.out.println("Exception e1:" + e);
-				UserMasterRole user2 = new UserMasterRole();
-				user2.setAppUser(user);
-				model.addAttribute("objEnt", user2);
-				model.addAttribute("pageTitle", "Create new User");
-				model.addAttribute("groupList", groupRepository.getAllGroups());
-				model.addAttribute("departments", DepartmentMasterRepository.findAll());
+	    // Handle role-based field management - SIMPLIFIED
+	    if (roleId == 1L) { // Admin - only department
+	        String adminDeptId = request.getParameter("adminDepartmentId");
+	        if (adminDeptId != null && !adminDeptId.isEmpty()) {
+	            DepartmentMaster dept = new DepartmentMaster();
+	            dept.setDepartmentId(Integer.parseInt(adminDeptId));
+	            user.setDepartmentName(dept);
+	        }
+	        user.setCourseName(null);
+	        user.setSemesterName(null);
+	        user.setBatchName(null);
+	    } else if (roleId == 5L) { // HOD - department and course
+	        String adminDeptId = request.getParameter("adminDepartmentId");
+	        String hodCourseId = request.getParameter("hodCourseId");
+	        
+	        if (adminDeptId != null && !adminDeptId.isEmpty()) {
+	            DepartmentMaster dept = new DepartmentMaster();
+	            dept.setDepartmentId(Integer.parseInt(adminDeptId));
+	            user.setDepartmentName(dept);
+	        }
+	        if (hodCourseId != null && !hodCourseId.isEmpty()) {
+	            CourseMaster course = new CourseMaster();
+	            course.setCourseId(Integer.parseInt(hodCourseId));
+	            user.setCourseName(course);
+	        }
+	        user.setSemesterName(null);
+	        user.setBatchName(null);
+	    } else if (roleId == 3L || roleId == 4L) { // Super Admin, Teacher - clear academic fields
+	        user.setDepartmentName(null);
+	        user.setCourseName(null);
+	        user.setSemesterName(null);
+	        user.setBatchName(null);
+	    }
+	    // Role 2 (User) keeps all academic fields as they are
 
-				// Reload template names
-				List<String> templateNames = RoleMenuTemplateRepository.findDistinctTemplateNames();
-				model.addAttribute("templateList", templateNames);
+	    if (user.getUserId() == null) {
+	        try {
+	            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	            user.setEncrytedPassword(encoder.encode(user.getEncrytedPassword()));
+	            user.setEnabled(true);
+	            System.out.println("Group: " + user.getGroupName());
+	            userRepository.save(user);
+	            redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
+	        } catch (Exception e) {
+	            System.out.println("Exception e1:" + e);
+	            UserMasterRole user2 = new UserMasterRole();
+	            user2.setAppUser(user);
+	            model.addAttribute("objEnt", user2);
+	            model.addAttribute("pageTitle", "Create new User");
+	            model.addAttribute("groupList", groupRepository.getAllGroups());
+	            model.addAttribute("departments", DepartmentMasterRepository.findAll());
 
-				return "user_add";
-			}
+	            // Reload template names
+	            List<String> templateNames = RoleMenuTemplateRepository.findDistinctTemplateNames();
+	            model.addAttribute("templateList", templateNames);
 
-			try {
-				Long role_id = userRole.getAppRole().getRoleId();
-				AppRole aprole = new AppRole();
-				aprole.setRoleId(role_id);
+	            return "user_add";
+	        }
 
-				UserRole userRole2 = new UserRole();
-				userRole2.setAppUser(user);
-				userRole2.setAppRole(aprole);
-				userRoleRepository.save(userRole2);
+	        try {
+	            AppRole aprole = new AppRole();
+	            aprole.setRoleId(roleId);
 
-				userDetailsServiceImpl.sendSimpleMail(user.getUserName(), user.getConfirmPassword(), user.getEmail());
+	            UserRole userRole2 = new UserRole();
+	            userRole2.setAppUser(user);
+	            userRole2.setAppRole(aprole);
+	            userRoleRepository.save(userRole2);
 
-				redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
-			} catch (Exception e) {
-				System.out.println("Exception e2:" + e);
-			}
-		} else {
-			try {
-				// Update user with academic fields and template name
-				userRepository.updateUserWithAcademicAndTemplate(user.getName(), user.getEmail(), user.getMobileNo(),
-						user.getGroupName(), user.getSwitch_id(), user.getGenerationType(), user.getDepartmentName(),
-						user.getCourseName(), user.getSemesterName(), user.getBatchName(), user.getTemplateName(),
-						user.getUserId());
+	            userDetailsServiceImpl.sendSimpleMail(user.getUserName(), user.getConfirmPassword(), user.getEmail());
 
-				userRoleRepository.updateUserRole(user.getUserId(), userRole.getAppRole().getRoleId());
-				redirectAttributes.addFlashAttribute("message", "The User has been updated successfully!");
-			} catch (Exception e) {
-				System.out.println("Exception occurred while updating user:" + e);
-				// Reload necessary data for the form
-				model.addAttribute("groupList", groupRepository.getAllGroups());
-				model.addAttribute("switchList", switchRepository.getAllSwitch());
-				model.addAttribute("departments", DepartmentMasterRepository.findAll());
+	            redirectAttributes.addFlashAttribute("message", "The User has been saved successfully!");
+	        } catch (Exception e) {
+	            System.out.println("Exception e2:" + e);
+	        }
+	    } else {
+	        try {
+	            // Update user with academic fields, template name and permissions
+	            userRepository.updateUserWithAcademicAndTemplate(user.getName(), user.getEmail(), user.getMobileNo(),
+	                    user.getGroupName(), user.getSwitch_id(), user.getGenerationType(), user.getDepartmentName(),
+	                    user.getCourseName(), user.getSemesterName(), user.getBatchName(), user.getTemplateName(),
+	                    user.getPermissions(), user.getUserId());
 
-				// Reload template names
-				List<String> templateNames = RoleMenuTemplateRepository.findDistinctTemplateNames();
-				model.addAttribute("templateList", templateNames);
+	            userRoleRepository.updateUserRole(user.getUserId(), roleId);
+	            redirectAttributes.addFlashAttribute("message", "The User has been updated successfully!");
+	        } catch (Exception e) {
+	            System.out.println("Exception occurred while updating user:" + e);
+	            // Reload necessary data for the form
+	            model.addAttribute("groupList", groupRepository.getAllGroups());
+	            model.addAttribute("switchList", switchRepository.getAllSwitch());
+	            model.addAttribute("departments", DepartmentMasterRepository.findAll());
 
-				return "user_add";
-			}
-		}
+	            // Reload template names
+	            List<String> templateNames = RoleMenuTemplateRepository.findDistinctTemplateNames();
+	            model.addAttribute("templateList", templateNames);
 
-		return "redirect:/users/view";
+	            return "user_add";
+	        }
+	    }
+
+	    return "redirect:/users/view";
 	}
 
 	@GetMapping("/edit/{id}")

@@ -22,6 +22,22 @@ public interface SubjectMasterRepository extends JpaRepository<SubjectMaster, In
 	List<SubjectMaster> findByTeacher(String name);
 
 	Optional<SubjectMaster> findBysubjectId(int subjectId);
+	
+	@Query("SELECT COUNT(DISTINCT s.teacher) FROM SubjectMaster s WHERE s.semester.course.courseId = :courseId AND s.teacher IS NOT NULL")
+	Long countTeachersByCourse(@Param("courseId") int courseId);
+
+	
+
+
+
+	
+
+
+	
+
+	
+
+
 
 
 

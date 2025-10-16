@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:include="template :: headFragment(${pageTitle})">
+<title th:text="${pageTitle}">Course Students</title>
+<link rel="icon" type="image/png" href="/webtemplate/dist/img/magicboxEye3.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+:root {
+    --primary: #4361ee;
+    --secondary: #3f37c9;
+    --success: #4cc9f0;
+    --danger: #f72585;
+    --warning: #f8961e;
+    --info: #4895ef;
+    --dark: #2b2d42;
+    --light: #f8f9fa;
+    --gray: #6c757d;
+    --white: #ffffff;
+    --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    background: var(--white);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.dashboard-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--success));
+}
+
+.summary-card {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--white) 0%, #f8f9fa 100%);
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.summary-card .count {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--dark);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.summary-card .label {
+    font-size: 0.8rem;
+    color: var(--gray);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.student-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.student-table th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.student-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.student-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.status-online {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.status-offline {
+    color: var(--gray);
+    font-weight: 600;
+}
+
+.badge-custom {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+</style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div th:replace="fragments/header :: header"></div>
+        <div th:replace="fragments/sidebar :: aside"></div>
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-sm-6">
+                            <h1 class="animate-fade-in">
+                                <i class="fas fa-users mr-3"></i> 
+                                <span th:text="${pageTitle}">Course Students</span>
+                            </h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a th:href="@{/guac/hod-dashboard}" class="text-decoration-none">
+                                    <i class="fas fa-home mr-2"></i>HOD Dashboard
+                                </a></li>
+                                <li class="breadcrumb-item active" th:text="${pageTitle}">Course Students</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content animate-slide-up">
+                <div class="container-fluid">
+                    
+                    <!-- Error Message -->
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <span th:text="${error}"></span>
+                    </div>
+
+                    <!-- Course Header -->
+                    <div th:if="${course != null}" class="row mb-4">
+                        <div class="col-12">
+                            <div class="card bg-gradient-primary text-white">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <h3 class="mb-2">
+                                                <i class="fas fa-book mr-2"></i>
+                                                <span th:text="${course.courseName}">Course Name</span>
+                                            </h3>
+                                            <p class="mb-0 opacity-75">
+                                                Course Code: <strong th:text="${course.courseCode}"></strong> | 
+                                                Department: <strong th:text="${course.department.departmentName}"></strong> |
+                                                Semesters: <strong th:text="${totalSemesters}"></strong>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-4 text-right">
+                                            <span class="badge-custom">
+                                                <i class="fas fa-user-graduate mr-1"></i>
+                                                <span th:text="${totalStudents} + ' Students'">0 Students</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="row mb-4">
+                        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+                            <div class="summary-card">
+                                <div class="count" th:text="${totalStudents}">0</div>
+                                <div class="label">Total Students</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+                            <div class="summary-card">
+                                <div class="count" th:text="${studentDetails != null ? studentDetails.stream().filter(s -> 'online'.equals(s.status)).count() : 0}">0</div>
+                                <div class="label">Online Students</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+                            <div class="summary-card">
+                                <div class="count" th:text="${studentDetails != null ? studentDetails.stream().filter(s -> 'offline'.equals(s.status)).count() : 0}">0</div>
+                                <div class="label">Offline Students</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+                            <div class="summary-card">
+                                <div class="count" th:text="${totalSemesters}">0</div>
+                                <div class="label">Semesters</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Students Table -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="dashboard-card">
+                                <div class="card-header">
+                                    <h3 class="mb-0">
+                                        <i class="fas fa-list-alt mr-2"></i>Students List
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="studentsTable" class="table table-bordered table-striped student-table">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Sr</th>
+                                                    <th>Student ID</th>
+                                                    <th>Username</th>
+                                                    <th>Full Name</th>
+                                                    <th>Email</th>
+                                                    <th>Semester</th>
+                                                    <th>Batch</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="student, stat : ${studentDetails}">
+                                                    <td th:text="${stat.count}">1</td>
+                                                    <td>
+                                                        <strong th:text="${student.studentId}">Student ID</strong>
+                                                    </td>
+                                                    <td th:text="${student.username}">Username</td>
+                                                    <td th:text="${student.fullName}">Full Name</td>
+                                                    <td>
+                                                        <span th:text="${student.email}" th:if="${student.email != null}">Email</span>
+                                                        <span th:if="${student.email == null}" class="text-muted">N/A</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-info" th:text="${student.semester}">Semester</span>
+                                                    </td>
+                                                    <td th:text="${student.batch}">Batch</td>
+                                                    <td>
+                                                        <span th:if="${'online'.equals(student.status)}" class="status-online">
+                                                            <i class="fas fa-circle mr-1"></i>Online
+                                                        </span>
+                                                        <span th:if="${'offline'.equals(student.status)}" class="status-offline">
+                                                            <i class="fas fa-circle mr-1"></i>Offline
+                                                        </span>
+                                                        <span th:if="${student.status == null}" class="text-muted">
+                                                            <i class="fas fa-circle mr-1"></i>Unknown
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-outline-primary btn-sm" 
+                                                                th:onclick="|viewStudentDetails(${student.studentId})|">
+                                                            <i class="fas fa-eye"></i> View
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                
+                                                <!-- No Students Message -->
+                                                <tr th:if="${studentDetails == null or studentDetails.empty}">
+                                                    <td colspan="9" class="text-center py-5 text-muted">
+                                                        <i class="fas fa-user-graduate fa-2x mb-2"></i>
+                                                        <div>
+                                                            <strong>No Students Found</strong>
+                                                            <p class="mb-0">No students enrolled in this course.</p>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
+
+    <div th:replace="template :: jsscript"></div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#studentsTable').DataTable({
+                "responsive": true,
+                "lengthChange": true,
+                "autoWidth": false,
+                "pageLength": 10,
+                "language": {
+                    "search": "Search students:",
+                    "lengthMenu": "Show _MENU_ entries"
+                }
+            });
+        });
+
+        function viewStudentDetails(studentId) {
+            Swal.fire({
+                title: 'Student Details',
+                html: 'Viewing detailed information for Student ID: ' + studentId + '<br><br>' +
+                      '<small>Detailed student profile including academic progress, attendance, and performance will be displayed here.</small>',
+                icon: 'info',
+                confirmButtonText: 'View Full Profile',
+                showCancelButton: true,
+                cancelButtonText: 'Close'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to student profile page
+                    window.location.href = '/guac/student-profile/' + studentId;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

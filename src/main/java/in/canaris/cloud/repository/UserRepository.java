@@ -75,22 +75,34 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
 
 	boolean existsByMobileNo(String mobileNo);
 
-	@Modifying
-	@Query("UPDATE AppUser u SET u.name = :name, u.email = :email, u.mobileNo = :mobileNo, "
-			+ "u.groupName = :groupName, u.switch_id = :switchId, u.generationType = :generationType, "
-			+ "u.departmentName = :department, u.courseName = :course, u.semesterName = :semester, "
-			+ "u.batchName = :batch,u.templateName = :templateName WHERE u.userId = :userId")
-	void updateUserWithAcademicAndTemplate(@Param("name") String name, @Param("email") String email,
-			@Param("mobileNo") String mobileNo, @Param("groupName") String groupName,
-			@Param("switchId") Switch switchId, @Param("generationType") String generationType,
-			@Param("department") DepartmentMaster department, @Param("course") CourseMaster course,
-			@Param("semester") SemesterMaster semester, @Param("batch") BatchMaster batch,
-			@Param("templateName") String templateName, @Param("userId") Long userId);
+//	@Modifying
+//	@Query("UPDATE AppUser u SET u.name = :name, u.email = :email, u.mobileNo = :mobileNo, "
+//			+ "u.groupName = :groupName, u.switch_id = :switchId, u.generationType = :generationType, "
+//			+ "u.departmentName = :department, u.courseName = :course, u.semesterName = :semester, "
+//			+ "u.batchName = :batch,u.templateName = :templateName WHERE u.userId = :userId")
+//	void updateUserWithAcademicAndTemplate(@Param("name") String name, @Param("email") String email,
+//			@Param("mobileNo") String mobileNo, @Param("groupName") String groupName,
+//			@Param("switchId") Switch switchId, @Param("generationType") String generationType,
+//			@Param("department") DepartmentMaster department, @Param("course") CourseMaster course,
+//			@Param("semester") SemesterMaster semester, @Param("batch") BatchMaster batch,
+//			@Param("templateName") String templateName, @Param("userId") Long userId);
 
 	@Query("SELECT u.templateName FROM AppUser u WHERE u.userName = :username")
 	String findTemplateNameByUsername(@Param("username") String username);
 
-	
+	@Modifying
+	@Query("UPDATE AppUser u SET u.name = :name, u.email = :email, u.mobileNo = :mobileNo, "
+			+ "u.groupName = :groupName, u.switch_id = :switchId, u.generationType = :generationType, "
+			+ "u.departmentName = :departmentName, u.courseName = :courseName, u.semesterName = :semesterName, "
+			+ "u.batchName = :batchName, u.templateName = :templateName, u.permissions = :permissions "
+			+ "WHERE u.userId = :userId")
+	void updateUserWithAcademicAndTemplate(@Param("name") String name, @Param("email") String email,
+			@Param("mobileNo") String mobileNo, @Param("groupName") String groupName,
+			@Param("switchId") Switch switchId, @Param("generationType") String generationType,
+			@Param("departmentName") DepartmentMaster departmentName, @Param("courseName") CourseMaster courseName,
+			@Param("semesterName") SemesterMaster semesterName, @Param("batchName") BatchMaster batchName,
+			@Param("templateName") String templateName, @Param("permissions") String permissions,
+			@Param("userId") Long userId);
 
 //	void updateUserWithAcademicAndTemplate(String name, String email, String mobileNo, String groupName,
 //			Switch switch_id, String generationType, DepartmentMaster departmentName, CourseMaster courseName,

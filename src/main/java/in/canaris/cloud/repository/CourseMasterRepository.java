@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import in.canaris.cloud.openstack.entity.CourseMaster;
+import in.canaris.cloud.openstack.entity.DepartmentMaster;
 
 public interface CourseMasterRepository extends JpaRepository<CourseMaster, Integer> {
 
@@ -18,5 +19,13 @@ public interface CourseMasterRepository extends JpaRepository<CourseMaster, Inte
 	List<CourseMaster> findByDepartmentDepartmentId(int deptId);
 
 	CourseMaster findByCourseName(String string);
+
+	
+
+	
+
+	
+
+	
 
 }

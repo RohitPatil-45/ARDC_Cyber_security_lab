@@ -8900,4 +8900,512 @@ public class GuacamoleController {
 	    
 	    return "redirect:/guac/manage";
 	}
+	
+	
+//	@GetMapping("/hod-dashboard")
+//	public String hodDashboard(Model model, Principal principal) {
+//	    try {
+//	        Authentication auth = (Authentication) principal;
+//	        String username = auth.getName();
+//
+//	        // Check if user has HOD role
+//	        boolean isHOD = auth.getAuthorities().stream()
+//	                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+//	        
+//	        if (!isHOD) {
+//	            model.addAttribute("error", "Access Denied: HOD role required!");
+//	            return "hod-dashboard";
+//	        }
+//
+//	        // Get HOD details
+//	        List<AppUser> hods = AppUserRepository.findByUserName(username);
+//	        if (hods.isEmpty()) {
+//	            model.addAttribute("error", "HOD not found!");
+//	            return "hod-dashboard";
+//	        }
+//
+//	        AppUser hod = hods.get(0);
+//	        model.addAttribute("hod", hod);
+//	        model.addAttribute("pageTitle", "HOD Dashboard - " + hod.getName());
+//
+//	        // Get HOD's department
+//	        DepartmentMaster department = hod.getDepartmentName();
+//	        if (department == null) {
+//	            model.addAttribute("error", "No department assigned to HOD!");
+//	            model.addAttribute("departmentStats", new HashMap<>());
+//	            model.addAttribute("courses", new ArrayList<>());
+//	            model.addAttribute("totalStudents", 0);
+//	            model.addAttribute("totalTeachers", 0);
+//	            model.addAttribute("totalCourses", 0);
+//	            return "hod-dashboard";
+//	        }
+//
+//	        model.addAttribute("department", department);
+//
+//	        // Get all courses in this department
+//	        List<CourseMaster> courses = CourseMasterRepository.findByDepartment_DepartmentId(department.getDepartmentId());
+//	        model.addAttribute("courses", courses != null ? courses : new ArrayList<>());
+//
+//	        // Get department statistics
+//	        Map<String, Object> departmentStats = new HashMap<>();
+//
+//	        // Count students in this department (ROLE_USER)
+//	        Long totalStudents = AppUserRepository.countStudentsByDepartment(department.getDepartmentId());
+//	        departmentStats.put("totalStudents", totalStudents != null ? totalStudents : 0L);
+//
+//	        // Count teachers in this department (ROLE_TEACHER)
+//	        Long totalTeachers = AppUserRepository.countTeachersByDepartment(department.getDepartmentId());
+//	        departmentStats.put("totalTeachers", totalTeachers != null ? totalTeachers : 0L);
+//
+//	        // Count courses in this department
+//	        Long totalCourses = CourseMasterRepository.countByDepartment_DepartmentId(department.getDepartmentId());
+//	        departmentStats.put("totalCourses", totalCourses != null ? totalCourses : 0L);
+//
+//	        // Get course-wise statistics
+//	        Map<Integer, Map<String, Object>> courseStats = new HashMap<>();
+//	        if (courses != null) {
+//	            for (CourseMaster course : courses) {
+//	                Map<String, Object> stats = new HashMap<>();
+//	                
+//	                // Count students in this course
+//	                Long courseStudents = AppUserRepository.countStudentsByCourse(course.getCourseId());
+//	                stats.put("studentCount", courseStudents != null ? courseStudents : 0L);
+//	                
+//	                // Count teachers for this course
+//	                Long courseTeachers = AppUserRepository.countTeachersByCourse(course.getCourseId());
+//	                stats.put("teacherCount", courseTeachers != null ? courseTeachers : 0L);
+//	                
+//	                // Count teachers through subjects for this course
+//	                Long subjectTeachers = SubjectMasterRepository.countTeachersByCourse(course.getCourseId());
+//	                stats.put("subjectTeacherCount", subjectTeachers != null ? subjectTeachers : 0L);
+//	                
+//	                // Get semesters for this course
+//	                List<SemesterMaster> semesters = SemesterMasterRepository.findByCourse_CourseId(course.getCourseId());
+//	                stats.put("semesterCount", semesters != null ? semesters.size() : 0);
+//	                stats.put("semesters", semesters != null ? semesters : new ArrayList<>());
+//	                
+//	                courseStats.put(course.getCourseId(), stats);
+//	            }
+//	        }
+//	        
+//	        departmentStats.put("courseStats", courseStats);
+//
+//	        model.addAttribute("departmentStats", departmentStats);
+//	        model.addAttribute("totalStudents", departmentStats.get("totalStudents"));
+//	        model.addAttribute("totalTeachers", departmentStats.get("totalTeachers"));
+//	        model.addAttribute("totalCourses", departmentStats.get("totalCourses"));
+//
+//	        // Debug logging
+//	        System.out.println("=== HOD DASHBOARD STATS ===");
+//	        System.out.println("Department: " + department.getDepartmentName() + " (ID: " + department.getDepartmentId() + ")");
+//	        System.out.println("Total Students: " + departmentStats.get("totalStudents"));
+//	        System.out.println("Total Teachers: " + departmentStats.get("totalTeachers"));
+//	        System.out.println("Total Courses: " + departmentStats.get("totalCourses"));
+//	        System.out.println("Courses Found: " + (courses != null ? courses.size() : 0));
+//
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	        model.addAttribute("error", "Error loading dashboard: " + e.getMessage());
+//
+//	        model.addAttribute("departmentStats", new HashMap<>());
+//	        model.addAttribute("courses", new ArrayList<>());
+//	        model.addAttribute("totalStudents", 0);
+//	        model.addAttribute("totalTeachers", 0);
+//	        model.addAttribute("totalCourses", 0);
+//	    }
+//	    return "hod-dashboard";
+//	}
+	
+	
+	@GetMapping("/hod-dashboard")
+	public String hodDashboard(Model model, Principal principal) {
+	    Authentication auth = (Authentication) principal;
+	    String username = auth.getName();
+
+	    try {
+	        // Get current user (HOD)
+	        List<AppUser> users = AppUserRepository.findByUserName(username);
+	        if (users.isEmpty()) {
+	            model.addAttribute("error", "User not found");
+	            return "hod-dashboard";
+	        }
+
+	        AppUser currentUser = users.get(0);
+	        model.addAttribute("hod", currentUser);
+	        model.addAttribute("pageTitle", "HOD Dashboard - " + currentUser.getName());
+
+	        // Get HOD's assigned department
+	        DepartmentMaster hodDepartment = currentUser.getDepartmentName();
+	        if (hodDepartment == null) {
+	            model.addAttribute("error", "No department assigned to HOD");
+	            model.addAttribute("departments", new ArrayList<>());
+	            model.addAttribute("departmentStats", new HashMap<>());
+	            model.addAttribute("courseDetails", new HashMap<>());
+	            model.addAttribute("overallCourses", 0);
+	            model.addAttribute("overallTeachers", 0);
+	            model.addAttribute("overallStudents", 0);
+	            model.addAttribute("totalDepartments", 0);
+	            return "hod-dashboard";
+	        }
+
+	        // Only show HOD's assigned department
+	        List<DepartmentMaster> departments = Collections.singletonList(hodDepartment);
+	        model.addAttribute("departments", departments);
+
+	        // Get department-wise statistics - only for HOD's department
+	        Map<Integer, Map<String, Object>> departmentStats = new HashMap<>();
+	        Map<Integer, List<Map<String, Object>>> courseDetails = new HashMap<>();
+
+	        // Department statistics
+	        Map<String, Object> stats = new HashMap<>();
+	        
+	        // Get courses for HOD's department
+	        List<CourseMaster> deptCourses = CourseMasterRepository.findByDepartmentDepartmentId(hodDepartment.getDepartmentId());
+	        
+	        // Calculate department totals
+	        long totalCourses = deptCourses.size();
+	        long totalTeachers = 0;
+	        long totalStudents = 0;
+	        long totalBatches = 0;
+	        long totalSemesters = 0;
+
+	        List<Map<String, Object>> coursesList = new ArrayList<>();
+
+	        for (CourseMaster course : deptCourses) {
+	            try {
+	                Map<String, Object> courseData = new HashMap<>();
+	                courseData.put("course", course);
+	                
+	                // Get semesters for this course
+	                List<SemesterMaster> semesters = SemesterMasterRepository.findByCourseCourseId(course.getCourseId());
+	                courseData.put("semesters", semesters);
+	                
+	                List<Map<String, Object>> semesterDetails = new ArrayList<>();
+	                
+	                for (SemesterMaster semester : semesters) {
+	                    try {
+	                        Map<String, Object> semesterData = new HashMap<>();
+	                        semesterData.put("semester", semester);
+	                        
+	                        // Get batches for this semester
+	                        List<BatchMaster> batches = BatchMasterRepository.findBySemesterSemesterId(semester.getSemesterId());
+	                        semesterData.put("batches", batches);
+	                        
+	                        // Get teachers for this semester (through subjects)
+	                        List<SubjectMaster> semesterSubjects = SubjectMasterRepository.findBysemester_SemesterId(semester.getSemesterId());
+	                        Set<String> teachers = semesterSubjects.stream()
+	                                .map(SubjectMaster::getTeacher)
+	                                .filter(teacher -> teacher != null && !teacher.trim().isEmpty())
+	                                .collect(Collectors.toSet());
+	                        semesterData.put("teachers", teachers);
+	                        
+	                        // Get student count for this semester
+	                        Long studentCount = AppUserRepository.countOnlyStudentsBySemesterId(semester.getSemesterId());
+	                        semesterData.put("studentCount", studentCount != null ? studentCount : 0);
+	                        
+	                        // Update totals
+	                        totalTeachers += teachers.size();
+	                        totalStudents += (studentCount != null ? studentCount : 0);
+	                        totalBatches += batches.size();
+	                        
+	                        semesterDetails.add(semesterData);
+	                    } catch (Exception e) {
+	                        System.err.println("Error processing semester: " + semester.getSemesterId() + " - " + e.getMessage());
+	                    }
+	                }
+	                
+	                courseData.put("semesterDetails", semesterDetails);
+	                totalSemesters += semesters.size();
+	                coursesList.add(courseData);
+	            } catch (Exception e) {
+	                System.err.println("Error processing course: " + course.getCourseId() + " - " + e.getMessage());
+	            }
+	        }
+
+	        stats.put("totalCourses", totalCourses);
+	        stats.put("totalTeachers", totalTeachers);
+	        stats.put("totalStudents", totalStudents);
+	        stats.put("totalBatches", totalBatches);
+	        stats.put("totalSemesters", totalSemesters);
+	        
+	        departmentStats.put(hodDepartment.getDepartmentId(), stats);
+	        courseDetails.put(hodDepartment.getDepartmentId(), coursesList);
+
+	        model.addAttribute("departmentStats", departmentStats);
+	        model.addAttribute("courseDetails", courseDetails);
+
+	        // Overall statistics (only for HOD's department)
+	        model.addAttribute("overallCourses", totalCourses);
+	        model.addAttribute("overallTeachers", totalTeachers);
+	        model.addAttribute("overallStudents", totalStudents);
+	        model.addAttribute("totalDepartments", 1); // Only one department for HOD
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("error", "Error loading HOD dashboard: " + e.getMessage());
+	        
+	        // Set default values
+	        model.addAttribute("departments", new ArrayList<>());
+	        model.addAttribute("departmentStats", new HashMap<>());
+	        model.addAttribute("courseDetails", new HashMap<>());
+	        model.addAttribute("overallCourses", 0);
+	        model.addAttribute("overallTeachers", 0);
+	        model.addAttribute("overallStudents", 0);
+	        model.addAttribute("totalDepartments", 0);
+	    }
+
+	    return "hod-dashboard";
+	}
+
+	// Updated department details method for HOD
+	@GetMapping("/department-details/{deptId}")
+	public String viewDepartmentDetails(@PathVariable Integer deptId, Model model, Principal principal) {
+	    try {
+	        // Verify that HOD has access to this department
+	        String username = principal.getName();
+	        List<AppUser> users = AppUserRepository.findByUserName(username);
+	        
+	        if (users.isEmpty()) {
+	            model.addAttribute("error", "User not found");
+	            return "department-details";
+	        }
+
+	        AppUser currentUser = users.get(0);
+	        DepartmentMaster hodDepartment = currentUser.getDepartmentName();
+	        
+	        // Check if HOD is trying to access their own department
+	        if (hodDepartment == null || hodDepartment.getDepartmentId() != deptId) {
+	            model.addAttribute("error", "Access denied to this department");
+	            return "department-details";
+	        }
+
+	        Optional<DepartmentMaster> departmentOpt = DepartmentMasterRepository.findById(deptId);
+	        if (!departmentOpt.isPresent()) {
+	            model.addAttribute("error", "Department not found!");
+	            return "department-details";
+	        }
+
+	        DepartmentMaster department = departmentOpt.get();
+	        model.addAttribute("department", department);
+	        model.addAttribute("pageTitle", "Department Details - " + department.getDepartmentName());
+
+	        // Get courses for this department
+	        List<CourseMaster> courses = CourseMasterRepository.findByDepartmentDepartmentId(department.getDepartmentId());
+	        model.addAttribute("courses", courses);
+
+	        // Get detailed statistics for each course
+	        List<Map<String, Object>> courseStats = new ArrayList<>();
+	        
+	        for (CourseMaster course : courses) {
+	            Map<String, Object> stats = new HashMap<>();
+	            stats.put("course", course);
+	            
+	            // Get semesters for this course
+	            List<SemesterMaster> semesters = SemesterMasterRepository.findByCourseCourseId(course.getCourseId());
+	            stats.put("semesterCount", semesters.size());
+	            
+	            // Get total students across all semesters
+	            Long totalStudents = 0L;
+	            Set<String> allTeachers = new HashSet<>();
+	            int totalBatches = 0;
+	            
+	            for (SemesterMaster semester : semesters) {
+	                // Student count for semester
+	                Long semesterStudents = AppUserRepository.countOnlyStudentsBySemesterId(semester.getSemesterId());
+	                totalStudents += (semesterStudents != null ? semesterStudents : 0);
+	                
+	                // Teachers for semester
+	                List<SubjectMaster> subjects = SubjectMasterRepository.findBysemester_SemesterId(semester.getSemesterId());
+	                subjects.stream()
+	                    .map(SubjectMaster::getTeacher)
+	                    .filter(teacher -> teacher != null && !teacher.trim().isEmpty())
+	                    .forEach(allTeachers::add);
+	                
+	                // Batches for semester
+	                List<BatchMaster> batches = BatchMasterRepository.findBySemesterSemesterId(semester.getSemesterId());
+	                totalBatches += batches.size();
+	            }
+	            
+	            stats.put("studentCount", totalStudents);
+	            stats.put("teacherCount", allTeachers.size());
+	            stats.put("teachers", allTeachers);
+	            stats.put("batchCount", totalBatches);
+	            
+	            courseStats.add(stats);
+	        }
+	        
+	        model.addAttribute("courseStats", courseStats);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("error", "Error loading department details: " + e.getMessage());
+	    }
+	    
+	    return "department-details";
+	}
+	
+	
+	// Add these methods to your HODDashboardController
+
+	@GetMapping("/course-teachers/{courseId}")
+	public String viewCourseTeachers(@PathVariable Integer courseId, Model model, Principal principal) {
+	    try {
+	        // Verify HOD access
+	        String username = principal.getName();
+	        List<AppUser> users = AppUserRepository.findByUserName(username);
+	        
+	        if (users.isEmpty()) {
+	            model.addAttribute("error", "User not found");
+	            return "course-teachers";
+	        }
+
+	        AppUser currentUser = users.get(0);
+	        DepartmentMaster hodDepartment = currentUser.getDepartmentName();
+	        
+	        // Verify course belongs to HOD's department
+	        Optional<CourseMaster> courseOpt = CourseMasterRepository.findById(courseId);
+	        if (!courseOpt.isPresent()) {
+	            model.addAttribute("error", "Course not found!");
+	            return "course-teachers";
+	        }
+
+	        CourseMaster course = courseOpt.get();
+	        if (hodDepartment == null || course.getDepartment().getDepartmentId() != hodDepartment.getDepartmentId()) {
+	            model.addAttribute("error", "Access denied to this course");
+	            return "course-teachers";
+	        }
+
+	        model.addAttribute("course", course);
+	        model.addAttribute("pageTitle", "Teachers - " + course.getCourseName());
+
+	        // Get all semesters for this course
+	        List<SemesterMaster> semesters = SemesterMasterRepository.findByCourseCourseId(courseId);
+	        
+	        // Get teachers from all subjects in all semesters
+	        List<Map<String, Object>> teacherDetails = new ArrayList<>();
+	        Set<String> uniqueTeachers = new HashSet<>();
+	        Set<String> allSubjects = new HashSet<>();
+	        Set<String> allSemesters = new HashSet<>();
+
+	        for (SemesterMaster semester : semesters) {
+	            allSemesters.add(semester.getSemesterName());
+	            List<SubjectMaster> subjects = SubjectMasterRepository.findBysemester_SemesterId(semester.getSemesterId());
+	            
+	            for (SubjectMaster subject : subjects) {
+	                if (subject.getTeacher() != null && !subject.getTeacher().trim().isEmpty()) {
+	                    String teacherName = subject.getTeacher().trim();
+	                    allSubjects.add(subject.getSubjectName());
+	                    
+	                    // Add only unique teachers
+	                    if (uniqueTeachers.add(teacherName)) {
+	                        Map<String, Object> teacherData = new HashMap<>();
+	                        teacherData.put("teacherName", teacherName);
+	                        teacherData.put("subjects", new ArrayList<String>());
+	                        teacherData.put("semesters", new ArrayList<String>());
+	                        teacherDetails.add(teacherData);
+	                    }
+	                    
+	                    // Add subject and semester to existing teacher
+	                    for (Map<String, Object> teacherData : teacherDetails) {
+	                        if (teacherData.get("teacherName").equals(teacherName)) {
+	                            @SuppressWarnings("unchecked")
+	                            List<String> teacherSubjects = (List<String>) teacherData.get("subjects");
+	                            @SuppressWarnings("unchecked")
+	                            List<String> teacherSemesters = (List<String>) teacherData.get("semesters");
+	                            
+	                            if (!teacherSubjects.contains(subject.getSubjectName())) {
+	                                teacherSubjects.add(subject.getSubjectName());
+	                            }
+	                            if (!teacherSemesters.contains(semester.getSemesterName())) {
+	                                teacherSemesters.add(semester.getSemesterName());
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+	        }
+
+	        model.addAttribute("teacherDetails", teacherDetails);
+	        model.addAttribute("totalTeachers", teacherDetails.size());
+	        model.addAttribute("subjectsCount", allSubjects.size());
+	        model.addAttribute("semestersCount", allSemesters.size());
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("error", "Error loading teacher details: " + e.getMessage());
+	    }
+	    
+	    return "course-teachers";
+	}
+
+	@GetMapping("/course-students/{courseId}")
+	public String viewCourseStudents(@PathVariable Integer courseId, Model model, Principal principal) {
+	    try {
+	        // Verify HOD access
+	        String username = principal.getName();
+	        List<AppUser> users = AppUserRepository.findByUserName(username);
+	        
+	        if (users.isEmpty()) {
+	            model.addAttribute("error", "User not found");
+	            return "course-students";
+	        }
+
+	        AppUser currentUser = users.get(0);
+	        DepartmentMaster hodDepartment = currentUser.getDepartmentName();
+	        
+	        // Verify course belongs to HOD's department
+	        Optional<CourseMaster> courseOpt = CourseMasterRepository.findById(courseId);
+	        if (!courseOpt.isPresent()) {
+	            model.addAttribute("error", "Course not found!");
+	            return "course-students";
+	        }
+
+	        CourseMaster course = courseOpt.get();
+	        if (hodDepartment == null || course.getDepartment().getDepartmentId() != hodDepartment.getDepartmentId()) {
+	            model.addAttribute("error", "Access denied to this course");
+	            return "course-students";
+	        }
+
+	        model.addAttribute("course", course);
+	        model.addAttribute("pageTitle", "Students - " + course.getCourseName());
+
+	        // Get all semesters for this course
+	        List<SemesterMaster> semesters = SemesterMasterRepository.findByCourseCourseId(courseId);
+	        
+	        // Get students from all semesters
+	        List<Map<String, Object>> studentDetails = new ArrayList<>();
+	        long totalStudents = 0;
+
+	        for (SemesterMaster semester : semesters) {
+	            // Get students for this semester
+	            List<AppUser> semesterStudents = AppUserRepository.findOnlyStudentsBySemesterId(semester.getSemesterId());
+	            
+	            for (AppUser student : semesterStudents) {
+	                Map<String, Object> studentData = new HashMap<>();
+	                studentData.put("studentId", student.getUserId());
+	                studentData.put("username", student.getUserName());
+	                studentData.put("fullName", student.getName());
+	                studentData.put("email", student.getEmail());
+	                studentData.put("mobileNo", student.getMobileNo());
+	                studentData.put("semester", semester.getSemesterName());
+	                studentData.put("batch", student.getBatchName() != null ? student.getBatchName().getBatchName() : "Not Assigned");
+	                studentData.put("status", student.getStatus());
+	                
+	                studentDetails.add(studentData);
+	            }
+	            
+	            totalStudents += semesterStudents.size();
+	        }
+
+	        model.addAttribute("studentDetails", studentDetails);
+	        model.addAttribute("totalStudents", totalStudents);
+	        model.addAttribute("totalSemesters", semesters.size());
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("error", "Error loading student details: " + e.getMessage());
+	    }
+	    
+	    return "course-students";
+	}
 }
