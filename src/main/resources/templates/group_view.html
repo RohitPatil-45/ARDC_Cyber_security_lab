@@ -34,7 +34,7 @@
 										<div class="col-md-10">
 											<h3 class="card-title" style="padding-top:10px">Group Master Details</h3>
 										</div>
-										<div class="col-md-2">
+										<div class="col-md-2" th:if="${session.access != 'READ'}">
 												<a th:href="@{'/'+${action_name}+'/new/'}" class="btn btn-block bg-gradient-primary">Add</a>
 										</div>
 									</div>
@@ -64,7 +64,7 @@
 												<th scope="col">Sr No.</th>
 												<th scope="col">Group Name</th>
 												<th scope="col">Description</th>
-												<th scope="col">Actions</th>
+												<th scope="col" th:if="${session.access != 'READ'}">Actions</th>
 											</tr>
 										</thead>
 										<tbody>
@@ -72,7 +72,7 @@
 												<th scope="row" th:text="${groupStat.count}">1</th>
 												<td>[[${obj.group_name}]]</td>
 												<td>[[${obj.description}]]</td>
-												<td><a th:href="@{'/'+${action_name}+'/edit/' + ${obj.id}}"
+												<td th:if="${session.access != 'READ'}"><a th:href="@{'/'+${action_name}+'/edit/' + ${obj.id}}"
 													title="Edit this group"
 													class="fa fa-edit"></a> &nbsp; <a
 													th:href="@{'/'+${action_name}+'/delete/' + ${obj.id}}"

@@ -113,4 +113,10 @@ public interface AppUserRepository extends JpaRepository<AppUser, Integer> {
 	    @Query("SELECT u FROM AppUser u WHERE u.semesterName.semesterId = :semesterId AND EXISTS (SELECT ur FROM u.userRoles ur WHERE ur.appRole.roleName = 'ROLE_USER')")
 	    List<AppUser> findOnlyStudentsBySemesterId(@Param("semesterId") Integer semesterId);
 
+	
+
+		
+
+		
+
 }

@@ -56,26 +56,19 @@ public class Add_Scenario {
 	@Column(name = "number_of_instance", nullable = false, length = 255)
 	private String NumberofInstance;
 
-//	@Column(name = "Cover_Image", nullable = false, length = 255)
-//	private String Cover_Image;
-
-//	@Lob // Large Object
-//	@Column(columnDefinition = "LONGBLOB") // ✅ For MySQL. For Oracle, just "BLOB"
-//	private byte[] coverImage;
+	// Add Ideal Time field
+	@Column(name = "IdealTime", nullable = false, length = 255)
+	private String IdealTime;
 
 	@Lob
-	@Column(name = "coverImage", nullable = true) // Make sure nullable = true
+	@Column(name = "coverImage", nullable = true)
 	private byte[] coverImage;
 
 	@Column(name = "Labs", nullable = false, length = 255)
 	private String Labs;
 
-//	@Column(name = "LabId", nullable = false, length = 255)
-//	private String LabId;
-
 	@Column(name = "Comments", nullable = false, length = 255)
 	private String Comments;
-	
 
 	@ManyToMany(mappedBy = "scenarios")
 	private Set<Playlist> playlists = new HashSet<>();
@@ -83,6 +76,7 @@ public class Add_Scenario {
 	@OneToMany(mappedBy = "scenario", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<SubPlaylistScenario> subPlaylists = new HashSet<>();
 
+	// Getters and Setters
 	public Set<SubPlaylistScenario> getSubPlaylists() {
 		return subPlaylists;
 	}
@@ -122,8 +116,6 @@ public class Add_Scenario {
 	public void setDescription(String description) {
 		Description = description;
 	}
-
-	
 
 	public String getCategory() {
 		return category;
@@ -173,6 +165,14 @@ public class Add_Scenario {
 		MaxPlayers = maxPlayers;
 	}
 
+	public String getIdealTime() {
+		return IdealTime;
+	}
+
+	public void setIdealTime(String idealTime) {
+		IdealTime = idealTime;
+	}
+
 	public byte[] getCoverImage() {
 		return coverImage;
 	}
@@ -201,14 +201,6 @@ public class Add_Scenario {
 		return serialVersionUID;
 	}
 
-//	public String getLabId() {
-//		return LabId;
-//	}
-//
-//	public void setLabId(String labId) {
-//		LabId = labId;
-//	}
-
 	public Set<Playlist> getPlaylists() {
 		return playlists;
 	}
@@ -224,9 +216,4 @@ public class Add_Scenario {
 	public void setNumberofInstance(String numberofInstance) {
 		NumberofInstance = numberofInstance;
 	}
-
-
-
-
-
 }

@@ -2,834 +2,835 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head th:include="template :: headFragment(${pageTitle})">
-<link rel="icon" type="image/png"
-	href="/webtemplate/dist/img/magicboxEye3.png">
-<title>Scenario Manager | CMP</title>
+    <link rel="icon" type="image/png" href="/webtemplate/dist/img/magicboxEye3.png">
+    <title>Scenario Manager | CMP</title>
 
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- Summernote CSS -->
-<link
-	href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css"
-	rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Summernote CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
 
-<link
-	href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
-	rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-<style>
-:root {
-	--primary: #3498db;
-	--secondary: #2c3e50;
-	--light: #ecf0f1;
-	--dark: #1a252f;
-	--success: #2ecc71;
-	--danger: #e74c3c;
-	--warning: #f39c12;
-	--info: #1abc9c;
-}
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --light: #ecf0f1;
+            --dark: #1a252f;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #1abc9c;
+        }
 
-body {
-	background-color: #ffffff;
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+        body {
+            background-color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-.content-wrapper {
-	background-color: #ffffff;
-}
+        .content-wrapper {
+            background-color: #ffffff;
+        }
 
-.card {
-	border-radius: 8px;
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-	border: none;
-	background-color: #ffffff;
-}
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            border: none;
+            background-color: #ffffff;
+        }
 
-.card-header {
-	background-color: #ffffff;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-	border-radius: 8px 8px 0 0 !important;
-	padding: 20px;
-}
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 8px 8px 0 0 !important;
+            padding: 20px;
+        }
 
-.content-header h1 {
-	color: #111111;
-}
+        .content-header h1 {
+            color: #111111;
+        }
 
-label {
-	color: #111111;
-}
+        label {
+            color: #111111;
+        }
 
-.card-title {
-	font-weight: 600;
-	color: var(--secondary);
-	font-size: 1.25rem;
-	margin: 0;
-}
+        .card-title {
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 1.25rem;
+            margin: 0;
+        }
 
-.form-control {
-	border-radius: 6px;
-	border: 1px solid #ddd;
-	padding: 10px 15px;
-	height: auto;
-	transition: all 0.3s;
-}
+        .form-control {
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            height: auto;
+            transition: all 0.3s;
+        }
 
-.form-control:focus {
-	border-color: var(--primary);
-	box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
-}
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
 
-.btn-primary {
-	background-color: var(--primary);
-	border-color: var(--primary);
-	border-radius: 6px;
-	padding: 10px 20px;
-	font-weight: 500;
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-}
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-.btn-primary:hover {
-	background-color: #2980b9;
-	border-color: #2980b9;
-}
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
 
-.breadcrumb {
-	background-color: transparent;
-	padding: 0;
-}
+        .breadcrumb {
+            background-color: transparent;
+            padding: 0;
+        }
 
-.content-header h1 {
-	font-weight: 600;
-	color: var(--secondary);
-	font-size: 1.8rem;
-}
+        .content-header h1 {
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 1.8rem;
+        }
 
-label {
-	font-weight: 500;
-	color: #555;
-	margin-bottom: 8px;
-}
+        label {
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 8px;
+        }
 
-.nav-sidebar .nav-item .nav-link {
-	border-radius: 4px;
-	margin-bottom: 5px;
-}
+        .nav-sidebar .nav-item .nav-link {
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
 
-.form-section {
-	background-color: white;
-	padding: 25px;
-	border-radius: 8px;
-	margin-bottom: 20px;
-}
+        .form-section {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
 
-.form-section-title {
-	font-size: 1.1rem;
-	color: var(--secondary);
-	margin-bottom: 20px;
-	padding-bottom: 10px;
-	border-bottom: 1px solid #eee;
-	font-weight: 600;
-}
+        .form-section-title {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+        }
 
-.footer {
-	background-color: var(--secondary);
-	color: white;
-	padding: 15px 0;
-}
+        .footer {
+            background-color: var(--secondary);
+            color: white;
+            padding: 15px 0;
+        }
 
-.note-editor.note-frame {
-	border-radius: 6px;
-	border: 1px solid #ddd;
-}
+        .note-editor.note-frame {
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
 
-.note-editor.note-frame .note-statusbar {
-	border-bottom-left-radius: 6px;
-	border-bottom-right-radius: 6px;
-}
+        .note-editor.note-frame .note-statusbar {
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
 
-.note-btn-group {
-	border-radius: 4px;
-	overflow: hidden;
-}
+        .note-btn-group {
+            border-radius: 4px;
+            overflow: hidden;
+        }
 
-.note-editable {
-	background-color: white;
-	min-height: 150px;
-}
+        .note-editable {
+            background-color: white;
+            min-height: 150px;
+        }
 
-.avatar-circle {
-	width: 40px;
-	height: 40px;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 18px;
-}
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
 
-.comment-box {
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	padding: 12px;
-	background-color: #f8f9fa;
-}
+        .comment-box {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            background-color: #f8f9fa;
+        }
 
-.comment-box textarea {
-	border: none;
-	background: transparent;
-	resize: none;
-	box-shadow: none;
-	padding: 0;
-}
+        .comment-box textarea {
+            border: none;
+            background: transparent;
+            resize: none;
+            box-shadow: none;
+            padding: 0;
+        }
 
-.comment-box textarea:focus {
-	box-shadow: none;
-}
+        .comment-box textarea:focus {
+            box-shadow: none;
+        }
 
-.comment-actions .btn-link {
-	padding: 0 8px;
-}
+        .comment-actions .btn-link {
+            padding: 0 8px;
+        }
 
-.comment-actions .btn-link:hover {
-	color: var(--primary) !important;
-}
+        .comment-actions .btn-link:hover {
+            color: var(--primary) !important;
+        }
 
-.select2-container--default .select2-selection--multiple {
-	border: 1px solid #ced4da;
-	border-radius: 6px;
-	padding: 4px;
-	min-height: 42px;
-	font-size: 14px;
-}
+        .select2-container--default .select2-selection--multiple {
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            padding: 4px;
+            min-height: 42px;
+            font-size: 14px;
+        }
 
-.select2-container--default .select2-selection--multiple .select2-selection__choice
-	{
-	background-color: #007bff;
-	border: none;
-	border-radius: 4px;
-	color: #fff;
-	padding: 4px 8px;
-	margin-top: 4px;
-	margin-right: 4px;
-	font-size: 13px;
-}
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            padding: 4px 8px;
+            margin-top: 4px;
+            margin-right: 4px;
+            font-size: 13px;
+        }
 
-.select2-container--default .select2-selection--multiple .select2-selection__choice__remove
-	{
-	color: #fff;
-	margin-right: 6px;
-	font-weight: bold;
-	cursor: pointer;
-}
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #fff;
+            margin-right: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover
-	{
-	color: #ffdddd;
-}
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #ffdddd;
+        }
 
-.select2-container--default .select2-results__option--highlighted {
-	background-color: #007bff;
-	color: #fff;
-}
+        .select2-container--default .select2-results__option--highlighted {
+            background-color: #007bff;
+            color: #fff;
+        }
 
-.selection-limit {
-	font-size: 0.875rem;
-	margin-top: 5px;
-	color: #6c757d;
-}
+        .selection-limit {
+            font-size: 0.875rem;
+            margin-top: 5px;
+            color: #6c757d;
+        }
 
-.selection-limit.error {
-	color: #dc3545;
-	font-weight: 500;
-}
+        .selection-limit.error {
+            color: #dc3545;
+            font-weight: 500;
+        }
 
-.instance-warning {
-	display: none;
-	color: #856404;
-	background-color: #fff3cd;
-	border: 1px solid #ffeeba;
-	border-radius: 4px;
-	padding: 10px;
-	margin-top: 10px;
-	font-size: 0.9rem;
-}
+        .instance-warning {
+            display: none;
+            color: #856404;
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
 
-.select2-container--disabled {
-	background-color: #e9ecef;
-	opacity: 0.8;
-	cursor: not-allowed;
-}
+        .select2-container--disabled {
+            background-color: #e9ecef;
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
 
-.select2-container--disabled .select2-selection {
-	background-color: #e9ecef;
-	cursor: not-allowed;
-}
+        .select2-container--disabled .select2-selection {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
 
-.is-invalid {
-	border-color: #dc3545 !important;
-}
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
 
-.note-editor.is-invalid {
-	border-color: #dc3545 !important;
-}
+        .note-editor.is-invalid {
+            border-color: #dc3545 !important;
+        }
 
-.select2-selection.is-invalid {
-	border-color: #dc3545 !important;
-}
-</style>
+        .select2-selection.is-invalid {
+            border-color: #dc3545 !important;
+        }
+        
+        .time-input-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .time-input-group .form-control {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .time-input-group .input-group-text {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-left: none;
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+            color: #6c757d;
+        }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
-	<div class="wrapper">
+    <div class="wrapper">
 
-		<div th:replace="fragments/header :: header"></div>
+        <div th:replace="fragments/header :: header"></div>
 
-		<div th:replace="fragments/sidebar :: aside"></div>
+        <div th:replace="fragments/sidebar :: aside"></div>
 
-		<div class="content-wrapper">
+        <div class="content-wrapper">
 
-			<section class="content-header">
-				<div class="container-fluid">
-					<div class="row mb-2">
-						<div class="col-sm-6">
-							<h1>[[${pageTitle}]]</h1>
-						</div>
-						<div class="col-sm-6">
-							<ol class="breadcrumb float-sm-right">
-								<li class="breadcrumb-item"><a href="#"><i
-										class="fas fa-home"></i> Home</a></li>
-								<li class="breadcrumb-item"><a href="#">Scenarios</a></li>
-								<li class="breadcrumb-item active"
-									th:text="${isEdit} ? 'Edit Scenario' : 'Create Scenario'"></li>
-							</ol>
-						</div>
-					</div>
-				</div>
-			</section>
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>[[${pageTitle}]]</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i> Home</a></li>
+                                <li class="breadcrumb-item"><a href="#">Scenarios</a></li>
+                                <li class="breadcrumb-item active" th:text="${isEdit} ? 'Edit Scenario' : 'Create Scenario'"></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-			<section class="content">
-				<div class="container-fluid">
-					<div class="row">
-						<div class="col-md-12">
-							<div class="card">
-								<div class="card-header">
-									<div class="d-flex justify-content-between align-items-center">
-										<h3 class="card-title">
-											<i class="fas fa-plus-circle mr-2"></i> <span
-												th:text="${isEdit} ? 'Edit Scenario Details' : 'Create Scenario Details'"></span>
-										</h3>
-										<div class="card-tools">
-											<button type="button" class="btn btn-tool"
-												data-card-widget="collapse">
-												<i class="fas fa-minus"></i>
-											</button>
-										</div>
-									</div>
-								</div>
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-plus-circle mr-2"></i> <span th:text="${isEdit} ? 'Edit Scenario Details' : 'Create Scenario Details'"></span>
+                                        </h3>
+                                        <div class="card-tools">
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
 
-								<form th:action="@{/guac/saveScenarioData}"
-									th:object="${scenario}" method="post"
-									enctype="multipart/form-data"
-									onsubmit="return validateScenarioForm()">
-									<input type="hidden" th:field="*{Id}" />
-									<div class="card-body">
-										<div class="form-section">
-											<h5 class="form-section-title">
-												<i class="fas fa-info-circle mr-2"></i>Basic Information
-											</h5>
-											<div class="row">
-												<div class="col-md-6">
-													<div class="form-group">
-														<label for="ScenarioTitle">Scenario Title <span
-															class="text-danger">*</span></label> <input type="text" required
-															id="ScenarioTitle" name="ScenarioTitle"
-															th:field="*{ScenarioTitle}" class="form-control"
-															placeholder="Enter scenario title">
-													</div>
-												</div>
-												<div class="col-md-6">
-													<div class="form-group">
-														<label for="ScenarioName">Scenario Name <span
-															class="text-danger">*</span></label> <input type="text" required
-															id="ScenarioName" name="ScenarioName"
-															th:field="*{ScenarioName}" class="form-control"
-															placeholder="Enter scenario Name">
-													</div>
-												</div>
-											</div>
+                                <form th:action="@{/guac/saveScenarioData}" th:object="${scenario}" method="post" enctype="multipart/form-data" onsubmit="return validateScenarioForm()">
+                                    <input type="hidden" th:field="*{Id}" />
+                                    <div class="card-body">
+                                        <div class="form-section">
+                                            <h5 class="form-section-title">
+                                                <i class="fas fa-info-circle mr-2"></i>Basic Information
+                                            </h5>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="ScenarioTitle">Scenario Title <span class="text-danger">*</span></label>
+                                                        <input type="text" required id="ScenarioTitle" name="ScenarioTitle" th:field="*{ScenarioTitle}" class="form-control" placeholder="Enter scenario title">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="ScenarioName">Scenario Name <span class="text-danger">*</span></label>
+                                                        <input type="text" required id="ScenarioName" name="ScenarioName" th:field="*{ScenarioName}" class="form-control" placeholder="Enter scenario Name">
+                                                    </div>
+                                                </div>
+                                            </div>
 
-											<div class="row">
-												<div class="col-md-12">
-													<div class="form-group">
-														<label for="Description">Description</label>
-														<textarea id="Description" name="Description"
-															th:field="*{Description}" class="summernote form-control"
-															rows="3"
-															placeholder="Briefly describe the scenario objectives"></textarea>
-													</div>
-												</div>
-											</div>
-										</div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="Description">Description</label>
+                                                        <textarea id="Description" name="Description" th:field="*{Description}" class="summernote form-control" rows="3" placeholder="Briefly describe the scenario objectives"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-										<div class="form-section">
-											<h5 class="form-section-title">
-												<i class="fas fa-cog mr-2"></i>Configuration
-											</h5>
-											<div class="row">
-												<div class="col-md-4">
-													<div class="form-group">
-														<label for="category">Category</label> <select
-															id="category" class="form-control"
-															th:field="*{category}" required>
-															<option value=""  selected>Select a
-																category</option>
-															<option th:each="cat : ${CategoryList}"
-																th:value="${cat.category}"
-																th:text="${cat.category}"></option>
-														</select>
-													</div>
+                                        <div class="form-section">
+                                            <h5 class="form-section-title">
+                                                <i class="fas fa-cog mr-2"></i>Configuration
+                                            </h5>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="category">Category</label>
+                                                        <select id="category" class="form-control" th:field="*{category}" required>
+                                                            <option value="" selected>Select a category</option>
+                                                            <option th:each="cat : ${CategoryList}" th:value="${cat.category}" th:text="${cat.category}"></option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="ScenarioType">Scenario Type <span class="text-danger">*</span></label>
+                                                        <select required id="ScenarioType" th:field="*{ScenarioType}" name="ScenarioType" class="form-control">
+                                                            <option value="">-- Select Type --</option>
+                                                            <option value="openrange">Open Range</option>
+                                                            <option value="guided">Guided</option>
+                                                            <option value="challenge">Challenge</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="Mode">Play Mode <span class="text-danger">*</span></label>
+                                                        <select required id="Mode" th:field="*{Mode}" name="Mode" class="form-control">
+                                                            <option value="">-- Select Mode --</option>
+                                                            <option value="singleplayer">Single Player</option>
+                                                            <option value="multiplayer">Multi Player</option>
+                                                            <option value="both">Both</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-												</div>
-												<div class="col-md-4">
-													<div class="form-group">
-														<label for="ScenarioType">Scenario Type <span
-															class="text-danger">*</span></label> <select required
-															id="ScenarioType" th:field="*{ScenarioType}"
-															name="ScenarioType" class="form-control">
-															<option value="">-- Select Type --</option>
-															<option value="openrange">Open Range</option>
-															<option value="guided">Guided</option>
-															<option value="challenge">Challenge</option>
-														</select>
-													</div>
-												</div>
-												<div class="col-md-4">
-													<div class="form-group">
-														<label for="Mode">Play Mode <span
-															class="text-danger">*</span></label> <select required id="Mode"
-															th:field="*{Mode}" name="Mode" class="form-control">
-															<option value="">-- Select Mode --</option>
-															<option value="singleplayer">Single Player</option>
-															<option value="multiplayer">Multi Player</option>
-															<option value="both">Both</option>
-														</select>
-													</div>
-												</div>
-											</div>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="DifficultyLevel">Difficulty Level <span class="text-danger">*</span></label>
+                                                        <select required th:field="*{DifficultyLevel}" id="DifficultyLevel" name="DifficultyLevel" class="form-control">
+                                                            <option value="">-- Select Difficulty --</option>
+                                                            <option value="Easy">Easy</option>
+                                                            <option value="Intermediate">Intermediate</option>
+                                                            <option value="Advanced">Advanced</option>
+                                                            <option value="Expert">Expert</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="Duration">Assessment Time (minutes) <span class="text-danger">*</span></label>
+                                                        <div class="time-input-group">
+                                                            <input type="number" min="5" th:field="*{Duration}" max="240" required id="Duration" name="Duration" class="form-control" placeholder="30">
+                                                            <span class="input-group-text">mins</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="IdealTime">Ideal Time (minutes) <span class="text-danger">*</span></label>
+                                                        <div class="time-input-group">
+                                                            <input type="number" min="1" th:field="*{IdealTime}" max="240" required id="IdealTime" name="IdealTime" class="form-control" placeholder="15">
+                                                            <span class="input-group-text">mins</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-											<div class="row">
-												<div class="col-md-4">
-													<div class="form-group">
-														<label for="DifficultyLevel">Difficulty Level <span
-															class="text-danger">*</span></label> <select required
-															th:field="*{DifficultyLevel}" id="DifficultyLevel"
-															name="DifficultyLevel" class="form-control">
-															<option value="">-- Select Difficulty --</option>
-															<option value="Easy">Easy</option>
-															<option value="Intermediate">Intermediate</option>
-															<option value="Advanced">Advanced</option>
-															<option value="Expert">Expert</option>
-														</select>
-													</div>
-												</div>
-												<div class="col-md-4">
-													<div class="form-group">
-														<label for="Duration">Duration (minutes) <span
-															class="text-danger">*</span></label> <input type="number" min="5"
-															th:field="*{Duration}" max="240" required id="Duration"
-															name="Duration" class="form-control" placeholder="30">
-													</div>
-												</div>
-												<div class="col-md-4">
-													<div class="form-group">
-														<label for="MaxPlayers">Max Players (if
-															multiplayer)</label> <input type="number" min="1" max="20"
-															th:field="*{MaxPlayers}" id="MaxPlayers"
-															name="MaxPlayers" class="form-control" placeholder="5">
-													</div>
-												</div>
-											</div>
-										</div>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="MaxPlayers">Max Players (if multiplayer)</label>
+                                                        <input type="number" min="1" max="20" th:field="*{MaxPlayers}" id="MaxPlayers" name="MaxPlayers" class="form-control" placeholder="5">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-										<div class="form-section">
-											<h5 class="form-section-title">
-												<i class="fas fa-image mr-2"></i>Media & Resources
-											</h5>
-											<div class="row">
-												<div class="col-md-6">
-													<div class="form-group">
-														<label for="cover_image">Cover Image</label>
-														<div class="custom-file">
-															<input type="file" class="custom-file-input"
-																id="cover_image" name="cover_image" accept="image/*">
-															<label class="custom-file-label" for="cover_image"
-																id="coverImageLabel"> <span
-																th:if="${scenario.coverImage != null}">Current
-																	image exists - choose new file to replace</span> <span
-																th:unless="${scenario.coverImage != null}">Choose
-																	file</span>
-															</label>
-														</div>
-														<small class="form-text text-muted">Recommended
-															size: 1200x630 pixels</small>
-														<div th:if="${scenario.coverImage != null}" class="mt-2">
-															<small class="text-success"> <i
-																class="fas fa-check-circle"></i> Cover image already
-																uploaded
-															</small>
-														</div>
-													</div>
-												</div>
-												<div class="col-md-6">
-													<div class="form-group">
-														<label for="NumberofInstance">Number of Instance <span
-															class="text-danger">*</span></label> <input type="number" min="1"
-															max="2000" th:field="*{NumberofInstance}"
-															id="NumberofInstance" name="NumberofInstance"
-															class="form-control"
-															placeholder="Enter number of instances..." required>
-														<div class="instance-warning" id="instanceWarning">
-															<i class="fas fa-exclamation-triangle mr-2"></i>Please
-															set the number of instances before selecting lab
-															templates.
-														</div>
-													</div>
-												</div>
-											</div>
+                                        <div class="form-section">
+                                            <h5 class="form-section-title">
+                                                <i class="fas fa-image mr-2"></i>Media & Resources
+                                            </h5>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="cover_image">Cover Image</label>
+                                                        <div class="custom-file">
+                                                            <input type="file" class="custom-file-input" id="cover_image" name="cover_image" accept="image/*">
+                                                            <label class="custom-file-label" for="cover_image" id="coverImageLabel">
+                                                                <span th:if="${scenario.coverImage != null}">Current image exists - choose new file to replace</span>
+                                                                <span th:unless="${scenario.coverImage != null}">Choose file</span>
+                                                            </label>
+                                                        </div>
+                                                        <small class="form-text text-muted">Recommended size: 1200x630 pixels</small>
+                                                        <div th:if="${scenario.coverImage != null}" class="mt-2">
+                                                            <small class="text-success">
+                                                                <i class="fas fa-check-circle"></i> Cover image already uploaded
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="NumberofInstance">Number of Instance <span class="text-danger">*</span></label>
+                                                        <input type="number" min="1" max="2000" th:field="*{NumberofInstance}" id="NumberofInstance" name="NumberofInstance" class="form-control" placeholder="Enter number of instances..." required>
+                                                        <div class="instance-warning" id="instanceWarning">
+                                                            <i class="fas fa-exclamation-triangle mr-2"></i>Please set the number of instances before selecting lab templates.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-											<div class="row mt-4">
-												<div class="col-md-12">
-													<div class="form-group">
-														<label for="Labs" class="form-label fw-bold">
-															Select Lab Template <span class="text-danger">*</span>
-														</label> <select id="Labs" name="Labs" class="form-control"
-															th:field="*{Labs}" multiple="multiple">
-															<option th:each="instance : ${instanceNameList}"
-																th:value="${instance.id + '~' + instance.instance_name}"
-																th:text="${instance.instance_name}"></option>
-														</select>
+                                            <div class="row mt-4">
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="Labs" class="form-label fw-bold">
+                                                            Select Lab Template <span class="text-danger">*</span>
+                                                        </label>
+                                                        <select id="Labs" name="Labs" class="form-control" th:field="*{Labs}" multiple="multiple">
+                                                            <option th:each="instance : ${instanceNameList}" th:value="${instance.id + '~' + instance.instance_name}" th:text="${instance.instance_name}"></option>
+                                                        </select>
 
-														<div class="selection-limit" id="selectionLimit">
-															You can select up to <span id="maxSelections">0</span>
-															lab templates
-														</div>
-													</div>
-												</div>
-											</div>
+                                                        <div class="selection-limit" id="selectionLimit">
+                                                            You can select up to <span id="maxSelections">0</span> lab templates
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-										</div>
+                                    <div class="card-footer text-right">
+                                        <a th:href="@{/scenarioList}" class="btn btn-outline-secondary mr-2">
+                                            <i class="fas fa-arrow-left mr-1"></i> Back to List
+                                        </a>
+                                        <button type="reset" class="btn btn-outline-secondary mr-2">
+                                            <i class="fas fa-undo mr-1"></i> Reset
+                                        </button>
+                                        <button type="submit" id="saveScenarioBtn" class="btn btn-primary">
+                                            <i class="fas fa-save mr-1"></i> <span th:text="${isEdit} ? 'Update Scenario' : 'Save Scenario'"></span>
+                                            <span id="scenarioSpinner" class="spinner-border spinner-border-sm ml-2 d-none"></span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
 
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
 
-									</div>
+    <div th:replace="template :: jsscript"></div>
 
-									<div class="card-footer text-right">
-										<a th:href="@{/scenarioList}"
-											class="btn btn-outline-secondary mr-2"> <i
-											class="fas fa-arrow-left mr-1"></i> Back to List
-										</a>
-										<button type="reset" class="btn btn-outline-secondary mr-2">
-											<i class="fas fa-undo mr-1"></i> Reset
-										</button>
-										<button type="submit" id="saveScenarioBtn"
-											class="btn btn-primary">
-											<i class="fas fa-save mr-1"></i> <span
-												th:text="${isEdit} ? 'Update Scenario' : 'Save Scenario'"></span>
-											<span id="scenarioSpinner"
-												class="spinner-border spinner-border-sm ml-2 d-none"></span>
-										</button>
-									</div>
-								</form>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-		</div>
+    <!-- jQuery (needed for Bootstrap and multiselect) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
+    <!-- Summernote JS -->
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-		<div th:replace="fragments/footer :: footer"></div>
-	</div>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Initialize custom file input
+            bsCustomFileInput.init();
 
-	<div th:replace="template :: jsscript"></div>
+            // Get edit mode flag from Thymeleaf
+            const isEdit = /*[[${isEdit}]]*/ false;
+            const existingDescription = /*[[${scenario.Description}]]*/ '';
+            const existingLabs = /*[[${scenario.Labs}]]*/ '';
+            const existingInstanceCount = /*[[${scenario.NumberofInstance}]]*/ 0;
+            const existingIdealTime = /*[[${scenario.IdealTime}]]*/ '';
 
-	<!-- jQuery (needed for Bootstrap and multiselect) -->
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<!-- Bootstrap JS -->
-	<script
-		src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-	<script
-		src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
-	<!-- Summernote JS -->
-	<script
-		src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
-	<script
-		src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            // Initialize Summernote
+            $('.summernote').summernote({
+                height: 150,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['fontsize', ['fontsize']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['view', ['fullscreen', 'codeview']]
+                ],
+                callbacks: {
+                    onPaste: function (e) {
+                        e.preventDefault();
+                        let text = (e.originalEvent || e).clipboardData.getData('text/plain');
+                        document.execCommand('insertText', false, text);
+                    }
+                }
+            });
 
-	<script type="text/javascript">
-	$(document).ready(function() {
-	    // Initialize custom file input
-	    bsCustomFileInput.init();
+            // Set existing description content for edit mode
+            if (isEdit && existingDescription) {
+                $('#Description').summernote('code', existingDescription);
+            }
 
-	    // Get edit mode flag from Thymeleaf
-	    const isEdit = /*[[${isEdit}]]*/ false;
-	    const existingDescription = /*[[${scenario.Description}]]*/ '';
-	    const existingLabs = /*[[${scenario.Labs}]]*/ '';
-	    const existingInstanceCount = /*[[${scenario.NumberofInstance}]]*/ 0;
+            // Set existing ideal time for edit mode
+            if (isEdit && existingIdealTime) {
+                $('#IdealTime').val(existingIdealTime);
+            }
 
-	    // Initialize Summernote
-	    $('.summernote').summernote({
-	        height: 150,
-	        toolbar: [
-	            ['style', ['bold', 'italic', 'underline', 'clear']],
-	            ['fontsize', ['fontsize']],
-	            ['para', ['ul', 'ol', 'paragraph']],
-	            ['view', ['fullscreen', 'codeview']]
-	        ],
-	        callbacks: {
-	            onPaste: function (e) {
-	                e.preventDefault();
-	                let text = (e.originalEvent || e).clipboardData.getData('text/plain');
-	                document.execCommand('insertText', false, text);
-	            }
-	        }
-	    });
+            // Initialize Select2 for multi-select
+            $('#Labs').select2({
+                placeholder: "Select lab templates",
+                allowClear: true,
+                width: '100%',
+                closeOnSelect: false
+            });
 
-	    // Set existing description content for edit mode
-	    if (isEdit && existingDescription) {
-	        $('#Description').summernote('code', existingDescription);
-	    }
+            // Initialize form based on edit mode
+            function initializeForm() {
+                const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
+                
+                if (isEdit) {
+                    // For edit mode, always enable Labs dropdown
+                    $('#Labs').prop('disabled', false);
+                    $('#instanceWarning').hide();
+                    
+                    // Set existing instance count
+                    if (existingInstanceCount > 0) {
+                        $('#maxSelections').text(existingInstanceCount);
+                        $('#selectionLimit').removeClass('error');
+                        
+                        // Update placeholder text
+                        if ($('#Labs').data('select2')) {
+                            $('#Labs').data('select2').$container.find('.select2-selection__placeholder')
+                                .text(`Select lab templates (max: ${existingInstanceCount})`);
+                        }
+                    }
+                    
+                    // Set pre-selected labs
+                    setTimeout(function() {
+                        if (existingLabs) {
+                            const labArray = existingLabs.split(',');
+                            $('#Labs').val(labArray).trigger('change');
+                            
+                            // Update selection count
+                            const currentSelections = $('#Labs').val() ? $('#Labs').val().length : 0;
+                            if (existingInstanceCount > 0 && currentSelections > 0) {
+                                $('#selectionLimit').html(`You have selected ${currentSelections} of ${existingInstanceCount} allowed lab templates`);
+                            }
+                        }
+                    }, 500);
+                } else {
+                    // For create mode, use the original logic
+                    if (instanceCount > 0) {
+                        $('#Labs').prop('disabled', false);
+                        $('#instanceWarning').hide();
+                        $('#maxSelections').text(instanceCount);
+                        $('#selectionLimit').removeClass('error');
+                    } else {
+                        $('#Labs').prop('disabled', true);
+                        $('#instanceWarning').show();
+                    }
+                }
+            }
 
-	    // Initialize Select2 for multi-select
-	    $('#Labs').select2({
-	        placeholder: "Select lab templates",
-	        allowClear: true,
-	        width: '100%',
-	        closeOnSelect: false
-	    });
+            // Initialize the form
+            initializeForm();
 
-	    // Initialize form based on edit mode
-	    function initializeForm() {
-	        const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
-	        
-	        if (isEdit) {
-	            // For edit mode, always enable Labs dropdown
-	            $('#Labs').prop('disabled', false);
-	            $('#instanceWarning').hide();
-	            
-	            // Set existing instance count
-	            if (existingInstanceCount > 0) {
-	                $('#maxSelections').text(existingInstanceCount);
-	                $('#selectionLimit').removeClass('error');
-	                
-	                // Update placeholder text
-	                if ($('#Labs').data('select2')) {
-	                    $('#Labs').data('select2').$container.find('.select2-selection__placeholder')
-	                        .text(`Select lab templates (max: ${existingInstanceCount})`);
-	                }
-	            }
-	            
-	            // Set pre-selected labs
-	            setTimeout(function() {
-	                if (existingLabs) {
-	                    const labArray = existingLabs.split(',');
-	                    $('#Labs').val(labArray).trigger('change');
-	                    
-	                    // Update selection count
-	                    const currentSelections = $('#Labs').val() ? $('#Labs').val().length : 0;
-	                    if (existingInstanceCount > 0 && currentSelections > 0) {
-	                        $('#selectionLimit').html(`You have selected ${currentSelections} of ${existingInstanceCount} allowed lab templates`);
-	                    }
-	                }
-	            }, 500);
-	        } else {
-	            // For create mode, use the original logic
-	            if (instanceCount > 0) {
-	                $('#Labs').prop('disabled', false);
-	                $('#instanceWarning').hide();
-	                $('#maxSelections').text(instanceCount);
-	                $('#selectionLimit').removeClass('error');
-	            } else {
-	                $('#Labs').prop('disabled', true);
-	                $('#instanceWarning').show();
-	            }
-	        }
-	    }
+            // Handle instance number change (for both create and edit)
+            $('#NumberofInstance').on('input', function() {
+                const instanceCount = parseInt($(this).val()) || 0;
+                
+                if (instanceCount > 0) {
+                    $('#Labs').prop('disabled', false);
+                    $('#instanceWarning').hide();
+                    $('#maxSelections').text(instanceCount);
+                    $('#selectionLimit').removeClass('error');
+                    
+                    // Update placeholder text
+                    if ($('#Labs').data('select2')) {
+                        $('#Labs').data('select2').$container.find('.select2-selection__placeholder')
+                            .text(`Select lab templates (max: ${instanceCount})`);
+                    }
+                    
+                    // If current selections exceed the new limit, remove the extra ones
+                    const selectedOptions = $('#Labs').val() || [];
+                    if (selectedOptions.length > instanceCount) {
+                        $('#Labs').val(selectedOptions.slice(0, instanceCount)).trigger('change');
+                        $('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>Selection limit exceeded! Only ${instanceCount} lab templates allowed.`);
+                    } else if (selectedOptions.length > 0) {
+                        $('#selectionLimit').html(`You have selected ${selectedOptions.length} of ${instanceCount} allowed lab templates`);
+                    } else {
+                        $('#selectionLimit').html(`You can select up to <span id="maxSelections">${instanceCount}</span> lab templates`);
+                    }
+                } else {
+                    $('#Labs').prop('disabled', true);
+                    $('#Labs').val(null).trigger('change');
+                    $('#instanceWarning').show();
+                    $('#maxSelections').text('0');
+                    $('#selectionLimit').html(`You can select up to <span id="maxSelections">0</span> lab templates`);
+                }
+            });
 
-	    // Initialize the form
-	    initializeForm();
+            // Handle lab template selection with limit validation
+            $('#Labs').on('select2:selecting', function(e) {
+                const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
+                const currentSelections = $('#Labs').select2('data').length;
+                
+                if (instanceCount > 0 && currentSelections >= instanceCount) {
+                    e.preventDefault();
+                    $('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>You can only select up to ${instanceCount} lab templates.`);
+                    
+                    setTimeout(function() {
+                        $('#selectionLimit').removeClass('error');
+                        const updatedSelections = $('#Labs').select2('data').length;
+                        $('#selectionLimit').html(`You have selected ${updatedSelections} of ${instanceCount} allowed lab templates`);
+                    }, 2000);
+                }
+            });
 
-	    // Handle instance number change (for both create and edit)
-	    $('#NumberofInstance').on('input', function() {
-	        const instanceCount = parseInt($(this).val()) || 0;
-	        
-	        if (instanceCount > 0) {
-	            $('#Labs').prop('disabled', false);
-	            $('#instanceWarning').hide();
-	            $('#maxSelections').text(instanceCount);
-	            $('#selectionLimit').removeClass('error');
-	            
-	            // Update placeholder text
-	            if ($('#Labs').data('select2')) {
-	                $('#Labs').data('select2').$container.find('.select2-selection__placeholder')
-	                    .text(`Select lab templates (max: ${instanceCount})`);
-	            }
-	            
-	            // If current selections exceed the new limit, remove the extra ones
-	            const selectedOptions = $('#Labs').val() || [];
-	            if (selectedOptions.length > instanceCount) {
-	                $('#Labs').val(selectedOptions.slice(0, instanceCount)).trigger('change');
-	                $('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>Selection limit exceeded! Only ${instanceCount} lab templates allowed.`);
-	            } else if (selectedOptions.length > 0) {
-	                $('#selectionLimit').html(`You have selected ${selectedOptions.length} of ${instanceCount} allowed lab templates`);
-	            } else {
-	                $('#selectionLimit').html(`You can select up to <span id="maxSelections">${instanceCount}</span> lab templates`);
-	            }
-	        } else {
-	            $('#Labs').prop('disabled', true);
-	            $('#Labs').val(null).trigger('change');
-	            $('#instanceWarning').show();
-	            $('#maxSelections').text('0');
-	            $('#selectionLimit').html(`You can select up to <span id="maxSelections">0</span> lab templates`);
-	        }
-	    });
+            // Update selection count when changing labs
+            $('#Labs').on('change', function() {
+                const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
+                const currentSelections = $('#Labs').select2('data').length;
+                
+                if (instanceCount > 0) {
+                    if (currentSelections > instanceCount) {
+                        const selectedOptions = $('#Labs').val() || [];
+                        $('#Labs').val(selectedOptions.slice(0, instanceCount)).trigger('change');
+                    } else if (currentSelections > 0) {
+                        $('#selectionLimit').html(`You have selected ${currentSelections} of ${instanceCount} allowed lab templates`);
+                    } else {
+                        $('#selectionLimit').html(`You can select up to <span id="maxSelections">${instanceCount}</span> lab templates`);
+                    }
+                }
+            });
 
-	    // Handle lab template selection with limit validation
-	    $('#Labs').on('select2:selecting', function(e) {
-	        const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
-	        const currentSelections = $('#Labs').select2('data').length;
-	        
-	        if (instanceCount > 0 && currentSelections >= instanceCount) {
-	            e.preventDefault();
-	            $('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>You can only select up to ${instanceCount} lab templates.`);
-	            
-	            setTimeout(function() {
-	                $('#selectionLimit').removeClass('error');
-	                const updatedSelections = $('#Labs').select2('data').length;
-	                $('#selectionLimit').html(`You have selected ${updatedSelections} of ${instanceCount} allowed lab templates`);
-	            }, 2000);
-	        }
-	    });
+            // Inline validation on input change
+            const requiredFields = [
+                'ScenarioTitle', 'ScenarioName', 'Category', 'ScenarioType', 
+                'Mode', 'DifficultyLevel', 'Duration', 'NumberofInstance', 'IdealTime'
+            ];
 
-	    // Update selection count when changing labs
-	    $('#Labs').on('change', function() {
-	        const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
-	        const currentSelections = $('#Labs').select2('data').length;
-	        
-	        if (instanceCount > 0) {
-	            if (currentSelections > instanceCount) {
-	                const selectedOptions = $('#Labs').val() || [];
-	                $('#Labs').val(selectedOptions.slice(0, instanceCount)).trigger('change');
-	            } else if (currentSelections > 0) {
-	                $('#selectionLimit').html(`You have selected ${currentSelections} of ${instanceCount} allowed lab templates`);
-	            } else {
-	                $('#selectionLimit').html(`You can select up to <span id="maxSelections">${instanceCount}</span> lab templates`);
-	            }
-	        }
-	    });
+            requiredFields.forEach(fieldId => {
+                $('#' + fieldId).on('input change', function() {
+                    if ($(this).val().trim()) {
+                        $(this).removeClass('is-invalid');
+                    } else {
+                        $(this).addClass('is-invalid');
+                    }
+                });
+            });
 
-	    // Inline validation on input change
-	    const requiredFields = [
-	        'ScenarioTitle', 'ScenarioName', 'Category', 'ScenarioType', 
-	        'Mode', 'DifficultyLevel', 'Duration', 'NumberofInstance'
-	    ];
+            // Summernote inline validation
+            $('#Description').on('summernote.change', function() {
+                const content = $(this).summernote('code').replace(/<[^>]*>/g, '').trim();
+                if (content) {
+                    $(this).closest('.form-group').find('.note-editor').removeClass('is-invalid');
+                } else {
+                    $(this).closest('.form-group').find('.note-editor').addClass('is-invalid');
+                }
+            });
 
-	    requiredFields.forEach(fieldId => {
-	        $('#' + fieldId).on('input change', function() {
-	            if ($(this).val().trim()) {
-	                $(this).removeClass('is-invalid');
-	            } else {
-	                $(this).addClass('is-invalid');
-	            }
-	        });
-	    });
+            // Handle file input change
+            $('#cover_image').on('change', function() {
+                const fileName = $(this).val().split('\\').pop();
+                $('#coverImageLabel').text(fileName || 'Choose file');
+            });
 
-	    // Summernote inline validation
-	    $('#Description').on('summernote.change', function() {
-	        const content = $(this).summernote('code').replace(/<[^>]*>/g, '').trim();
-	        if (content) {
-	            $(this).closest('.form-group').find('.note-editor').removeClass('is-invalid');
-	        } else {
-	            $(this).closest('.form-group').find('.note-editor').addClass('is-invalid');
-	        }
-	    });
+            // Validate ideal time vs assessment time
+            $('#IdealTime, #Duration').on('change', function() {
+                const idealTime = parseInt($('#IdealTime').val()) || 0;
+                const assessmentTime = parseInt($('#Duration').val()) || 0;
+                
+                if (idealTime > 0 && assessmentTime > 0 && idealTime > assessmentTime) {
+                    $('#IdealTime').addClass('is-invalid');
+                    $('#IdealTime').after('<div class="invalid-feedback d-block">Ideal time cannot be greater than assessment time</div>');
+                } else {
+                    $('#IdealTime').removeClass('is-invalid');
+                    $('.invalid-feedback.d-block').remove();
+                }
+            });
+        });
 
-	    // Handle file input change
-	    $('#cover_image').on('change', function() {
-	        const fileName = $(this).val().split('\\').pop();
-	        $('#coverImageLabel').text(fileName || 'Choose file');
-	    });
-	});
+        function validateScenarioForm() {
+            let isValid = true;
 
-	function validateScenarioForm() {
-	    let isValid = true;
+            // Validate required fields
+            const requiredFields = [
+                'ScenarioTitle', 'ScenarioName', 'Category', 'ScenarioType', 
+                'Mode', 'DifficultyLevel', 'Duration', 'NumberofInstance', 'IdealTime'
+            ];
 
-	    // Validate required fields
-	    const requiredFields = [
-	        'ScenarioTitle', 'ScenarioName', 'Category', 'ScenarioType', 
-	        'Mode', 'DifficultyLevel', 'Duration', 'NumberofInstance'
-	    ];
+            requiredFields.forEach(fieldId => {
+                const field = $('#' + fieldId);
+                if (!field.val().trim()) {
+                    field.addClass('is-invalid');
+                    isValid = false;
+                } else {
+                    field.removeClass('is-invalid');
+                }
+            });
 
-	    requiredFields.forEach(fieldId => {
-	        const field = $('#' + fieldId);
-	        if (!field.val().trim()) {
-	            field.addClass('is-invalid');
-	            isValid = false;
-	        } else {
-	            field.removeClass('is-invalid');
-	        }
-	    });
-
-	    // Validate Labs selection
-	    const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
-	    const selectedLabs = $('#Labs').val();
-	    
-	    if (!selectedLabs || selectedLabs.length === 0) {
-	        $('#Labs').closest('.form-group').find('.select2-selection').addClass('is-invalid');
-	        isValid = false;
-	    } else if (selectedLabs.length > instanceCount) {
-	        $('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>You can only select up to ${instanceCount} lab templates.`);
-	        isValid = false;
-	    } else {
-	        $('#Labs').closest('.form-group').find('.select2-selection').removeClass('is-invalid');
-	    }
-
-	    // Validate Summernote
-	    const summernoteContent = $('#Description').summernote('code').replace(/<[^>]*>/g, '').trim();
-	    if (!summernoteContent) {
-	        $('#Description').closest('.form-group').find('.note-editor').addClass('is-invalid');
-	        isValid = false;
-	    } else {
-	        $('#Description').closest('.form-group').find('.note-editor').removeClass('is-invalid');
-	    }
-
-	    if (!isValid) {
-	        $('html, body').animate({
-	            scrollTop: $('.is-invalid:first').offset().top - 100
-	        }, 500);
-	        return false;
-	    }
-
-	    $('#scenarioSpinner').removeClass('d-none');
-	    $('#saveScenarioBtn').prop('disabled', true);
-	    return true;
-	}
-</script>
-
-	<script th:inline="javascript">
-    document.addEventListener("DOMContentLoaded", function () {
-        // Get labs from Thymeleaf (already "id~name" format)
-        var assignedLabs = /*[[${scenario.Labs}]]*/ "";
-        
-        if (assignedLabs) {
-            var selectedValues = assignedLabs.split(",");
+            // Validate Ideal Time vs Assessment Time
+            const idealTime = parseInt($('#IdealTime').val()) || 0;
+            const assessmentTime = parseInt($('#Duration').val()) || 0;
             
-            // Set the values in the select box
-            $("#Labs").val(selectedValues).trigger("change");
+            if (idealTime > assessmentTime) {
+                $('#IdealTime').addClass('is-invalid');
+                if (!$('#IdealTime').next('.invalid-feedback.d-block').length) {
+                    $('#IdealTime').after('<div class="invalid-feedback d-block">Ideal time cannot be greater than assessment time</div>');
+                }
+                isValid = false;
+            }
+
+            // Validate Labs selection
+            const instanceCount = parseInt($('#NumberofInstance').val()) || 0;
+            const selectedLabs = $('#Labs').val();
+            
+            if (!selectedLabs || selectedLabs.length === 0) {
+                $('#Labs').closest('.form-group').find('.select2-selection').addClass('is-invalid');
+                isValid = false;
+            } else if (selectedLabs.length > instanceCount) {
+                $('#selectionLimit').addClass('error').html(`<i class="fas fa-exclamation-circle mr-1"></i>You can only select up to ${instanceCount} lab templates.`);
+                isValid = false;
+            } else {
+                $('#Labs').closest('.form-group').find('.select2-selection').removeClass('is-invalid');
+            }
+
+            // Validate Summernote
+            const summernoteContent = $('#Description').summernote('code').replace(/<[^>]*>/g, '').trim();
+            if (!summernoteContent) {
+                $('#Description').closest('.form-group').find('.note-editor').addClass('is-invalid');
+                isValid = false;
+            } else {
+                $('#Description').closest('.form-group').find('.note-editor').removeClass('is-invalid');
+            }
+
+            if (!isValid) {
+                $('html, body').animate({
+                    scrollTop: $('.is-invalid:first').offset().top - 100
+                }, 500);
+                return false;
+            }
+
+            $('#scenarioSpinner').removeClass('d-none');
+            $('#saveScenarioBtn').prop('disabled', true);
+            return true;
         }
-    });
-</script>
+    </script>
+
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get labs from Thymeleaf (already "id~name" format)
+            var assignedLabs = /*[[${scenario.Labs}]]*/ "";
+            
+            if (assignedLabs) {
+                var selectedValues = assignedLabs.split(",");
+                
+                // Set the values in the select box
+                $("#Labs").val(selectedValues).trigger("change");
+            }
+        });
+    </script>
 
 </body>
 </html>

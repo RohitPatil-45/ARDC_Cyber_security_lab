@@ -13,7 +13,7 @@
 .academic-fields {
 	display: none;
 }
-.permission-field {
+.admin-hod-fields {
 	display: none;
 }
 </style>
@@ -124,11 +124,11 @@
 														onchange="roleChange(this.value)" tabindex="1"
 														id="userRole" th:field="*{appRole.roleId}" required
 														name="userRole" class="form-control" style="width: 100%;">
-														<option value="1">Admin</option>
 														<option value="2" selected>User</option>
+														<option value="1">Admin</option>
 														<option value="3">Super Admin</option>
-														<option value="5">Hod</option>
 														<option value="4">Teacher</option>
+														<option value="5">Hod</option>
 													</select>
 												</div>
 
@@ -193,8 +193,8 @@
 												</div>
 											</div>
 
-											<!-- Permission Field -->
-											<div class="col-md-6 permission-field" id="permissionField">
+											<!-- Permission Field - Available for all roles -->
+											<div class="col-md-6">
 												<div class="form-group">
 													<label>Permission</label>
 													<div class="form-check">
@@ -262,27 +262,30 @@
 											</div>
 
 											<!-- Admin/HOD Fields -->
-											<div class="col-md-12 academic-fields" id="adminHodFields">
+											<div class="col-md-12 admin-hod-fields" id="adminHodFields">
 												<h5>Administrative Information</h5>
 												<div class="row">
 													<!-- Department dropdown for Admin/HOD -->
 													<div class="col-md-6">
 														<div class="form-group">
-															<label>Department</label> <select id="adminDepartmentSelect"
-																class="form-control" name="adminDepartmentId">
+															<label>Department</label> 
+															<select id="adminDepartmentSelect" class="form-control" name="adminDepartmentId">
 																<option value="">-- Select Department --</option>
-																<option th:each="d : ${departments}"
-																	th:value="${d.departmentId}"
-																	th:text="${d.departmentName}"></option>
+																<option th:each="d : ${departments}" 
+																		th:value="${d.departmentId}" 
+																		th:text="${d.departmentName}"
+																		th:selected="${selectedAdminDepartmentId != null && selectedAdminDepartmentId == d.departmentId}">
+																</option>
 															</select>
 														</div>
 													</div>
 													<!-- Course dropdown for HOD only -->
 													<div class="col-md-6" id="hodCourseField">
 														<div class="form-group">
-															<label>Course</label> <select id="hodCourseSelect"
-																class="form-control" name="hodCourseId">
+															<label>Course</label> 
+															<select id="hodCourseSelect" class="form-control" name="hodCourseId">
 																<option value="">-- Select Course --</option>
+																<!-- Courses will be loaded dynamically via AJAX -->
 															</select>
 														</div>
 													</div>
@@ -321,6 +324,8 @@
     const selectedCourseId = [[${selectedCourseId != null ? selectedCourseId : 'null'}]];
     const selectedSemesterId = [[${selectedSemesterId != null ? selectedSemesterId : 'null'}]];
     const selectedBatchId = [[${selectedBatchId != null ? selectedBatchId : 'null'}]];
+    const selectedAdminDeptId = [[${selectedAdminDepartmentId != null ? selectedAdminDepartmentId : 'null'}]];
+    const selectedHodCourseId = [[${selectedHodCourseId != null ? selectedHodCourseId : 'null'}]];
 
     $(function() {
         $('.select2').select2();
@@ -329,6 +334,18 @@
         const selectedRole = $('#userRole').val();
         toggleRoleBasedFields(selectedRole);
         initializeGroupSelect(selectedRole);
+        
+        // Initialize Admin/HOD fields if editing
+        if (selectedAdminDeptId && (selectedRole == '1' || selectedRole == '5')) {
+            $('#adminDepartmentSelect').val(selectedAdminDeptId);
+            
+            if (selectedRole == '5' && selectedHodCourseId) {
+                // Load courses for HOD
+                loadAdminCourses(selectedAdminDeptId, function() {
+                    $('#hodCourseSelect').val(selectedHodCourseId);
+                });
+            }
+        }
         
         var $groupName = $('#appUser\\.groupName');
 
@@ -367,55 +384,33 @@
     function toggleRoleBasedFields(roleId) {
         const academicFields = $('#academicFields');
         const adminHodFields = $('#adminHodFields');
-        const permissionField = $('#permissionField');
         const hodCourseField = $('#hodCourseField');
 
         // Hide all fields first
         academicFields.hide();
         adminHodFields.hide();
-        permissionField.hide();
         
         // Remove required attributes
         $('#departmentSelect').prop('required', false);
         $('#courseSelect').prop('required', false);
         $('#semesterSelect').prop('required', false);
         $('#batchSelect').prop('required', false);
-        $('#adminDepartmentSelect').prop('required', false);
-        $('#hodCourseSelect').prop('required', false);
 
         // Show fields based on role
-        switch(roleId) {
-            case '2': // User
-                academicFields.show();
-                $('#departmentSelect').prop('required', true);
-                $('#courseSelect').prop('required', true);
-                $('#semesterSelect').prop('required', true);
-                $('#batchSelect').prop('required', true);
-                break;
-                
-            case '1': // Admin
-                adminHodFields.show();
-                permissionField.show();
-                $('#adminDepartmentSelect').prop('required', true);
-                hodCourseField.hide(); // Hide course field for Admin
-                break;
-                
-            case '5': // HOD
-                adminHodFields.show();
-                permissionField.show();
-                $('#adminDepartmentSelect').prop('required', true);
-                hodCourseField.show(); // Show course field for HOD
-                $('#hodCourseSelect').prop('required', true);
-                break;
-                
-            case '4': // Teacher
-                permissionField.show();
-                break;
-                
-            case '3': // Super Admin
-                permissionField.show();
-                break;
+        if (roleId == '2') { // User
+            academicFields.show();
+            $('#departmentSelect').prop('required', true);
+            $('#courseSelect').prop('required', true);
+            $('#semesterSelect').prop('required', true);
+            $('#batchSelect').prop('required', true);
+        } else if (roleId == '1') { // Admin
+            adminHodFields.show();
+            hodCourseField.hide();
+        } else if (roleId == '5') { // HOD
+            adminHodFields.show();
+            hodCourseField.show();
         }
+        // Permission field is always visible for all roles
     }
 
     function initializeGroupSelect(roleId) {

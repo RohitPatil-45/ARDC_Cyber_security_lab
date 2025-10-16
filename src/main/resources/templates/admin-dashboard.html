@@ -4,7 +4,6 @@
 <title th:text="${pageTitle}">Admin Dashboard</title>
 <link rel="icon" type="image/png" href="/webtemplate/dist/img/magicboxEye3.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
@@ -21,43 +20,8 @@
     --info: #4895ef;
     --dark: #2b2d42;
     --light: #f8f9fa;
-    --gray: #6c757d;
-    --white: #ffffff;
-    --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e4e7ec 100%);
-    color: var(--dark);
-    line-height: 1.6;
-    min-height: 100vh;
-}
-
-/* Modern Header */
-.content-header {
-    background: transparent;
-    padding: 2rem 0 1rem;
-    border-bottom: none;
-}
-
-.content-header h1 {
-    font-weight: 700;
-    color: var(--dark);
-    font-size: 2.25rem;
-    background: linear-gradient(135deg, var(--primary), var(--success));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* Welcome Section */
 .welcome-section {
     text-align: center;
     padding: 2rem 1rem;
@@ -67,18 +31,6 @@ body {
     margin-bottom: 2rem;
     position: relative;
     overflow: hidden;
-}
-
-.welcome-section::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1%, transparent 1%);
-    background-size: 20px 20px;
-    animation: float 6s ease-in-out infinite;
 }
 
 .welcome-title {
@@ -93,95 +45,62 @@ body {
     font-size: 1.1rem;
     opacity: 0.9;
     font-weight: 500;
-    letter-spacing: 0.5px;
 }
 
-/* Animation */
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+.stats-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1rem;
+    border: none;
 }
 
-.animate-fade-in {
-    animation: fadeIn 0.8s ease-in;
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--primary);
 }
 
-.animate-slide-up {
-    animation: slideUp 0.6s ease-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes slideUp {
-    from { 
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to { 
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-    width: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 3px;
-}
-
-/* Breadcrumb Modernization */
-.breadcrumb {
-    background: transparent;
-    padding: 0;
-}
-
-.breadcrumb-item a {
+.stats-label {
+    font-size: 1rem;
     color: var(--gray);
-    text-decoration: none;
-    transition: color 0.3s ease;
     font-weight: 500;
 }
 
-.breadcrumb-item.active {
-    color: var(--primary);
-    font-weight: 600;
-}
-
-/* Alert Styling */
-.alert-info {
-    border-radius: 12px;
-    border: none;
-    background: linear-gradient(135deg, #e7f3ff 0%, #d4e7ff 100%);
+.subject-badge {
+    background: var(--light);
     color: var(--dark);
-    border-left: 4px solid var(--info);
+    padding: 0.3rem 0.6rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    margin: 0.1rem;
+    display: inline-block;
+    border: 1px solid #e9ecef;
 }
 
-/* Badge Styling */
-.badge {
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.5rem 0.75rem;
+.teacher-badge {
+    background: #fff3cd;
+    color: #856404;
+    padding: 0.3rem 0.6rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    margin: 0.1rem;
+    display: inline-block;
+    border: 1px solid #ffeaa7;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .content-header h1 {
-        font-size: 1.75rem;
-    }
-    .welcome-title {
-        font-size: 2rem;
-    }
+.batch-badge {
+    background: #d1ecf1;
+    color: #0c5460;
+    padding: 0.3rem 0.6rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    margin: 0.1rem;
+    display: inline-block;
+    border: 1px solid #bee5eb;
 }
 </style>
 
@@ -191,21 +110,19 @@ body {
         <div th:replace="fragments/sidebar :: aside"></div>
 
         <div class="content-wrapper">
-            <!-- Enhanced Header -->
+            <!-- Header -->
             <section class="content-header">
                 <div class="container-fluid">
                     <div class="row align-items-center mb-4">
                         <div class="col-sm-6">
-                            <h1 class="animate-fade-in">
+                            <h1>
                                 <i class="fas fa-user-shield mr-3"></i> 
                                 <span th:text="${pageTitle}">Admin Dashboard</span>
                             </h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="#" class="text-decoration-none">
-                                    <i class="fas fa-home mr-2"></i>Home
-                                </a></li>
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
                                 <li class="breadcrumb-item active" th:text="${pageTitle}">Admin Dashboard</li>
                             </ol>
                         </div>
@@ -214,150 +131,162 @@ body {
             </section>
 
             <!-- Main Content -->
-            <section class="content animate-slide-up">
+            <section class="content">
                 <div class="container-fluid">
                     
-                    <!-- Admin Welcome Section -->
+                    <!-- Welcome Section -->
                     <div class="row mb-4">
                         <div class="col-12">
                             <div class="welcome-section">
                                 <div class="welcome-title" th:text="'Welcome, ' + ${admin?.name} + '!'">Welcome, Admin!</div>
-                                <div class="welcome-subtitle" th:text="'Department: ' + ${department?.departmentName}">Managing Department Operations</div>
+                                <div class="welcome-subtitle" th:if="${department}" 
+                                     th:text="'Managing: ' + ${department.departmentName} + ' Department'">
+                                    Managing Department Operations
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Success/Error Messages -->
-                    <div th:if="${success}" class="alert alert-success alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                        <span th:text="${success}"></span>
+                    <!-- Statistics Cards -->
+                    <div class="row mb-4">
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="stats-card">
+                                <div class="stats-number" th:text="${overallCourses}">0</div>
+                                <div class="stats-label">Total Courses</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="stats-card">
+                                <div class="stats-number" th:text="${overallTeachers}">0</div>
+                                <div class="stats-label">Teachers</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="stats-card">
+                                <div class="stats-number" th:text="${overallStudents}">0</div>
+                                <div class="stats-label">Students</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="stats-card">
+                                <div class="stats-number" th:text="${totalBatches}">0</div>
+                                <div class="stats-label">Batches</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="stats-card">
+                                <div class="stats-number" th:text="${totalSemesters}">0</div>
+                                <div class="stats-label">Semesters</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6">
+                            <div class="stats-card">
+                                <div class="stats-number" th:text="${departments != null ? departments.size() : 0}">1</div>
+                                <div class="stats-label">Departments</div>
+                            </div>
+                        </div>
                     </div>
-                    <div th:if="${error}" class="alert alert-danger alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+
+                    <!-- Error Message -->
+                    <div th:if="${error}" class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
                         <span th:text="${error}"></span>
                     </div>
 
                     <!-- Course Management Table -->
-                    <div class="card shadow-sm border-0 rounded">
-                        <div class="card-header bg-white border-bottom">
-                            <div class="row align-items-center">
-                                <div class="col-md-8">
-                                    <h5 class="mb-0 text-dark">
-                                        <i class="fas fa-table me-2"></i>Course Management
-                                    </h5>
-                                    <small class="text-muted" th:if="${department}" th:text="'Department: ' + ${department.departmentName}"></small>
-                                </div>
-                                <div class="col-md-4 text-right">
-                                    <small class="text-muted" th:text="'Total Courses: ' + ${courseDetails.size()}"></small>
-                                </div>
-                            </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-table me-2"></i>Course Management
+                                <span class="badge badge-primary ml-2" th:text="'Total: ' + ${courseDetails.size()}"></span>
+                            </h5>
                         </div>
-                        <div class="card-body p-0">
+                        <div class="card-body">
                             <div class="table-responsive">
-                                <table id="courseManagementTable" class="table table-bordered table-striped mb-0">
-                                    <thead class="table-light">
+                                <table id="courseTable" class="table table-bordered table-striped">
+                                    <thead>
                                         <tr>
-                                            <th class="text-center">#</th>
-                                            <th><i class="fas fa-book me-2"></i>Course</th>
-                                            <th><i class="fas fa-calendar-alt me-2"></i>Semester</th>
-                                            <th><i class="fas fa-layer-group me-2"></i>Batch</th>
-                                            <th class="text-center"><i class="fas fa-chalkboard-teacher me-2"></i>Teacher Count</th>
-                                            <th class="text-center"><i class="fas fa-users me-2"></i>Student Count</th>
-                                            <th class="text-center"><i class="fas fa-cog me-2"></i>Actions</th>
+                                            <th>#</th>
+                                            <th>Course</th>
+                                            <th>Semesters</th>
+                                            <th>Batches</th>
+                                            <th>Teachers</th>
+                                            <th>Students</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:each="courseDetail, stat : ${courseDetails}">
-                                            <td class="text-center" th:text="${stat.count}">1</td>
+                                        <tr th:each="courseData, stat : ${courseDetails}">
+                                            <td th:text="${stat.count}">1</td>
                                             
                                             <!-- Course -->
                                             <td>
-                                                <strong th:text="${courseDetail.course.courseName}">Course Name</strong>
+                                                <strong th:text="${courseData.course.courseName}">Course Name</strong>
                                                 <br>
-                                                <small class="text-muted" th:text="${courseDetail.course.courseCode}">Course Code</small>
+                                                <small class="text-muted" th:text="${courseData.course.courseCode}">Course Code</small>
                                             </td>
                                             
-                                            <!-- Semester -->
+                                            <!-- Semesters -->
                                             <td>
-                                                <div th:if="${not courseDetail.semesters.empty}">
-                                                    <span th:each="semester, semStat : ${courseDetail.semesters}" 
-                                                          class="badge badge-info me-1 mb-1"
-                                                          th:text="${semester.semesterName}">
-                                                        Semester
-                                                    </span>
+                                                <div th:each="semester : ${courseData.semesters}">
+                                                    <span class="subject-badge" th:text="${semester.semesterName}">Semester</span>
                                                 </div>
-                                                <div th:if="${courseDetail.semesters.empty}">
+                                                <div th:if="${courseData.semesters.empty}">
                                                     <span class="text-muted">No Semesters</span>
                                                 </div>
                                             </td>
                                             
-                                            <!-- Batch -->
+                                            <!-- Batches -->
                                             <td>
-                                                <div th:if="${not courseDetail.batches.empty}">
-                                                    <span th:each="batch, batchStat : ${courseDetail.batches}" 
-                                                          class="badge badge-secondary me-1 mb-1"
-                                                          th:text="${batch.batchName}">
-                                                        Batch
-                                                    </span>
+                                                <div th:each="batch : ${courseData.batches}">
+                                                    <span class="batch-badge" th:text="${batch.batchName}">Batch</span>
                                                 </div>
-                                                <div th:if="${courseDetail.batches.empty}">
+                                                <div th:if="${courseData.batches.empty}">
                                                     <span class="text-muted">No Batches</span>
                                                 </div>
                                             </td>
                                             
-                                            <!-- Teacher Count -->
-                                            <td class="text-center">
-                                                <span class="badge bg-warning px-3 py-2"
-                                                      th:text="${courseDetail.teacherCount}">
-                                                    0
-                                                </span>
+                                            <!-- Teachers -->
+                                            <td>
+                                                <div th:each="teacher : ${courseData.teachers}">
+                                                    <span class="teacher-badge" th:text="${teacher}">Teacher</span>
+                                                </div>
+                                                <div th:if="${courseData.teachers.empty}">
+                                                    <span class="text-muted">No Teachers</span>
+                                                </div>
                                             </td>
                                             
-                                            <!-- Student Count -->
+                                            <!-- Students -->
                                             <td class="text-center">
-                                                <span class="badge bg-primary px-3 py-2"
-                                                      th:text="${courseDetail.studentCount}">
-                                                    0
-                                                </span>
+                                                <span class="badge badge-primary" th:text="${courseData.studentCount}">0</span>
                                             </td>
                                             
                                             <!-- Actions -->
                                             <td class="text-center">
-                                                <div class="btn-group" role="group">
-                                                    <!-- View Students Button -->
-                                                    <a th:href="@{'/guac/course-students/' + ${courseDetail.course.courseId}}"
-                                                       class="btn btn-primary btn-sm me-1"
-                                                       title="View Students">
-                                                        <i class="fas fa-users"></i>
-                                                        <span class="d-none d-md-inline"> Students</span>
-                                                    </a>
-                                                    
-                                                    <!-- View Teachers Button -->
-                                                    <a th:href="@{'/guac/course-teachers/' + ${courseDetail.course.courseId}}"
-                                                       class="btn btn-warning btn-sm me-1"
-                                                       title="View Teachers">
-                                                        <i class="fas fa-chalkboard-teacher"></i>
-                                                        <span class="d-none d-md-inline"> Teachers</span>
-                                                    </a>
-                                                    
-                                                    <!-- View Details Button -->
-                                                    <a th:href="@{'/guac/course-details/' + ${courseDetail.course.courseId}}"
-                                                       class="btn btn-info btn-sm"
-                                                       title="View Details">
+                                                <div class="btn-group">
+                                                    <button class="btn btn-primary btn-sm" 
+                                                            th:onclick="|viewCourseDetails(${courseData.course.courseId})|">
                                                         <i class="fas fa-eye"></i>
-                                                        <span class="d-none d-md-inline"> Details</span>
-                                                    </a>
+                                                    </button>
+                                                    <button class="btn btn-success btn-sm"
+                                                            th:onclick="|viewStudents(${courseData.course.courseId})|">
+                                                        <i class="fas fa-users"></i>
+                                                    </button>
+                                                    <button class="btn btn-warning btn-sm"
+                                                            th:onclick="|viewTeachers(${courseData.course.courseId})|">
+                                                        <i class="fas fa-chalkboard-teacher"></i>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
 
-                                        <!-- Show message if no data -->
+                                        <!-- Empty State -->
                                         <tr th:if="${courseDetails.empty}">
                                             <td colspan="7" class="text-center py-5 text-muted">
-                                                <i class="fas fa-inbox fa-3x mb-3"></i>
+                                                <i class="fas fa-inbox fa-2x mb-3"></i>
                                                 <div>
-                                                    <strong>No Course Data Available</strong>
-                                                    <p class="mb-0">No courses found in this department.</p>
+                                                    <strong>No Courses Found</strong>
+                                                    <p class="mb-0">No courses available in this department.</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -374,68 +303,30 @@ body {
     </div>
 
     <div th:replace="template :: jsscript"></div>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <!-- DataTables Scripts -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
     
     <script type="text/javascript">
         $(document).ready(function() {
-            // Initialize DataTable for Course Management
-            var courseTable = $('#courseManagementTable').DataTable({
+            $('#courseTable').DataTable({
                 "responsive": true,
                 "lengthChange": true,
                 "autoWidth": false,
-                "pageLength": 10,
-                "dom": '<"row"<"col-md-6"B><"col-md-6"f>><"row"<"col-md-12"tr>><"row"<"col-md-5"i><"col-md-7"p>>',
-                "buttons": [
-                    {
-                        extend: 'copy',
-                        className: 'btn btn-secondary',
-                        text: '<i class="fas fa-copy"></i> Copy'
-                    },
-                    {
-                        extend: 'excel',
-                        className: 'btn btn-success',
-                        text: '<i class="fas fa-file-excel"></i> Excel'
-                    },
-                    {
-                        extend: 'pdf',
-                        className: 'btn btn-danger',
-                        text: '<i class="fas fa-file-pdf"></i> PDF'
-                    },
-                    {
-                        extend: 'print',
-                        className: 'btn btn-info',
-                        text: '<i class="fas fa-print"></i> Print'
-                    }
-                ],
-                "language": {
-                    "search": "Search:",
-                    "lengthMenu": "Show _MENU_ entries",
-                    "info": "Showing _START_ to _END_ of _TOTAL_ courses",
-                    "paginate": {
-                        "previous": "<i class='fas fa-chevron-left'></i>",
-                        "next": "<i class='fas fa-chevron-right'></i>"
-                    }
-                },
-                "columnDefs": [
-                    { "orderable": false, "targets": [6] } // Disable sorting for Actions column
-                ]
+                "pageLength": 10
             });
-
-            // Add custom styling to DataTables
-            $('.dataTables_filter input').addClass('form-control form-control-sm');
-            $('.dataTables_length select').addClass('form-control form-control-sm');
-
-            console.log('Admin Dashboard with DataTables loaded');
         });
+
+        function viewCourseDetails(courseId) {
+            window.location.href = '/guac/course-details/' + courseId;
+        }
+
+        function viewStudents(courseId) {
+            window.location.href = '/guac/course-students/' + courseId;
+        }
+
+        function viewTeachers(courseId) {
+            window.location.href = '/guac/course-teachers/' + courseId;
+        }
     </script>
 </body>
 </html>

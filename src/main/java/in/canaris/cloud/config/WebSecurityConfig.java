@@ -102,12 +102,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				String user = authentication.getName();
 				AppUser userObj = appUserRepository.findOneByUserName(user);
 				Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-				
-				List<String> allowedUrls = roleMenuTemplateRepository.findUrlsByTemplateName(userObj.getTemplateName());
-				request.getSession().setAttribute("allowedUrls", allowedUrls);
-				
-				List<String> allowedModules = roleMenuTemplateRepository.findModulesByTemplateName(userObj.getTemplateName());
+
+
+				List<String> allowedSubModules = roleMenuTemplateRepository.findUrlsByTemplateName(userObj.getTemplateName());
+				System.out.println("Allowed urls = "+allowedSubModules);
+				request.getSession().setAttribute("allowedSubModules", allowedSubModules);
+
+				List<String> allowedModules = roleMenuTemplateRepository
+						.findModulesByTemplateName(userObj.getTemplateName());
 				request.getSession().setAttribute("allowedModules", allowedModules);
+				
+				request.getSession().setAttribute("access", userObj.getPermissions());
 
 				if (userObj.getIsFirstTimeLogin()) {
 					landingpageURl = "/users/resetloginpassword";
@@ -121,11 +126,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				else if (roles.contains("ROLE_SUPERADMIN")) {
 					landingpageURl = "/guac/SuperAdmin_Dashboard";
 				} else if (roles.contains("ROLE_ADMIN")) {
-					landingpageURl = "/guac/SuperAdmin_Dashboard";
+					landingpageURl = "/guac/admin-dashboard";
 				} else if (roles.contains("ROLE_USER")) {
-					landingpageURl = "/guac/UserWise_Dashboard";
+//					landingpageURl = "/guac/UserWise_Dashboard";
+					landingpageURl = "/guac/subjectView";
 				} else if (roles.contains("ROLE_TEACHER")) {
 					landingpageURl = "/guac/teacher-dashboard";
+				} else if (roles.contains("ROLE_HOD")) {
+					landingpageURl = "/guac/hod-dashboard";
 				}
 
 				getRedirectStrategy().sendRedirect(request, response, landingpageURl);

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle}">Teachers List</title>
+    <th:block th:include="template :: headFragment(${pageTitle})" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        .teacher-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            background: white;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+        }
+        
+        .teacher-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4361ee, #4895ef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+        }
+        
+        .teacher-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2b2d42;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .subject-badge {
+            background: #f8f9fa;
+            color: #2b2d42;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin: 0.2rem;
+            display: inline-block;
+            border: 1px solid #e9ecef;
+        }
+        
+        .btn-action {
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            margin: 0.2rem;
+        }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div th:replace="fragments/header :: header"></div>
+        <div th:replace="fragments/sidebar :: aside"></div>
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>
+                                <i class="fas fa-chalkboard-teacher mr-2"></i>
+                                <span th:text="${pageTitle}">Teachers List</span>
+                            </h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Semester Info -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <strong>Semester:</strong> 
+                                <span th:text="${semester?.semesterName}">Semester Name</span>
+                                <span class="badge badge-primary ml-2" th:text="'Teachers: ' + ${teacherMap != null ? teacherMap.size() : 0}">Teachers: 0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div th:if="${error}" class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <span th:text="${error}"></span>
+                    </div>
+
+                    <!-- Teachers Grid -->
+                    <div class="row">
+                        <div th:each="teacherEntry : ${teacherMap}" class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                            <div class="teacher-card">
+                                <div class="teacher-avatar">
+                                    <i class="fas fa-user-tie"></i>
+                                </div>
+                                <div class="teacher-name" th:text="${teacherEntry.key}">Teacher Name</div>
+                                
+                                <div class="text-center mb-3">
+                                    <strong><i class="fas fa-book mr-1"></i>Subjects:</strong>
+                                </div>
+                                <div class="text-center mb-3">
+                                    <span th:each="subject : ${teacherEntry.value}" class="subject-badge" th:text="${subject}">Subject</span>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <button class="btn btn-primary btn-action" th:attr="data-teacher=${teacherEntry.key}">
+                                        <i class="fas fa-eye mr-1"></i>View Profile
+                                    </button>
+                                    <button class="btn btn-success btn-action" th:attr="data-teacher=${teacherEntry.key}">
+                                        <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div th:if="${teacherMap == null or teacherMap.empty}" class="col-12">
+                            <div class="alert alert-warning text-center">
+                                <i class="fas fa-chalkboard-teacher fa-2x mb-3"></i>
+                                <h4>No Teachers Found</h4>
+                                <p>There are no teachers assigned to this semester.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Back Button -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <a th:href="@{/hod-dashboard}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
+
+    <div th:replace="template :: jsscript"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click event listeners to buttons
+            document.querySelectorAll('.btn-primary').forEach(button => {
+                button.addEventListener('click', function() {
+                    const teacherName = this.getAttribute('data-teacher');
+                    viewTeacherProfile(teacherName);
+                });
+            });
+            
+            document.querySelectorAll('.btn-success').forEach(button => {
+                button.addEventListener('click', function() {
+                    const teacherName = this.getAttribute('data-teacher');
+                    viewTeacherDashboard(teacherName);
+                });
+            });
+        });
+
+        function viewTeacherProfile(teacherName) {
+            // Show confirmation before redirecting
+            if (confirm('Redirect to ' + teacherName + "'s dashboard?")) {
+                window.location.href = '/guac/teacher-dashboardbyName?teacherName=' + encodeURIComponent(teacherName);
+            }
+        }
+
+        function viewTeacherDashboard(teacherName) {
+            alert('Redirecting to dashboard for: ' + teacherName);
+            // Add your dashboard redirection logic here
+        }
+    </script>
+</body>
+</html>

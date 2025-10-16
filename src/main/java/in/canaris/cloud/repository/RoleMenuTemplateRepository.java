@@ -18,7 +18,7 @@ public interface RoleMenuTemplateRepository extends JpaRepository<RoleMenuTempla
 
 	List<RoleMenuTemplate> findByTemplateName(String template);
 
-	@Query("SELECT r.menu.url FROM RoleMenuTemplate r WHERE r.templateName = :templateName")
+	@Query("SELECT r.menu.subModuleName FROM RoleMenuTemplate r WHERE r.templateName = :templateName")
 	List<String> findUrlsByTemplateName(@Param("templateName") String templateName);
 
 	@Query("SELECT r.menu.moduleName FROM RoleMenuTemplate r WHERE r.templateName = :templateName")
