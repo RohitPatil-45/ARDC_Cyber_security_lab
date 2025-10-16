@@ -1,7 +1,7 @@
 package in.canaris.cloud.config;
 
 import java.io.IOException;
-import java.security.Principal;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -9,9 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import in.canaris.cloud.entity.AppUser;
-import in.canaris.cloud.repository.AppUserRepository;
-import in.canaris.cloud.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +16,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.session.SessionRegistry;
@@ -29,7 +25,11 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import in.canaris.cloud.entity.AppUser;
+import in.canaris.cloud.repository.AppUserRepository;
+import in.canaris.cloud.repository.RoleMenuTemplateRepository;
+import in.canaris.cloud.service.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
@@ -43,6 +43,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private AppUserRepository appUserRepository;
+
+	@Autowired
+	private RoleMenuTemplateRepository roleMenuTemplateRepository;
 
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
@@ -100,15 +103,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				AppUser userObj = appUserRepository.findOneByUserName(user);
 				Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
 				
-				if(userObj.getIsFirstTimeLogin())
-				{
+				List<String> allowedUrls = roleMenuTemplateRepository.findUrlsByTemplateName(userObj.getTemplateName());
+				request.getSession().setAttribute("allowedUrls", allowedUrls);
+				
+				List<String> allowedModules = roleMenuTemplateRepository.findModulesByTemplateName(userObj.getTemplateName());
+				request.getSession().setAttribute("allowedModules", allowedModules);
+
+				if (userObj.getIsFirstTimeLogin()) {
 					landingpageURl = "/users/resetloginpassword";
+				} else if (userObj.isPasswordExpired()) {
+					request.getSession().setAttribute("resetPasswordMessage",
+							"Your password has expired. Please reset your password.");
+					getRedirectStrategy().sendRedirect(request, response, "/users/resetloginpassword");
+					return;
 				}
-				else if (userObj.isPasswordExpired()) {
-			        request.getSession().setAttribute("resetPasswordMessage", "Your password has expired. Please reset your password.");
-			        getRedirectStrategy().sendRedirect(request, response, "/users/resetloginpassword");
-			        return; 
-			    }
 
 				else if (roles.contains("ROLE_SUPERADMIN")) {
 					landingpageURl = "/guac/SuperAdmin_Dashboard";

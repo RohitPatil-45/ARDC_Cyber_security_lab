@@ -101,63 +101,63 @@
 
 
 
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="#" class="nav-link"> <i
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('Master')}" class="nav-item"><a href="#" class="nav-link"> <i
 								class="nav-icon fas fa-table"></i>
 							<p>
 								Master <i class="right fas fa-angle-left"></i>
 							</p>
 						</a>
 						<ul class="nav nav-treeview">
-							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a href="/group/view"
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/group/view')}"><a href="/group/view"
 									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 									<p>Group Master</p>
 								</a></li>
-							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a href="/location/view"
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/location/view')}"><a href="/location/view"
 									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 									<p>Location Master</p>
 								</a></li>
 
-							<li class="nav-item"><a href="/guac/View_Category" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_Category')}"><a href="/guac/View_Category" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Category</p>
 								</a></li>
 
-							<li class="nav-item"><a href="/discount/view" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/discount/view')}"><a href="/discount/view" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Discount Master</p>
 								</a></li>
-							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a href="/emailConfig/view"
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/emailConfig/view')}"><a href="/emailConfig/view"
 									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 									<p>Mail Master</p>
 								</a></li>
-							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/physicalServer/view')}"><a
 									href="/physicalServer/view" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Physical Server Master</p>
 								</a></li>
 
-							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/vmLocationPath/view')}"><a
 									href="/vmLocationPath/view" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>VM Location Path Master</p>
 								</a></li>
 
-							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a href="/switchmaster/view"
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/switchmaster/view')}"><a href="/switchmaster/view"
 									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 									<p>Switch</p>
 								</a></li>
 
-							<li class="nav-item" sec:authorize="hasRole('ROLE_SUPERADMIN')"><a href="/discover/view"
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/discover/view')}"><a href="/discover/view"
 									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 									<p>Discover</p>
 								</a></li>
 
-							<li class="nav-item"><a href="/billing/view" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/billing/view')}"><a href="/billing/view" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Billing</p>
 								</a></li>
 								
-								<li class="nav-item"><a href="/guac/manage" class="nav-link"> <i
+								<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/manage')}"><a href="/guac/manage" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Manage Scope</p>
 								</a></li>
@@ -167,7 +167,7 @@
 						</ul>
 					</li>
 
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="/guac/SuperAdmin_Dashboard"
+					<li th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/SuperAdmin_Dashboard')}" class="nav-item"><a href="/guac/SuperAdmin_Dashboard"
 							class="nav-link"> <i class="fas fa-tachometer-alt nav-icon"></i>
 							<p>
 								Dashboard
@@ -176,20 +176,21 @@
 
 					</li>
 
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item has-treeview"><a href="#"
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('Templates')}" class="nav-item has-treeview"><a href="#"
 							class="nav-link"> <i class="fas fa-file-edit nav-icon"></i>
 							<p>
 								Templates <i class="right fas fa-angle-left"></i>
 							</p>
 						</a>
 						<ul class="nav nav-treeview">
-							<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item">
+							<li th:if="${#httpSession.getAttribute('allowedUrls').contains('/cloud_instance/new')}" class="nav-item">
 								<a href="/cloud_instance/new" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Create Template</p>
 								</a>
 							</li>
-							<li class="nav-item"><a href="/cloud_instance/view" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/cloud_instance/view')}">
+								<a href="/cloud_instance/view" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>View Template</p>
 								</a></li>
@@ -197,18 +198,18 @@
 					</li>
 
 					<!-- Scenarios -->
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item has-treeview"><a href="#" class="nav-link"> <i
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('Scenarios')}" class="nav-item has-treeview"><a href="#" class="nav-link"> <i
 								class="fas fa-exchange-alt nav-icon"></i>
 							<p>
 								Scenarios <i class="right fas fa-angle-left"></i>
 							</p>
 						</a>
 						<ul class="nav nav-treeview">
-							<li class="nav-item"><a href="/guac/Scenario_Details" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/Scenario_Details')}"><a href="/guac/Scenario_Details" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Create Scenario</p>
 								</a></li>
-							<li class="nav-item"><a href="/guac/View_Scenario" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_Scenario')}"><a href="/guac/View_Scenario" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>View Scenario</p>
 								</a></li>
@@ -218,17 +219,17 @@
 					</li>
 
 					<!-- Playlists -->
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item has-treeview"><a href="#" class="nav-link"> <i class="fas fa-play nav-icon"></i>
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('Playlists')}" class="nav-item has-treeview"><a href="#" class="nav-link"> <i class="fas fa-play nav-icon"></i>
 							<p>
 								Playlists <i class="right fas fa-angle-left"></i>
 							</p>
 						</a>
 						<ul class="nav nav-treeview">
-							<li class="nav-item"><a href="/guac/Add_Playlist" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/Add_Playlist')}"><a href="/guac/Add_Playlist" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Create Playlist</p>
 								</a></li>
-							<li class="nav-item"><a href="/guac/View_Playlist" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_Playlist')}"><a href="/guac/View_Playlist" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>View Playlist</p>
 								</a></li>
@@ -236,18 +237,18 @@
 					</li>
 
 					<!-- Sub-Playlists -->
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item has-treeview"><a href="#" class="nav-link"> <i
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('Sub-Playlists')}" class="nav-item has-treeview"><a href="#" class="nav-link"> <i
 								class="fas fa-music nav-icon"></i>
 							<p>
 								Sub-Playlists <i class="right fas fa-angle-left"></i>
 							</p>
 						</a>
 						<ul class="nav nav-treeview">
-							<li class="nav-item"><a href="/guac/Add_Sub_Playlist" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/Add_Sub_Playlist')}"><a href="/guac/Add_Sub_Playlist" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Create Sub Playlist</p>
 								</a></li>
-							<li class="nav-item"><a href="/guac/View_SubPalylist" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_SubPalylist')}"><a href="/guac/View_SubPalylist" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>View Sub Playlist</p>
 								</a></li>
@@ -255,22 +256,22 @@
 						</ul>
 					</li>
 
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item has-treeview"><a href="#" class="nav-link"> <i
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('Scenario Mapping')}" class="nav-item has-treeview"><a href="#" class="nav-link"> <i
 								class="fas fa-project-diagram nav-icon"></i>
 							<p>
 								Scenario Mapping <i class="right fas fa-angle-left"></i>
 							</p>
 						</a>
 						<ul class="nav nav-treeview">
-							<li class="nav-item"><a href="/guac/Add_ScenarioInSub_Playlist" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/Add_ScenarioInSub_Playlist')}"><a href="/guac/Add_ScenarioInSub_Playlist" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Map Scenario in Sub-Playlist</p>
 								</a></li>
-							<li class="nav-item"><a href="/guac/Add_Scenario_and_Sub_Playlist_In_Playlist"
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/Add_Scenario_and_Sub_Playlist_In_Playlist')}"><a href="/guac/Add_Scenario_and_Sub_Playlist_In_Playlist"
 									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 									<p>Map Scenario & Sub-Playlist In Playlist</p>
 								</a></li>
-							<li class="nav-item"><a href="/guac//guac/View_SubjectWisePlaylist"
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac//guac/View_SubjectWisePlaylist')}"><a href="/guac//guac/View_SubjectWisePlaylist"
 									class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 									<p>Map Scenario to Subject</p>
 								</a></li>
@@ -278,18 +279,18 @@
 					</li>
 
 
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item has-treeview"><a href="#"
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('In Progress Task')}" class="nav-item has-treeview"><a href="#"
 							class="nav-link"> <i class="fas fa-hourglass-half nav-icon"></i>
 							<p>
 								In Progress Task <i class="right fas fa-angle-left"></i>
 							</p>
 						</a>
 						<ul class="nav nav-treeview">
-							<li class="nav-item"><a href="/guac/My_Scenario_Inprogress" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/My_Scenario_Inprogress')}"><a href="/guac/My_Scenario_Inprogress" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>My Scenario Inprogress</p>
 								</a></li>
-							<li class="nav-item"><a href="/guac/My_Scenario_Completed" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/My_Scenario_Completed')}"><a href="/guac/My_Scenario_Completed" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>My Scenario Completed</p>
 								</a></li>
@@ -298,27 +299,27 @@
 					</li>
 
 					<!-- Docker -->
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item has-treeview"><a href="#"
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('Docker Management')}" class="nav-item has-treeview"><a href="#"
 							class="nav-link"> <i class="fas fa-boxes-stacked nav-icon"></i>
 							<p>
 								Docker Management<i class="right fas fa-angle-left"></i>
 							</p>
 						</a>
 						<ul class="nav nav-treeview">
-							<li class="nav-item"><a href="/guac/Add_Docker" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/Add_Docker')}"><a href="/guac/Add_Docker" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Discover Docker</p>
 								</a></li>
-							<li class="nav-item"><a href="/guac/Create_docker_network" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/Create_docker_network')}"><a href="/guac/Create_docker_network" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Create Docker Network</p>
 								</a></li>
-							<li class="nav-item"><a href="/guac/View_DockerListing" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_DockerListing')}"><a href="/guac/View_DockerListing" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>View Docker Network</p>
 								</a></li>
 
-							<li class="nav-item"><a href="/guac/View_DiscoverContainerListing" class="nav-link">
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_DiscoverContainerListing')}"><a href="/guac/View_DiscoverContainerListing" class="nav-link">
 									<i class="far fa-dot-circle nav-icon"></i>
 									<p>View Discover Container</p>
 								</a></li>
@@ -334,14 +335,14 @@
 						</a></li>-->
 
 					<!-- Teacher Section -->
-					<li sec:authorize="hasRole('ROLE_TEACHER')" class="nav-item">
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('Teacher')}" class="nav-item">
 						<a href="#" class="nav-link"> <i class="nav-icon fas fa-chalkboard-teacher"></i>
 							<p>
 								Teacher <i class="right fas fa-angle-left"></i>
 							</p>
 						</a>
 						<ul class="nav nav-treeview">
-							<li class="nav-item"><a href="/guac/teacher-dashboard" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/teacher-dashboard')}"><a href="/guac/teacher-dashboard" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Dashboard</p>
 								</a></li>
@@ -351,7 +352,7 @@
 
 					<!--User Sidebar-->
 
-					<li sec:authorize="hasRole('ROLE_USER')" class="nav-item"><a href="#" class="nav-link"> <i
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('User')}" class="nav-item"><a href="#" class="nav-link"> <i
 								class="fas fa-users nav-icon"></i>
 							<p>
 								User <i class="right fas fa-angle-left"></i>
@@ -359,7 +360,7 @@
 						</a>
 						<ul class="nav nav-treeview">
 
-							<li class="nav-item"><a href="/guac/UserWise_Dashboard" class="nav-link">
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/UserWise_Dashboard')}"><a href="/guac/UserWise_Dashboard" class="nav-link">
 									<i class="fas fa-tachometer-alt nav-icon"></i>
 									<p>Dashboard</p>
 								</a></li>
@@ -373,17 +374,17 @@
 								</a>
 								<ul class="nav nav-treeview">
 
-									<li class="nav-item"><a href="/guac/View_Playlist" class="nav-link"> <i
+									<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_Playlist')}"><a href="/guac/View_Playlist" class="nav-link"> <i
 												class="far fa-dot-circle nav-icon"></i>
 											<p>View Playlist</p>
 										</a></li>
 
-									<li class="nav-item"><a href="/guac/View_SubPalylist" class="nav-link"> <i
+									<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_SubPalylist')}"><a href="/guac/View_SubPalylist" class="nav-link"> <i
 												class="far fa-dot-circle nav-icon"></i>
 											<p>View Sub Playlist</p>
 										</a></li>
 
-									<li class="nav-item"><a href="/guac/View_Scenario" class="nav-link"> <i
+									<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_Scenario')}"><a href="/guac/View_Scenario" class="nav-link"> <i
 												class="far fa-dot-circle nav-icon"></i>
 											<p>View Scenario</p>
 										</a></li>
@@ -398,16 +399,16 @@
 									</p>
 								</a>
 								<ul class="nav nav-treeview">
-									<li class="nav-item"><a href="/guac/My_Scenario_Inprogress" class="nav-link"> <i
+									<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/My_Scenario_Inprogress')}"><a href="/guac/My_Scenario_Inprogress" class="nav-link"> <i
 												class="far fa-dot-circle nav-icon"></i>
 											<p>My Scenario Inprogress</p>
 										</a></li>
-									<li class="nav-item"><a href="/guac/My_Scenario_Completed" class="nav-link"> <i
+									<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/My_Scenario_Completed')}"><a href="/guac/My_Scenario_Completed" class="nav-link"> <i
 												class="far fa-dot-circle nav-icon"></i>
 											<p>My Scenario Completed</p>
 										</a></li>
 
-									<li class="nav-item"><a href="/guac/UserTaskPerformance" class="nav-link"> <i
+									<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/UserTaskPerformance')}"><a href="/guac/UserTaskPerformance" class="nav-link"> <i
 												class="far fa-dot-circle nav-icon"></i>
 											<p>Task Performance</p>
 										</a></li>
@@ -421,7 +422,7 @@
 					<!--End user Sidebar-->
 
 
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="#" class="nav-link"> <i
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('User Management')}" class="nav-item"><a href="#" class="nav-link"> <i
 								class="fas fa-users nav-icon"></i>
 							<p>
 								User Management <i class="fas fa-angle-left right"></i>
@@ -429,13 +430,13 @@
 						</a>
 						<ul class="nav nav-treeview">
 
-							<li class="nav-item"><a href="/users/view" class="nav-link">
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/users/view')}"><a href="/users/view" class="nav-link">
 									<i class="far fa-dot-circle nav-icon"></i>
 									<p>Users</p>
 								</a></li>
 
 
-							<li class="nav-item"><a href="/guac/teachers" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/teachers')}"><a href="/guac/teachers" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Teachers</p>
 								</a></li>
@@ -443,7 +444,7 @@
 					</li>
 
 
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="#" class="nav-link"> <i
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('University Management')}" class="nav-item"><a href="#" class="nav-link"> <i
 								class="fas fa-university nav-icon"></i>
 							<p>
 								University Management<i class="right fas fa-angle-left"></i>
@@ -454,7 +455,7 @@
 							<!-- 										class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
 							<!-- 											<p>Add Department</p> -->
 							<!-- 									</a></li> -->
-							<li class="nav-item"><a href="/guac/View_Department" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_Department')}"><a href="/guac/View_Department" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p> Department</p>
 								</a></li>
@@ -463,7 +464,7 @@
 							<!-- 											<p>Add Course</p> -->
 							<!-- 									</a></li> -->
 
-							<li class="nav-item"><a href="/guac/View_Course" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_Course')}"><a href="/guac/View_Course" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p> Course</p>
 								</a></li>
@@ -473,7 +474,7 @@
 							<!-- 											<p>Add Semester</p> -->
 							<!-- 									</a></li> -->
 
-							<li class="nav-item"><a href="/guac/View_Semester" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_Semester')}"><a href="/guac/View_Semester" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p> Semester</p>
 								</a></li>
@@ -483,17 +484,17 @@
 							<!-- 											<p>Add_Subject</p> -->
 							<!-- 									</a></li> -->
 
-							<li class="nav-item"><a href="/guac/View_Subject" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_Subject')}"><a href="/guac/View_Subject" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p> Subject</p>
 								</a></li>
 
-							<li class="nav-item"><a href="/guac/Add_batch" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/Add_batch')}"><a href="/guac/Add_batch" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p> Add_batch</p>
 								</a></li>
 
-							<li class="nav-item"><a href="/guac/View_Batches" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_Batches')}"><a href="/guac/View_Batches" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p> View Batch</p>
 								</a></li>
@@ -505,7 +506,7 @@
 					</li>
 
 
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="#" class="nav-link"> <i
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('Role Management')}" class="nav-item"><a href="#" class="nav-link"> <i
 								class="nav-icon fas fa-key"></i>
 							<p>
 								Role Management <i class="fas fa-angle-left right"></i>
@@ -513,7 +514,7 @@
 						</a>
 						<ul class="nav nav-treeview">
 
-							<li class="nav-item"><a href="/users/view" class="nav-link">
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/users/view')}"><a href="/users/view" class="nav-link">
 									<i class="far fa-dot-circle nav-icon"></i>
 									<p>Assign Role</p>
 								</a></li>
@@ -522,7 +523,7 @@
 					</li>
 
 
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="#" class="nav-link"> <i
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('Performance Management')}" class="nav-item"><a href="#" class="nav-link"> <i
 								class="nav-icon fas fa-trophy"></i>
 							<p>
 								Performance Management <i class="fas fa-angle-left right"></i>
@@ -530,7 +531,7 @@
 						</a>
 						<ul class="nav nav-treeview">
 
-							<li class="nav-item"><a href="/guac/UserWisePerformance" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/UserWisePerformance')}"><a href="/guac/UserWisePerformance" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>User Wise Performance</p>
 								</a></li>
@@ -538,7 +539,7 @@
 					</li>
 
 
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="#" class="nav-link"> <i
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('Lab Management')}" class="nav-item"><a href="#" class="nav-link"> <i
 								class="nav-icon fas fa-flask"></i>
 							<p>
 								Lab Management <i class="fas fa-angle-left right"></i>
@@ -546,7 +547,7 @@
 						</a>
 						<ul class="nav nav-treeview">
 
-							<li class="nav-item"><a href="/guac/View_All_Vm_Listing" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/guac/View_All_Vm_Listing')}"><a href="/guac/View_All_Vm_Listing" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Labs</p>
 								</a></li>
@@ -555,14 +556,14 @@
 					</li>
 
 
-					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" class="nav-item"><a href="#"
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('Price Master')}" class="nav-item"><a href="#"
 							class="nav-link"> <i class="nav-icon fas fa-money-bill-wave"></i>
 							<p>
 								Price Master <i class="right fas fa-angle-left"></i>
 							</p>
 						</a>
 						<ul class="nav nav-treeview">
-							<li class="nav-item"><a href="/price/view" class="nav-link">
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/price/view')}"><a href="/price/view" class="nav-link">
 									<i class="far fa-dot-circle nav-icon"></i>
 									<p>View Price</p>
 								</a></li>
@@ -587,7 +588,7 @@
 					<!-- 									<p>Assign Public IP</p> -->
 					<!-- 							</a></li> -->
 					<!-- 						</ul></li> -->
-					<li sec:authorize="hasRole('ROLE_SUPERADMIN')" class="nav-item"><a href="#" class="nav-link"> <i
+					<li th:if="${#httpSession.getAttribute('allowedModules').contains('Product Master')}" class="nav-item"><a href="#" class="nav-link"> <i
 								class="nav-icon fas fa-tags"></i>
 							<p>
 								Product Master <i class="fas fa-angle-left right"></i>
@@ -595,12 +596,12 @@
 						</a>
 						<ul class="nav nav-treeview">
 
-							<li class="nav-item"><a href="/product/view" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/product/view')}"><a href="/product/view" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Product Master</p>
 								</a></li>
 
-							<li class="nav-item"><a href="/sub_product/view" class="nav-link"> <i
+							<li class="nav-item" th:if="${#httpSession.getAttribute('allowedUrls').contains('/sub_product/view')}"><a href="/sub_product/view" class="nav-link"> <i
 										class="far fa-dot-circle nav-icon"></i>
 									<p>Sub Product Master</p>
 								</a></li>
