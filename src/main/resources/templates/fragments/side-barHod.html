@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magicbox Sidebar</title>
+<!-- Bootstrap CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<!-- Font Awesome -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- AdminLTE CSS (for treeview functionality) -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+<style>
+.main-sidebar {
+	background-color: #ffffff !important;
+	color: #2c3e50;
+}
+
+.sidebar-dark-primary {
+	--bs-light: #f8f9fa;
+}
+
+.nav-sidebar>.nav-item>.nav-link, .nav-sidebar .nav-link>p, .nav-sidebar .nav-link>i
+	{
+	color: #2c3e50 !important;
+}
+
+.nav-sidebar>.nav-item .nav-treeview .nav-link {
+	color: #6c757d !important;
+}
+
+.nav-sidebar>.nav-item .nav-treeview .nav-link:hover {
+	color: #2c3e50 !important;
+	background-color: #f8f9fa;
+}
+
+.nav-sidebar>.nav-item .nav-link.active, .nav-sidebar>.nav-item .nav-link:hover
+	{
+	background-color: #e9ecef;
+	color: #2c3e50 !important;
+}
+
+.brand-link {
+	border-bottom: 1px solid #dee2e6;
+}
+
+.logo-admin {
+	display: flex;
+	justify-content: center;
+	padding: 15px 0;
+}
+
+.form-control-sidebar {
+	border: 1px solid #dee2e6;
+	background-color: #fff;
+}
+
+.sidebar {
+	height: 100vh;
+	overflow-y: auto;
+}
+
+.nav-header {
+	color: #6c757d !important;
+	font-weight: 600;
+}
+</style>
+</head>
+
+<body>
+	<!-- Main Sidebar Container -->
+	<aside class="main-sidebar sidebar-light-primary elevation-4">
+		<!-- Brand Logo -->
+		<div>
+			<a href="javascript:void(0);" id="logo" class="logo logo-admin"
+				style="margin-left: 11px;"> <img
+				src="/webtemplate/dist/img/Magicbox-logo.png" width="100px"
+				alt="Magicbox logo" style="width: 90%;">
+			</a>
+		</div>
+
+		<!-- Sidebar -->
+		<div class="sidebar">
+			<!-- SidebarSearch Form -->
+			<div class="form-inline">
+				<div class="input-group" data-widget="sidebar-search">
+					<input class="form-control form-control-sidebar" type="search"
+						placeholder="Search" aria-label="Search">
+					<div class="input-group-append">
+						<button class="btn btn-sidebar">
+							<i class="fas fa-search fa-fw"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Sidebar Menu -->
+			<nav class="mt-2">
+				<ul class="nav nav-pills nav-sidebar flex-column"
+					data-widget="treeview" role="menu" data-accordion="false">
+
+
+
+					
+
+					
+
+				
+
+					
+
+					
+					
+
+					<!-- Connections -->
+					<!--<li class="nav-item"><a href="/guac/" class="nav-link">
+							<i class="far fa-dot-circle nav-icon"></i>
+							<p>Connection</p>
+						</a></li>-->
+
+					<!-- Teacher Section -->
+					<li
+						
+						class="nav-item"><a href="#" class="nav-link"> 
+							<p>
+								<li class="nav-item"><a href="/guac/Hod-homePage"
+								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+									<p>Home-HOD</p>
+							</a></li>
+
+							<li class="nav-item"
+								><a
+								href="/guac/hod-dashboard" class="nav-link"> <i
+									class="far fa-dot-circle nav-icon"></i>
+									<p>Dashboard</p>
+							</a></li>
+
+
+							</p>
+					</a>
+<!-- 						<ul class="nav nav-treeview"> -->
+
+<!-- 							<li class="nav-item"><a href="/guac/teacher-homePage" -->
+<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+<!-- 									<p>Home</p> -->
+<!-- 							</a></li> -->
+
+<!-- 							<li class="nav-item" -->
+<!-- 								th:if="${#httpSession.getAttribute('allowedSubModules').contains('Teacher Dashboard')}"><a -->
+<!-- 								href="/guac/teacher-dashboard" class="nav-link"> <i -->
+<!-- 									class="far fa-dot-circle nav-icon"></i> -->
+<!-- 									<p>Dashboard</p> -->
+<!-- 							</a></li> -->
+
+
+
+<!-- 						</ul> -->
+						</li>
+
+					<!--User Sidebar-->
+
+					
+					<!--End user Sidebar-->
+
+
+					
+
+
+					
+
+
+					
+
+
+					
+
+					
+
+
+					
+
+				
+					
+
+					<!-- 					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
+					<!-- 						class="nav-item"><a href="#" class="nav-link"> <i -->
+					<!-- 							class="nav-icon fas fa-check-circle"></i> -->
+					<!-- 							<p> -->
+					<!-- 								Approval <i class="fas fa-angle-left right"></i> -->
+					<!-- 							</p> -->
+					<!-- 					</a> -->
+					<!-- 						<ul class="nav nav-treeview"> -->
+					<!-- 							<li class="nav-item"><a href="/approval/allRequests" -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+					<!-- 									<p>Approval Request</p> -->
+					<!-- 							</a></li> -->
+					<!-- 						</ul></li> -->
+
+					<!-- 					<li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_SUPERADMIN')" -->
+					<!-- 						class="nav-item"><a href="#" class="nav-link"> <i -->
+					<!-- 							class="nav-icon fas fa-file-alt"></i> -->
+					<!-- 							<p> -->
+					<!-- 								Reports <i class="fas fa-angle-left right"></i> -->
+					<!-- 							</p> -->
+					<!-- 					</a> -->
+					<!-- 						<ul class="nav nav-treeview"> -->
+
+					<!-- 							<li class="nav-item"><a href="/report/groupWise" -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+					<!-- 									<p>Group wise VM Report</p> -->
+					<!-- 							</a></li> -->
+
+					<!-- 							<li class="nav-item"><a -->
+					<!-- 								href="/report/vmStatusHistoryReport -->
+					<!--                             " -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+					<!-- 									<p>VM Status History</p> -->
+					<!-- 							</a></li> -->
+
+					<!-- 							<li class="nav-item"><a href="/report/vmActivityReport" -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+					<!-- 									<p>VM Activity Report</p> -->
+					<!-- 							</a></li> -->
+
+					<!-- 							<li class="nav-item"><a href="/report/vmAvailability" -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+					<!-- 									<p>VM Availability Report</p> -->
+					<!-- 							</a></li> -->
+
+					<!-- 							<li class="nav-item"><a href="/report/vmHealthHistoryReport" -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+					<!-- 									<p>VM Health History Report</p> -->
+					<!-- 							</a></li> -->
+
+					<!-- 							<li class="nav-item"><a href="/report/vmCpuThresholdReport" -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+					<!-- 									<p>VM CPU Threshold Report</p> -->
+					<!-- 							</a></li> -->
+
+					<!-- 							<li class="nav-item"><a -->
+					<!-- 								href="/report/vmMemoryThresholdReport" class="nav-link"> <i -->
+					<!-- 									class="far fa-dot-circle nav-icon"></i> -->
+					<!-- 									<p>VM Memory Threshold Report</p> -->
+					<!-- 							</a></li> -->
+
+					<!-- 							<li class="nav-item"><a href="/report/vmStartStopReport" -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+					<!-- 									<p>VM Start/Stop Report</p> -->
+					<!-- 							</a></li> -->
+					<!-- 							<li class="nav-item"><a href="/report/statusWise" -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+					<!-- 									<p>Current Status VM Report</p> -->
+					<!-- 							</a></li> -->
+
+					<!-- 							<li class="nav-item"><a href="/report/KVMviewPage" -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+					<!-- 									<p>Disk Utilization (Live)</p> -->
+					<!-- 							</a></li> -->
+
+					<!-- 							<li class="nav-item"><a href="/report/HealthMonitoring" -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+					<!-- 									<p>Health Monitoring (Live)</p> -->
+					<!-- 							</a></li> -->
+
+					<!-- 							<li class="nav-item"><a href="/report/DiskandHealthviewPage" -->
+					<!-- 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i> -->
+					<!-- 									<p>Disk & Health Utilization (Live)</p> -->
+					<!-- 							</a></li> -->
+
+					<!-- 							<li class="nav-item"><a -->
+					<!-- 								href="/report/vmDiskHistorylogReport" class="nav-link"> <i -->
+					<!-- 									class="far fa-dot-circle nav-icon"></i> -->
+					<!-- 									<p>Disk Utilization (Historical)</p> -->
+					<!-- 							</a></li> -->
+					<!-- 						</ul></li> -->
+
+					<!-- 					<li sec:authorize="hasAnyRole('ROLE_ADMIN')" class="nav-item"><a -->
+					<!-- 						href="/approval/userRequests" class="nav-link"> <i -->
+					<!-- 							class="nav-icon fas fa-hand-paper"></i> -->
+					<!-- 							<p>Raised Request</p> -->
+					<!-- 					</a></li> -->
+				</ul>
+			</nav>
+			<!-- /.sidebar-menu -->
+		</div>
+		<!-- /.sidebar -->
+	</aside>
+
+	<!-- jQuery -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<!-- Bootstrap 5 JS Bundle -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<!-- AdminLTE App -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+
+</html>

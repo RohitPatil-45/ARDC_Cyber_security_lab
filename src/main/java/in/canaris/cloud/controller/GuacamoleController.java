@@ -4687,75 +4687,164 @@ public class GuacamoleController {
 		return subjectIds;
 	}
 
+//	@GetMapping("/My_Scenario_Inprogress")
+//	public ModelAndView getMy_View_Scenario(Principal principal, Model model) {
+//		ModelAndView mav = new ModelAndView("My_View_Scenario");
+//		JSONArray finalArray = new JSONArray();
+//
+//		try {
+//			Authentication authentication = (Authentication) principal;
+//			User loginedUser = (User) authentication.getPrincipal();
+//			String userName = loginedUser.getUsername();
+//
+//			model.addAttribute("pageTitle", "My Scenario Inprogress");
+//			List<UserScenario> scenarioIds = UserScenerioRepository.findByUsername(userName);
+//
+//			for (UserScenario objs : scenarioIds) {
+//				Add_Scenario temp = ScenarioRepository.findById(Integer.parseInt(objs.getScenarioId())).orElse(null);
+//
+//				if (temp == null) {
+//					continue; // skip if scenario not found
+//				}
+//
+//				String username = principal.getName();
+//				System.out.println("scenarioId : " + objs.getId());
+//
+//				Integer falseCount = instructionTemplateRepository
+//						.getFalseCompletionCountsByusernameandscenarioId(username, temp.getId());
+//				Integer trueCount = instructionTemplateRepository
+//						.getTrueCompletionCountsByusernameandscenarioId(username, temp.getId());
+//
+//				falseCount = (falseCount != null) ? falseCount : 0;
+//				trueCount = (trueCount != null) ? trueCount : 0;
+//
+//				int total = falseCount + trueCount;
+//				int percentage = 0;
+//
+//				if (total > 0) {
+//					percentage = (trueCount * 100) / total;
+//				}
+//
+//				System.out.println("percentage : " + percentage);
+//				System.out.println("percentage : " + percentage);
+//
+//				// ✅ compare integers, not string
+//				if (percentage != 100) {
+//					JSONObject obj = new JSONObject();
+//					obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
+//					obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
+//					obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
+//					obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
+//					obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
+//					obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
+//					obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
+//					obj.put("Cover_Image", ""); // add image path if available
+//					obj.put("Id", temp.getId());
+//
+//					finalArray.put(obj);
+//				}
+//			}
+//
+//			System.out.println("Finalarray_getMy_View_Scenario ::" + finalArray);
+//			mav.addObject("listObj", finalArray.toString());
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			mav.addObject("listObj", null);
+//			mav.addObject("error", e.getMessage());
+//			System.out.println("Error fetching data: " + e.getMessage());
+//		}
+//
+//		return mav;
+//	}
+	
+	
 	@GetMapping("/My_Scenario_Inprogress")
 	public ModelAndView getMy_View_Scenario(Principal principal, Model model) {
-		ModelAndView mav = new ModelAndView("My_View_Scenario");
-		JSONArray finalArray = new JSONArray();
+	    ModelAndView mav = new ModelAndView("My_View_Scenario");
+	    JSONArray finalArray = new JSONArray();
 
-		try {
-			Authentication authentication = (Authentication) principal;
-			User loginedUser = (User) authentication.getPrincipal();
-			String userName = loginedUser.getUsername();
+	    try {
+	        Authentication authentication = (Authentication) principal;
+	        User loginedUser = (User) authentication.getPrincipal();
+	        String userName = loginedUser.getUsername();
 
-			model.addAttribute("pageTitle", "My Scenario Inprogress");
-			List<UserScenario> scenarioIds = UserScenerioRepository.findByUsername(userName);
+	        model.addAttribute("pageTitle", "My Scenario Inprogress");
+	        
+	        List<Add_Scenario> authorizedScenarios = new ArrayList<>();
+	        
+	        // Apply the same subject mapping logic as in View_Scenario
+//	        boolean isSuperAdmin = authentication.getAuthorities().stream()
+//	                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
 
-			for (UserScenario objs : scenarioIds) {
-				Add_Scenario temp = ScenarioRepository.findById(Integer.parseInt(objs.getScenarioId())).orElse(null);
+//	        if (isSuperAdmin) {
+//	            // SuperAdmin → all scenarios
+//	            authorizedScenarios = ScenarioRepository.findAll();
+//	        } else {
+	            // Normal User → scenarios based on their subjects
+	            List<Integer> userSubjectIds = getUserSubjectIds(userName);
 
-				if (temp == null) {
-					continue; // skip if scenario not found
-				}
+	            if (userSubjectIds != null && !userSubjectIds.isEmpty()) {
+	                // Get scenario IDs mapped to user's subjects
+	                List<Integer> scenarioIds = SubjectScenarioMappingRepository
+	                        .findScenarioIdsBySubjectIds(userSubjectIds);
 
-				String username = principal.getName();
-				System.out.println("scenarioId : " + objs.getId());
+	                if (scenarioIds != null && !scenarioIds.isEmpty()) {
+	                    authorizedScenarios = ScenarioRepository.findAllById(scenarioIds);
+	                }
+	            }
+//	        }
 
-				Integer falseCount = instructionTemplateRepository
-						.getFalseCompletionCountsByusernameandscenarioId(username, temp.getId());
-				Integer trueCount = instructionTemplateRepository
-						.getTrueCompletionCountsByusernameandscenarioId(username, temp.getId());
+	        // Process only authorized scenarios and check their progress
+	        for (Add_Scenario temp : authorizedScenarios) {
+	            String username = principal.getName();
+	            System.out.println("scenarioId : " + temp.getId());
 
-				falseCount = (falseCount != null) ? falseCount : 0;
-				trueCount = (trueCount != null) ? trueCount : 0;
+	            Integer falseCount = instructionTemplateRepository
+	                    .getFalseCompletionCountsByusernameandscenarioId(username, temp.getId());
+	            Integer trueCount = instructionTemplateRepository
+	                    .getTrueCompletionCountsByusernameandscenarioId(username, temp.getId());
 
-				int total = falseCount + trueCount;
-				int percentage = 0;
+	            falseCount = (falseCount != null) ? falseCount : 0;
+	            trueCount = (trueCount != null) ? trueCount : 0;
 
-				if (total > 0) {
-					percentage = (trueCount * 100) / total;
-				}
+	            int total = falseCount + trueCount;
+	            int percentage = 0;
 
-				System.out.println("percentage : " + percentage);
-				System.out.println("percentage : " + percentage);
+	            if (total > 0) {
+	                percentage = (trueCount * 100) / total;
+	            }
 
-				// ✅ compare integers, not string
-				if (percentage != 100) {
-					JSONObject obj = new JSONObject();
-					obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
-					obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
-					obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
-					obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
-					obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
-					obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
-					obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
-					obj.put("Cover_Image", ""); // add image path if available
-					obj.put("Id", temp.getId());
+	            System.out.println("percentage : " + percentage);
 
-					finalArray.put(obj);
-				}
-			}
+	            // ✅ compare integers, not string
+	            if (percentage != 100) {
+	                JSONObject obj = new JSONObject();
+	                obj.put("Scenario_Name", temp.getScenarioName() != null ? temp.getScenarioName() : "");
+	                obj.put("Scenario_Title", temp.getScenarioTitle() != null ? temp.getScenarioTitle() : "");
+	                obj.put("Category", temp.getCategory() != null ? temp.getCategory() : "");
+	                obj.put("Scenario_Type", temp.getScenarioType() != null ? temp.getScenarioType() : "");
+	                obj.put("Mode", temp.getMode() != null ? temp.getMode() : "");
+	                obj.put("Difficulty_Level", temp.getDifficultyLevel() != null ? temp.getDifficultyLevel() : "");
+	                obj.put("Duration", temp.getDuration() != null ? temp.getDuration() : "");
+	                obj.put("Cover_Image", ""); // add image path if available
+	                obj.put("Id", temp.getId());
 
-			System.out.println("Finalarray_getMy_View_Scenario ::" + finalArray);
-			mav.addObject("listObj", finalArray.toString());
+	                finalArray.put(obj);
+	            }
+	        }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			mav.addObject("listObj", null);
-			mav.addObject("error", e.getMessage());
-			System.out.println("Error fetching data: " + e.getMessage());
-		}
+	        System.out.println("Finalarray_getMy_View_Scenario ::" + finalArray);
+	        mav.addObject("listObj", finalArray.toString());
 
-		return mav;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        mav.addObject("listObj", null);
+	        mav.addObject("error", e.getMessage());
+	        System.out.println("Error fetching data: " + e.getMessage());
+	    }
+
+	    return mav;
 	}
 
 	@GetMapping("/My_Scenario_Completed")
@@ -7680,53 +7769,53 @@ public class GuacamoleController {
 //		return "subjectView";
 //	}
 
-//	@GetMapping("/subjectView/{userId}")
-//	public String subjectView(@PathVariable("userId") Long userId, Model model, Principal principal) {
-//
-//		try {
-//			// Verify user exists
-//			AppUser user = AppUserRepository.findByuserId(userId);
-//
-//			// Get user's subjects based on semester
-//			List<SubjectMaster> userSubjects = new ArrayList<>();
-//			if (user.getSemesterName() != null) {
-//				Integer semesterId = user.getSemesterName().getSemesterId();
-//				userSubjects = SubjectMasterRepository.findBySemesterAndElective(user.getSemesterName(), false);
-//
-//				System.out.println("User: " + user.getUserName() + ", User ID: " + userId + ", Semester ID: "
-//						+ semesterId + ", Subjects: " + userSubjects.size());
-//			}
-//
-//			// Get all available elective subjects for the modal
-//			// List<ElectiveSubject> electiveSubjects = ElectiveSubjectRepository.findAll();
-//
-//			List<SubjectMaster> electiveSubjects = SubjectMasterRepository
-//					.findBySemesterAndElective(user.getSemesterName(), true);
-//
-//			// Get user's mapped elective subjects
-//			List<ElectvieSubjectUserMapping> userElectiveMappings = ElectvieSubjectUserMappingRepository
-//					.findByUserName(user.getUserName());
-//			List<SubjectMaster> userElectiveSubjects = userElectiveMappings.stream()
-//					.map(ElectvieSubjectUserMapping::getElective).collect(Collectors.toList());
-//
-//			boolean hasElectiveMappings = !userElectiveSubjects.isEmpty();
-//			model.addAttribute("hasElectiveMappings", hasElectiveMappings);
-//
-//			System.out.println("electiveSubjects :: " + electiveSubjects);
-//
-//			model.addAttribute("electiveSubjects", electiveSubjects);
-//			model.addAttribute("userElectiveSubjects", userElectiveSubjects); // Add user's elective subjects
-//			model.addAttribute("user", user);
-//			model.addAttribute("userSubjects", userSubjects);
-//			model.addAttribute("pageTitle", user.getName() + "'s Subjects");
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			model.addAttribute("error", "Error loading subjects: " + e.getMessage());
-//		}
-//
-//		return "subjectView";
-//	}
+	@GetMapping("/subjectView/{userId}")
+	public String subjectViewc(@PathVariable("userId") Long userId, Model model, Principal principal) {
+
+		try {
+			// Verify user exists
+			AppUser user = AppUserRepository.findByuserId(userId);
+
+			// Get user's subjects based on semester
+			List<SubjectMaster> userSubjects = new ArrayList<>();
+			if (user.getSemesterName() != null) {
+				Integer semesterId = user.getSemesterName().getSemesterId();
+				userSubjects = SubjectMasterRepository.findBySemesterAndElective(user.getSemesterName(), false);
+
+				System.out.println("User: " + user.getUserName() + ", User ID: " + userId + ", Semester ID: "
+						+ semesterId + ", Subjects: " + userSubjects.size());
+			}
+
+			// Get all available elective subjects for the modal
+			// List<ElectiveSubject> electiveSubjects = ElectiveSubjectRepository.findAll();
+
+			List<SubjectMaster> electiveSubjects = SubjectMasterRepository
+					.findBySemesterAndElective(user.getSemesterName(), true);
+
+			// Get user's mapped elective subjects
+			List<ElectvieSubjectUserMapping> userElectiveMappings = ElectvieSubjectUserMappingRepository
+					.findByUserName(user.getUserName());
+			List<SubjectMaster> userElectiveSubjects = userElectiveMappings.stream()
+					.map(ElectvieSubjectUserMapping::getElective).collect(Collectors.toList());
+
+			boolean hasElectiveMappings = !userElectiveSubjects.isEmpty();
+			model.addAttribute("hasElectiveMappings", hasElectiveMappings);
+
+			System.out.println("electiveSubjects :: " + electiveSubjects);
+
+			model.addAttribute("electiveSubjects", electiveSubjects);
+			model.addAttribute("userElectiveSubjects", userElectiveSubjects); // Add user's elective subjects
+			model.addAttribute("user", user);
+			model.addAttribute("userSubjects", userSubjects);
+			model.addAttribute("pageTitle", user.getName() + "'s Subjects");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			model.addAttribute("error", "Error loading subjects: " + e.getMessage());
+		}
+
+		return "subjectView";
+	}
 	
 	
 	@GetMapping("/subjectView")
@@ -8288,6 +8377,75 @@ public class GuacamoleController {
 			model.addAttribute("totalSubjects", 0);
 		}
 		return "teacher-dashboard";
+	}
+	
+	
+	@GetMapping("/teacher-homePage")
+	public String teacherhomePage(Model model, Principal principal) {
+		try {
+			Authentication auth = (Authentication) principal;
+			String username = auth.getName();
+
+			// Get teacher details
+			List<AppUser> teachers = AppUserRepository.findByUserName(username);
+			if (teachers.isEmpty()) {
+				model.addAttribute("error", "Teacher not found!");
+				return "teacher-homePage";
+			}
+
+			AppUser teacher = teachers.get(0);
+			model.addAttribute("teacher", teacher);
+			model.addAttribute("pageTitle", "Teacher Home  - " + teacher.getName());
+
+			// Get subjects assigned to this teacher
+			List<SubjectMaster> assignedSubjects = SubjectMasterRepository.findByTeacher(teacher.getName());
+			model.addAttribute("assignedSubjects", assignedSubjects != null ? assignedSubjects : new ArrayList<>());
+
+			// Get student counts for each subject based on semester (only ROLE_USER)
+			Map<Integer, Long> subjectStudentCounts = new HashMap<>();
+			Map<Integer, List<AppUser>> subjectStudentsMap = new HashMap<>();
+
+			if (assignedSubjects != null) {
+				for (SubjectMaster subject : assignedSubjects) {
+					// Get semester ID from the subject
+					Integer semesterId = null;
+					if (subject.getSemester() != null) {
+						semesterId = subject.getSemester().getSemesterId();
+					}
+
+					Long studentCount = 0L;
+					List<AppUser> students = new ArrayList<>();
+
+					if (semesterId != null) {
+
+						studentCount = AppUserRepository.countOnlyStudentsBySemesterId(semesterId);
+						students = AppUserRepository.findOnlyStudentsBySemesterId(semesterId);
+					}
+
+					subjectStudentCounts.put(subject.getSubjectId(), studentCount != null ? studentCount : 0L);
+					subjectStudentsMap.put(subject.getSubjectId(), students != null ? students : new ArrayList<>());
+				}
+			}
+
+			model.addAttribute("subjectStudentCounts", subjectStudentCounts);
+			model.addAttribute("subjectStudentsMap", subjectStudentsMap);
+
+			// Calculate totals
+			long totalStudents = subjectStudentCounts.values().stream().mapToLong(Long::longValue).sum();
+			model.addAttribute("totalStudents", totalStudents);
+			model.addAttribute("totalSubjects", assignedSubjects != null ? assignedSubjects.size() : 0);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			model.addAttribute("error", "Error loading dashboard: " + e.getMessage());
+
+			model.addAttribute("assignedSubjects", new ArrayList<>());
+			model.addAttribute("subjectStudentCounts", new HashMap<>());
+			model.addAttribute("subjectStudentsMap", new HashMap<>());
+			model.addAttribute("totalStudents", 0);
+			model.addAttribute("totalSubjects", 0);
+		}
+		return "teacher-homePage";
 	}
 
 //	@GetMapping("/teacher-dashboardbyName")
@@ -9321,6 +9479,153 @@ public class GuacamoleController {
 
 	    return "admin-dashboard";
 	}
+	
+	
+	@GetMapping("/admin-homePage")
+	public String adminhomePage(Model model, Principal principal) {
+	    Authentication auth = (Authentication) principal;
+	    String username = auth.getName();
+
+	    try {
+	        // Get current user (Admin/HOD)
+	        List<AppUser> users = AppUserRepository.findByUserName(username);
+	        if (users.isEmpty()) {
+	            model.addAttribute("error", "User not found");
+	            return "admin-homePage";
+	        }
+
+	        AppUser currentUser = users.get(0);
+	        model.addAttribute("admin", currentUser);
+	        model.addAttribute("pageTitle", "Admin Dashboard - " + currentUser.getName());
+
+	        // Get HOD's assigned department
+	        DepartmentMaster hodDepartment = currentUser.getDepartmentName();
+	        if (hodDepartment == null) {
+	            model.addAttribute("error", "No department assigned");
+	            model.addAttribute("departments", new ArrayList<>());
+	            model.addAttribute("departmentStats", new HashMap<>());
+	            model.addAttribute("courseDetails", new ArrayList<>());
+	            model.addAttribute("overallCourses", 0);
+	            model.addAttribute("overallTeachers", 0);
+	            model.addAttribute("overallStudents", 0);
+	            model.addAttribute("totalDepartments", 0);
+	            return "admin-homePage";
+	        }
+
+	        // Only show HOD's assigned department
+	        List<DepartmentMaster> departments = Collections.singletonList(hodDepartment);
+	        model.addAttribute("departments", departments);
+	        model.addAttribute("department", hodDepartment);
+
+	        // Get department-wise statistics
+	        Map<String, Object> stats = new HashMap<>();
+
+	        // Get courses for HOD's department
+	        List<CourseMaster> deptCourses = CourseMasterRepository
+	                .findByDepartmentDepartmentId(hodDepartment.getDepartmentId());
+
+	        // Calculate department totals
+	        long totalCourses = deptCourses.size();
+	        long totalTeachers = 0;
+	        long totalStudents = 0;
+	        long totalBatches = 0;
+	        long totalSemesters = 0;
+
+	        // Create course details list for the table
+	        List<Map<String, Object>> coursesList = new ArrayList<>();
+
+	        for (CourseMaster course : deptCourses) {
+	            try {
+	                Map<String, Object> courseData = new HashMap<>();
+	                courseData.put("course", course);
+
+	                // Get semesters for this course
+	                List<SemesterMaster> semesters = SemesterMasterRepository
+	                        .findByCourseCourseId(course.getCourseId());
+	                courseData.put("semesters", semesters);
+
+	                // Get all batches for this course
+	                List<BatchMaster> allBatches = new ArrayList<>();
+	                Set<String> allTeachers = new HashSet<>();
+	                long courseStudentCount = 0;
+
+	                for (SemesterMaster semester : semesters) {
+	                    try {
+	                        // Get batches for this semester
+	                        List<BatchMaster> batches = BatchMasterRepository
+	                                .findBySemesterSemesterId(semester.getSemesterId());
+	                        allBatches.addAll(batches);
+
+	                        // Get teachers for this semester (through subjects)
+	                        List<SubjectMaster> semesterSubjects = SubjectMasterRepository
+	                                .findBysemester_SemesterId(semester.getSemesterId());
+	                        Set<String> teachers = semesterSubjects.stream()
+	                                .map(SubjectMaster::getTeacher)
+	                                .filter(teacher -> teacher != null && !teacher.trim().isEmpty())
+	                                .collect(Collectors.toSet());
+	                        allTeachers.addAll(teachers);
+
+	                        // Get student count for this semester
+	                        Long studentCount = AppUserRepository
+	                                .countOnlyStudentsBySemesterId(semester.getSemesterId());
+	                        courseStudentCount += (studentCount != null ? studentCount : 0);
+	                        
+	                        // Update totals
+	                        totalTeachers += teachers.size();
+	                        totalStudents += (studentCount != null ? studentCount : 0);
+	                        totalBatches += batches.size();
+
+	                    } catch (Exception e) {
+	                        System.err.println(
+	                                "Error processing semester: " + semester.getSemesterId() + " - " + e.getMessage());
+	                    }
+	                }
+
+	                courseData.put("batches", allBatches);
+	                courseData.put("teachers", allTeachers);
+	                courseData.put("teacherCount", allTeachers.size());
+	                courseData.put("studentCount", courseStudentCount);
+	                
+	                totalSemesters += semesters.size();
+	                coursesList.add(courseData);
+	            } catch (Exception e) {
+	                System.err.println("Error processing course: " + course.getCourseId() + " - " + e.getMessage());
+	            }
+	        }
+
+	        stats.put("totalCourses", totalCourses);
+	        stats.put("totalTeachers", totalTeachers);
+	        stats.put("totalStudents", totalStudents);
+	        stats.put("totalBatches", totalBatches);
+	        stats.put("totalSemesters", totalSemesters);
+
+	        model.addAttribute("departmentStats", stats);
+	        model.addAttribute("courseDetails", coursesList);
+
+	        // Overall statistics
+	        model.addAttribute("overallCourses", totalCourses);
+	        model.addAttribute("overallTeachers", totalTeachers);
+	        model.addAttribute("overallStudents", totalStudents);
+	        model.addAttribute("totalBatches", totalBatches);
+	        model.addAttribute("totalSemesters", totalSemesters);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("error", "Error loading admin dashboard: " + e.getMessage());
+
+	        // Set default values
+	        model.addAttribute("departments", new ArrayList<>());
+	        model.addAttribute("departmentStats", new HashMap<>());
+	        model.addAttribute("courseDetails", new ArrayList<>());
+	        model.addAttribute("overallCourses", 0);
+	        model.addAttribute("overallTeachers", 0);
+	        model.addAttribute("overallStudents", 0);
+	        model.addAttribute("totalBatches", 0);
+	        model.addAttribute("totalSemesters", 0);
+	    }
+
+	    return "admin-homePage";
+	}
 
 	// Updated department details method for HOD
 	@GetMapping("/department-details/{deptId}")
@@ -9506,6 +9811,105 @@ public class GuacamoleController {
 		}
 
 		return "hod-dashboard";
+	}
+	
+	
+	@GetMapping("/Hod-homePage")
+	public String HodhomePage(Model model, Principal principal) {
+		Authentication auth = (Authentication) principal;
+		String username = auth.getName();
+
+		try {
+			// Get current user (HOD)
+			List<AppUser> users = AppUserRepository.findByUserName(username);
+			if (users.isEmpty()) {
+				model.addAttribute("error", "User not found");
+				return "Hod-homePage";
+			}
+
+			AppUser currentUser = users.get(0);
+			model.addAttribute("hod", currentUser);
+			model.addAttribute("pageTitle", "HOD Home - " + currentUser.getName());
+
+			// Get HOD's assigned department and course
+			DepartmentMaster hodDepartment = currentUser.getDepartmentName();
+			CourseMaster hodCourse = currentUser.getCourseName();
+
+			if (hodDepartment == null || hodCourse == null) {
+				model.addAttribute("error", "No department or course assigned to HOD");
+				model.addAttribute("semesterDetails", new ArrayList<>());
+				model.addAttribute("overallTeachers", 0);
+				model.addAttribute("overallStudents", 0);
+				model.addAttribute("totalBatches", 0);
+				model.addAttribute("totalSemesters", 0);
+				return "Hod-homePage";
+			}
+
+			model.addAttribute("hodDepartment", hodDepartment);
+			model.addAttribute("hodCourse", hodCourse);
+
+			// Get semester details for the assigned course
+			List<SemesterMaster> semesters = SemesterMasterRepository.findByCourseCourseId(hodCourse.getCourseId());
+
+			List<Map<String, Object>> semesterDetails = new ArrayList<>();
+			long totalTeachers = 0;
+			long totalStudents = 0;
+			long totalBatches = 0;
+
+			for (SemesterMaster semester : semesters) {
+				try {
+					Map<String, Object> semesterData = new HashMap<>();
+					semesterData.put("semester", semester);
+
+					// Get batches for this semester
+					List<BatchMaster> batches = BatchMasterRepository
+							.findBySemesterSemesterId(semester.getSemesterId());
+					semesterData.put("batches", batches);
+
+					// Get teachers for this semester (through subjects)
+					List<SubjectMaster> semesterSubjects = SubjectMasterRepository
+							.findBysemester_SemesterId(semester.getSemesterId());
+					Set<String> teachers = semesterSubjects.stream().map(SubjectMaster::getTeacher)
+							.filter(teacher -> teacher != null && !teacher.trim().isEmpty())
+							.collect(Collectors.toSet());
+					semesterData.put("teachers", teachers);
+					semesterData.put("teacherCount", teachers.size());
+
+					// Get student count for this semester
+					Long studentCount = AppUserRepository.countOnlyStudentsBySemesterId(semester.getSemesterId());
+					semesterData.put("studentCount", studentCount != null ? studentCount : 0);
+
+					// Update totals
+					totalTeachers += teachers.size();
+					totalStudents += (studentCount != null ? studentCount : 0);
+					totalBatches += batches.size();
+
+					semesterDetails.add(semesterData);
+				} catch (Exception e) {
+					System.err
+							.println("Error processing semester: " + semester.getSemesterId() + " - " + e.getMessage());
+				}
+			}
+
+			model.addAttribute("semesterDetails", semesterDetails);
+			model.addAttribute("overallTeachers", totalTeachers);
+			model.addAttribute("overallStudents", totalStudents);
+			model.addAttribute("totalBatches", totalBatches);
+			model.addAttribute("totalSemesters", semesters.size());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			model.addAttribute("error", "Error loading HOD dashboard: " + e.getMessage());
+
+			// Set default values
+			model.addAttribute("semesterDetails", new ArrayList<>());
+			model.addAttribute("overallTeachers", 0);
+			model.addAttribute("overallStudents", 0);
+			model.addAttribute("totalBatches", 0);
+			model.addAttribute("totalSemesters", 0);
+		}
+
+		return "Hod-homePage";
 	}
 
 	// Add these methods to your HODDashboardController

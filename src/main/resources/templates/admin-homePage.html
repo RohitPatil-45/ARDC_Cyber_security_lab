@@ -149,44 +149,7 @@
                     </div>
 
                     <!-- Statistics Cards -->
-                    <div class="row mb-4">
-                        <div class="col-lg-2 col-md-4 col-sm-6">
-                            <div class="stats-card">
-                                <div class="stats-number" th:text="${overallCourses}">0</div>
-                                <div class="stats-label">Total Courses</div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-sm-6">
-                            <div class="stats-card">
-                                <div class="stats-number" th:text="${overallTeachers}">0</div>
-                                <div class="stats-label">Teachers</div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-sm-6">
-                            <div class="stats-card">
-                                <div class="stats-number" th:text="${overallStudents}">0</div>
-                                <div class="stats-label">Students</div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-sm-6">
-                            <div class="stats-card">
-                                <div class="stats-number" th:text="${totalBatches}">0</div>
-                                <div class="stats-label">Batches</div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-sm-6">
-                            <div class="stats-card">
-                                <div class="stats-number" th:text="${totalSemesters}">0</div>
-                                <div class="stats-label">Semesters</div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-sm-6">
-                            <div class="stats-card">
-                                <div class="stats-number" th:text="${departments != null ? departments.size() : 0}">1</div>
-                                <div class="stats-label">Departments</div>
-                            </div>
-                        </div>
-                    </div>
+                    
 
                     <!-- Error Message -->
                     <div th:if="${error}" class="alert alert-danger">
