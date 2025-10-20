@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:include="template :: headFragment(${pageTitle})">
+<title>Subject Tasks | Cyber Ranges</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link
+	href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap"
+	rel="stylesheet">
+    
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+</head>
+
+<style>
+body {
+	background-color: #ffffff;
+	color: #333333;
+	font-family: 'Roboto', sans-serif;
+}
+
+.content-wrapper {
+	background-color: #f8f9fa;
+	padding: 20px;
+}
+
+/* Card Styling */
+.task-card {
+	background-color: #ffffff;
+	border: 2px solid #e0e0e0;
+	border-radius: 12px;
+	overflow: hidden;
+	color: #333333;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+	transition: transform 0.2s, box-shadow 0.2s;
+	margin-bottom: 20px;
+}
+
+.task-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card-image img {
+	width: 100%;
+	height: 200px;
+	object-fit: cover;
+	display: block;
+	border-bottom: 2px solid #e9ecef;
+}
+
+.card-content {
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.card-title {
+	font-family: 'Poppins', sans-serif;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: #2d4fa6;
+	margin: 0;
+}
+
+.card-subtitle {
+	font-size: 1.1rem;
+	color: #666666;
+	margin: 0;
+	font-weight: 500;
+}
+
+.card-description {
+	font-size: 1rem;
+	color: #666666;
+	margin: 0;
+	line-height: 1.5;
+}
+
+.card-tags {
+	margin-top: 12px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.card-tags .tag {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	background: #f1f5f9;
+	color: #2d4fa6;
+	font-size: 0.85rem;
+	font-weight: 500;
+	padding: 6px 12px;
+	border-radius: 12px;
+	text-transform: uppercase;
+}
+
+.card-actions {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 15px;
+	padding-top: 15px;
+	border-top: 1px solid #e9ecef;
+}
+
+.start-btn {
+	background: linear-gradient(90deg, #16a34a, #22c55e);
+	color: #fff;
+	padding: 8px 20px;
+	border-radius: 20px;
+	font-size: 0.9rem;
+	font-weight: 600;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	transition: all 0.3s ease;
+	border: none;
+	cursor: pointer;
+}
+
+.start-btn:hover {
+	background: linear-gradient(90deg, #15803d, #16a34a);
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	color: #fff;
+	text-decoration: none;
+}
+
+.start-btn i {
+	font-size: 0.9rem;
+}
+
+.section-header {
+	font-family: 'Poppins', sans-serif;
+	font-size: 1.8rem;
+	font-weight: 700;
+	color: #2d4fa6;
+	margin: 30px 0 20px 0;
+	padding-bottom: 10px;
+	border-bottom: 2px solid #e9ecef;
+}
+
+.section-header:first-child {
+	margin-top: 0;
+}
+
+/* Empty state styling */
+.empty-state {
+	text-align: center;
+	padding: 40px 20px;
+	color: #666;
+}
+
+.empty-state i {
+	font-size: 3rem;
+	color: #ccc;
+	margin-bottom: 15px;
+}
+
+.empty-state h4 {
+	color: #666;
+	margin-bottom: 10px;
+}
+
+/* Content header */
+.content-header h1 {
+	color: #2d4fa6;
+	font-family: 'Poppins', sans-serif;
+}
+
+/* Breadcrumb styling */
+.breadcrumb {
+	background-color: transparent;
+}
+
+.breadcrumb-item a {
+	color: #2d4fa6;
+	text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+	color: #1e3a8a;
+	text-decoration: underline;
+}
+
+/* DataTable Styling */
+.dataTables_wrapper {
+    margin-top: 20px;
+}
+
+.table-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.table-card .card-header {
+    background: linear-gradient(135deg, #2d4fa6, #3b82f6);
+    color: white;
+    border-bottom: none;
+    padding: 15px 20px;
+}
+
+.table-card .card-header h3 {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+/* Progress Bar Styles */
+.progress {
+    height: 8px;
+    margin-bottom: 5px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+}
+
+.progress-bar-practice {
+    background-color: #17a2b8;
+}
+
+.progress-bar-assessment {
+    background-color: #28a745;
+}
+
+.percentage-badge {
+    font-size: 0.75rem;
+    font-weight: bold;
+    min-width: 45px;
+    text-align: center;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.badge-practice {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.badge-assessment {
+    background-color: #28a745;
+    color: white;
+}
+
+.progress-container {
+    min-width: 120px;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-completed {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-inprogress {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+/* Badge for type */
+.type-badge {
+	background: #2d4fa6;
+	color: white;
+	padding: 4px 8px;
+	border-radius: 6px;
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media ( max-width : 768px) {
+	.card-actions {
+		flex-direction: column;
+		gap: 10px;
+		align-items: flex-start;
+	}
+	.start-btn {
+		align-self: stretch;
+		text-align: center;
+		justify-content: center;
+	}
+}
+</style>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header :: header"></div>
+		<div th:replace="fragments/side-barUser :: aside"></div>
+
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>
+								<i class="fas fa-tasks"></i> 
+								<span th:text="${subject.subjectName + ' - Tasks'}">Subject Tasks</span>
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#"><i
+										class="fas fa-home"></i> Home</a></li>
+								<li class="breadcrumb-item active" th:text="${subject.subjectName} + ' Tasks'">Subject Tasks</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+
+					<!-- Error Message -->
+					<div th:if="${error}" class="alert alert-danger alert-dismissible">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						<i class="fas fa-exclamation-triangle mr-2"></i> 
+						<span th:text="${error}"></span>
+					</div>
+
+					<!-- Scenario Performance Table Section -->
+					<div class="row mb-4">
+						<div class="col-12">
+							<div class="table-card">
+								<div class="card-header">
+									<div class="row align-items-center">
+										<div class="col-md-6">
+											<h3 class="mb-0">
+												<i class="fas fa-chart-line mr-2"></i> Scenario Performance Overview
+											</h3>
+										</div>
+										<div class="col-md-6 text-right">
+											<button class="btn btn-light" onclick="location.reload()">
+												<i class="fas fa-sync-alt mr-2"></i>Refresh
+											</button>
+										</div>
+									</div>
+								</div>
+								<div class="card-body">
+									<div class="table-responsive">
+										<table id="scenarioPerformanceTable" class="table table-bordered table-striped table-hover">
+											<thead class="thead-light">
+												<tr>
+													<th width="5%">Sr No.</th>
+													<th width="25%">Scenario Name</th>
+													<th width="20%">Student Name</th>
+													<th width="15%">Practice Status</th>
+													<th width="17%">Practice Performance %</th>
+													<th width="18%">Assessment Performance %</th>
+												</tr>
+											</thead>
+											<thead class="thead-light" id="searchHeader" style="display: none;">
+												<tr>
+													<th><input type="text" class="form-control form-control-sm column-search" placeholder="Search Sr No" data-column="0"></th>
+													<th><input type="text" class="form-control form-control-sm column-search" placeholder="Search scenario" data-column="1"></th>
+													<th><input type="text" class="form-control form-control-sm column-search" placeholder="Search student" data-column="2"></th>
+													<th><input type="text" class="form-control form-control-sm column-search" placeholder="Search status" data-column="3"></th>
+													<th></th>
+													<th></th>
+												</tr>
+											</thead>
+											<tbody>
+												<!-- Data will be populated by DataTables -->
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Playlists Section -->
+					<h3 class="section-header">
+						<i class="fas fa-list-ol"></i> Playlists <span class="type-badge"
+							th:text="${playlists.size()} + ' items'"></span>
+					</h3>
+
+					<div th:if="${playlists != null and !playlists.empty}">
+						<div class="row">
+							<div th:each="playlist : ${playlists}"
+								class="col-lg-4 col-md-6 col-sm-12 mb-4">
+								<div class="task-card">
+									<div class="card-image">
+										<img th:src="@{/guac/Playlistimage/{id}(id=${playlist.id})}"
+											th:alt="${playlist.playlistTitle}" loading="lazy"
+											onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+									</div>
+									<div class="card-content">
+										<h3 class="card-title" th:text="${playlist.playlistTitle}">Playlist
+											Title</h3>
+										<h5 class="card-subtitle" th:text="${playlist.playlistName}">Playlist
+											Name</h5>
+										<p class="card-description"
+											th:text="${playlist.description} ?: 'No description available'">Description</p>
+
+										<div class="card-tags">
+											<span th:if="${playlist.tag}" class="tag"> <i
+												class="fas fa-tag"></i> <span th:text="${playlist.tag}">Tag</span>
+											</span>
+										</div>
+
+										<div class="card-actions">
+											<span class="text-muted">Playlist</span> <a
+												th:href="@{/guac/View_Particular_Playlist(Id=${playlist.id})}"
+												class="start-btn"> <i class="fas fa-play"></i> Start
+												Playlist
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div th:if="${playlists == null or playlists.empty}"
+						class="empty-state">
+						<i class="fas fa-list-ol"></i>
+						<h4>No Playlists Available</h4>
+						<p>There are no playlists assigned to your subjects.</p>
+					</div>
+
+					<!-- Sub-Playlists Section -->
+					<h3 class="section-header">
+						<i class="fas fa-layer-group"></i> Sub-Playlists <span
+							class="type-badge" th:text="${subPlaylists.size()} + ' items'"></span>
+					</h3>
+
+					<div th:if="${subPlaylists != null and !subPlaylists.empty}">
+						<div class="row">
+							<div th:each="subplaylist : ${subPlaylists}"
+								class="col-lg-4 col-md-6 col-sm-12 mb-4">
+								<div class="task-card">
+									<div class="card-image">
+										<img
+											th:src="@{/guac/SubPlaylistimage/{id}(id=${subplaylist.id})}"
+											th:alt="${subplaylist.playlistTitle}" loading="lazy"
+											onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200?text=No+Image';" />
+									</div>
+									<div class="card-content">
+										<h3 class="card-title" th:text="${subplaylist.playlistTitle}">Sub-Playlist
+											Title</h3>
+										<h5 class="card-subtitle"
+											th:text="${subplaylist.playlistName}">Sub-Playlist Name</h5>
+										<p class="card-description"
+											th:text="${subplaylist.description} ?: 'No description available'">Description</p>
+
+										<div class="card-tags">
+											<span th:if="${subplaylist.tag}" class="tag"> <i
+												class="fas fa-tag"></i> <span th:text="${subplaylist.tag}">Tag</span>
+											</span>
+										</div>
+
+										<div class="card-actions">
+											<span class="text-muted">Sub-Playlist</span> <a
+												th:href="@{/guac/View_Particular_SubPlaylist(Id=${subplaylist.id})}"
+												class="start-btn"> <i class="fas fa-play"></i> Start
+												Sub-Playlist
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div th:if="${subPlaylists == null or subPlaylists.empty}"
+						class="empty-state">
+						<i class="fas fa-layer-group"></i>
+						<h4>No Sub-Playlists Available</h4>
+						<p>There are no sub-playlists assigned to your subjects.</p>
+					</div>
+
+					<!-- Scenarios Section -->
+					<h3 class="section-header">
+						<i class="fas fa-scroll"></i> Scenarios <span class="type-badge"
+							th:text="${scenarios.size()} + ' items'"></span>
+					</h3>
+
+					<div th:if="${scenarios != null and !scenarios.empty}">
+						<div class="row">
+							<div th:each="scenario : ${scenarios}"
+								class="col-lg-4 col-md-6 col-sm-12 mb-4">
+								<div class="task-card">
+									<div class="card-image">
+										<img th:src="@{/report/image/{id}(id=${scenario.id})}"
+											th:alt="${scenario.scenarioTitle}" loading="lazy"
+											onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+									</div>
+									<div class="card-content">
+										<h3 class="card-title" th:text="${scenario.scenarioTitle}">Scenario
+											Title</h3>
+										<h5 class="card-subtitle" th:text="${scenario.scenarioName}">Scenario
+											Name</h5>
+
+										<div class="card-tags">
+											<span th:if="${scenario.category}" class="tag"> <i
+												class="fas fa-folder"></i> <span
+												th:text="${scenario.category}">Category</span>
+											</span> <span th:if="${scenario.scenarioType}" class="tag"> <i
+												class="fas fa-layer-group"></i> <span
+												th:text="${scenario.scenarioType}">Type</span>
+											</span> <span th:if="${scenario.difficultyLevel}" class="tag">
+												<i class="fas fa-signal"></i> <span
+												th:text="${scenario.difficultyLevel}">Difficulty</span>
+											</span>
+										</div>
+
+										<div class="card-actions">
+											<span class="text-muted">Scenario</span> <a
+												th:href="@{/guac/View_Particular_Scenerio(Id=${scenario.id})}"
+												class="start-btn"> <i class="fas fa-play"></i> Start
+												Scenario
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div th:if="${scenarios == null or scenarios.empty}"
+						class="empty-state">
+						<i class="fas fa-scroll"></i>
+						<h4>No Scenarios Available</h4>
+						<p>There are no scenarios assigned to your subjects.</p>
+					</div>
+
+				</div>
+			</section>
+		</div>
+
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="template :: jsscript"></div>
+
+	<!-- DataTables Scripts -->
+	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+	<script th:inline="javascript">
+		let rawData = [[${scenarioData}]];
+		let jsonData = [];
+
+		try {
+			jsonData = (typeof rawData === "string") ? JSON.parse(rawData) : rawData;
+			console.log("Loaded scenario performance data:", jsonData);
+		} catch (e) {
+			console.error("Invalid JSON data for scenario performance:", e);
+			jsonData = [];
+		}
+
+		// Initialize DataTable for scenario performance
+		var table = $('#scenarioPerformanceTable').DataTable({
+			data: jsonData,
+			responsive: true,
+			lengthChange: true,
+			autoWidth: false,
+			pageLength: 10,
+			dom: '<"row"<"col-md-6"B><"col-md-6"f>><"row"<"col-md-12"tr>><"row"<"col-md-5"i><"col-md-7"p>>',
+			buttons: [
+				{
+					extend: 'collection',
+					className: 'btn btn-secondary',
+					text: '<i class="fas fa-cog"></i> Options',
+					buttons: [
+						{
+							extend: 'copy',
+							className: 'btn btn-secondary',
+							text: '<i class="fas fa-copy"></i> Copy',
+							exportOptions: {
+								columns: [0, 1, 2, 3, 4, 5]
+							}
+						},
+						{
+							extend: 'excel',
+							className: 'btn btn-success',
+							text: '<i class="fas fa-file-excel"></i> Excel',
+							exportOptions: {
+								columns: [0, 1, 2, 3, 4, 5]
+							}
+						},
+						{
+							extend: 'pdf',
+							className: 'btn btn-danger',
+							text: '<i class="fas fa-file-pdf"></i> PDF',
+							exportOptions: {
+								columns: [0, 1, 2, 3, 4, 5]
+							}
+						},
+						{
+							extend: 'print',
+							className: 'btn btn-info',
+							text: '<i class="fas fa-print"></i> Print',
+							exportOptions: {
+								columns: [0, 1, 2, 3, 4, 5]
+							}
+						},
+						{
+							text: '<i class="fas fa-search"></i> Toggle Search',
+							className: 'btn btn-warning',
+							action: function ( e, dt, node, config ) {
+								$('#searchHeader').toggle();
+								table.columns.adjust();
+							}
+						}
+					]
+				}
+			],
+			columns: [
+				{ 
+					data: 0, // Sr No
+					className: "text-center"
+				},
+				{ 
+					data: 1, // Scenario Name
+					render: function(data, type, row) {
+						return `<strong>` + data + `</strong>`;
+					}
+				},
+				{ 
+					data: 2, // Student Name
+					render: function(data, type, row) {
+						return `<i class="fas fa-user mr-2 text-primary"></i>` + data;
+					}
+				},
+				{ 
+					data: 3, // Practice Status
+					render: function(data, type, row) {
+						const statusClass = data === 'Completed' ? 'status-completed' : 'status-inprogress';
+						const icon = data === 'Completed' ? 'fa-check-circle' : 'fa-spinner';
+						return `
+							<span class="status-badge ${statusClass}">
+								<i class="fas ${icon} mr-1"></i>${data}
+							</span>
+						`;
+					}
+				},
+				{ 
+					data: 4, // Practice Performance %
+					render: function(data, type, row) {
+						if (type === 'display') {
+							const percentage = parseFloat(data) || 0;
+							return `
+								<div class="progress-container">
+									<div class="d-flex align-items-center">
+										<div class="flex-grow-1 mr-2">
+											<div class="progress">
+												<div class="progress-bar progress-bar-practice" 
+													 role="progressbar" 
+													 style="width: ${percentage}%;"
+													 aria-valuenow="${percentage}" 
+													 aria-valuemin="0" 
+													 aria-valuemax="100">
+												</div>
+											</div>
+										</div>
+										<span class="percentage-badge badge-practice">
+											${percentage}%
+										</span>
+									</div>
+								</div>
+							`;
+						}
+						return data;
+					}
+				},
+				{ 
+					data: 5, // Assessment Performance %
+					render: function(data, type, row) {
+						if (type === 'display') {
+							const percentage = parseFloat(data) || 0;
+							return `
+								<div class="progress-container">
+									<div class="d-flex align-items-center">
+										<div class="flex-grow-1 mr-2">
+											<div class="progress">
+												<div class="progress-bar progress-bar-assessment" 
+													 role="progressbar" 
+													 style="width: ${percentage}%;"
+													 aria-valuenow="${percentage}" 
+													 aria-valuemin="0" 
+													 aria-valuemax="100">
+												</div>
+											</div>
+										</div>
+										<span class="percentage-badge badge-assessment">
+											${percentage}%
+										</span>
+									</div>
+								</div>
+							`;
+						}
+						return data;
+					}
+				}
+			],
+			language: {
+				search: "Global Search:",
+				lengthMenu: "Show _MENU_ entries",
+				info: "Showing _START_ to _END_ of _TOTAL_ records",
+				infoEmpty: "No performance records available",
+				infoFiltered: "(filtered from _MAX_ total records)",
+				zeroRecords: "No matching performance records found",
+				paginate: {
+					first: "First",
+					last: "Last",
+					next: "Next",
+					previous: "Previous"
+				}
+			},
+			order: [[0, 'asc']],
+			columnDefs: [
+				{ orderable: true, targets: [0, 1, 2, 3] },
+				{ orderable: false, targets: [4, 5] }
+			]
+		});
+
+		// Individual column search
+		$('#scenarioPerformanceTable thead').on('keyup', '.column-search', function() {
+			var columnIndex = $(this).data('column');
+			table.column(columnIndex).search(this.value).draw();
+		});
+
+		// Auto-hide alerts after 5 seconds
+		setTimeout(function() {
+			$('.alert').fadeOut('slow');
+		}, 5000);
+
+		document.addEventListener("DOMContentLoaded", function() {
+			console.log("Subject Tasks page loaded successfully");
+		});
+	</script>
+</body>
+</html>

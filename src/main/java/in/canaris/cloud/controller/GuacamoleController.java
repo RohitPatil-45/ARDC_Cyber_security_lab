@@ -6351,55 +6351,128 @@ public class GuacamoleController {
 		return mav;
 	}
 
+//	@GetMapping("/UserTaskPerformance")
+//	public ModelAndView getUserTaskPerformance(Model model, Principal principal) {
+//		ModelAndView mav = new ModelAndView("UserTaskPerformance");
+//		JSONArray finalArray = new JSONArray();
+//
+//		try {
+//			Authentication auth = (Authentication) principal;
+//			String username = auth.getName();
+//
+//			// Return List<Integer> now
+//			List<Object> scenarioIdList = instructionTemplateRepository.findByScenarioIdAndUserName(username);
+//
+//			int srno = 0;
+//			for (Object scenarioId : scenarioIdList) {
+//				srno++;
+//				JSONArray array = new JSONArray();
+//
+//				String scenarioName = "Unknown";
+//
+//				Optional<Add_Scenario> scenarioOpt = ScenarioRepository
+//						.findById(Integer.parseInt(scenarioId.toString()));
+//				if (scenarioOpt.isPresent()) {
+//					scenarioName = scenarioOpt.get().getScenarioName();
+//				}
+//
+//				Integer falseCount = instructionTemplateRepository.getFalseCompletionCountsByusernameandscenarioId(
+//						username, Integer.parseInt(scenarioId.toString()));
+//				Integer trueCount = instructionTemplateRepository.getTrueCompletionCountsByusernameandscenarioId(
+//						username, Integer.parseInt(scenarioId.toString()));
+//
+//				int total = (falseCount != null ? falseCount : 0) + (trueCount != null ? trueCount : 0);
+//				int percentage = (total == 0) ? 0 : ((trueCount != null ? trueCount : 0) * 100 / total);
+//
+//				array.put(srno);
+//				array.put(username);
+//				array.put(scenarioName);
+//				array.put(percentage + "%");
+//
+//				finalArray.put(array);
+//			}
+//
+//			mav.addObject("listObj", finalArray.toString());
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			model.addAttribute("performanceList", new ArrayList<>());
+//		}
+//
+//		return mav;
+//	}
+	
+	
 	@GetMapping("/UserTaskPerformance")
 	public ModelAndView getUserTaskPerformance(Model model, Principal principal) {
-		ModelAndView mav = new ModelAndView("UserTaskPerformance");
-		JSONArray finalArray = new JSONArray();
+	    ModelAndView mav = new ModelAndView("UserTaskPerformance");
+	    JSONArray finalArray = new JSONArray();
 
-		try {
-			Authentication auth = (Authentication) principal;
-			String username = auth.getName();
+	    try {
+	        Authentication auth = (Authentication) principal;
+	        String username = auth.getName();
 
-			// Return List<Integer> now
-			List<Object> scenarioIdList = instructionTemplateRepository.findByScenarioIdAndUserName(username);
+	        // Return List<Integer> now
+	        List<Object> scenarioIdList = instructionTemplateRepository.findByScenarioIdAndUserName(username);
 
-			int srno = 0;
-			for (Object scenarioId : scenarioIdList) {
-				srno++;
-				JSONArray array = new JSONArray();
+	        int srno = 0;
+	        for (Object scenarioId : scenarioIdList) {
+	            srno++;
+	            JSONArray array = new JSONArray();
 
-				String scenarioName = "Unknown";
+	            String scenarioName = "Unknown";
+	            String subjectName = "N/A";
 
-				Optional<Add_Scenario> scenarioOpt = ScenarioRepository
-						.findById(Integer.parseInt(scenarioId.toString()));
-				if (scenarioOpt.isPresent()) {
-					scenarioName = scenarioOpt.get().getScenarioName();
-				}
+	            Optional<Add_Scenario> scenarioOpt = ScenarioRepository
+	                    .findById(Integer.parseInt(scenarioId.toString()));
+	            if (scenarioOpt.isPresent()) {
+	                Add_Scenario scenario = scenarioOpt.get();
+	                scenarioName = scenario.getScenarioName();
+	                // Assuming you have a way to get subject name from scenario
+	                // subjectName = scenario.getSubject() != null ? scenario.getSubject().getSubjectName() : "N/A";
+	            }
 
-				Integer falseCount = instructionTemplateRepository.getFalseCompletionCountsByusernameandscenarioId(
-						username, Integer.parseInt(scenarioId.toString()));
-				Integer trueCount = instructionTemplateRepository.getTrueCompletionCountsByusernameandscenarioId(
-						username, Integer.parseInt(scenarioId.toString()));
+	            // Task Progress Calculation
+	            Integer falseTaskCount = instructionTemplateRepository.getFalseCompletionCountsByusernameandscenarioId(
+	                    username, Integer.parseInt(scenarioId.toString()));
+	            Integer trueTaskCount = instructionTemplateRepository.getTrueCompletionCountsByusernameandscenarioId(
+	                    username, Integer.parseInt(scenarioId.toString()));
 
-				int total = (falseCount != null ? falseCount : 0) + (trueCount != null ? trueCount : 0);
-				int percentage = (total == 0) ? 0 : ((trueCount != null ? trueCount : 0) * 100 / total);
+	            int totalTasks = (falseTaskCount != null ? falseTaskCount : 0) + (trueTaskCount != null ? trueTaskCount : 0);
+	            int taskProgress = (totalTasks == 0) ? 0 : ((trueTaskCount != null ? trueTaskCount : 0) * 100 / totalTasks);
 
-				array.put(srno);
-				array.put(username);
-				array.put(scenarioName);
-				array.put(percentage + "%");
+	            // Assessment Progress Calculation (you'll need to implement this based on your logic)
+	            // This is a placeholder - replace with your actual assessment logic
+//	            Integer falseAssessmentCount = 0; // Replace with actual repository call
+//	            Integer trueAssessmentCount = 0;  // Replace with actual repository call
+	            
+	            Integer trueAssessmentCount = assessmentInstructionTemplateRepository.getTrueCompletionCountsByusernameandscenarioId(username, Integer.parseInt(scenarioId.toString()));
+		        Integer falseAssessmentCount = assessmentInstructionTemplateRepository.getFalseCompletionCountsByusernameandscenarioId(username, Integer.parseInt(scenarioId.toString()));
+		        
+	            int totalAssessments = (falseAssessmentCount != null ? falseAssessmentCount : 0) + (trueAssessmentCount != null ? trueAssessmentCount : 0);
+	            int assessmentProgress = (totalAssessments == 0) ? 0 : ((trueAssessmentCount != null ? trueAssessmentCount : 0) * 100 / totalAssessments);
 
-				finalArray.put(array);
-			}
+	            // Overall Progress (average of task and assessment)
+	            int overallProgress = (taskProgress + assessmentProgress) / 2;
 
-			mav.addObject("listObj", finalArray.toString());
+	            array.put(srno);
+	            array.put(username);
+	            array.put(scenarioName);
+	            array.put(taskProgress);        // Task Progress percentage
+	            array.put(assessmentProgress);  // Assessment Progress percentage
+	            array.put(overallProgress);     // Overall Progress percentage
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			model.addAttribute("performanceList", new ArrayList<>());
-		}
+	            finalArray.put(array);
+	        }
 
-		return mav;
+	        mav.addObject("listObj", finalArray.toString());
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("performanceList", new ArrayList<>());
+	    }
+
+	    return mav;
 	}
 
 	@GetMapping("/UserWiseChartBoarView")
@@ -7575,6 +7648,71 @@ public class GuacamoleController {
 
 		return "viewsubjecttasks";
 	}
+	
+	
+//	@GetMapping("/viewtablarsubjectTasks/{subjectId}")
+//	public String viewtablarsubjectTasks(@PathVariable("subjectId") Integer subjectId, Model model, Principal principal) {
+//	    Authentication auth = (Authentication) principal;
+//	    String username = auth.getName();
+//
+//	    try {
+//	        // Verify subject exists
+//	        SubjectMaster subject = SubjectMasterRepository.findById(subjectId)
+//	                .orElseThrow(() -> new RuntimeException("Subject not found with ID: " + subjectId));
+//
+//	        // Get playlists, sub-playlists, and scenarios
+//	        List<Playlist> playlists = getPlaylistsForSubject(subjectId);
+//	        List<SubPlaylist> subPlaylists = getSubPlaylistsForSubject(subjectId);
+//	        List<Add_Scenario> scenarios = getScenariosForSubject(subjectId);
+//
+//	        // Get scenario performance data for DataTable
+//	        List<Object[]> scenarioPerformanceData = getScenarioPerformanceData(subjectId);
+//	        JSONArray scenarioDataArray = new JSONArray();
+//	        
+//	        int srNo = 1;
+//	        for (Object[] data : scenarioPerformanceData) {
+//	            JSONArray row = new JSONArray();
+//	            row.put(srNo++);
+//	            row.put(data[0]); // Scenario name
+//	            row.put(data[1]); // Student name
+//	            row.put(data[2]); // Practice status
+//	            row.put(data[3]); // Practice performance %
+//	            row.put(data[4]); // Assessment performance %
+//	            scenarioDataArray.put(row);
+//	        }
+//
+//	        // Add attributes to model
+//	        model.addAttribute("playlists", playlists);
+//	        model.addAttribute("subPlaylists", subPlaylists);
+//	        model.addAttribute("scenarios", scenarios);
+//	        model.addAttribute("subject", subject);
+//	        model.addAttribute("subjectId", subjectId);
+//	        model.addAttribute("pageTitle", subject.getSubjectName() + " - Tasks");
+//	        model.addAttribute("scenarioData", scenarioDataArray.toString());
+//
+//	        // Debug info
+//	        System.out.println("Subject ID: " + subjectId);
+//	        System.out.println("Playlists: " + (playlists != null ? playlists.size() : 0));
+//	        System.out.println("SubPlaylists: " + (subPlaylists != null ? subPlaylists.size() : 0));
+//	        System.out.println("Scenarios: " + (scenarios != null ? scenarios.size() : 0));
+//	        System.out.println("Scenario Performance Records: " + scenarioPerformanceData.size());
+//
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	        model.addAttribute("error", "Error loading tasks: " + e.getMessage());
+//	    }
+//
+//	    return "viewtabularsubjecttasks";
+//	}
+//
+//	// Method to get scenario performance data
+//	private List<Object[]> getScenarioPerformanceData(Integer subjectId) {
+//	    // Implement this method based on your repository structure
+//	    // This should return data in format: [scenarioName, studentName, practiceStatus, practicePerformance, assessmentPerformance]
+//	    
+//	    // Example implementation (replace with your actual repository call):
+//	    return instructionTemplateRepository.findScenarioPerformanceBySubjectId(subjectId);
+//	}
 
 //	private List<Playlist> getPlaylistsForSubject(Integer subjectId) {
 //	    // Get playlist IDs from mapping table
@@ -9508,6 +9646,7 @@ public class GuacamoleController {
 	            model.addAttribute("overallCourses", 0);
 	            model.addAttribute("overallTeachers", 0);
 	            model.addAttribute("overallStudents", 0);
+	            model.addAttribute("overallSubjects", 0);
 	            model.addAttribute("totalDepartments", 0);
 	            return "admin-homePage";
 	        }
@@ -9530,6 +9669,7 @@ public class GuacamoleController {
 	        long totalStudents = 0;
 	        long totalBatches = 0;
 	        long totalSemesters = 0;
+	        long totalSubjects = 0;
 
 	        // Create course details list for the table
 	        List<Map<String, Object>> coursesList = new ArrayList<>();
@@ -9548,6 +9688,7 @@ public class GuacamoleController {
 	                List<BatchMaster> allBatches = new ArrayList<>();
 	                Set<String> allTeachers = new HashSet<>();
 	                long courseStudentCount = 0;
+	                long courseSubjectCount = 0;
 
 	                for (SemesterMaster semester : semesters) {
 	                    try {
@@ -9556,9 +9697,11 @@ public class GuacamoleController {
 	                                .findBySemesterSemesterId(semester.getSemesterId());
 	                        allBatches.addAll(batches);
 
-	                        // Get teachers for this semester (through subjects)
+	                        // Get subjects for this semester
 	                        List<SubjectMaster> semesterSubjects = SubjectMasterRepository
 	                                .findBysemester_SemesterId(semester.getSemesterId());
+	                        
+	                        // Get teachers for this semester (through subjects)
 	                        Set<String> teachers = semesterSubjects.stream()
 	                                .map(SubjectMaster::getTeacher)
 	                                .filter(teacher -> teacher != null && !teacher.trim().isEmpty())
@@ -9570,10 +9713,14 @@ public class GuacamoleController {
 	                                .countOnlyStudentsBySemesterId(semester.getSemesterId());
 	                        courseStudentCount += (studentCount != null ? studentCount : 0);
 	                        
+	                        // Update subject count
+	                        courseSubjectCount += semesterSubjects.size();
+	                        
 	                        // Update totals
 	                        totalTeachers += teachers.size();
 	                        totalStudents += (studentCount != null ? studentCount : 0);
 	                        totalBatches += batches.size();
+	                        totalSubjects += semesterSubjects.size();
 
 	                    } catch (Exception e) {
 	                        System.err.println(
@@ -9585,6 +9732,7 @@ public class GuacamoleController {
 	                courseData.put("teachers", allTeachers);
 	                courseData.put("teacherCount", allTeachers.size());
 	                courseData.put("studentCount", courseStudentCount);
+	                courseData.put("subjectCount", courseSubjectCount);
 	                
 	                totalSemesters += semesters.size();
 	                coursesList.add(courseData);
@@ -9598,6 +9746,7 @@ public class GuacamoleController {
 	        stats.put("totalStudents", totalStudents);
 	        stats.put("totalBatches", totalBatches);
 	        stats.put("totalSemesters", totalSemesters);
+	        stats.put("totalSubjects", totalSubjects);
 
 	        model.addAttribute("departmentStats", stats);
 	        model.addAttribute("courseDetails", coursesList);
@@ -9606,6 +9755,7 @@ public class GuacamoleController {
 	        model.addAttribute("overallCourses", totalCourses);
 	        model.addAttribute("overallTeachers", totalTeachers);
 	        model.addAttribute("overallStudents", totalStudents);
+	        model.addAttribute("overallSubjects", totalSubjects);
 	        model.addAttribute("totalBatches", totalBatches);
 	        model.addAttribute("totalSemesters", totalSemesters);
 
@@ -9620,14 +9770,15 @@ public class GuacamoleController {
 	        model.addAttribute("overallCourses", 0);
 	        model.addAttribute("overallTeachers", 0);
 	        model.addAttribute("overallStudents", 0);
+	        model.addAttribute("overallSubjects", 0);
 	        model.addAttribute("totalBatches", 0);
 	        model.addAttribute("totalSemesters", 0);
 	    }
 
 	    return "admin-homePage";
 	}
-
-	// Updated department details method for HOD
+	
+	
 	@GetMapping("/department-details/{deptId}")
 	public String viewDepartmentDetails(@PathVariable Integer deptId, Model model, Principal principal) {
 		try {
@@ -9878,6 +10029,11 @@ public class GuacamoleController {
 					// Get student count for this semester
 					Long studentCount = AppUserRepository.countOnlyStudentsBySemesterId(semester.getSemesterId());
 					semesterData.put("studentCount", studentCount != null ? studentCount : 0);
+					
+					 List<SubjectMaster> semesterSubjects1 = SubjectMasterRepository
+		                        .findBysemester_SemesterId(semester.getSemesterId());
+		                semesterData.put("subjects", semesterSubjects1);
+		                semesterData.put("subjectCount", semesterSubjects1.size());
 
 					// Update totals
 					totalTeachers += teachers.size();
@@ -9911,6 +10067,225 @@ public class GuacamoleController {
 
 		return "Hod-homePage";
 	}
+
+	
+//	@GetMapping("/subjects/semester/{semesterId}")
+//	public String getSubjectsBySemester(@PathVariable("semesterId") int semesterId, 
+//	                                   Model model, 
+//	                                   Principal principal) {
+//	    try {
+//	        // Get current user info
+//	    
+////	        String username = principal.getName();
+////	        List<AppUser> users = AppUserRepository.findByUserName(username);
+////	        
+////	        if (!users.isEmpty()) {
+////	            model.addAttribute("currentUser", users.get(0));
+////	        }
+//
+//	        // Get semester details first
+//	        Optional<SemesterMaster> semesterOpt = SemesterMasterRepository.findById(semesterId);
+//	        if (semesterOpt.isEmpty()) {
+//	            model.addAttribute("error", "Semester not found");
+//	            return "subject-list";
+//	        }
+//	        
+//	        SemesterMaster semester = semesterOpt.get();
+//	        model.addAttribute("semester", semester);
+//
+//	        // Get subjects for this semester
+//	        List<SubjectMaster> semesterSubjects = SubjectMasterRepository.findBysemester_SemesterId(semesterId);
+//	        
+//	        // Calculate statistics
+//	        long totalSubjects = semesterSubjects.size();
+//	        long totalCoreSubjects = semesterSubjects.stream().filter(subject -> !subject.isElective()).count();
+//	        long totalElectiveSubjects = semesterSubjects.stream().filter(SubjectMaster::isElective).count();
+//	        long subjectsWithTeachers = semesterSubjects.stream()
+//	                .filter(subject -> subject.getTeacher() != null && !subject.getTeacher().trim().isEmpty())
+//	                .count();
+//	        
+//	        // Get unique teachers
+//	        Set<String> teachers = semesterSubjects.stream()
+//	                .map(SubjectMaster::getTeacher)
+//	                .filter(teacher -> teacher != null && !teacher.trim().isEmpty())
+//	                .collect(Collectors.toSet());
+//
+//	        // Get student count for this semester
+//	        Long studentCount = AppUserRepository.countOnlyStudentsBySemesterId(semesterId);
+//
+//	        // Add all attributes to model
+//	        model.addAttribute("subjects", semesterSubjects);
+//	        model.addAttribute("totalSubjects", totalSubjects);
+//	        model.addAttribute("totalCoreSubjects", totalCoreSubjects);
+//	        model.addAttribute("totalElectiveSubjects", totalElectiveSubjects);
+//	        model.addAttribute("subjectsWithTeachers", subjectsWithTeachers);
+//	        model.addAttribute("teachers", teachers);
+//	        model.addAttribute("teacherCount", teachers.size());
+//	        model.addAttribute("studentCount", studentCount != null ? studentCount : 0);
+//	        model.addAttribute("pageTitle", "Subjects - " + semester.getSemesterName());
+//
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	        model.addAttribute("error", "Error loading subjects: " + e.getMessage());
+//	    }
+//
+//	    return "subject-list";
+//	}
+	
+	
+	@GetMapping("/subjects/semester/{semesterId}")
+	public String getSubjectsBySemester(@PathVariable("semesterId") int semesterId, 
+	                                   Model model, 
+	                                   Principal principal) {
+	    try {
+	        // Get current user info
+	        String currentUsername = principal.getName();
+	        List<AppUser> users = AppUserRepository.findByUserName(currentUsername);
+	        
+	        if (!users.isEmpty()) {
+	            model.addAttribute("currentUser", users.get(0));
+	        }
+
+	        // Get semester details first
+	        Optional<SemesterMaster> semesterOpt = SemesterMasterRepository.findById(semesterId);
+	        if (semesterOpt.isEmpty()) {
+	            model.addAttribute("error", "Semester not found");
+	            return "subject-list";
+	        }
+	        
+	        SemesterMaster semester = semesterOpt.get();
+	        model.addAttribute("semester", semester);
+
+	        // Get subjects for this semester
+	        List<SubjectMaster> semesterSubjects = SubjectMasterRepository.findBysemester_SemesterId(semesterId);
+	        
+	        // Prepare data with progress percentages
+	        List<Map<String, Object>> subjectData = new ArrayList<>();
+	        
+	        for (SubjectMaster subject : semesterSubjects) {
+	            Map<String, Object> data = new HashMap<>();
+	            data.put("subject", subject);
+	            
+	            // Calculate progress percentages for this subject
+	            double taskProgress = calculateSubjectTaskProgress(subject.getSubjectId());
+	            double assessmentProgress = calculateSubjectAssessmentProgress(subject.getSubjectId());
+	            double overallProgress = (taskProgress + assessmentProgress) / 2;
+	            
+	            data.put("taskProgress", taskProgress);
+	            data.put("assessmentProgress", assessmentProgress);
+	            data.put("overallProgress", overallProgress);
+	            
+	            subjectData.add(data);
+	        }
+	        
+	        // Calculate statistics
+	        long totalSubjects = semesterSubjects.size();
+	        long totalCoreSubjects = semesterSubjects.stream().filter(subject -> !subject.isElective()).count();
+	        long totalElectiveSubjects = semesterSubjects.stream().filter(SubjectMaster::isElective).count();
+	        long subjectsWithTeachers = semesterSubjects.stream()
+	                .filter(subject -> subject.getTeacher() != null && !subject.getTeacher().trim().isEmpty())
+	                .count();
+	        
+	        // Get unique teachers
+	        Set<String> teachers = semesterSubjects.stream()
+	                .map(SubjectMaster::getTeacher)
+	                .filter(teacher -> teacher != null && !teacher.trim().isEmpty())
+	                .collect(Collectors.toSet());
+
+	        // Get student count for this semester
+	        Long studentCount = AppUserRepository.countOnlyStudentsBySemesterId(semesterId);
+
+	        // Add all attributes to model
+	        model.addAttribute("subjectData", subjectData);
+	        model.addAttribute("totalSubjects", totalSubjects);
+	        model.addAttribute("totalCoreSubjects", totalCoreSubjects);
+	        model.addAttribute("totalElectiveSubjects", totalElectiveSubjects);
+	        model.addAttribute("subjectsWithTeachers", subjectsWithTeachers);
+	        model.addAttribute("teachers", teachers);
+	        model.addAttribute("teacherCount", teachers.size());
+	        model.addAttribute("studentCount", studentCount != null ? studentCount : 0);
+	        model.addAttribute("pageTitle", "Subjects - " + semester.getSemesterName());
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("error", "Error loading subjects: " + e.getMessage());
+	    }
+
+	    return "subject-list";
+	}
+
+	private double calculateSubjectTaskProgress(int subjectId) {
+	    try {
+	        // Get all scenarios for this subject
+	        List<SubjectScenarioMapping> scenarioMappings = SubjectScenarioMappingRepository.findBySubject(subjectId);
+	        
+	        if (scenarioMappings == null || scenarioMappings.isEmpty()) {
+	            return 0.0;
+	        }
+	        
+	        double totalTaskProgress = 0.0;
+	        int scenarioCount = 0;
+	        
+	        for (SubjectScenarioMapping mapping : scenarioMappings) {
+	            // Get all users for this subject's semester
+	            Optional<SubjectMaster> subjectOpt = SubjectMasterRepository.findById(subjectId);
+	            if (subjectOpt.isPresent()) {
+	                SubjectMaster subject = subjectOpt.get();
+	                List<AppUser> subjectUsers = getUsersForSubject(subject);
+	                
+	                for (AppUser user : subjectUsers) {
+	                    double userTaskProgress = calculatePracticePercentage(user.getUserName(), mapping.getScenarioId());
+	                    totalTaskProgress += userTaskProgress;
+	                }
+	                scenarioCount += subjectUsers.size();
+	            }
+	        }
+	        
+	        return scenarioCount > 0 ? totalTaskProgress / scenarioCount : 0.0;
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return 0.0;
+	    }
+	}
+
+	private double calculateSubjectAssessmentProgress(int subjectId) {
+	    try {
+	        // Get all scenarios for this subject
+	        List<SubjectScenarioMapping> scenarioMappings = SubjectScenarioMappingRepository.findBySubject(subjectId);
+	        
+	        if (scenarioMappings == null || scenarioMappings.isEmpty()) {
+	            return 0.0;
+	        }
+	        
+	        double totalAssessmentProgress = 0.0;
+	        int scenarioCount = 0;
+	        
+	        for (SubjectScenarioMapping mapping : scenarioMappings) {
+	            // Get all users for this subject's semester
+	            Optional<SubjectMaster> subjectOpt = SubjectMasterRepository.findById(subjectId);
+	            if (subjectOpt.isPresent()) {
+	                SubjectMaster subject = subjectOpt.get();
+	                List<AppUser> subjectUsers = getUsersForSubject(subject);
+	                
+	                for (AppUser user : subjectUsers) {
+	                    double userAssessmentProgress = calculateAssessmentPercentage(user.getUserName(), mapping.getScenarioId());
+	                    totalAssessmentProgress += userAssessmentProgress;
+	                }
+	                scenarioCount += subjectUsers.size();
+	            }
+	        }
+	        
+	        return scenarioCount > 0 ? totalAssessmentProgress / scenarioCount : 0.0;
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return 0.0;
+	    }
+	}
+
+
+
 
 	// Add these methods to your HODDashboardController
 
@@ -9968,6 +10343,120 @@ public class GuacamoleController {
 		}
 
 		return "teacher-list";
+	}
+	
+	
+	
+	@GetMapping("/subjects/{subjectId}/scenarios")
+	public String getSubjectScenarios(@PathVariable("subjectId") int subjectId, Model model, Principal principal) {
+	    try {
+	        String currentUsername = principal.getName();
+	        
+	        // Get current user
+	        List<AppUser> users = AppUserRepository.findByUserName(currentUsername);
+	        if (users.isEmpty()) {
+	            model.addAttribute("error", "User not found");
+	            return "subject-scenarios";
+	        }
+	        AppUser currentUser = users.get(0);
+	        model.addAttribute("currentUser", currentUser);
+
+	        // Get subject details
+	        Optional<SubjectMaster> subjectOpt = SubjectMasterRepository.findById(subjectId);
+	        if (subjectOpt.isEmpty()) {
+	            model.addAttribute("error", "Subject not found with ID: " + subjectId);
+	            return "subject-scenarios";
+	        }
+	        
+	        SubjectMaster subject = subjectOpt.get();
+	        model.addAttribute("subject", subject);
+	        model.addAttribute("pageTitle", "Subject Scenarios - " + subject.getSubjectName());
+
+	        // Get all scenario mappings for this subject
+	        List<SubjectScenarioMapping> scenarioMappings = SubjectScenarioMappingRepository.findBySubject(subjectId);
+	        
+	        if (scenarioMappings == null || scenarioMappings.isEmpty()) {
+	            model.addAttribute("scenarioData", Collections.emptyList());
+	            model.addAttribute("message", "No scenarios found for this subject");
+	            return "subject-scenarios";
+	        }
+	        
+	        // Prepare data for view
+	        List<Map<String, Object>> scenarioData = new ArrayList<>();
+	        
+	        for (SubjectScenarioMapping mapping : scenarioMappings) {
+	            Optional<Add_Scenario> scenarioOpt = ScenarioRepository.findById(mapping.getScenarioId());
+	            if (scenarioOpt.isPresent()) {
+	                Add_Scenario scenario = scenarioOpt.get();
+	                
+	                // Get all users for this subject's semester
+	                List<AppUser> subjectUsers = getUsersForSubject(subject);
+	                
+	                for (AppUser user : subjectUsers) {
+	                    Map<String, Object> data = new HashMap<>();
+	                    data.put("scenario", scenario);
+	                    data.put("user", user);
+	                    data.put("practicePercentage", calculatePracticePercentage(user.getUserName(), scenario.getId()));
+	                    data.put("assessmentPercentage", calculateAssessmentPercentage(user.getUserName(), scenario.getId()));
+	                    scenarioData.add(data);
+	                }
+	            }
+	        }
+
+	        model.addAttribute("scenarioData", scenarioData);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.addAttribute("error", "Error loading scenarios: " + e.getMessage());
+	        model.addAttribute("scenarioData", Collections.emptyList());
+	    }
+
+	    return "subject-scenarios";
+	}
+
+	private List<AppUser> getUsersForSubject(SubjectMaster subject) {
+	    try {
+	        if (subject.getSemester() != null) {
+	            Integer semesterId = subject.getSemester().getSemesterId();
+	            // Use the method that exists in your AppUserRepository
+	            return AppUserRepository.findBySemesterName_SemesterId(semesterId);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return new ArrayList<>();
+	}
+	
+	private double calculatePracticePercentage(String username, int scenarioId) {
+	    try {
+	        // Fixed: Use the correct repository method that exists in your codebase
+	        Integer trueCount = instructionTemplateRepository.getTrueCompletionCountsByusernameandscenarioId(username, scenarioId);
+	        Integer falseCount = instructionTemplateRepository.getFalseCompletionCountsByusernameandscenarioId(username, scenarioId);
+	        
+	        int total = (trueCount != null ? trueCount : 0) + (falseCount != null ? falseCount : 0);
+	        if (total == 0) return 0.0;
+	        
+	        return (double) (trueCount != null ? trueCount : 0) / total * 100;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return 0.0;
+	    }
+	}
+
+	private double calculateAssessmentPercentage(String username, int scenarioId) {
+		 try {
+		        // Fixed: Use the correct repository method that exists in your codebase
+		        Integer trueCount = assessmentInstructionTemplateRepository.getTrueCompletionCountsByusernameandscenarioId(username, scenarioId);
+		        Integer falseCount = assessmentInstructionTemplateRepository.getFalseCompletionCountsByusernameandscenarioId(username, scenarioId);
+		        
+		        int total = (trueCount != null ? trueCount : 0) + (falseCount != null ? falseCount : 0);
+		        if (total == 0) return 0.0;
+		        
+		        return (double) (trueCount != null ? trueCount : 0) / total * 100;
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		        return 0.0;
+		    }
 	}
 
 }

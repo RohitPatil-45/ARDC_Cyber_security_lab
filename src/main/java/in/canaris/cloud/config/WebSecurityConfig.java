@@ -128,8 +128,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				} else if (roles.contains("ROLE_ADMIN")) {
 					landingpageURl = "/guac/admin-dashboard";
 				} else if (roles.contains("ROLE_USER")) {
-//					landingpageURl = "/guac/UserWise_Dashboard";
-					landingpageURl = "/guac/subjectView";
+					landingpageURl = "/guac/UserWise_Dashboard";
+//					landingpageURl = "/guac/subjectView";
 				} else if (roles.contains("ROLE_TEACHER")) {
 					landingpageURl = "/guac/teacher-dashboard";
 				} else if (roles.contains("ROLE_HOD")) {

@@ -392,47 +392,7 @@ body {
 					</div>
 
 					<!-- Quick Statistics -->
-<!-- 					<div class="row mb-5"> -->
-<!-- 						<div class="col-lg-3 col-md-6 col-sm-12 mb-4"> -->
-<!-- 							<div class="summary-card"> -->
-<!-- 								<div class="icon-wrapper"> -->
-<!-- 									<i class="fas fa-layer-group"></i> -->
-<!-- 								</div> -->
-<!-- 								<div class="count" th:text="${totalSemesters}">0</div> -->
-<!-- 								<div class="label">Semesters</div> -->
-<!-- 							</div> -->
-<!-- 						</div> -->
-
-<!-- 						<div class="col-lg-3 col-md-6 col-sm-12 mb-4"> -->
-<!-- 							<div class="summary-card"> -->
-<!-- 								<div class="icon-wrapper"> -->
-<!-- 									<i class="fas fa-chalkboard-teacher"></i> -->
-<!-- 								</div> -->
-<!-- 								<div class="count" th:text="${overallTeachers}">0</div> -->
-<!-- 								<div class="label">Teachers</div> -->
-<!-- 							</div> -->
-<!-- 						</div> -->
-
-<!-- 						<div class="col-lg-3 col-md-6 col-sm-12 mb-4"> -->
-<!-- 							<div class="summary-card"> -->
-<!-- 								<div class="icon-wrapper"> -->
-<!-- 									<i class="fas fa-users"></i> -->
-<!-- 								</div> -->
-<!-- 								<div class="count" th:text="${overallStudents}">0</div> -->
-<!-- 								<div class="label">Students</div> -->
-<!-- 							</div> -->
-<!-- 						</div> -->
-
-<!-- 						<div class="col-lg-3 col-md-6 col-sm-12 mb-4"> -->
-<!-- 							<div class="summary-card"> -->
-<!-- 								<div class="icon-wrapper"> -->
-<!-- 									<i class="fas fa-users-cog"></i> -->
-<!-- 								</div> -->
-<!-- 								<div class="count" th:text="${totalBatches}">0</div> -->
-<!-- 								<div class="label">Batches</div> -->
-<!-- 							</div> -->
-<!-- 						</div> -->
-<!-- 					</div> -->
+					
 
 					<!-- Semester-wise Details -->
 					<div class="row">
@@ -466,6 +426,7 @@ body {
 													<th>Semester</th>
 													<th>Teachers</th>
 													<th>Students</th>
+													<th>Subject</th>
 													<th>Batches</th>
 													<th>Actions</th>
 												</tr>
@@ -483,7 +444,7 @@ body {
 													</td>
 													<td>
 														<a href="javascript:void(0)" class="teacher-count-link"
-														   th:onclick="|showTeachers(${semesterData.semester.semesterId})|">
+														   th:onclick="|showSubject(${semesterData.semester.semesterId})|">
 															<span th:text="${semesterData.teacherCount}">0</span> Teachers
 														</a>
 														<div class="teacher-list mt-1">
@@ -499,8 +460,15 @@ body {
 													</td>
 													<td>
 														<a href="javascript:void(0)" class="student-count-link"
-														   th:onclick="|showStudents(${semesterData.semester.semesterId})|">
+														   th:onclick="|showSubject(${semesterData.semester.semesterId})|">
 															<span th:text="${semesterData.studentCount}">0</span> Students
+														</a>
+													</td>
+													
+													<td>
+														<a href="javascript:void(0)" class="student-count-link"
+														   th:onclick="|showSubject(${semesterData.semester.semesterId})|">
+															<span th:text="${semesterData.subjectCount}">0</span> Subject
 														</a>
 													</td>
 													<td>
@@ -519,7 +487,7 @@ body {
 													<td>
 														<div class="btn-group btn-group-sm">
 															<button class="btn btn-outline-primary" 
-																	th:onclick="|viewTeachers(${semesterData.semester.semesterId})|"
+																	th:onclick="|showSubject(${semesterData.semester.semesterId})|"
 																	title="View Teachers">
 																<i class="fas fa-chalkboard-teacher"></i>
 															</button>
@@ -680,6 +648,13 @@ body {
 		function showStudents(semesterId) {
 			viewStudents(semesterId);
 		}
+		
+		function showSubject(semesterId) {
+			window.location.href = '/guac/subjects/semester/' + semesterId;
+		}
+		
+		
+		
 	</script>
 </body>
 </html>

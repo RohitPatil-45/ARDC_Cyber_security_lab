@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Subject List</title>
+<head th:include="templateListing :: headFragment"></head>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+<style>
+    .progress {
+        height: 8px;
+        margin-bottom: 5px;
+    }
+    .progress-bar-task {
+        background-color: #17a2b8;
+    }
+    .progress-bar-assessment {
+        background-color: #28a745;
+    }
+    .percentage-badge {
+        font-size: 0.75rem;
+        font-weight: bold;
+        min-width: 45px;
+        text-align: center;
+    }
+    .badge-task {
+        background-color: #17a2b8;
+        color: white;
+    }
+    .badge-assessment {
+        background-color: #28a745;
+        color: white;
+    }
+    .progress-container {
+        min-width: 120px;
+    }
+    
+    /* Simple export button styling */
+    .export-buttons {
+        margin-bottom: 15px;
+    }
+</style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header_bk :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<div class="content-wrapper">
+			
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row align-items-center mb-4">
+						<div class="col-sm-6">
+							<h1 class="animate-fade-in">
+								<i class="fas fa-book mr-3"></i> <span
+									th:text="${pageTitle != null ? pageTitle : 'Subject List'}">Subject
+									List</span>
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="/guac/Hod-homePage"
+									class="text-decoration-none"> <i class="fas fa-home mr-2"></i>Home
+								</a></li>
+								<li class="breadcrumb-item active"
+									th:text="${pageTitle != null ? pageTitle : 'Subject List'}">Subject
+									List</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			
+			<section class="content">
+				<div class="container-fluid">
+				
+					<div class="row mb-4" th:if="${semester != null}">
+						<div class="col-12">
+							<div class="dashboard-card">
+								<div class="card-body">
+									<div class="row">
+										<div class="col-md-8">
+											<h4 th:text="'Semester: ' + ${semester.semesterName}">Semester
+												Name</h4>
+											<p class="text-muted mb-0" th:if="${semester.semesterCode}">
+												Code: <span th:text="${semester.semesterCode}"></span> <span
+													th:if="${semester.course?.courseName}"> | Course: <span
+													th:text="${semester.course.courseName}"></span>
+												</span>
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				
+					<!-- Statistics Cards -->
+					<div class="row mb-4" th:if="${totalSubjects != null}">
+						<div class="col-lg-3 col-md-6">
+							<div class="stat-card">
+								<div class="stat-number" th:text="${totalSubjects}">0</div>
+								<div class="stat-label">Total Subjects</div>
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-6">
+							<div class="stat-card">
+								<div class="stat-number" th:text="${totalCoreSubjects}">0</div>
+								<div class="stat-label">Core Subjects</div>
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-6">
+							<div class="stat-card">
+								<div class="stat-number" th:text="${totalElectiveSubjects}">0</div>
+								<div class="stat-label">Elective Subjects</div>
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-6">
+							<div class="stat-card">
+								<div class="stat-number" th:text="${subjectsWithTeachers}">0</div>
+								<div class="stat-label">Assigned Teachers</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Error Message -->
+					<div th:if="${error}" class="alert alert-danger alert-dismissible">
+						<button type="button" class="close" data-dismiss="alert"
+							aria-hidden="true">×</button>
+						<i class="fas fa-exclamation-triangle mr-2"></i> <span
+							th:text="${error}"></span>
+					</div>
+
+					<!-- Success Message -->
+					<div th:if="${success}"
+						class="alert alert-success alert-dismissible">
+						<button type="button" class="close" data-dismiss="alert"
+							aria-hidden="true">×</button>
+						<i class="fas fa-check-circle mr-2"></i> <span
+							th:text="${success}"></span>
+					</div>
+					
+					<div class="row">
+						<div class="col-12">
+							<div class="dashboard-card">
+								<div class="card-header">
+									<div class="row align-items-center">
+										<div class="col-md-6">
+											<h3 class="mb-0">
+												<i class="fas fa-list mr-2"></i> Subject Details
+											</h3>
+										</div>
+										<div class="col-md-6 text-right">
+											<button class="btn btn-light" onclick="location.reload()">
+												<i class="fas fa-sync-alt mr-2"></i>Refresh
+											</button>
+										</div>
+									</div>
+								</div>
+								<div class="card-body">
+									<div class="table-responsive">
+										<table id="subjectsTable" class="table table-bordered table-striped table-hover">
+											<thead class="thead-light">
+												<tr>
+													<th width="5%">Sr No.</th>
+													<th width="20%">Subject Name</th>
+													<th width="12%">Subject Code</th>
+													<th width="8%">Type</th>
+													<th width="20%">Teacher</th>
+													<th width="15%">Task Progress</th>
+													<th width="15%">Assessment Progress</th>
+													<th width="10%">Overall</th>
+													<th width="10%">Actions</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr th:each="data, dataStat : ${subjectData}"
+													th:classappend="${data.subject.elective} ? 'elective-card' : 'subject-card'">
+													<td th:text="${dataStat.count}">1</td>
+													<td>
+														<strong th:text="${data.subject.subjectName}">Subject Name</strong>
+													</td>
+													<td>
+														<span class="badge badge-info" th:text="${data.subject.subjectCode}">CODE</span>
+													</td>
+													<td>
+														<span th:if="${data.subject.elective}" class="elective-badge">
+															<i class="fas fa-star mr-1"></i>Elective
+														</span> 
+														<span th:unless="${data.subject.elective}" class="core-badge">
+															<i class="fas fa-book mr-1"></i>Core
+														</span>
+													</td>
+													<td>
+														<div th:if="${data.subject.teacher != null and !data.subject.teacher.trim().isEmpty()}">
+															<span class="teacher-badge">
+																<i class="fas fa-user-tie mr-1"></i>
+																<span th:text="${data.subject.teacher}">Teacher</span>
+															</span>
+														</div>
+														<div th:unless="${data.subject.teacher != null and !data.subject.teacher.trim().isEmpty()}">
+															<span class="text-muted">
+																<i class="fas fa-user-slash mr-1"></i>Not Assigned
+															</span>
+														</div>
+													</td>
+													
+													<!-- Task Progress Column -->
+													<td>
+														<div class="progress-container">
+															<div class="d-flex align-items-center">
+																<div class="flex-grow-1 mr-2">
+																	<div class="progress">
+																		<div class="progress-bar progress-bar-task" 
+																			 role="progressbar" 
+																			 th:style="'width: ' + ${data.taskProgress} + '%;'"
+																			 th:attr="aria-valuenow=${data.taskProgress}" 
+																			 aria-valuemin="0" 
+																			 aria-valuemax="100">
+																		</div>
+																	</div>
+																</div>
+																<span class="percentage-badge badge-task" 
+																	  th:text="${#numbers.formatDecimal(data.taskProgress, 1, 1) + '%'}">
+																	  0%
+																</span>
+															</div>
+														</div>
+													</td>
+													
+													<!-- Assessment Progress Column -->
+													<td>
+														<div class="progress-container">
+															<div class="d-flex align-items-center">
+																<div class="flex-grow-1 mr-2">
+																	<div class="progress">
+																		<div class="progress-bar progress-bar-assessment" 
+																			 role="progressbar" 
+																			 th:style="'width: ' + ${data.assessmentProgress} + '%;'"
+																			 th:attr="aria-valuenow=${data.assessmentProgress}" 
+																			 aria-valuemin="0" 
+																			 aria-valuemax="100">
+																		</div>
+																	</div>
+																</div>
+																<span class="percentage-badge badge-assessment" 
+																	  th:text="${#numbers.formatDecimal(data.assessmentProgress, 1, 1) + '%'}">
+																	  0%
+																</span>
+															</div>
+														</div>
+													</td>
+													
+													<!-- Overall Progress Column -->
+													<td class="text-center">
+														<div class="overall-progress">
+															<div class="h5 mb-0" 
+																 th:class="${data.overallProgress >= 50} ? 'text-success' : 'text-warning'"
+																 th:text="${#numbers.formatDecimal(data.overallProgress, 1, 1) + '%'}">
+																 0%
+															</div>
+															<small class="text-muted">Average</small>
+														</div>
+													</td>
+													
+													<td class="text-center">
+														<div class="btn-group btn-group-sm">
+															<button class="btn btn-outline-primary"
+																	th:onclick="'showScenario(' + ${data.subject.subjectId} + ')'"
+																	title="View Scenarios">
+																<i class="fas fa-info-circle"></i>
+															</button>
+														</div>
+													</td>
+												</tr>
+
+												<!-- No Subjects Message -->
+												<tr th:if="${subjectData == null or subjectData.empty}">
+													<td colspan="9" class="text-center py-5 text-muted">
+														<i class="fas fa-inbox fa-3x mb-3"></i>
+														<div>
+															<strong>No Subjects Available</strong>
+															<p class="mb-0">No subjects found for this semester.</p>
+														</div>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="templateListing :: jsscript"></div>
+	
+	<!-- DataTables Scripts -->
+	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+	
+	<script type="text/javascript">
+        $(document).ready(function() {
+            // Initialize DataTable with export options
+            var table = $('#subjectsTable').DataTable({
+                "responsive": true,
+                "lengthChange": true,
+                "autoWidth": false,
+                "pageLength": 10,
+                "dom": '<"row"<"col-md-6"B><"col-md-6"f>><"row"<"col-md-12"tr>><"row"<"col-md-5"i><"col-md-7"p>>',
+                "buttons": [
+                    {
+                        extend: 'collection',
+                        className: 'btn btn-secondary',
+                        text: '<i class="fas fa-cog"></i> Options',
+                        buttons: [
+                            {
+                                extend: 'copy',
+                                className: 'btn btn-secondary',
+                                text: '<i class="fas fa-copy"></i> Copy',
+                                exportOptions: {
+                                    columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                                }
+                            },
+                            {
+                                extend: 'excel',
+                                className: 'btn btn-success',
+                                text: '<i class="fas fa-file-excel"></i> Excel',
+                                exportOptions: {
+                                    columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                                }
+                            },
+                            {
+                                extend: 'pdf',
+                                className: 'btn btn-danger',
+                                text: '<i class="fas fa-file-pdf"></i> PDF',
+                                exportOptions: {
+                                    columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                                }
+                            },
+                            {
+                                extend: 'print',
+                                className: 'btn btn-info',
+                                text: '<i class="fas fa-print"></i> Print',
+                                exportOptions: {
+                                    columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "language": {
+                    "search": "Search subjects:",
+                    "lengthMenu": "Show _MENU_ entries",
+                    "emptyTable": "No subjects available for this semester.",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ subjects",
+                    "infoEmpty": "Showing 0 to 0 of 0 subjects",
+                    "infoFiltered": "(filtered from _MAX_ total subjects)"
+                }
+            });
+
+            // Auto-hide alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        });
+
+        function showScenario(subjectId) {
+            window.location.href = `/guac/subjects/${subjectId}/scenarios`;
+        }
+    </script>
+</body>
+</html>

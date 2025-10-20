@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Subject Scenarios</title>
+<head th:include="templateListing :: headFragment"></head>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header_bk :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1 th:text="${pageTitle}">Subject Scenarios</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Subject List</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px" th:text="${pageTitle}">Subject Scenarios</h3>
+										</div>
+										
+										
+									</div>
+									<div th:if="${message != null}" class="alert alert-success alert-dismissible fade show text-center message" role="alert">
+										[[${message}]]
+										<button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+								<div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="scenariosTable" class="table table-bordered table-striped">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th width="25%">Scenario Name</th>
+                                                    <th width="15%">User</th>
+                                                    <th width="20%">Practice Progress</th>
+                                                    <th width="20%">Assessment Progress</th>
+                                                    <th width="20%">Overall Progress</th>
+                                                </tr>
+                                            </thead>
+                                            <thead class="thead-light" id="searchHeader" style="display: none;">
+                                                <tr>
+                                                    <th><input type="text" class="form-control form-control-sm column-search" placeholder="Search scenario" data-column="0"></th>
+                                                    <th><input type="text" class="form-control form-control-sm column-search" placeholder="Search user" data-column="1"></th>
+                                                    <th></th>
+                                                    <th></th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:if="${scenarioData != null and !scenarioData.empty}" 
+                                                    th:each="data : ${scenarioData}">
+                                                    <td>
+                                                        <div class="scenario-title" 
+                                                             th:text="${data.scenario?.scenarioTitle} ?: 'No Title'">
+                                                            Scenario Title
+                                                        </div>
+                                                        <div class="scenario-desc" 
+                                                             th:text="${data.scenario?.scenarioName} ?: 'No Description'">
+                                                            Scenario Name
+                                                        </div>
+                                                        <small class="text-muted">
+                                                            Level: 
+                                                            <span th:text="${data.scenario?.difficultyLevel} ?: 'N/A'"></span> | 
+                                                            Duration: 
+                                                            <span th:text="${data.scenario?.duration} ?: 'N/A'"></span>
+                                                        </small>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="user-avatar mr-2">
+                                                                <span th:if="${data.user?.name}" 
+                                                                      th:text="${#strings.substring(data.user.name, 0, 1).toUpperCase()}">
+                                                                    U
+                                                                </span>
+                                                                <span th:unless="${data.user?.name}">U</span>
+                                                            </div>
+                                                            <div>
+                                                                <div th:text="${data.user?.name} ?: 'Unknown User'">User Name</div>
+                                                                <small class="text-muted" 
+                                                                       th:text="${data.user?.userName} ?: 'No username'">
+                                                                    username
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="flex-grow-1 mr-2">
+                                                                <div class="progress">
+                                                                    <div class="progress-bar progress-bar-practice" 
+                                                                         role="progressbar" 
+                                                                         th:style="'width: ' + ${data.practicePercentage} + '%;'"
+                                                                         th:attr="aria-valuenow=${data.practicePercentage}" 
+                                                                         aria-valuemin="0" 
+                                                                         aria-valuemax="100">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <span class="percentage-badge badge-practice" 
+                                                                  th:text="${#numbers.formatDecimal(data.practicePercentage, 1, 1) + '%'}">
+                                                                  0%
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="flex-grow-1 mr-2">
+                                                                <div class="progress">
+                                                                    <div class="progress-bar progress-bar-assessment" 
+                                                                         role="progressbar" 
+                                                                         th:style="'width: ' + ${data.assessmentPercentage} + '%;'"
+                                                                         th:attr="aria-valuenow=${data.assessmentPercentage}" 
+                                                                         aria-valuemin="0" 
+                                                                         aria-valuemax="100">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <span class="percentage-badge badge-assessment" 
+                                                                  th:text="${#numbers.formatDecimal(data.assessmentPercentage, 1, 1) + '%'}">
+                                                                  0%
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-center">
+                                                            <div class="h4 mb-1" 
+                                                                 th:class="${((data.practicePercentage + data.assessmentPercentage) / 2) >= 50} ? 'text-success' : 'text-danger'"
+                                                                 th:text="${#numbers.formatDecimal((data.practicePercentage + data.assessmentPercentage) / 2, 1, 1) + '%'}">
+                                                                 0%
+                                                            </div>
+                                                            <small class="text-muted">Average</small>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                
+                                                <!-- No Data Message -->
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="templateListing :: jsscript"></div>
+	
+	<!-- DataTables Scripts -->
+	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+	
+	 <script type="text/javascript">
+        $(document).ready(function() {
+            // Initialize DataTable
+            var table = $('#scenariosTable').DataTable({
+                "responsive": true,
+                "lengthChange": true,
+                "autoWidth": false,
+                "pageLength": 10,
+                "dom": '<"row"<"col-md-6"B><"col-md-6"f>><"row"<"col-md-12"tr>><"row"<"col-md-5"i><"col-md-7"p>>',
+                "buttons": [
+                    {
+                        extend: 'collection',
+                        className: 'btn btn-secondary',
+                        text: '<i class="fas fa-cog"></i> Options',
+                        buttons: [
+                            {
+                                extend: 'copy',
+                                className: 'btn btn-secondary',
+                                text: '<i class="fas fa-copy"></i> Copy'
+                            },
+                            {
+                                extend: 'excel',
+                                className: 'btn btn-success',
+                                text: '<i class="fas fa-file-excel"></i> Excel'
+                            },
+                            {
+                                extend: 'pdf',
+                                className: 'btn btn-danger',
+                                text: '<i class="fas fa-file-pdf"></i> PDF'
+                            },
+                            {
+                                extend: 'print',
+                                className: 'btn btn-info',
+                                text: '<i class="fas fa-print"></i> Print'
+                            },
+                            {
+                                text: '<i class="fas fa-search"></i> Toggle Search',
+                                className: 'btn btn-warning',
+                                action: function ( e, dt, node, config ) {
+                                    $('#searchHeader').toggle();
+                                    // Adjust table header if needed
+                                    table.columns.adjust();
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "language": {
+                    "search": "Global Search:",
+                    "lengthMenu": "Show _MENU_ entries"
+                }
+            });
+            
+            // Individual column search
+            $('#scenariosTable thead').on('keyup', '.column-search', function() {
+                var columnIndex = $(this).data('column');
+                table.column(columnIndex).search(this.value).draw();
+            });
+            
+            // Auto-hide alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

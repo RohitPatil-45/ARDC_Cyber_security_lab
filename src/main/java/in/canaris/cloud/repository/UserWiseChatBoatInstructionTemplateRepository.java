@@ -103,12 +103,19 @@ public interface UserWiseChatBoatInstructionTemplateRepository
 	List<Object> findByScenarioIdAndUserName(@Param("userName") String userName);
 
 	@Query("SELECT COUNT(u) FROM UserWiseChatBoatInstructionTemplate u WHERE u.labId = :labId AND u.ScenarioId = :scenarioId AND u.isCommandExecuted = 'true'")
-	Integer getTrueCompletionCountsByLabIdAndScenarioId(@Param("labId") int labId,
-			@Param("scenarioId") int scenarioId);
+	Integer getTrueCompletionCountsByLabIdAndScenarioId(@Param("labId") int labId, @Param("scenarioId") int scenarioId);
 
 	@Query("SELECT COUNT(u) FROM UserWiseChatBoatInstructionTemplate u WHERE u.labId = :labId AND u.ScenarioId = :scenarioId AND u.isCommandExecuted = 'false'")
 	Integer getFalseCompletionCountsByLabIdAndScenarioId(@Param("labId") int labId,
 			@Param("scenarioId") int scenarioId);
+
+//	@Query("SELECT s.scenarioName, u.username, "
+//			+ "CASE WHEN MAX(it.completionStatus) = true THEN 'Completed' ELSE 'In Progress' END, "
+//			+ "COALESCE(ROUND(SUM(CASE WHEN it.completionStatus = true THEN 1 ELSE 0 END) * 100.0 / COUNT(it), 2), 0), "
+//			+ "COALESCE(ROUND(SUM(CASE WHEN a.completionStatus = true THEN 1 ELSE 0 END) * 100.0 / COUNT(a), 2), 0) "
+//			+ "FROM InstructionTemplate it " + "JOIN it.scenario s " + "JOIN it.user u " + "LEFT JOIN it.assessments a "
+//			+ "WHERE s.subject.id = :subjectId " + "GROUP BY s.scenarioName, u.username")
+//	List<Object[]> findScenarioPerformanceBySubjectId(@Param("subjectId") Integer subjectId);
 
 //	@Query(value = "SELECT COUNT(*) FROM userwise_chatboat_instruction_template "
 //			+ "WHERE isCommandExecuted='false' and username=:username", nativeQuery = true)

@@ -72,9 +72,7 @@ public interface AppUserRepository extends JpaRepository<AppUser, Integer> {
 			+ "AND (:batchId = 0 OR b.batch_id = :batchId)", nativeQuery = true)
 	List<AppUser> findByDepartmentCourseSemesterBatchNative(@Param("deptId") Long deptId,
 			@Param("courseId") Long courseId, @Param("semesterId") Long semesterId, @Param("batchId") Long batchId);
-	
-	
-	
+
 //	// Count students by department (ROLE_USER)
 //	@Query(value = "SELECT COUNT(DISTINCT u.user_id) FROM app_user u " +
 //	               "INNER JOIN user_role ur ON u.user_id = ur.user_id " +
@@ -107,16 +105,16 @@ public interface AppUserRepository extends JpaRepository<AppUser, Integer> {
 //	       nativeQuery = true)
 //	Long countTeachersByCourse(@Param("courseId") int courseId);
 
-	   @Query("SELECT COUNT(u) FROM AppUser u WHERE u.semesterName.semesterId = :semesterId AND EXISTS (SELECT ur FROM u.userRoles ur WHERE ur.appRole.roleName = 'ROLE_USER')")
-	    Long countOnlyStudentsBySemesterId(@Param("semesterId") Integer semesterId);
-	    
-	    @Query("SELECT u FROM AppUser u WHERE u.semesterName.semesterId = :semesterId AND EXISTS (SELECT ur FROM u.userRoles ur WHERE ur.appRole.roleName = 'ROLE_USER')")
-	    List<AppUser> findOnlyStudentsBySemesterId(@Param("semesterId") Integer semesterId);
+	@Query("SELECT COUNT(u) FROM AppUser u WHERE u.semesterName.semesterId = :semesterId AND EXISTS (SELECT ur FROM u.userRoles ur WHERE ur.appRole.roleName = 'ROLE_USER')")
+	Long countOnlyStudentsBySemesterId(@Param("semesterId") Integer semesterId);
 
-	
+	@Query("SELECT u FROM AppUser u WHERE u.semesterName.semesterId = :semesterId AND EXISTS (SELECT ur FROM u.userRoles ur WHERE ur.appRole.roleName = 'ROLE_USER')")
+	List<AppUser> findOnlyStudentsBySemesterId(@Param("semesterId") Integer semesterId);
 
-		
+	List<AppUser> findBySemesterName_SemesterId(Integer semesterId);
 
-		
+	@Query("SELECT DISTINCT u FROM AppUser u " + "JOIN u.userRoles ur " + "JOIN ur.appRole r "
+			+ "WHERE u.departmentName.departmentId = :departmentId " + "AND r.roleName = 'ROLE_HOD'")
+	List<AppUser> findHodsByDepartmentId(@Param("departmentId") Integer departmentId);
 
 }

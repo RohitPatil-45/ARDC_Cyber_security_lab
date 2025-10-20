@@ -42,4 +42,12 @@ public interface AssessmentUserWiseChatBoatInstructionTemplateRepository
 	@Query(value = "SELECT COUNT(*) FROM assessment_userwise_chatboat_instruction_template "
 			+ "WHERE isCommandExecuted='true' AND lab_id = :labid", nativeQuery = true)
 	Integer gettrueCompletionCountsByTemplateName(@Param("labid") int labid);
+
+	@Query("SELECT COUNT(u) FROM AssessmentUserWiseChatBoatInstructionTemplate u WHERE u.username = :userName AND u.ScenarioId = :scenarioId AND u.isCommandExecuted = 'false'")
+	Integer getFalseCompletionCountsByusernameandscenarioId(@Param("userName") String userName,
+			@Param("scenarioId") int scenarioId);
+
+	@Query("SELECT COUNT(u) FROM AssessmentUserWiseChatBoatInstructionTemplate u WHERE u.username = :userName AND u.ScenarioId = :scenarioId AND u.isCommandExecuted = 'true'")
+	Integer getTrueCompletionCountsByusernameandscenarioId(@Param("userName") String userName,
+			@Param("scenarioId") int scenarioId);
 }
