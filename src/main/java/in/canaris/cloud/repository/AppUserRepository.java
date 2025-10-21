@@ -117,4 +117,13 @@ public interface AppUserRepository extends JpaRepository<AppUser, Integer> {
 			+ "WHERE u.departmentName.departmentId = :departmentId " + "AND r.roleName = 'ROLE_HOD'")
 	List<AppUser> findHodsByDepartmentId(@Param("departmentId") Integer departmentId);
 
+	List<AppUser> findBySemesterName_SemesterIdAndEnabledTrue(int semesterId);
+
+	
+
+	
+	
+
+	
+
 }

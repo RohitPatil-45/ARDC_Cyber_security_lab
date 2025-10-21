@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>All Subjects Scenarios Report</title>
+<head th:include="templateListing :: headFragment"></head>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+<style>
+    .progress {
+        height: 8px;
+        margin-bottom: 5px;
+    }
+    .progress-bar-practice {
+        background-color: #17a2b8;
+    }
+    .progress-bar-assessment {
+        background-color: #28a745;
+    }
+    .percentage-badge {
+        font-size: 0.75rem;
+        font-weight: bold;
+        min-width: 45px;
+        text-align: center;
+    }
+    .badge-practice {
+        background-color: #17a2b8;
+        color: white;
+    }
+    .badge-assessment {
+        background-color: #28a745;
+        color: white;
+    }
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: #6c757d;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    .subject-badge {
+        background-color: #6f42c1;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    .scenario-title {
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+    .scenario-desc {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 2px;
+    }
+    .no-data-cell {
+        background-color: #f8f9fa;
+    }
+    .info-box {
+        box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+        border-radius: 0.25rem;
+        background: #fff;
+        display: flex;
+        margin-bottom: 1rem;
+        min-height: 80px;
+        padding: 0.5rem;
+        position: relative;
+    }
+    .info-box .info-box-icon {
+        border-radius: 0.25rem;
+        align-items: center;
+        display: flex;
+        font-size: 1.875rem;
+        justify-content: center;
+        text-align: center;
+        width: 70px;
+    }
+    .info-box .info-box-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        line-height: 1.8;
+        flex: 1;
+        padding: 0 10px;
+    }
+    .info-box .info-box-text {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-transform: uppercase;
+        font-size: 0.875rem;
+    }
+    .info-box .info-box-number {
+        display: block;
+        font-weight: 700;
+        font-size: 1.5rem;
+    }
+</style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header_bk :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1 th:text="${pageTitle}">Subjects Scenarios Report</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a th:href="@{/guac/Hod-homePage}">Home</a></li>
+								<li class="breadcrumb-item active" th:text="${pageTitle}">Subjects Scenarios Report</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-8">
+											<h3 class="card-title" style="padding-top: 10px"> Subjects & Scenarios Data</h3>
+										</div>
+										<div class="col-md-4 text-right">
+											
+										</div>
+									</div>
+									
+									<!-- Statistics Cards -->
+<!-- 									<div class="row mt-3" th:if="${totalSubjects != null}"> -->
+<!-- 										<div class="col-md-4"> -->
+<!-- 											<div class="info-box bg-info"> -->
+<!-- 												<span class="info-box-icon"><i class="fas fa-book"></i></span> -->
+<!-- 												<div class="info-box-content"> -->
+<!-- 													<span class="info-box-text">Total Subjects</span> -->
+<!-- 													<span class="info-box-number" th:text="${totalSubjects}">0</span> -->
+<!-- 												</div> -->
+<!-- 											</div> -->
+<!-- 										</div> -->
+<!-- 										<div class="col-md-4"> -->
+<!-- 											<div class="info-box bg-success"> -->
+<!-- 												<span class="info-box-icon"><i class="fas fa-tasks"></i></span> -->
+<!-- 												<div class="info-box-content"> -->
+<!-- 													<span class="info-box-text">Total Scenarios</span> -->
+<!-- 													<span class="info-box-number" th:text="${totalScenarios}">0</span> -->
+<!-- 												</div> -->
+<!-- 											</div> -->
+<!-- 										</div> -->
+<!-- 										<div class="col-md-4"> -->
+<!-- 											<div class="info-box bg-warning"> -->
+<!-- 												<span class="info-box-icon"><i class="fas fa-link"></i></span> -->
+<!-- 												<div class="info-box-content"> -->
+<!-- 													<span class="info-box-text">Scenario Mappings</span> -->
+<!-- 													<span class="info-box-number" th:text="${totalScenarioMappings}">0</span> -->
+<!-- 												</div> -->
+<!-- 											</div> -->
+<!-- 										</div> -->
+<!-- 									</div> -->
+
+									<!-- Error Message -->
+									<div th:if="${error}" class="alert alert-danger alert-dismissible fade show text-center message mt-3" role="alert">
+										<i class="fas fa-exclamation-triangle mr-2"></i> 
+										<span th:text="${error}">Error message</span>
+										<button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+
+									<!-- Success Message -->
+									<div th:if="${success}" class="alert alert-success alert-dismissible fade show text-center message mt-3" role="alert">
+										<i class="fas fa-check-circle mr-2"></i> 
+										<span th:text="${success}">Success message</span>
+										<button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+								<div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="scenariosReportTable" class="table table-bordered table-striped">
+                                            <thead class="thead-light">
+                                                <tr>
+<!--                                                  <th width="15%">Sr.</th> -->
+                                                    <th width="15%">Subject</th>
+                                                    <th width="20%">Scenario</th>
+                                                    <th width="15%">User</th>
+                                                    <th width="12%">Practice Progress</th>
+                                                    <th width="12%">Assessment Progress</th>
+                                                    <th width="12%">Overall Progress</th>
+                                                    <th width="14%">Course & Semester</th>
+                                                </tr>
+                                            </thead>
+                                            <thead class="thead-light" id="searchHeader" style="display: none;">
+                                                <tr>
+                                                    <th><input type="text" class="form-control form-control-sm column-search" placeholder="Search subject" data-column="0"></th>
+                                                    <th><input type="text" class="form-control form-control-sm column-search" placeholder="Search scenario" data-column="1"></th>
+                                                    <th><input type="text" class="form-control form-control-sm column-search" placeholder="Search user" data-column="2"></th>
+                                                    <th></th>
+                                                    <th></th>
+                                                    <th></th>
+                                                    <th><input type="text" class="form-control form-control-sm column-search" placeholder="Search course" data-column="6"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:if="${reportData != null and !reportData.empty}" 
+                                                    th:each="data : ${reportData}">
+                                                    <!-- Subject Column -->
+<!--                                                     <td th:text="${reportData.count}">1</td> -->
+                                                    <td>
+                                                        <div class="subject-title" th:text="${data.subject?.subjectName} ?: 'No Subject'">
+                                                            Subject Name
+                                                        </div>
+                                                        <div>
+                                                            <span class="badge badge-info" th:text="${data.subject?.subjectCode} ?: 'No Code'">
+                                                                CODE
+                                                            </span>
+                                                        </div>
+                                                        <small class="text-muted" th:if="${data.subject?.teacher}">
+                                                            Teacher: <span th:text="${data.subject.teacher}"></span>
+                                                        </small>
+                                                    </td>
+                                                    
+                                                    <!-- Scenario Column -->
+                                                    <td th:class="${!data.hasScenarios} ? 'no-data-cell' : ''">
+                                                        <div th:if="${data.scenario != null}">
+                                                            <div class="scenario-title" th:text="${data.scenario?.scenarioTitle} ?: 'No Title'">
+                                                                Scenario Title
+                                                            </div>
+                                                            <div class="scenario-desc" th:text="${data.scenario?.scenarioName} ?: 'No Description'">
+                                                                Scenario Name
+                                                            </div>
+                                                            <small class="text-muted">
+                                                                Level: <span th:text="${data.scenario?.difficultyLevel} ?: 'N/A'"></span> | 
+                                                                Duration: <span th:text="${data.scenario?.duration} ?: 'N/A'"></span>
+                                                            </small>
+                                                        </div>
+                                                        <div th:if="${!data.hasScenarios}">
+                                                            <span class="text-muted">
+                                                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                                No scenarios assigned
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    
+                                                    <!-- User Column -->
+                                                    <td th:class="${data.user == null} ? 'no-data-cell' : ''">
+                                                        <div th:if="${data.user != null}">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="user-avatar mr-2">
+                                                                    <span th:if="${data.user?.name}" 
+                                                                          th:text="${#strings.substring(data.user.name, 0, 1).toUpperCase()}">
+                                                                        U
+                                                                    </span>
+                                                                    <span th:unless="${data.user?.name}">U</span>
+                                                                </div>
+                                                                <div>
+                                                                    <div th:text="${data.user?.name} ?: 'Unknown User'">User Name</div>
+                                                                    <small class="text-muted" 
+                                                                           th:text="${data.user?.userName} ?: 'No username'">
+                                                                        username
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div th:if="${data.user == null}">
+                                                            <span class="text-muted">No user data</span>
+                                                        </div>
+                                                    </td>
+                                                    
+                                                    <!-- Practice Progress Column -->
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="flex-grow-1 mr-2">
+                                                                <div class="progress">
+                                                                    <div class="progress-bar progress-bar-practice" 
+                                                                         role="progressbar" 
+                                                                         th:style="'width: ' + ${data.practicePercentage} + '%;'"
+                                                                         th:attr="aria-valuenow=${data.practicePercentage}" 
+                                                                         aria-valuemin="0" 
+                                                                         aria-valuemax="100">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <span class="percentage-badge badge-practice" 
+                                                                  th:text="${#numbers.formatDecimal(data.practicePercentage, 1, 1) + '%'}">
+                                                                  0%
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    
+                                                    <!-- Assessment Progress Column -->
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="flex-grow-1 mr-2">
+                                                                <div class="progress">
+                                                                    <div class="progress-bar progress-bar-assessment" 
+                                                                         role="progressbar" 
+                                                                         th:style="'width: ' + ${data.assessmentPercentage} + '%;'"
+                                                                         th:attr="aria-valuenow=${data.assessmentPercentage}" 
+                                                                         aria-valuemin="0" 
+                                                                         aria-valuemax="100">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <span class="percentage-badge badge-assessment" 
+                                                                  th:text="${#numbers.formatDecimal(data.assessmentPercentage, 1, 1) + '%'}">
+                                                                  0%
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    
+                                                    <!-- Overall Progress Column -->
+                                                    <td class="text-center">
+                                                        <div th:if="${data.hasScenarios}">
+                                                            <div class="h5 mb-1" 
+                                                                 th:class="${((data.practicePercentage + data.assessmentPercentage) / 2) >= 50} ? 'text-success' : 'text-danger'"
+                                                                 th:text="${#numbers.formatDecimal((data.practicePercentage + data.assessmentPercentage) / 2, 1, 1) + '%'}">
+                                                                 0%
+                                                            </div>
+                                                            <small class="text-muted">Average</small>
+                                                        </div>
+                                                        <div th:if="${!data.hasScenarios}">
+                                                            <span class="text-muted">-</span>
+                                                        </div>
+                                                    </td>
+                                                    
+                                                    <!-- Course & Semester Column -->
+                                                    <td>
+                                                        <div th:if="${data.subject?.semester != null}">
+                                                            <div th:if="${data.subject.semester.course != null}">
+                                                                <strong th:text="${data.subject.semester.course.courseName}">Course Name</strong>
+                                                            </div>
+                                                            <div th:text="${data.subject.semester.semesterName}">Semester Name</div>
+                                                            <small class="text-muted" th:text="${data.subject.semester.semesterCode}">Code</small>
+                                                        </div>
+                                                        <div th:if="${data.subject?.semester == null}">
+                                                            <span class="text-muted">Not assigned</span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                
+                                                <!-- No Data Message -->
+                                                <tr th:if="${reportData == null or reportData.empty}">
+                                                    <td colspan="7" class="text-center py-5 text-muted">
+                                                        <i class="fas fa-inbox fa-3x mb-3"></i>
+                                                        <div>
+                                                            <strong>No Data Available</strong>
+                                                            <p class="mb-0">No subjects or scenarios found in the system.</p>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="templateListing :: jsscript"></div>
+	
+	<!-- DataTables Scripts -->
+	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			// Initialize DataTable
+			var table = $('#scenariosReportTable').DataTable({
+				"responsive": true,
+				"lengthChange": true,
+				"autoWidth": false,
+				"pageLength": 8,
+				"dom": '<"row"<"col-md-6"B><"col-md-6"f>><"row"<"col-md-12"tr>><"row"<"col-md-5"i><"col-md-7"p>>',
+				"buttons": [
+					{
+						extend: 'collection',
+						className: 'btn btn-secondary',
+						text: '<i class="fas fa-cog"></i> Options',
+						buttons: [
+							{
+								extend: 'copy',
+								className: 'btn btn-secondary',
+								text: '<i class="fas fa-copy"></i> Copy',
+								exportOptions: {
+									columns: ':visible'
+								},
+								title: 'All Subjects Scenarios Report'
+							},
+							{
+								extend: 'excel',
+								className: 'btn btn-success',
+								text: '<i class="fas fa-file-excel"></i> Excel',
+								exportOptions: {
+									columns: ':visible'
+								},
+								title: 'All Subjects Scenarios Report',
+								filename: 'subjects_scenarios_report_' + new Date().toISOString().slice(0,10)
+							},
+							{
+								extend: 'pdf',
+								className: 'btn btn-danger',
+								text: '<i class="fas fa-file-pdf"></i> PDF',
+								exportOptions: {
+									columns: ':visible'
+								},
+								title: 'All Subjects Scenarios Report',
+								filename: 'subjects_scenarios_report_' + new Date().toISOString().slice(0,10),
+								orientation: 'landscape'
+							},
+							{
+								extend: 'print',
+								className: 'btn btn-info',
+								text: '<i class="fas fa-print"></i> Print',
+								exportOptions: {
+									columns: ':visible'
+								},
+								title: 'All Subjects Scenarios Report - ' + new Date().toLocaleDateString()
+							},
+							{
+								text: '<i class="fas fa-search"></i> Toggle Search',
+								className: 'btn btn-warning',
+								action: function ( e, dt, node, config ) {
+									$('#searchHeader').toggle();
+									table.columns.adjust();
+								}
+							}
+						]
+					}
+				],
+				"language": {
+					"search": "Search:",
+					"lengthMenu": "Show _MENU_ entries",
+					"emptyTable": "No data available in the system.",
+					"info": "Showing _START_ to _END_ of _TOTAL_ entries",
+					"infoEmpty": "Showing 0 to 0 of 0 entries",
+					"infoFiltered": "(filtered from _MAX_ total entries)"
+				}
+			});
+			
+			// Individual column search
+			$('#scenariosReportTable thead').on('keyup', '.column-search', function() {
+				var columnIndex = $(this).data('column');
+				table.column(columnIndex).search(this.value).draw();
+			});
+			
+			// Auto-hide alerts after 5 seconds
+			setTimeout(function() {
+				$('.alert').fadeOut('slow');
+			}, 5000);
+		});
+	</script>
+</body>
+</html>

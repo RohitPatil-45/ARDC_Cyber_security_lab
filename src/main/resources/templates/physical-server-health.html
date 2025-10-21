@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Physical Server Health Monitoring</title>
+    <head th:replace="templateListing :: headFragment"></head>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+    <style>
+        .usage-text {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        .badge-health {
+            font-size: 0.75rem;
+            padding: 0.3em 0.6em;
+        }
+        .health-excellent { 
+            background-color: #28a745; 
+            color: white; 
+        }
+        .health-good { 
+            background-color: #17a2b8; 
+            color: white; 
+        }
+        .health-warning { 
+            background-color: #ffc107; 
+            color: black; 
+        }
+        .health-critical { 
+            background-color: #dc3545; 
+            color: white; 
+        }
+        .server-ip {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div th:replace="fragments/header_bk :: header"></div>
+        <div th:replace="fragments/sidebar :: aside"></div>
+        
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Physical Server Health Monitoring</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/guac/Hod-homePage">Home</a></li>
+                                <li class="breadcrumb-item active">Server Health</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card card-secondary">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-10">
+                                            <h3 class="card-title" style="padding-top: 10px">Server Health Details</h3>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="button" class="btn btn-block bg-gradient-primary" onclick="location.reload()">
+                                                <i class="fas fa-sync-alt"></i> Refresh
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show text-center message" role="alert">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <span th:text="${error}">Error</span>
+                                        <button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                Total Servers Monitored: <strong th:text="${totalServers}">0</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <table id="serversTable" class="table table-bordered table-striped">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Sr No.</th>
+                                                <th>Server IP</th>
+                                                <th>RAM Details (GB)</th>
+                                                <th>CPU Details (Cores)</th>
+                                                <th>Disk Details (GB)</th>
+                                                <th>Health Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="server, stat : ${serverData}">
+                                                <td th:text="${stat.count}">1</td>
+                                                
+                                                <td>
+                                                    <span class="server-ip" th:text="${server.physicalServerIp}">IP</span>
+                                                </td>
+                                                
+                                                <td>
+                                                    <div class="mb-1">
+                                                        <strong>Total:</strong> <span th:text="${server.totalRam}">0</span> GB
+                                                    </div>
+                                                    <div class="mb-1">
+                                                        <strong>Used:</strong> <span th:text="${server.usedRam}">0</span> GB
+                                                    </div>
+                                                    <div class="mb-1">
+                                                        <strong>Free:</strong> <span th:text="${server.freeRam}">0</span> GB
+                                                    </div>
+                                                    <div>
+                                                        <small class="usage-text">
+                                                            Usage: <span th:text="${server.ramUsagePercent}">0</span>%
+                                                        </small>
+                                                    </div>
+                                                </td>
+                                                
+                                                <td>
+                                                    <div class="mb-1">
+                                                        <strong>Total:</strong> <span th:text="${server.totalCpu}">0</span> cores
+                                                    </div>
+                                                    <div class="mb-1">
+                                                        <strong>Used:</strong> <span th:text="${server.usedCpu}">0</span> cores
+                                                    </div>
+                                                    <div class="mb-1">
+                                                        <strong>Free:</strong> <span th:text="${server.freeCpu}">0</span> cores
+                                                    </div>
+                                                    <div>
+                                                        <small class="usage-text">
+                                                            Usage: <span th:text="${server.cpuUsagePercent}">0</span>%
+                                                        </small>
+                                                    </div>
+                                                </td>
+                                                
+                                                <td>
+                                                    <div class="mb-1">
+                                                        <strong>Total:</strong> <span th:text="${server.totalDisk}">0</span> GB
+                                                    </div>
+                                                    <div class="mb-1">
+                                                        <strong>Used:</strong> <span th:text="${server.usedDisk}">0</span> GB
+                                                    </div>
+                                                    <div class="mb-1">
+                                                        <strong>Free:</strong> <span th:text="${server.freeDisk}">0</span> GB
+                                                    </div>
+                                                    <div>
+                                                        <small class="usage-text">
+                                                            Usage: <span th:text="${server.diskUsagePercent}">0</span>%
+                                                        </small>
+                                                    </div>
+                                                </td>
+                                                
+                                                <td>
+                                                    <!-- Simple health status display without complex conditions -->
+                                                    <th:block th:switch="${server.healthStatus}">
+                                                        <span th:case="'EXCELLENT'" class="badge badge-health health-excellent" th:text="${server.healthStatus}">EXCELLENT</span>
+                                                        <span th:case="'GOOD'" class="badge badge-health health-good" th:text="${server.healthStatus}">GOOD</span>
+                                                        <span th:case="'WARNING'" class="badge badge-health health-warning" th:text="${server.healthStatus}">WARNING</span>
+                                                        <span th:case="'CRITICAL'" class="badge badge-health health-critical" th:text="${server.healthStatus}">CRITICAL</span>
+                                                    </th:block>
+                                                </td>
+                                            </tr>
+                                            
+                                            <tr th:if="${#lists.isEmpty(serverData)}">
+                                                <td colspan="6" class="text-center text-muted py-4">
+                                                    <i class="fas fa-server fa-3x mb-3"></i>
+                                                    <div>
+                                                        <strong class="d-block">No Server Data Found</strong>
+                                                        <p class="mb-0">No physical server health monitoring data available.</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
+
+    <div th:replace="templateListing :: jsscript"></div>
+    
+    <!-- DataTables Scripts -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Initialize DataTable
+            var table = $('#serversTable').DataTable({
+                "responsive": true,
+                "lengthChange": true,
+                "autoWidth": false,
+                "pageLength": 10,
+                "dom": '<"row"<"col-md-6"B><"col-md-6"f>><"row"<"col-md-12"tr>><"row"<"col-md-5"i><"col-md-7"p>>',
+                "buttons": [
+                    {
+                        extend: 'collection',
+                        className: 'btn btn-secondary',
+                        text: '<i class="fas fa-cog"></i> Options',
+                        buttons: [
+                            {
+                                extend: 'copy',
+                                className: 'btn btn-secondary',
+                                text: '<i class="fas fa-copy"></i> Copy'
+                            },
+                            {
+                                extend: 'excel',
+                                className: 'btn btn-success',
+                                text: '<i class="fas fa-file-excel"></i> Excel'
+                            },
+                            {
+                                extend: 'pdf',
+                                className: 'btn btn-danger',
+                                text: '<i class="fas fa-file-pdf"></i> PDF'
+                            },
+                            {
+                                extend: 'print',
+                                className: 'btn btn-info',
+                                text: '<i class="fas fa-print"></i> Print'
+                            }
+                        ]
+                    }
+                ],
+                "language": {
+                    "search": "Search all columns:",
+                    "lengthMenu": "Show _MENU_ entries",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ servers"
+                }
+            });
+        });
+    </script>
+</body>
+</html>

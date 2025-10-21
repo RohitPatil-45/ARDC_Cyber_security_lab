@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>All Subjects Report</title>
+<head th:include="templateListing :: headFragment"></head>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+<style>
+    .progress {
+        height: 8px;
+        margin-bottom: 5px;
+    }
+    .progress-bar-task {
+        background-color: #17a2b8;
+    }
+    .progress-bar-assessment {
+        background-color: #28a745;
+    }
+    .percentage-badge {
+        font-size: 0.75rem;
+        font-weight: bold;
+        min-width: 45px;
+        text-align: center;
+    }
+    .badge-task {
+        background-color: #17a2b8;
+        color: white;
+    }
+    .badge-assessment {
+        background-color: #28a745;
+        color: white;
+    }
+    .progress-container {
+        min-width: 120px;
+    }
+    .elective-badge {
+        background-color: #ffc107;
+        color: #212529;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    .core-badge {
+        background-color: #17a2b8;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    .teacher-badge {
+        background-color: #28a745;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+</style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header_bk :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1 th:text="${pageTitle != null ? pageTitle : 'All Subjects Report'}"> Subjects Report</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a th:href="@{/guac/Hod-homePage}">Home</a></li>
+								<li class="breadcrumb-item active" th:text="${pageTitle != null ? pageTitle : 'All Subjects Report'}"> Subjects Report</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card card-secondary">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-md-10">
+											<h3 class="card-title" style="padding-top: 10px">Subject Details</h3>
+										</div>
+										<div class="col-md-2 text-right">
+											
+										</div>
+									</div>
+									
+									<!-- Error Message -->
+									<div th:if="${error}" class="alert alert-danger alert-dismissible fade show text-center message" role="alert">
+										<i class="fas fa-exclamation-triangle mr-2"></i> 
+										<span th:text="${error}">Error message</span>
+										<button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+
+									<!-- Success Message -->
+									<div th:if="${success}" class="alert alert-success alert-dismissible fade show text-center message" role="alert">
+										<i class="fas fa-check-circle mr-2"></i> 
+										<span th:text="${success}">Success message</span>
+										<button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+								<div class="card-body" th:if="${subjectData != null}">
+									<table id="subjectsTable" class="table table-bordered table-striped">
+										<thead class="thead-light">
+											<tr>
+												<th scope="col">Sr</th>
+												<th scope="col">Subject Name</th>
+												<th scope="col">Subject Code</th>
+												<th scope="col">Type</th>
+												<th scope="col">Teacher</th>
+												<th scope="col">Course</th>
+												<th scope="col">Semester</th>
+												<th scope="col">Task Progress</th>
+												<th scope="col">Assessment Progress</th>
+												<th scope="col">Overall</th>
+											</tr>
+										</thead>
+										<thead class="thead-light" id="searchHeader" style="display: none;">
+											<tr>
+												<th scope="col"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search subject" data-column="1"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search code" data-column="2"></th>
+												<th scope="col">
+													<select class="form-control form-control-sm column-search" data-column="3">
+														<option value="">All Types</option>
+														<option value="Core">Core</option>
+														<option value="Elective">Elective</option>
+													</select>
+												</th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search teacher" data-column="4"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search course" data-column="5"></th>
+												<th scope="col"><input type="text" class="form-control form-control-sm column-search" placeholder="Search semester" data-column="6"></th>
+												<th scope="col"></th>
+												<th scope="col"></th>
+												<th scope="col"></th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="data, dataStat : ${subjectData}">
+												<th scope="row" th:text="${dataStat.count}">1</th>
+												<td>
+													<strong th:text="${data.subject.subjectName}">Subject Name</strong>
+												</td>
+												<td>
+													<span class="badge badge-info" th:text="${data.subject.subjectCode}">CODE</span>
+												</td>
+												<td>
+													<span th:if="${data.subject.elective}" class="elective-badge">
+														<i class="fas fa-star mr-1"></i>Elective
+													</span> 
+													<span th:unless="${data.subject.elective}" class="core-badge">
+														<i class="fas fa-book mr-1"></i>Core
+													</span>
+												</td>
+												<td>
+													<div th:if="${data.subject.teacher != null and !#strings.isEmpty(data.subject.teacher)}">
+														<span class="teacher-badge">
+															<i class="fas fa-user-tie mr-1"></i>
+															<span th:text="${data.subject.teacher}">Teacher</span>
+														</span>
+													</div>
+													<div th:unless="${data.subject.teacher != null and !#strings.isEmpty(data.subject.teacher)}">
+														<span class="text-muted">
+															<i class="fas fa-user-slash mr-1"></i>Not Assigned
+														</span>
+													</div>
+												</td>
+												<td th:text="${data.courseName}">Course Name</td>
+												<td>
+													<span th:text="${data.semesterName}">Semester Name</span>
+													<small class="text-muted d-block" th:if="${data.semesterCode != 'N/A'}" th:text="'(' + ${data.semesterCode} + ')'">(Code)</small>
+												</td>
+												
+												<!-- Task Progress Column -->
+												<td>
+													<div class="progress-container">
+														<div class="d-flex align-items-center">
+															<div class="flex-grow-1 mr-2">
+																<div class="progress">
+																	<div class="progress-bar progress-bar-task" 
+																		 role="progressbar" 
+																		 th:style="'width: ' + ${data.taskProgress} + '%;'"
+																		 th:attr="aria-valuenow=${data.taskProgress}" 
+																		 aria-valuemin="0" 
+																		 aria-valuemax="100">
+																	</div>
+																</div>
+															</div>
+															<span class="percentage-badge badge-task" 
+																  th:text="${#numbers.formatDecimal(data.taskProgress, 1, 1) + '%'}">
+																  0%
+															</span>
+														</div>
+													</div>
+												</td>
+												
+												<!-- Assessment Progress Column -->
+												<td>
+													<div class="progress-container">
+														<div class="d-flex align-items-center">
+															<div class="flex-grow-1 mr-2">
+																<div class="progress">
+																	<div class="progress-bar progress-bar-assessment" 
+																		 role="progressbar" 
+																		 th:style="'width: ' + ${data.assessmentProgress} + '%;'"
+																		 th:attr="aria-valuenow=${data.assessmentProgress}" 
+																		 aria-valuemin="0" 
+																		 aria-valuemax="100">
+																	</div>
+																</div>
+															</div>
+															<span class="percentage-badge badge-assessment" 
+																  th:text="${#numbers.formatDecimal(data.assessmentProgress, 1, 1) + '%'}">
+																  0%
+															</span>
+														</div>
+													</div>
+												</td>
+												
+												<!-- Overall Progress Column -->
+												<td class="text-center">
+													<div class="overall-progress">
+														<div class="h5 mb-0" 
+															 th:class="${data.overallProgress >= 50} ? 'text-success' : 'text-warning'"
+															 th:text="${#numbers.formatDecimal(data.overallProgress, 1, 1) + '%'}">
+															 0%
+														</div>
+														<small class="text-muted">Average</small>
+													</div>
+												</td>
+											</tr>
+
+											<!-- No Subjects Message -->
+											<tr th:if="${#lists.isEmpty(subjectData)}">
+												<td colspan="10" class="text-center py-5 text-muted">
+													<i class="fas fa-inbox fa-3x mb-3"></i>
+													<div>
+														<strong>No Subjects Available</strong>
+														<p class="mb-0">No subjects found in the system.</p>
+													</div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+	<div th:replace="templateListing :: jsscript"></div>
+	
+	<!-- DataTables Scripts -->
+	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			// Initialize DataTable
+			var table = $('#subjectsTable').DataTable({
+				"responsive": true,
+				"lengthChange": true,
+				"autoWidth": false,
+				"pageLength": 8,
+				"dom": '<"row"<"col-md-6"B><"col-md-6"f>><"row"<"col-md-12"tr>><"row"<"col-md-5"i><"col-md-7"p>>',
+				"buttons": [
+					{
+						extend: 'collection',
+						className: 'btn btn-secondary',
+						text: '<i class="fas fa-cog"></i> Options',
+						buttons: [
+							{
+								extend: 'copy',
+								className: 'btn btn-secondary',
+								text: '<i class="fas fa-copy"></i> Copy',
+								exportOptions: {
+									columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+								},
+								title: 'All Subjects Report'
+							},
+							{
+								extend: 'excel',
+								className: 'btn btn-success',
+								text: '<i class="fas fa-file-excel"></i> Excel',
+								exportOptions: {
+									columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+								},
+								title: 'All Subjects Report',
+								filename: 'subjects_report_' + new Date().toISOString().slice(0,10)
+							},
+							{
+								extend: 'pdf',
+								className: 'btn btn-danger',
+								text: '<i class="fas fa-file-pdf"></i> PDF',
+								exportOptions: {
+									columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+								},
+								title: 'All Subjects Report',
+								filename: 'subjects_report_' + new Date().toISOString().slice(0,10),
+								orientation: 'landscape'
+							},
+							{
+								extend: 'print',
+								className: 'btn btn-info',
+								text: '<i class="fas fa-print"></i> Print',
+								exportOptions: {
+									columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+								},
+								title: 'All Subjects Report - ' + new Date().toLocaleDateString()
+							},
+							{
+								text: '<i class="fas fa-search"></i> Toggle Search',
+								className: 'btn btn-warning',
+								action: function ( e, dt, node, config ) {
+									$('#searchHeader').toggle();
+									// Adjust table header if needed
+									table.columns.adjust();
+								}
+							}
+						]
+					}
+				],
+				"language": {
+					"search": "Search:",
+					"lengthMenu": "Show _MENU_ entries",
+					"emptyTable": "No subjects available in the system.",
+					"info": "Showing _START_ to _END_ of _TOTAL_ subjects",
+					"infoEmpty": "Showing 0 to 0 of 0 subjects",
+					"infoFiltered": "(filtered from _MAX_ total subjects)"
+				}
+			});
+			
+			// Individual column search
+			$('#subjectsTable thead').on('keyup change', '.column-search', function() {
+				var columnIndex = $(this).data('column');
+				table.column(columnIndex).search(this.value).draw();
+			});
+		});
+
+		// Auto-hide alerts after 5 seconds
+		setTimeout(function() {
+			$('.alert').fadeOut('slow');
+		}, 5000);
+	</script>
+</body>
+</html>

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Elective Subject Mapping</title>
+<head th:include="templateListing :: headFragment"></head>
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.10/select2-bootstrap.min.css">
+<style>
+.dashboard-card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 0 1px rgba(0, 0, 0, .125), 0 1px 3px rgba(0, 0, 0, .2);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: #6c757d;
+    border-bottom: 1px solid rgba(0, 0, 0, .125);
+    color: white;
+    padding: 0.75rem 1.25rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.cascading-loading {
+    position: relative;
+}
+
+.cascading-loading::after {
+    content: "Loading...";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.subject-selection {
+    display: none;
+}
+</style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div th:replace="fragments/header_bk :: header"></div>
+        <div th:replace="fragments/sidebar :: aside"></div>
+
+        <div class="content-wrapper">
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Error Message -->
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <i class="fas fa-exclamation-triangle me-2"></i> <span th:text="${error}"></span>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div th:if="${success}" class="alert alert-success alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <i class="fas fa-check-circle me-2"></i> <span th:text="${success}"></span>
+                    </div>
+
+                    <!-- Mapping Form -->
+                    <div class="dashboard-card card">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <h3 class="card-title" style="padding-top: 10px">Map Elective Subjects</h3>
+                                </div>
+                                <div class="col-md-2">
+                                    <a th:href="@{'/guac/viewElectiveMappingPage/'}" class="btn btn-block bg-gradient-primary">View</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <form id="mappingForm">
+                                <!-- Cascading Dropdowns -->
+                                <div class="row mb-4">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="departmentId" class="form-label">Department</label>
+                                            <select class="form-control select2-single" id="departmentId" required>
+                                                <option value="">Select Department</option>
+                                                <option th:each="dept : ${departments}" 
+                                                    th:value="${dept.departmentId}"
+                                                    th:text="${dept.departmentName}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="courseId" class="form-label">Course</label>
+                                            <select class="form-control select2-single" id="courseId" required disabled>
+                                                <option value="">Select Course</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="semesterId" class="form-label">Semester</label>
+                                            <select class="form-control select2-single" id="semesterId" required disabled>
+                                                <option value="">Select Semester</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="userId" class="form-label">Student</label>
+                                            <select class="form-control select2-single" id="userId" name="userId" required disabled>
+                                                <option value="">Select Student</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Elective Subjects Selection - Initially Hidden -->
+                                <div id="subjectSelection" class="subject-selection">
+                                    <div class="row">
+                                        <div class="col-md-10">
+                                            <div class="form-group">
+                                                <label for="subjectMasterIds" class="form-label">Select Elective Subjects</label>
+                                                <select class="form-control select2-multiple" id="subjectMasterIds" name="subjectMasterIds" multiple="multiple" required>
+                                                    <!-- Subjects will be loaded dynamically -->
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group" style="margin-top: 30px;">
+                                                <button type="submit" class="btn btn-primary btn-block">
+                                                    <i class="fas fa-save me-1"></i> Map Subjects
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
+
+    <div th:replace="templateListing :: jsscript"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+    <script>
+    $(document).ready(function() {
+        // Initialize Select2
+        $('.select2-single').select2({ theme: 'bootstrap' });
+        $('.select2-multiple').select2({ 
+            theme: 'bootstrap', 
+            placeholder: "Choose elective subjects...",
+            closeOnSelect: false
+        });
+
+        // Cascading dropdown functionality
+        $('#departmentId').change(function() {
+            const departmentId = $(this).val();
+            resetDependentDropdowns(['#courseId', '#semesterId', '#userId']);
+            hideSubjectSelection();
+            
+            if (departmentId) {
+                loadCourses(departmentId);
+            }
+        });
+
+        $('#courseId').change(function() {
+            const courseId = $(this).val();
+            resetDependentDropdowns(['#semesterId', '#userId']);
+            hideSubjectSelection();
+            
+            if (courseId) {
+                loadSemesters(courseId);
+            }
+        });
+
+        $('#semesterId').change(function() {
+            const semesterId = $(this).val();
+            resetDependentDropdowns(['#userId']);
+            hideSubjectSelection();
+            
+            if (semesterId) {
+                loadStudents(semesterId);
+                // Also load elective subjects for this semester
+                loadElectiveSubjects(semesterId);
+            }
+        });
+
+        $('#userId').change(function() {
+            if ($(this).val()) {
+                $('#subjectSelection').show();
+            } else {
+                hideSubjectSelection();
+            }
+        });
+
+        function resetDependentDropdowns(selectors) {
+            selectors.forEach(selector => {
+                $(selector).val(null).trigger('change').prop('disabled', true);
+                $(selector).html('<option value="">Select ' + getFieldName(selector) + '</option>');
+            });
+        }
+
+        function getFieldName(selector) {
+            const names = {
+                '#courseId': 'Course',
+                '#semesterId': 'Semester', 
+                '#userId': 'Student'
+            };
+            return names[selector] || 'Option';
+        }
+
+        function hideSubjectSelection() {
+            $('#subjectSelection').hide();
+            $('#subjectMasterIds').val(null).trigger('change');
+        }
+
+        function loadCourses(departmentId) {
+            $('#courseId').prop('disabled', true).addClass('cascading-loading');
+            
+            $.ajax({
+                url: '/guac/courses',
+                type: 'GET',
+                data: { departmentId: departmentId },
+                success: function(data) {
+                    const courseSelect = $('#courseId');
+                    courseSelect.empty().append('<option value="">Select Course</option>');
+                    
+                    data.forEach(course => {
+                        courseSelect.append(`<option value="${course.courseId}">${course.courseName}</option>`);
+                    });
+                    
+                    courseSelect.prop('disabled', false).removeClass('cascading-loading');
+                },
+                error: function(xhr) {
+                    showMessage('Error', 'Failed to load courses', 'error');
+                    $('#courseId').prop('disabled', false).removeClass('cascading-loading');
+                }
+            });
+        }
+
+        function loadSemesters(courseId) {
+            $('#semesterId').prop('disabled', true).addClass('cascading-loading');
+            
+            $.ajax({
+                url: '/guac/electivesemesters',
+                type: 'GET',
+                data: { courseId: courseId },
+                success: function(data) {
+                    const semesterSelect = $('#semesterId');
+                    semesterSelect.empty().append('<option value="">Select Semester</option>');
+                    
+                    data.forEach(semester => {
+                        semesterSelect.append(`<option value="${semester.semesterId}">${semester.semesterName}</option>`);
+                    });
+                    
+                    semesterSelect.prop('disabled', false).removeClass('cascading-loading');
+                },
+                error: function(xhr) {
+                    showMessage('Error', 'Failed to load semesters', 'error');
+                    $('#semesterId').prop('disabled', false).removeClass('cascading-loading');
+                }
+            });
+        }
+
+//         function loadStudents(semesterId) {
+//             $('#userId').prop('disabled', true).addClass('cascading-loading');
+            
+//             $.ajax({
+//                 url: '/guac/getStudentsBySemester',
+//                 type: 'GET',
+//                 data: { semesterId: semesterId },
+//                 success: function(data) {
+//                     const userSelect = $('#userId');
+//                     userSelect.empty().append('<option value="">Select Student</option>');
+                    
+//                     data.forEach(user => {
+//                         userSelect.append(`<option value="${user.userId}">${user.name} - ${user.userName}</option>`);
+//                     });
+                    
+//                     userSelect.prop('disabled', false).removeClass('cascading-loading');
+//                 },
+//                 error: function(xhr) {
+//                     showMessage('Error', 'Failed to load students', 'error');
+//                     $('#userId').prop('disabled', false).removeClass('cascading-loading');
+//                 }
+//             });
+//         }
+
+function loadStudents(semesterId) {
+    $('#userId').prop('disabled', true).addClass('cascading-loading');
+    
+    $.ajax({
+        url: '/guac/getStudentsBySemester',
+        type: 'GET',
+        data: { semesterId: semesterId },
+        success: function(data) {
+            const userSelect = $('#userId');
+            userSelect.empty().append('<option value="">Select Student</option>');
+            
+            if (data.length === 0) {
+                userSelect.append('<option value="">No students found for this semester</option>');
+            } else {
+                data.forEach(student => {
+                    // Use the format that matches your AJAX response
+                    const displayText = student.displayName || 
+                                      (student.name + ' - ' + student.userName);
+                    userSelect.append(`<option value="${student.userId}">${displayText}</option>`);
+                });
+            }
+            
+            userSelect.prop('disabled', false).removeClass('cascading-loading');
+        },
+        error: function(xhr) {
+            showMessage('Error', 'Failed to load students', 'error');
+            $('#userId').prop('disabled', false).removeClass('cascading-loading');
+        }
+    });
+}
+
+        function loadElectiveSubjects(semesterId) {
+            $.ajax({
+                url: '/guac/elective-subjects',
+                type: 'GET',
+                data: { semesterId: semesterId },
+                success: function(data) {
+                    const subjectSelect = $('#subjectMasterIds');
+                    subjectSelect.empty();
+                    
+                    if (data.length === 0) {
+                        subjectSelect.append('<option value="">No elective subjects available for this semester</option>');
+                        subjectSelect.prop('disabled', true);
+                    } else {
+                        data.forEach(subject => {
+                            subjectSelect.append(`<option value="${subject.subjectId}">${subject.subjectName} (${subject.subjectCode})</option>`);
+                        });
+                        subjectSelect.prop('disabled', false);
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Failed to load elective subjects');
+                    const subjectSelect = $('#subjectMasterIds');
+                    subjectSelect.empty().append('<option value="">Error loading subjects</option>');
+                    subjectSelect.prop('disabled', true);
+                }
+            });
+        }
+
+        // Handle form submission
+//         $('#mappingForm').on('submit', function(e) {
+//             e.preventDefault();
+            
+//             const userId = $('#userId').val();
+//             const subjectMasterIds = $('#subjectMasterIds').val();
+            
+//             if (!userId) {
+//                 showMessage('Error', 'Please select a student', 'error');
+//                 return;
+//             }
+            
+//             if (!subjectMasterIds || subjectMasterIds.length === 0) {
+//                 showMessage('Error', 'Please select at least one elective subject', 'error');
+//                 return;
+//             }
+            
+//             const submitBtn = $(this).find('button[type="submit"]');
+//             const originalText = submitBtn.html();
+//             submitBtn.prop('disabled', true).html('<span class="loading-spinner"></span> Mapping...');
+            
+//             $.ajax({
+//                 url: '/guac/saveElectiveMapping',
+//                 type: 'POST',
+//                 traditional: true,
+//                 data: { userId: userId, subjectMasterIds: subjectMasterIds },
+//                 success: function(response) {
+//                     if (response.success) {
+//                         showMessage('Success', response.message, 'success');
+//                         setTimeout(() => location.reload(), 2000);
+//                     } else {
+//                         showMessage('Error', response.message, 'error');
+//                     }
+//                 },
+//                 error: function(xhr) {
+//                     showMessage('Error', 'An error occurred while saving', 'error');
+//                 },
+//                 complete: function() {
+//                     submitBtn.prop('disabled', false).html(originalText);
+//                 }
+//             });
+//         });
+        
+        
+        // Handle form submission
+$('#mappingForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    const userId = $('#userId').val();
+    const subjectMasterIds = $('#subjectMasterIds').val();
+    
+    if (!userId) {
+        showMessage('Error', 'Please select a student', 'error');
+        return;
+    }
+    
+    if (!subjectMasterIds || subjectMasterIds.length === 0) {
+        showMessage('Error', 'Please select at least one elective subject', 'error');
+        return;
+    }
+    
+    const submitBtn = $(this).find('button[type="submit"]');
+    const originalText = submitBtn.html();
+    submitBtn.prop('disabled', true).html('<span class="loading-spinner"></span> Mapping...');
+    
+    $.ajax({
+        url: '/guac/saveElectiveMapping',
+        type: 'POST',
+        traditional: true,
+        data: { userId: userId, subjectMasterIds: subjectMasterIds },
+        success: function(response) {
+            if (response.success) {
+                showMessage('Success', response.message, 'success');
+                
+                // Redirect to view page after 2 seconds
+                setTimeout(() => {
+                    if (response.redirectUrl) {
+                        window.location.href = response.redirectUrl;
+                    } else {
+                        window.location.href = '/guac/viewElectiveMappingPage/';
+                    }
+                }, 2000);
+            } else {
+                showMessage('Error', response.message, 'error');
+            }
+        },
+        error: function(xhr) {
+            showMessage('Error', 'An error occurred while saving', 'error');
+        },
+        complete: function() {
+            submitBtn.prop('disabled', false).html(originalText);
+        }
+    });
+});
+        
+        function showMessage(title, message, type) {
+            // Simple alert for now - you can use your modal if needed
+            alert(title + ': ' + message);
+        }
+    });
+    </script>
+</body>
+</html>

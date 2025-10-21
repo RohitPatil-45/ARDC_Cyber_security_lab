@@ -1,286 +1,403 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Cloud Portal</title>
-<head th:include="templateListing :: headFragment"></head>
-<link rel="icon" type="image/png"
-	href="/webtemplate/dist/img/magicboxEye3.png">
-<link rel="stylesheet"
-	th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
-<!-- Ionicons -->
-<link rel="stylesheet" th:href="@{/css/ionicIcons.css}">
-<!-- Tempusdominus Bootstrap 4 -->
-<link rel="stylesheet"
-	th:href="@{/webtemplate/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css}">
-<!-- iCheck -->
-<link rel="stylesheet"
-	th:href="@{/webtemplate/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
-<!-- JQVMap -->
-<link rel="stylesheet"
-	th:href="@{/webtemplate/plugins/jqvmap/jqvmap.min.css}">
-<!-- Theme style -->
-<link rel="stylesheet"
-	th:href="@{/webtemplate/dist/css/adminlte.min.css}">
-<!-- overlayScrollbars -->
-<link rel="stylesheet"
-	th:href="@{/webtemplate/plugins/overlayScrollbars/css/OverlayScrollbars.min.css}">
-<!-- Daterange picker -->
-<link rel="stylesheet"
-	th:href="@{/webtemplate/plugins/daterangepicker/daterangepicker.css}">
-<!-- summernote -->
-<link rel="stylesheet"
-	th:href="@{/webtemplate/plugins/summernote/summernote-bs4.min.css}">
-<link rel="stylesheet" type="text/css"
-	th:href="@{/webtemplate/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css}">
-
-<!--End Common CSS  -->
-
-<!-- <link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">  -->
-<link rel="stylesheet"
-	th:href="@{/webtemplate/css/cloudfont-awesome.min.css}">
-<link rel="stylesheet"
-	th:href="@{/webtemplate/css/font-awesome.min.css}">
-<link rel="stylesheet"
-	th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
-<link rel="stylesheet"
-	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
-<link rel="stylesheet"
-	th:href="@{/webtemplate/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css}">
-<link rel="stylesheet"
-	th:href="@{/webtemplate/plugins/datatables-responsive/css/responsive.bootstrap4.min.css}">
-<link rel="stylesheet"
-	th:href="@{/webtemplate/plugins/datatables-buttons/css/buttons.bootstrap4.min.css}">
-<style>
-/* Add a custom style for the Action button to make it look nice */
-.action-btn {
-	background-color: #007bff;
-	color: white;
-	border: none;
-	padding: 8px 12px;
-	border-radius: 4px;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-}
-
-.action-btn:hover {
-	background-color: #0056b3;
-}
-
-/* Style for the modal and progress bar */
-.progress-container {
-	height: 25px;
-	background-color: #e9ecef;
-	border-radius: 5px;
-	margin-top: 10px;
-}
-
-.progress-bar {
-	background-color: #28a745;
-	transition: width 0.6s ease;
-}
-</style>
+    <title>All Users Task Performance</title>
+    <head th:include="templateListing :: headFragment"></head>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+    <style>
+        .progress { height: 8px; margin-bottom: 5px; }
+        .progress-bar-task { background-color: #17a2b8; }
+        .progress-bar-assessment { background-color: #28a745; }
+        .percentage-badge { font-size: 0.75rem; font-weight: bold; min-width: 45px; text-align: center; }
+        .badge-task { background-color: #17a2b8; color: white; }
+        .badge-assessment { background-color: #28a745; color: white; }
+        .progress-container { min-width: 120px; }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background-color: #6c757d; color: white;
+                       display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px; }
+        .no-scenario-cell { background-color: #f8f9fa; font-style: italic; color: #6c757d; }
+        .department-badge { background-color: #6f42c1; color: white; }
+        .course-badge { background-color: #e83e8c; color: white; }
+        .semester-badge { background-color: #20c997; color: white; }
+        .batch-badge { background-color: #fd7e14; color: white; }
+        .info-badge { font-size: 0.7rem; padding: 3px 6px; margin: 1px; display: inline-block; }
+    </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
-	<div class="wrapper">
-		<div th:replace="fragments/header :: header"></div>
-		<div th:replace="fragments/sidebar :: aside"></div>
+    <div class="wrapper">
+        <div th:replace="fragments/header_bk :: header"></div>
+        <div th:replace="fragments/sidebar :: aside"></div>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Users Task Performance</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a >Home</a></li>
+                                <li class="breadcrumb-item active">Users Task Performance</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-		<div class="content-wrapper">
-			<section class="content-header">
-				<div class="container-fluid">
-					<div class="row mb-2">
-						<div class="col-sm-6">
-							<h1>User Wise Performance</h1>
-						</div>
-						<div class="col-sm-6">
-							<ol class="breadcrumb float-sm-right">
-								<li class="breadcrumb-item"><a href="#">Home</a></li>
-								<li class="breadcrumb-item active">User Wise Performance</li>
-							</ol>
-						</div>
-					</div>
-				</div>
-			</section>
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card card-secondary">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h3 class="card-title" style="padding-top: 10px">Users Performance Details</h3>
+                                        </div>
+                                        <div class="col-md-4 text-right">
+                                            
+                                        </div>
+                                    </div>
+                                    <!-- Error Message -->
+                                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show text-center mt-3" role="alert">
+                                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                                        <span th:text="${error}">Error message</span>
+                                        <button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                </div>
 
-			<section class="content">
-				<div class="container-fluid">
-					<div class="row">
-						<div class="col-12">
-							<div class="card card-secondary">
-								<div class="card-header">
-									<h3 class="card-title" style="padding-top: 10px">User
-										Performance Details</h3>
-								</div>
-								<div class="card-body">
-									<table id="userPerformanceTable"
-										class="table table-bordered table-striped">
-										<thead class="thead-light">
-											<tr>
-												<th>Sr No.</th>
-												<th>User Name</th>
-												<th>Performance %</th>
-												<th>Action</th>
-											</tr>
-										</thead>
-									</table>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-		</div>
+                                <div class="card-body">
+                                    <div id="loadingMessage" class="text-center py-4">
+                                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                        <p class="mt-2">Loading data...</p>
+                                    </div>
 
-		<div th:replace="fragments/footer :: footer"></div>
-	</div>
+                                    <table id="allUsersPerformanceTable" class="table table-bordered table-striped" style="display: none;">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th width="4%">Sr No.</th>
+                                                <th width="10%">Username</th>
+                                                <th width="10%">Full Name</th>
+                                                <th width="15%">Scenario Name</th>
+                                                <th width="10%">Department</th>
+                                                <th width="10%">Course</th>
+                                                <th width="10%">Semester</th>
+                                                <th width="8%">Batch</th>
+                                                <th width="9%">Task Progress</th>
+                                                <th width="9%">Assessment Progress</th>
+                                                <th width="9%">Overall Progress</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- DataTables will populate -->
+                                        </tbody>
+                                    </table>
+                                </div>
 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
+        </div>
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
 
-	<div class="modal fade" id="performanceModal" tabindex="-1"
-		aria-labelledby="performanceModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered modal-lg">
-			<!-- Added modal-lg -->
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="performanceModalLabel">
-						Scenario Performance for <span id="modalUsername"></span>
-					</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close"></button>
-				</div>
-				<div class="modal-body" id="modalBodyContent">
-					<!-- Table will be inserted here -->
-					<table id="modalScenarioTable"
-						class="table table-bordered table-striped w-100">
-						<thead>
-							<tr>
-								<th>Sr No.</th>
-								<th>Scenario Name</th>
-								<th>Progress %</th>
-							</tr>
-						</thead>
-						<tbody></tbody>
-					</table>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary"
-						data-bs-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div th:replace="templateListing :: jsscript"></div>
 
+    <!-- DataTables Scripts -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
-	<div th:replace="templateListing :: jsscript"></div>
+   <script th:inline="javascript">
+    $(document).ready(function() {
+        console.log("Document ready - initializing DataTable");
+        
+        // Get the raw data from Thymeleaf
+        let rawData = /*[[${listObj}]]*/ '';
+        console.log("Raw data received:", rawData);
+        
+        let jsonData = [];
 
-	<!-- Common JS  -->
-	<!-- jQuery -->
-	<script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
-	<!-- jQuery UI 1.11.4 -->
-	<script th:src="@{/webtemplate/plugins/jquery-ui/jquery-ui.min.js}"></script>
+        try {
+            // Handle the Thymeleaf string format with double brackets
+            if (typeof rawData === "string") {
+                // Remove the double brackets if present
+                let cleanedData = rawData.trim();
+                if (cleanedData.startsWith('[[') && cleanedData.endsWith(']]')) {
+                    cleanedData = cleanedData.substring(2, cleanedData.length - 2);
+                }
+                
+                if (cleanedData.startsWith('[') && cleanedData.endsWith(']')) {
+                    jsonData = JSON.parse(cleanedData);
+                } else if (cleanedData) {
+                    // Try to parse as is
+                    jsonData = JSON.parse(cleanedData);
+                }
+            } else if (Array.isArray(rawData)) {
+                jsonData = rawData;
+            }
+            
+            console.log("Parsed JSON data:", jsonData);
+            console.log("Number of records:", jsonData.length);
+            
+            if (jsonData.length > 0) {
+                console.log("First record sample:", jsonData[0]);
+                console.log("First record length:", jsonData[0].length);
+            }
+        } catch (e) {
+            console.error("Error parsing JSON data:", e);
+            // Try alternative parsing method
+            try {
+                // Direct evaluation (be careful with this approach)
+                if (typeof rawData === "string" && rawData.includes('[')) {
+                    jsonData = eval(rawData);
+                    console.log("Data parsed using eval:", jsonData);
+                }
+            } catch (e2) {
+                console.error("Alternative parsing also failed:", e2);
+                jsonData = [];
+            }
+        }
 
-	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-	<script>
-		$.widget.bridge('uibutton', $.ui.button)
-	</script>
-	<!-- Bootstrap 4 -->
-	<script
-		th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
-	<!-- ChartJS -->
-	<script th:src="@{/webtemplate/plugins/chart.js/Chart.min.js}"></script>
-	<!-- Sparkline -->
-	<!-- 	<script th:src="@{/webtemplate/plugins/sparklines/sparkline.js}"></script> -->
-	<!-- JQVMap -->
-	<!-- <script th:src="@{/webtemplate/plugins/jqvmap/jquery.vmap.min.js}"></script>
-	<script th:src="@{/webtemplate/plugins/jqvmap/maps/jquery.vmap.usa.js}"></script> -->
-	<!-- jQuery Knob Chart -->
-	<script th:src="@{/webtemplate/plugins/jquery-knob/jquery.knob.min.js}"></script>
-	<!-- daterangepicker -->
-	<script th:src="@{/webtemplate/plugins/moment/moment.min.js}"></script>
-	<script
-		th:src="@{/webtemplate/plugins/daterangepicker/daterangepicker.js}"></script>
-	<!-- Tempusdominus Bootstrap 4 -->
-	<script
-		th:src="@{/webtemplate/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js}"></script>
-	<!-- Summernote -->
-	<script
-		th:src="@{/webtemplate/plugins/summernote/summernote-bs4.min.js}"></script>
-	<!-- overlayScrollbars -->
-	<script
-		th:src="@{/webtemplate/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js}"></script>
-	<!-- AdminLTE App -->
-	<script th:src="@{/webtemplate/dist/js/adminlte.js}"></script>
-	<!-- AdminLTE for demo purposes -->
-	<script th:src="@{/webtemplate/dist/js/demo.js}"></script>
-	<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-	<!-- <script th:src="@{/webtemplate/dist/js/pages/dashboard.js}"></script> -->
-	<!--End Common JS  -->
+        // Initialize DataTable
+        if (jsonData && jsonData.length > 0) {
+            console.log("Initializing DataTable with", jsonData.length, "records");
+            
+            var table = $('#allUsersPerformanceTable').DataTable({
+                data: jsonData,
+                responsive: true,
+                lengthChange: true,
+                autoWidth: false,
+                pageLength: 25,
+                initComplete: function(settings, json) {
+                    console.log("DataTable initialization complete");
+                    $('#loadingMessage').hide();
+                    $('#allUsersPerformanceTable').show();
+                },
+                createdRow: function(row, data, dataIndex) {
+                    console.log("Created row:", dataIndex, data);
+                },
+                buttons: [
+                    {
+                        extend: 'collection',
+                        className: 'btn btn-secondary',
+                        text: '<i class="fas fa-cog"></i> Options',
+                        buttons: [
+                            {
+                                extend: 'copy',
+                                className: 'btn btn-secondary',
+                                text: '<i class="fas fa-copy"></i> Copy',
+                                exportOptions: {
+                                    columns: ':visible'
+                                },
+                                title: 'All Users Task Performance Report'
+                            },
+                            {
+                                extend: 'excel',
+                                className: 'btn btn-success',
+                                text: '<i class="fas fa-file-excel"></i> Excel',
+                                exportOptions: {
+                                    columns: ':visible'
+                                },
+                                title: 'All Users Task Performance Report',
+                                filename: 'all_users_performance_' + new Date().toISOString().slice(0,10)
+                            },
+                            {
+                                extend: 'pdf',
+                                className: 'btn btn-danger',
+                                text: '<i class="fas fa-file-pdf"></i> PDF',
+                                exportOptions: {
+                                    columns: ':visible'
+                                },
+                                title: 'All Users Task Performance Report',
+                                filename: 'all_users_performance_' + new Date().toISOString().slice(0,10),
+                                orientation: 'landscape'
+                            },
+                            {
+                                extend: 'print',
+                                className: 'btn btn-info',
+                                text: '<i class="fas fa-print"></i> Print',
+                                exportOptions: {
+                                    columns: ':visible'
+                                },
+                                title: 'All Users Task Performance Report - ' + new Date().toLocaleDateString()
+                            },
+                            {
+                                text: '<i class="fas fa-search"></i> Toggle Search',
+                                className: 'btn btn-warning',
+                                action: function ( e, dt, node, config ) {
+                                    // Search header functionality
+                                    $('#searchHeader').toggle();
+                                    table.columns.adjust();
+                                }
+                            },
+                            {
+                                extend: 'colvis',
+                                className: 'btn btn-primary',
+                                text: '<i class="fas fa-columns"></i> Show/Hide Columns'
+                            }
+                        ]
+                    }
+                ],
+                columns: [
+                    { 
+                        data: 0, 
+                        title: "Sr No.",
+                        className: "text-center"
+                    },
+                    { 
+                        data: 1, 
+                        title: "Username",
+                        render: function(data, type, row) {
+                            if (!data) return '<span class="text-muted">N/A</span>';
+                            return '<div class="d-flex align-items-center">' +
+                                   '<div class="user-avatar">' +
+                                   data.charAt(0).toUpperCase() +
+                                   '</div>' +
+                                   '<div><strong>' + data + '</strong></div>' +
+                                   '</div>';
+                        }
+                    },
+                    { 
+                        data: 2, 
+                        title: "Full Name",
+                        render: function(data, type, row) {
+                            return data || '<span class="text-muted">N/A</span>';
+                        }
+                    },
+                    { 
+                        data: 3, 
+                        title: "Scenario Name",
+                        render: function(data, type, row) {
+                            if (!data || data === "No Scenarios Assigned") {
+                                return '<span class="text-muted"><i class="fas fa-exclamation-circle mr-1"></i>No Scenarios Assigned</span>';
+                            }
+                            return '<strong>' + data + '</strong>';
+                        }
+                    },
+                    { 
+                        data: 4, 
+                        title: "Department",
+                        render: function(data, type, row) {
+                            if (!data || data === "Not Assigned") {
+                                return '<span class="text-muted"><i class="fas fa-building mr-1"></i>Not Assigned</span>';
+                            }
+                            return '<span class="badge department-badge info-badge"><i class="fas fa-building mr-1"></i>' + data + '</span>';
+                        }
+                    },
+                    { 
+                        data: 5, 
+                        title: "Course",
+                        render: function(data, type, row) {
+                            if (!data || data === "Not Assigned") {
+                                return '<span class="text-muted"><i class="fas fa-graduation-cap mr-1"></i>Not Assigned</span>';
+                            }
+                            return '<span class="badge course-badge info-badge"><i class="fas fa-graduation-cap mr-1"></i>' + data + '</span>';
+                        }
+                    },
+                    { 
+                        data: 6, 
+                        title: "Semester",
+                        render: function(data, type, row) {
+                            if (!data || data === "Not Assigned") {
+                                return '<span class="text-muted"><i class="fas fa-calendar-alt mr-1"></i>Not Assigned</span>';
+                            }
+                            return '<span class="badge semester-badge info-badge"><i class="fas fa-calendar-alt mr-1"></i>' + data + '</span>';
+                        }
+                    },
+                    { 
+                        data: 7, 
+                        title: "Batch",
+                        render: function(data, type, row) {
+                            if (!data || data === "Not Assigned") {
+                                return '<span class="text-muted"><i class="fas fa-users mr-1"></i>Not Assigned</span>';
+                            }
+                            return '<span class="badge batch-badge info-badge"><i class="fas fa-users mr-1"></i>' + data + '</span>';
+                        }
+                    },
+                    { 
+                        data: 8, 
+                        title: "Task Progress",
+                        render: function(data, type, row) {
+                            var progress = parseInt(data) || 0;
+                            var progressBar = '<div class="progress-container">' +
+                                '<div class="d-flex align-items-center">' +
+                                '<div class="flex-grow-1 mr-2">' +
+                                '<div class="progress">' +
+                                '<div class="progress-bar progress-bar-task" role="progressbar" ' +
+                                'style="width: ' + progress + '%;" ' +
+                                'aria-valuenow="' + progress + '" aria-valuemin="0" aria-valuemax="100">' +
+                                '</div></div></div>' +
+                                '<span class="percentage-badge badge-task">' + progress + '%</span>' +
+                                '</div></div>';
+                            return progressBar;
+                        }
+                    },
+                    { 
+                        data: 9, 
+                        title: "Assessment Progress",
+                        render: function(data, type, row) {
+                            var progress = parseInt(data) || 0;
+                            var progressBar = '<div class="progress-container">' +
+                                '<div class="d-flex align-items-center">' +
+                                '<div class="flex-grow-1 mr-2">' +
+                                '<div class="progress">' +
+                                '<div class="progress-bar progress-bar-assessment" role="progressbar" ' +
+                                'style="width: ' + progress + '%;" ' +
+                                'aria-valuenow="' + progress + '" aria-valuemin="0" aria-valuemax="100">' +
+                                '</div></div></div>' +
+                                '<span class="percentage-badge badge-assessment">' + progress + '%</span>' +
+                                '</div></div>';
+                            return progressBar;
+                        }
+                    },
+                    { 
+                        data: 10, 
+                        title: "Overall Progress",
+                        className: "text-center",
+                        render: function(data, type, row) {
+                            var progress = parseInt(data) || 0;
+                            var colorClass = progress >= 50 ? 'text-success' : progress >= 25 ? 'text-warning' : 'text-danger';
+                            var icon = progress >= 50 ? 'fa-check-circle' : progress >= 25 ? 'fa-exclamation-circle' : 'fa-times-circle';
+                            return '<div class="text-center">' +
+                                   '<div class="h5 mb-1 ' + colorClass + '">' +
+                                   '<i class="fas ' + icon + ' mr-1"></i>' + progress + '%</div>' +
+                                   '<small class="text-muted">Average</small>' +
+                                   '</div>';
+                        }
+                    }
+                ],
+                language: {
+                    search: " Search:",
+                    lengthMenu: "Show _MENU_ entries",
+                    emptyTable: "No performance data available.",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)"
+                }
+            });
 
-	<script
-		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
-	<script
-		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
-	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
-	<script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+            console.log("DataTable initialized successfully");
 
-	<script
-		th:src="@{/webtemplate/plugins/datatables/jquery.dataTables.min.js}"></script>
-	<script
-		th:src="@{/webtemplate/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js}"></script>
-	<script
-		th:src="@{/webtemplate/plugins/datatables-responsive/js/dataTables.responsive.min.js}"></script>
-	<script
-		th:src="@{/webtemplate/plugins/datatables-responsive/js/responsive.bootstrap4.min.js}"></script>
-	<script
-		th:src="@{/webtemplate/plugins/datatables-buttons/js/dataTables.buttons.min.js}"></script>
-	<script
-		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.bootstrap4.min.js}"></script>
-	<script th:src="@{/webtemplate/plugins/jszip/jszip.min.js}"></script>
-	<script th:src="@{/webtemplate/plugins/pdfmake/pdfmake.min.js}"></script>
-	<script th:src="@{/webtemplate/plugins/pdfmake/vfs_fonts.js}"></script>
-	<script
-		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.html5.min.js}"></script>
-	<script
-		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.print.min.js}"></script>
-	<script
-		th:src="@{/webtemplate/plugins/datatables-buttons/js/buttons.colVis.min.js}"></script>
-	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+        } else {
+            console.warn("No data available to display");
+            $('#loadingMessage').html('<div class="alert alert-warning text-center">No data available to display.</div>');
+            $('#allUsersPerformanceTable').hide();
+        }
 
-	<script th:inline="javascript">
-    let rawData = [[${listObj}]]; // ✅ not inside quotes
-    let jsonData = [];
-
-    try {
-        jsonData = (typeof rawData === "string") ? JSON.parse(rawData) : rawData;
-    } catch (e) {
-        console.error("Invalid JSON data for UserWisePerformance:", e);
-    }
-
-    $("#userPerformanceTable").DataTable({
-        data: jsonData,
-        responsive: false,
-        lengthChange: false,
-        autoWidth: false,
-        buttons: ["csv", "excel", "print", "colvis"]
-    }).buttons().container().appendTo('#userPerformanceTable_wrapper .col-md-6:eq(0)');
-</script>
-
-
-	<script>
-	
-
-	function getuserPerformance(username) {
-	  
-	    const url = `/guac/UserNameTaskPerformance?username=${encodeURIComponent(username)}`;
-	    
-	  
-	    window.open(url, '_blank');
-	}
-
-
-
-
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    });
 </script>
 
 </body>

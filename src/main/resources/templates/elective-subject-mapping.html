@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Elective Subject Mapping</title>
+<head th:include="templateListing :: headFragment"></head>
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+<!-- Select2 CSS -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.10/select2-bootstrap.min.css">
+<style>
+.dashboard-card {
+	border: none;
+	border-radius: 8px;
+	box-shadow: 0 0 1px rgba(0, 0, 0, .125), 0 1px 3px rgba(0, 0, 0, .2);
+	margin-bottom: 1.5rem;
+}
+
+.card-header {
+	background-color: #6c757d;
+	border-bottom: 1px solid rgba(0, 0, 0, .125);
+	color: white;
+	padding: 0.75rem 1.25rem;
+}
+
+.card-header h3 {
+	margin: 0;
+	font-size: 1.2rem;
+	font-weight: 600;
+}
+
+.form-label {
+	font-weight: 600;
+	color: #495057;
+	margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select, .select2-container--bootstrap .select2-selection--single,
+	.select2-container--bootstrap .select2-selection--multiple {
+	border-radius: 4px;
+	border: 1px solid #ced4da;
+}
+
+.form-control:focus, .form-select:focus, .select2-container--bootstrap .select2-selection--single:focus,
+	.select2-container--bootstrap .select2-selection--multiple:focus {
+	border-color: #80bdff;
+	box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+}
+
+.btn-primary {
+	background-color: #007bff;
+	border-color: #007bff;
+}
+
+.btn-primary:hover {
+	background-color: #0069d9;
+	border-color: #0062cc;
+}
+
+.table-container {
+	border-radius: 4px;
+	overflow: hidden;
+	box-shadow: 0 0 1px rgba(0, 0, 0, .125), 0 1px 3px rgba(0, 0, 0, .2);
+}
+
+.table thead th {
+	background-color: #f8f9fa;
+	border-bottom: 2px solid #dee2e6;
+	font-weight: 600;
+	color: #495057;
+}
+
+.alert {
+	border-radius: 4px;
+	border: 1px solid transparent;
+}
+
+.alert-success {
+	color: #155724;
+	background-color: #d4edda;
+	border-color: #c3e6cb;
+}
+
+.alert-danger {
+	color: #721c24;
+	background-color: #f8d7da;
+	border-color: #f5c6cb;
+}
+
+.selected-subjects-container {
+	background: #f8f9fa;
+	border-radius: 4px;
+	padding: 0.75rem;
+	margin-top: 0.5rem;
+	min-height: 50px;
+	border: 1px dashed #dee2e6;
+}
+
+.selected-subject-item {
+	display: inline-flex;
+	align-items: center;
+	background: white;
+	border: 1px solid #dee2e6;
+	border-radius: 4px;
+	padding: 0.25rem 0.5rem;
+	margin: 0.2rem;
+	font-size: 0.85rem;
+}
+
+.selected-subject-item .remove-btn {
+	background: none;
+	border: none;
+	color: #dc3545;
+	margin-left: 0.5rem;
+	cursor: pointer;
+	font-size: 1rem;
+	padding: 0;
+	width: 16px;
+	height: 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.selected-count {
+	font-size: 0.85rem;
+	color: #6c757d;
+	margin-top: 0.5rem;
+}
+
+.empty-state {
+	padding: 2rem 1rem;
+	text-align: center;
+	color: #6c757d;
+}
+
+.select2-container--bootstrap .select2-selection--multiple {
+	min-height: 38px;
+	padding: 2px 8px;
+}
+
+.select2-container--bootstrap .select2-selection--multiple .select2-selection__choice
+	{
+	background-color: #007bff;
+	border-color: #007bff;
+	color: white;
+	padding: 0 8px;
+	margin-top: 5px;
+}
+
+.select2-container--bootstrap .select2-selection--multiple .select2-selection__choice__remove
+	{
+	color: white;
+	margin-right: 5px;
+}
+
+.page-title {
+	font-weight: 600;
+	color: #343a40;
+	font-size: 1.5rem;
+	margin-bottom: 1rem;
+}
+</style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<div th:replace="fragments/header_bk :: header"></div>
+		<div th:replace="fragments/sidebar :: aside"></div>
+
+		<div class="content-wrapper">
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row align-items-center mb-2">
+						<div class="col-sm-6">
+							<h1 class="page-title">
+								<i class="fas fa-book me-2"></i>Elective Subject Mapping
+							</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="/guac/Hod-homePage"
+									class="text-decoration-none"> <i class="fas fa-home mr-2"></i>Home
+								</a></li>
+								<li class="breadcrumb-item active">Elective Mapping</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="container-fluid">
+					<!-- Error Message -->
+					<div th:if="${error}" class="alert alert-danger alert-dismissible">
+						<button type="button" class="close" data-dismiss="alert"
+							aria-hidden="true">×</button>
+						<i class="fas fa-exclamation-triangle me-2"></i> <span
+							th:text="${error}"></span>
+					</div>
+
+					<!-- Success Message -->
+					<div th:if="${success}"
+						class="alert alert-success alert-dismissible">
+						<button type="button" class="close" data-dismiss="alert"
+							aria-hidden="true">×</button>
+						<i class="fas fa-check-circle me-2"></i> <span
+							th:text="${success}"></span>
+					</div>
+
+					<!-- Mapping Form -->
+
+
+					<!-- Existing Mappings Table -->
+					<!-- Existing Mappings Table -->
+					<!-- Existing Mappings Table -->
+<div class="dashboard-card card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-10">
+                <h3 class="card-title" style="padding-top: 10px">Existing Mappings</h3>
+            </div>
+            <div class="col-md-2">
+                <a th:href="@{'/guac/addElectiveMappingPage/'}" class="btn btn-block bg-gradient-primary">Add New</a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-container">
+            <div class="table-responsive">
+                <table id="mappingsTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th width="5%">Sr.</th>
+                            <th width="20%">User</th>
+                            <th width="30%">Elective Subjects</th>
+                            <th width="20%">Semester</th>
+                            <th width="25%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="mapping, stat : ${existingMappings}">
+                            <td th:text="${stat.count}">1</td>
+                            <td>
+                                <strong th:text="${mapping.userName}">username</strong>
+                                <br>
+                                <small class="text-muted" th:if="${mapping.elective != null && mapping.elective.teacher != null}">
+                                    Teacher: <span th:text="${mapping.elective.teacher}"></span>
+                                </small>
+                            </td>
+                            <td>
+                                <span th:if="${mapping.elective != null}" 
+                                      th:text="${mapping.elective.subjectName + ' (' + mapping.elective.subjectCode + ')'}">Subject</span>
+                                <span th:if="${mapping.elective == null}" class="text-muted">N/A</span>
+                            </td>
+                            <td>
+                                <span th:if="${mapping.semester != null}" 
+                                      th:text="${mapping.semester.semesterName}">Semester</span>
+                                <span th:if="${mapping.semester == null}" class="text-muted">N/A</span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <!-- Edit Button
+                                    <a th:href="@{'/guac/addElectiveMappingPage?mappingId=' + ${mapping.id}}"
+                                       class="btn btn-warning btn-sm btn-edit"
+                                       th:title="'Edit mapping for ' + ${mapping.userName}">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    -->
+                                    <!-- Delete Button -->
+                                    <button type="button"
+                                            class="btn btn-danger btn-sm btn-delete"
+                                            th:data-mapping-id="${mapping.id}"
+                                            th:data-user-name="${mapping.userName}"
+                                            th:data-subject-name="${mapping.elective != null ? mapping.elective.subjectName : 'N/A'}"
+                                            title="Delete Mapping">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(existingMappings)}">
+                            <td colspan="5" class="empty-state text-center py-4">
+                                <i class="fas fa-inbox fa-3x mb-3 text-muted"></i>
+                                <div>
+                                    <strong class="d-block">No Elective Mappings Found</strong>
+                                    <p class="mb-0 text-muted">No elective subject mappings have been created yet.</p>
+                                    <a th:href="@{'/guac/addElectiveMappingPage'}" class="btn btn-primary mt-3">
+                                        <i class="fas fa-plus me-1"></i> Create First Mapping
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+				</div>
+			</section>
+		</div>
+
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+
+	<div th:replace="templateListing :: jsscript"></div>
+
+	<!-- Select2 JS -->
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+	<!-- Message Modal -->
+	<div class="modal fade" id="messageModal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitle">Message</h5>
+					<button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body" id="modalMessage">
+					<!-- Message will be inserted here -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+	$(document).ready(function() {
+	    // Initialize Select2 for single select
+	    $('.select2-single').select2({
+	        theme: 'bootstrap',
+	        placeholder: "Select User",
+	        allowClear: true
+	    });
+	    
+	    // Initialize Select2 for multiple select
+	    $('.select2-multiple').select2({
+	        theme: 'bootstrap',
+	        placeholder: "Choose elective subjects...",
+	        allowClear: true,
+	        closeOnSelect: false
+	    });
+	    
+	    // Handle form submission
+	    $('#mappingForm').on('submit', function(e) {
+	        e.preventDefault();
+	        
+	        const userId = $('#userId').val();
+	        const subjectMasterIds = $('#subjectMasterIds').val();
+	        
+	        if (!userId) {
+	            showMessage('Error', 'Please select a user', 'error');
+	            return;
+	        }
+	        
+	        if (!subjectMasterIds || subjectMasterIds.length === 0) {
+	            showMessage('Error', 'Please select at least one elective subject', 'error');
+	            return;
+	        }
+	        
+	        // Show loading state
+	        const submitBtn = $(this).find('button[type="submit"]');
+	        const originalText = submitBtn.html();
+	        submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Mapping...');
+	        
+	        // Submit via AJAX
+	        $.ajax({
+	            url: '/guac/saveElectiveMapping',
+	            type: 'POST',
+	            traditional: true, // Important for arrays
+	            data: {
+	                userId: userId,
+	                subjectMasterIds: subjectMasterIds
+	            },
+	            success: function(response) {
+	                if (response.success) {
+	                    showMessage('Success', response.message, 'success');
+	                    $('#mappingForm')[0].reset();
+	                    $('.select2-single').val(null).trigger('change');
+	                    $('.select2-multiple').val(null).trigger('change');
+	                    
+	                    setTimeout(() => {
+	                        location.reload();
+	                    }, 2000);
+	                } else {
+	                    showMessage('Error', response.message, 'error');
+	                }
+	            },
+	            error: function(xhr) {
+	                showMessage('Error', 'An error occurred while saving the mapping', 'error');
+	            },
+	            complete: function() {
+	                // Restore button state
+	                submitBtn.prop('disabled', false).html(originalText);
+	            }
+	        });
+	    });
+	    
+	    // Delete functionality
+	   $(document).on('click', '.btn-delete', function() {
+    const mappingId = $(this).data('mapping-id');
+    const userName = $(this).data('user-name');
+    const subjectName = $(this).data('subject-name');
+    
+    Swal.fire({
+        title: 'Are you sure?',
+        html: `You are about to delete the mapping for <strong>${userName}</strong> with subject <strong>${subjectName}</strong>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+            return $.ajax({
+                url: '/guac/deleteElectiveMapping',
+                type: 'POST',
+                data: { mappingId: mappingId },
+                success: function(response) {
+                    return response;
+                },
+                error: function(xhr) {
+                    throw new Error('An error occurred while deleting the mapping');
+                }
+            });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        if (result.isConfirmed) {
+            if (result.value.success) {
+                Swal.fire({
+                    title: 'Deleted!',
+                    text: result.value.message,
+                    icon: 'success',
+                    confirmButtonColor: '#3085d6',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    // Remove the row from table
+                    $('.btn-delete[data-mapping-id="' + mappingId + '"]').closest('tr').fadeOut(400, function() {
+                        $(this).remove();
+                        // Check if table is empty and show empty state
+                        if ($('#mappingsTable tbody tr').length === 0) {
+                            $('#mappingsTable tbody').html(`
+                                <tr>
+                                    <td colspan="5" class="empty-state text-center py-4">
+                                        <i class="fas fa-inbox fa-3x mb-3 text-muted"></i>
+                                        <div>
+                                            <strong class="d-block">No Elective Mappings Found</strong>
+                                            <p class="mb-0 text-muted">No elective subject mappings have been created yet.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `);
+                        }
+                    });
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: result.value.message,
+                    icon: 'error',
+                    confirmButtonColor: '#3085d6'
+                });
+            }
+        }
+    });
+});
+	    
+	    function showMessage(title, message, type) {
+	        $('#modalTitle').text(title);
+	        $('#modalMessage').text(message);
+	        
+	        const modalHeader = $('#messageModal .modal-header');
+	        modalHeader.removeClass('bg-success bg-danger bg-warning');
+	        
+	        if (type === 'success') {
+	            modalHeader.addClass('bg-success text-white');
+	        } else if (type === 'error') {
+	            modalHeader.addClass('bg-danger text-white');
+	        }
+	        
+	        $('#messageModal').modal('show');
+	    }
+	    
+	    // Refresh functionality
+	    window.refreshMappings = function() {
+	        location.reload();
+	    }
+	    
+	    // Auto-hide alerts after 5 seconds
+	    setTimeout(function() {
+	        $('.alert').fadeOut('slow');
+	    }, 5000);
+	});
+    </script>
+</body>
+</html>

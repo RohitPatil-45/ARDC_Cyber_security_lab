@@ -1,6 +1,7 @@
 package in.canaris.cloud.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,6 +16,14 @@ public interface ElectvieSubjectUserMappingRepository extends JpaRepository<Elec
 
 	boolean existsByUserNameAndElectiveAndSemester(String studentUsername, SubjectMaster subject,
 			SemesterMaster semester);
+
+	List<ElectvieSubjectUserMapping> findByUserNameAndElective(String userName, SubjectMaster subject);
+
+//	Optional<ElectvieSubjectUserMapping> findById(Long mappingId);
+//
+//	void deleteById(Long mappingId);
+
+
 
 	
 	
