@@ -4238,7 +4238,119 @@ public class CloudInstanceController {
 
 	}
 	
-	
+	 @GetMapping("/template_edit/{id}")
+	    public String showEditForm(@PathVariable("id") int id, Model model) {
+	        try {
+	            Optional<CloudInstance> cloudInstanceOptional = repository.findById(id);
+	            
+	            if (cloudInstanceOptional.isPresent()) {
+	                CloudInstance cloudInstance = cloudInstanceOptional.get();
+	                model.addAttribute("cloudInstance", cloudInstance);
+	                model.addAttribute("pageTitle", "Edit Template");
+	                return "edit_template";
+	            } else {
+	                return "redirect:/cloud_instance/view?error=Template+not+found";
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return "redirect:/cloud_instance/view?error=Error+loading+template";
+	        }
+	    }
+	 
+	 
+	 @PostMapping("/updateTemplate")
+	 public String updateTemplate(
+	         @ModelAttribute CloudInstance cloudInstance,
+	         @RequestParam(value = "uploadedImage", required = false) MultipartFile uploadedImage,
+	         @RequestParam(value = "removeImage", defaultValue = "false") boolean removeImage,
+	         RedirectAttributes redirectAttributes) {
+	     
+	     try {
+	         // Get existing template to preserve all data
+	         Optional<CloudInstance> existingTemplate = repository.findById(cloudInstance.getId());
+	         
+	         if (existingTemplate.isPresent()) {
+	             CloudInstance existing = existingTemplate.get();
+	             
+	             // Only update fields that are provided/not null
+	             if (cloudInstance.getInstance_name() != null && !cloudInstance.getInstance_name().trim().isEmpty()) {
+	                 existing.setInstance_name(cloudInstance.getInstance_name());
+	             }
+	             
+	             if (cloudInstance.getLab_tag() != null && !cloudInstance.getLab_tag().trim().isEmpty()) {
+	                 existing.setLab_tag(cloudInstance.getLab_tag());
+	             }
+	             
+	             if (cloudInstance.getConsoleUsername() != null && !cloudInstance.getConsoleUsername().trim().isEmpty()) {
+	                 existing.setConsoleUsername(cloudInstance.getConsoleUsername());
+	             }
+	             
+	             // Only update password if provided (not blank)
+	             if (cloudInstance.getConsolePassword() != null && !cloudInstance.getConsolePassword().trim().isEmpty()) {
+	                 existing.setConsolePassword(cloudInstance.getConsolePassword());
+	             }
+	             
+	             if (cloudInstance.getConsoleProtocol() != null && !cloudInstance.getConsoleProtocol().trim().isEmpty()) {
+	                 existing.setConsoleProtocol(cloudInstance.getConsoleProtocol());
+	             }
+	             
+	             if (cloudInstance.getSecurityMode() != null && !cloudInstance.getSecurityMode().trim().isEmpty()) {
+	                 existing.setSecurityMode(cloudInstance.getSecurityMode());
+	             }
+	             
+	             if (cloudInstance.getServerCertificate() != null) {
+	                 existing.setServerCertificate(cloudInstance.getServerCertificate());
+	             }
+	             
+	             if (cloudInstance.getDescription() != null && !cloudInstance.getDescription().trim().isEmpty()) {
+	                 existing.setDescription(cloudInstance.getDescription());
+	             }
+	             
+	             if (cloudInstance.getVirtualization_type() != null && !cloudInstance.getVirtualization_type().trim().isEmpty()) {
+	                 existing.setVirtualization_type(cloudInstance.getVirtualization_type());
+	             }
+	             
+	             if (cloudInstance.getPhysicalServerIP() != null && !cloudInstance.getPhysicalServerIP().trim().isEmpty()) {
+	                 existing.setPhysicalServerIP(cloudInstance.getPhysicalServerIP());
+	             }
+	             
+	             // Handle image upload/removal
+	             if (removeImage) {
+	                 // Remove current image
+	                 existing.setLab_image(null);
+	             } else if (uploadedImage != null && !uploadedImage.isEmpty()) {
+	                 // Handle new image upload
+	                 if (!uploadedImage.getContentType().startsWith("image/")) {
+	                     redirectAttributes.addFlashAttribute("errorMessage", "Please upload a valid image file");
+	                     return "redirect:/cloud_instance/edit/" + cloudInstance.getId();
+	                 }
+	                 
+	                 // Check file size (max 5MB)
+	                 if (uploadedImage.getSize() > 5 * 1024 * 1024) {
+	                     redirectAttributes.addFlashAttribute("errorMessage", "Image size should be less than 5MB");
+	                     return "redirect:/cloud_instance/edit/" + cloudInstance.getId();
+	                 }
+	                 
+	                 existing.setLab_image(uploadedImage.getBytes());
+	             }
+	             // If no image change, keep the existing image
+	             
+	             // Update the template
+	             repository.save(existing);
+	             
+	             redirectAttributes.addFlashAttribute("successMessage", "Template updated successfully");
+	             return "redirect:/cloud_instance/view";
+	         } else {
+	             redirectAttributes.addFlashAttribute("errorMessage", "Template not found");
+	             return "redirect:/cloud_instance/view";
+	         }
+	         
+	     } catch (Exception e) {
+	         e.printStackTrace();
+	         redirectAttributes.addFlashAttribute("errorMessage", "Error updating template: " + e.getMessage());
+	         return "redirect:/cloud_instance/edit/" + cloudInstance.getId();
+	     }
+	 }
 	
 
 }

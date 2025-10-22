@@ -104,6 +104,14 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
 			@Param("templateName") String templateName, @Param("permissions") String permissions,
 			@Param("userId") Long userId);
 
+	
+	
+	@Query("SELECT a.email FROM AppUser a WHERE a.email=:email")
+	AppUser findBymail(@Param("email") String email);
+
+
+
+
 //	void updateUserWithAcademicAndTemplate(String name, String email, String mobileNo, String groupName,
 //			Switch switch_id, String generationType, DepartmentMaster departmentName, CourseMaster courseName,
 //			SemesterMaster semesterName, BatchMaster batchName, String templateName, Long userId);

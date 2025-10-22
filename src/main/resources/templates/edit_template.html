@@ -4,372 +4,665 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Edit Template</title>
-<link rel="icon" type="image/png" href="/webtemplate/dist/img/magicboxEye3.png">
+<link rel="icon" type="image/png"
+	href="/webtemplate/dist/img/magicboxEye3.png">
 
 <!-- Common CSS -->
 <link rel="stylesheet" th:href="@{/css/fontAwesome.css}">
-<link rel="stylesheet" th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
 <link rel="stylesheet" th:href="@{/css/ionicIcons.css}">
-<link rel="stylesheet" th:href="@{/webtemplate/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css}">
-<link rel="stylesheet" th:href="@{/webtemplate/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
-<link rel="stylesheet" th:href="@{/webtemplate/plugins/jqvmap/jqvmap.min.css}">
-<link rel="stylesheet" th:href="@{/webtemplate/dist/css/adminlte.min.css}">
-<link rel="stylesheet" th:href="@{/webtemplate/plugins/overlayScrollbars/css/OverlayScrollbars.min.css}">
-<link rel="stylesheet" th:href="@{/webtemplate/plugins/daterangepicker/daterangepicker.css}">
-<link rel="stylesheet" th:href="@{/webtemplate/plugins/summernote/summernote-bs4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/jqvmap/jqvmap.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/dist/css/adminlte.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/overlayScrollbars/css/OverlayScrollbars.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/daterangepicker/daterangepicker.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/summernote/summernote-bs4.min.css}">
 
-<link rel="stylesheet" th:href="@{/webtemplate/css/cloudfont-awesome.min.css}">
-<link rel="stylesheet" type="text/css" th:href="@{/webtemplate/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css}">
-<link rel="stylesheet" th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
-<link rel="stylesheet" th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/css/cloudfont-awesome.min.css}">
+<link rel="stylesheet" type="text/css"
+	th:href="@{/webtemplate/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-responsive/css/responsive.bootstrap4.min.css}">
+<link rel="stylesheet"
+	th:href="@{/webtemplate/plugins/datatables-buttons/css/buttons.bootstrap4.min.css}">
+
+<!-- Summernote CSS -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs4.min.css">
 
 <style>
 .glowBtn {
-    background-color: #1c87c9;
-    border-radius: 5px;
-    border: none;
-    color: #eeeeee;
-    cursor: pointer;
-    display: inline-block;
-    font-family: sans-serif;
-    font-size: 20px;
-    padding: 5px 15px;
-    text-align: center;
-    text-decoration: none;
+	background-color: #1c87c9;
+	border-radius: 5px;
+	border: none;
+	color: #eeeeee;
+	cursor: pointer;
+	display: inline-block;
+	font-family: sans-serif;
+	font-size: 20px;
+	padding: 5px 15px;
+	text-align: center;
+	text-decoration: none;
 }
 
-@keyframes glowing {
-  0% { background-color: #2ba805; box-shadow: 0 0 5px #2ba805; }
-  50% { background-color: #49e819; box-shadow: 0 0 20px #49e819; }
-  100% { background-color: #2ba805; box-shadow: 0 0 5px #2ba805; }
+@
+keyframes glowing { 0% {
+	background-color: #2ba805;
+	box-shadow: 0 0 5px #2ba805;
+}
+
+50
+%
+{
+background-color
+:
+#49e819;
+box-shadow
+:
+0
+0
+20px
+#49e819;
+}
+100
+%
+{
+background-color
+:
+#2ba805;
+box-shadow
+:
+0
+0
+5px
+#2ba805;
+}
 }
 .glowBtn {
-    animation: glowing 1300ms infinite;
+	animation: glowing 1300ms infinite;
 }
 
-.card-header {
-    background: linear-gradient(135deg, #4361ee, #3f37c9);
-    color: white;
+th {
+	text-align: center;
 }
 
-.form-control:focus {
-    border-color: #4361ee;
-    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+td {
+	text-align: center;
+}
+
+.info-box-text {
+	font-family: math;
+	font-size: larger;
+}
+
+.current-image {
+    max-width: 200px;
+    max-height: 150px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    margin-top: 10px;
 }
 </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
-        <!-- Header -->
-        <div th:replace="fragments/header_bk :: header"></div>
-        <!-- Close Header -->
+	<div class="wrapper">
+		<!-- Header -->
+		<div th:replace="fragments/header_bk :: header"></div>
+		<!--Close Header -->
 
-        <!-- Sidebar -->
-        <div th:replace="fragments/sidebar :: aside"></div>
-        <!-- Close Sidebar -->
+		<!-- Sidebar -->
+		<div th:replace="fragments/sidebar :: aside"></div>
+		<!-- Close Sidebar -->
+		<div class="content-wrapper">
+			<div class="container-fluid">
+				<div class="row mb-2">
+					<div class="col-sm-6">
+						<h2 class="m-0">Edit Template</h2>
+					</div>
+				</div>
+			</div>
 
-        <div class="content-wrapper">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h2 class="m-0 text-primary">Edit Template</h2>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a th:href="@{/cloud_instance/view}">Templates</a></li>
-                            <li class="breadcrumb-item active">Edit Template</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
+			<!-- Edit Form -->
+			<form th:action="@{/cloud_instance/updateTemplate}" method="post"
+				enctype="multipart/form-data" th:object="${cloudInstance}">
+				<input type="hidden" th:field="*{id}" />
 
-            <!-- Edit Form -->
-            <form th:action="@{/cloud_instance/update}" method="post" th:object="${cloudInstance}">
-                <input type="hidden" th:field="*{id}" />
-                
-                <div class="container-fluid">
-                    <div class="row">
-                        <!-- Basic Information -->
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">Basic Information</h3>
-                                </div>
-                                <div class="card-body">
-                                    <!-- Template Name -->
-                                    <div class="form-group">
-                                        <label for="instance_name">Template Name *</label>
-                                        <input type="text" th:field="*{instance_name}" class="form-control" 
-                                               id="instance_name" required placeholder="Enter template name">
-                                    </div>
+				<!-- Instance Name -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12" style="padding-top: 10px">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Template
+												Name</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Provide
+												Template Name</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<input tabindex="2" type="text" th:field="*{instance_name}"
+												required id="instance_name" name="instance_name"
+												class="form-control" placeholder="Enter Cloud Lab Name" />
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Instance Name -->
 
-                                    <!-- Description -->
-                                    <div class="form-group">
-                                        <label for="description">Description</label>
-                                        <textarea th:field="*{description}" class="form-control" 
-                                                 id="description" rows="3" placeholder="Enter template description"></textarea>
-                                    </div>
+				<!-- Start Lab Image -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Template
+												Image</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Provide
+												Template Image</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<!-- Display current image if exists -->
+										<div th:if="${cloudInstance.lab_image != null}" class="mb-3">
+											
+											<img th:src="@{'/cloud_instance/image/' + ${cloudInstance.id}}" 
+												 alt="Current Template Image" 
+												 class="current-image"
+												 onerror="this.style.display='none'"/>
+											
+											
+										</div>
+										
+										<div class="form-group">
+											<div class="custom-file">
+												<input type="file" class="custom-file-input"
+													id="uploadedImage" name="uploadedImage" accept="image/*">
+												<label class="custom-file-label" for="uploadedImage">
+													<span th:if="${cloudInstance.lab_image != null}">Change Template image file</span>
+													<span th:unless="${cloudInstance.lab_image != null}">Choose Template image file</span>
+												</label>
+											</div>
+											<small class="form-text text-muted">Recommended size:
+												1200x630 pixels</small>
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Lab Image -->
 
-                                    <!-- Lab Tag -->
-                                    <div class="form-group">
-                                        <label for="lab_tag">Lab Tag *</label>
-                                        <input type="text" th:field="*{lab_tag}" class="form-control" 
-                                               id="lab_tag" required placeholder="Enter lab tag">
-                                    </div>
+				<!-- Start Lab Tag -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Template
+												Tag</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Provide
+												Template Tag</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<input tabindex="2" type="text" th:field="*{lab_tag}"
+												required id="lab_tag" name="lab_tag" class="form-control"
+												placeholder="Enter Cloud Lab Tag" />
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Lab Tag -->
 
-                                    <!-- Virtualization Type -->
-                                    <div class="form-group">
-                                        <label for="virtualization_type">Virtualization Type *</label>
-                                        <select th:field="*{virtualization_type}" class="form-control" 
-                                                id="virtualization_type" required>
-                                            <option value="">SELECT</option>
-                                            <option value="KVM">KVM</option>
-                                            <option value="hyperv">Hyper-V</option>
-                                            <option value="Docker">Docker</option>
-                                            <option value="OpenStack">OpenStack</option>
-                                            <option value="Proxmox">Proxmox</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+				<!-- Start Lab Username -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start; flex-direction: column; display: flex;">
+											<span style="font-weight: bold;">UserName</span> <span
+												style="font-size: 1rem; color: #b5b5c3;">Provide
+												UserName</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<input tabindex="1" type="text" th:field="*{ConsoleUsername}"
+												required class="form-control"
+												placeholder="Enter Cloud UserName" />
+										</div>
+									</div>
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Lab Username -->
 
-                        <!-- Connection Details -->
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">Connection Details</h3>
-                                </div>
-                                <div class="card-body">
-                                    <!-- Console Username -->
-                                    <div class="form-group">
-                                        <label for="ConsoleUsername">Username *</label>
-                                        <input type="text" th:field="*{ConsoleUsername}" class="form-control" 
-                                               id="ConsoleUsername" required placeholder="Enter username">
-                                    </div>
+				<!-- Start Lab Password -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start; flex-direction: column; display: flex;">
+											<span style="font-weight: bold;">Password</span> <span
+												style="font-size: 1rem; color: #b5b5c3;">Provide
+												Password</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<input tabindex="2" type="password"
+												th:field="*{instance_password}" 
+												th:attr="value=${cloudInstance.instance_password}"
+												class="form-control"
+												placeholder="Enter Cloud Password" />
+											<small class="form-text text-muted">Leave blank to keep current password unchanged</small>
+										</div>
+									</div>
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Lab Password -->
 
-                                    <!-- Console Password -->
-                                    <div class="form-group">
-                                        <label for="ConsolePassword">Password *</label>
-                                        <input type="password" th:field="*{ConsolePassword}" class="form-control" 
-                                               id="ConsolePassword" required placeholder="Enter password">
-                                    </div>
+				<!-- Start Lab ConsoleProtocol -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- Protocol -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="display: flex; flex-direction: column;">
+											<span style="font-weight: bold;">Protocol</span> <span
+												style="font-size: 1rem; color: #b5b5c3;">Provide
+												Protocol</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<select th:field="*{ConsoleProtocol}" required
+												class="form-control" style="width: 100%;">
+												<option value="">SELECT</option>
+												<option value="rdp">RDP</option>
+												<option value="ssh">SSH</option>
+												<option value="vnc">VNC</option>
+												<option value="telnet">Telnet</option>
+												<option value="kubernetes">Kubernetes</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Lab ConsoleProtocol -->
 
-                                    <!-- Console Protocol -->
-                                    <div class="form-group">
-                                        <label for="ConsoleProtocol">Protocol *</label>
-                                        <select th:field="*{ConsoleProtocol}" class="form-control" 
-                                                id="ConsoleProtocol" required>
-                                            <option value="">SELECT</option>
-                                            <option value="rdp">RDP</option>
-                                            <option value="ssh">SSH</option>
-                                            <option value="vnc">VNC</option>
-                                            <option value="telnet">Telnet</option>
-                                            <option value="kubernetes">Kubernetes</option>
-                                        </select>
-                                    </div>
+				<!-- Security Mode -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- Security Mode Dropdown -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="display: flex; flex-direction: column;">
+											<span style="font-weight: bold;">Security Mode</span> <span
+												style="font-size: 1rem; color: #b5b5c3;">Select
+												Security Mode</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<select class="form-control" th:field="*{SecurityMode}"
+												style="width: 100%;">
+												<option value="">SELECT</option>
+												<option value="any">Any</option>
+												<option value="nla">NLA (Network Level
+													Authentication)</option>
+												<option value="rdp">RDP Security</option>
+												<option value="tls">TLS</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Security Mode -->
 
-                                    <!-- Security Mode -->
-                                    <div class="form-group">
-                                        <label for="SecurityMode">Security Mode</label>
-                                        <select th:field="*{SecurityMode}" class="form-control" 
-                                                id="SecurityMode">
-                                            <option value="">SELECT</option>
-                                            <option value="any">Any</option>
-                                            <option value="nla">NLA (Network Level Authentication)</option>
-                                            <option value="rdp">RDP Security</option>
-                                            <option value="tls">TLS</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+				<!-- Server Certificate -->
+				<div class="card border-transparent mt-3">
+					<div class="card-header">
+						<h3 class="card-title"
+							style="display: flex; flex-direction: column;">
+							<span style="font-weight: bold;">Server Certificate</span> <span
+								style="font-size: 1rem; color: #b5b5c3;">Enable or
+								disable server certificate validation</span>
+						</h3>
+					</div>
+					<div class="card-body">
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox"
+								id="enableServerCert" name="enableServerCert"
+								th:checked="${cloudInstance.ServerCertificate != null && !cloudInstance.ServerCertificate.isEmpty()}">
+							<label class="form-check-label" for="enableServerCert"> Enable
+								Server Certificate Validation </label>
+						</div>
 
-                    <!-- Server Configuration -->
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">Server Configuration</h3>
-                                </div>
-                                <div class="card-body">
-                                    <!-- Physical Server IP -->
-                                    <div class="form-group">
-                                        <label for="physicalServerIP">Physical Server IP *</label>
-                                        <input type="text" th:field="*{physicalServerIP}" class="form-control" 
-                                               id="physicalServerIP" required placeholder="Enter server IP">
-                                    </div>
+						<!-- Optional dropdown that appears only when checkbox is checked -->
+						<div class="form-group mt-3" id="serverCertOptions">
+							<label for="serverCertificate">Validation Mode</label> 
+							<select class="form-control" id="serverCertificate"
+								th:field="*{ServerCertificate}" name="ServerCertificate">
+								<option value="">SELECT</option>
+								<option value="ignore">Ignore</option>
+								<option value="trust">Trust only system CA certificates</option>
+								<option value="trust-all">Trust all certificates
+									(insecure)</option>
+								<option value="validate">Validate server certificate
+									(recommended)</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<!-- End Server Certificate -->
 
-                                    <!-- Instance IP -->
-                                    <div class="form-group">
-                                        <label for="instance_ip">Instance IP</label>
-                                        <input type="text" th:field="*{instance_ip}" class="form-control" 
-                                               id="instance_ip" placeholder="Enter instance IP">
-                                    </div>
+				<!-- Start Lab Description -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Description</span>
+											<span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Provide
+												Description</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<input tabindex="2" type="text" th:field="*{description}"
+												required id="description" name="description"
+												class="form-control" placeholder="Enter Cloud Description" />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Lab Description -->
 
-                                    <!-- VNC Port -->
-                                    <div class="form-group">
-                                        <label for="vnc_port">VNC Port</label>
-                                        <input type="text" th:field="*{vnc_port}" class="form-control" 
-                                               id="vnc_port" placeholder="Enter VNC port">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+				<!-- virtualization type -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Virtualization
+												Type</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Select
+												Virtualization Type</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<select tabindex="1" id="virtualization_type"
+												th:field="*{virtualization_type}" required
+												name="virtualization_type" class="form-control"
+												data-placeholder="Select switch" style="width: 100%;">
+												<option value=''>SELECT</option>
+												<option value='KVM'>KVM</option>
+												<option value='hyperv'>Hyper-V</option>
+												<option value='Docker'>Docker</option>
+												<option value='OpenStack'>OpenStack</option>
+												<option value='Proxmox'>Proxmox</option>
+											</select>
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End virtualization type  -->
 
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">Resource Allocation</h3>
-                                </div>
-                                <div class="card-body">
-                                    <!-- Memory Assigned -->
-                                    <div class="form-group">
-                                        <label for="memoryAssigned">Memory Assigned</label>
-                                        <input type="text" th:field="*{memoryAssigned}" class="form-control" 
-                                               id="memoryAssigned" placeholder="e.g., 4GB">
-                                    </div>
+				<!-- Physical Server IP -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- PIE CHART -->
+								<div class="card border-transparent">
+									<div class="card-header">
+										<h3 class="card-title"
+											style="align-items: flex-start !important; flex-direction: column !important; display: flex;">
+											<span class="card-title" style="font-weight: bold;">Physical
+												server IP</span> <span class="card-title"
+												style="font-size: 1rem !important; color: #b5b5c3 !important">Enter
+												server ip address</span>
+										</h3>
+									</div>
+									<div class="card-body">
+										<div class="form-group">
+											<input tabindex="1" type="text" id="physicalServerIP"
+												th:field="*{physicalServerIP}" required
+												name="physicalServerIP" class="form-control"
+												placeholder="Enter Physical Server IP" style="width: 100%;" />
+										</div>
+									</div>
+									<!-- /.card-body -->
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- End Physical Server IP -->
 
-                                    <!-- CPU Assigned -->
-                                    <div class="form-group">
-                                        <label for="cpuAssigned">CPU Assigned</label>
-                                        <input type="text" th:field="*{cpuAssigned}" class="form-control" 
-                                               id="cpuAssigned" placeholder="e.g., 2 vCPU">
-                                    </div>
+				<!-- Cloud Instance Password -->
+				<section class="content">
+					<div class="container-fluid">
+						<div class="form-group" style="padding-top: 10px;">
+							<button id="updateVMBtn" type="submit" class="glowBtn">
+								Update Template <i
+									style="margin-left: 10px; color: yellow; display: none"
+									id="vmUpdateSpinner" class='fa fa-spinner fa-spin'></i>
+							</button>
+							<a th:href="@{/cloud_instance/view}"
+								class="btn btn-secondary ml-3"> Cancel </a>
+						</div>
+					</div>
+				</section>
+				<!-- End Cloud Instance Password -->
+			</form>
+		</div>
+	</div>
 
-                                    <!-- Disk Assigned -->
-                                    <div class="form-group">
-                                        <label for="diskAssigned">Disk Assigned</label>
-                                        <input type="text" th:field="*{diskAssigned}" class="form-control" 
-                                               id="diskAssigned" placeholder="e.g., 50GB">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+	<!-- Footer -->
+	<div th:replace="fragments/footer :: footer"></div>
+	<!--Close Footer -->
 
-                    <!-- Additional Information -->
-                    <div class="row mt-3">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">Additional Information</h3>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <!-- VM Instructions -->
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="vm_instructions">VM Instructions</label>
-                                                <textarea th:field="*{vm_instructions}" class="form-control" 
-                                                         id="vm_instructions" rows="4" placeholder="Enter VM setup instructions"></textarea>
-                                            </div>
-                                        </div>
+	<!-- Common JS  -->
+	<script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/jquery-ui/jquery-ui.min.js}"></script>
+	<script>
+		$.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<!-- ChartJS -->
+	<script th:src="@{/webtemplate/plugins/chart.js/Chart.min.js}"></script>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script
+		th:src="@{/webtemplate/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js}"></script>
+	<!-- Summernote -->
+	<script
+		th:src="@{/webtemplate/plugins/summernote/summernote-bs4.min.js}"></script>
+	<!-- overlayScrollbars -->
+	<script
+		th:src="@{/webtemplate/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js}"></script>
+	<!-- AdminLTE App -->
+	<script th:src="@{/webtemplate/dist/js/adminlte.js}"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script th:src="@{/webtemplate/dist/js/demo.js}"></script>
 
-                                        <!-- Status Information -->
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="vm_status">VM Status</label>
-                                                <select th:field="*{vm_status}" class="form-control" 
-                                                        id="vm_status">
-                                                    <option value="">SELECT</option>
-                                                    <option value="Running">Running</option>
-                                                    <option value="Stopped">Stopped</option>
-                                                    <option value="Paused">Paused</option>
-                                                    <option value="Error">Error</option>
-                                                </select>
-                                            </div>
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/jquery.validate.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/jquery-validation/additional-methods.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+	<script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
 
-                                            <div class="form-group">
-                                                <label for="request_status">Request Status</label>
-                                                <select th:field="*{request_status}" class="form-control" 
-                                                        id="request_status">
-                                                    <option value="">SELECT</option>
-                                                    <option value="Pending">Pending</option>
-                                                    <option value="Approved">Approved</option>
-                                                    <option value="Rejected">Rejected</option>
-                                                    <option value="Completed">Completed</option>
-                                                </select>
-                                            </div>
+	<script
+		th:src="@{/webtemplate/plugins/datatables/jquery.dataTables.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/dataTables.responsive.min.js}"></script>
+	<script
+		th:src="@{/webtemplate/plugins/datatables-responsive/js/responsive.bootstrap4.min.js}"></script>
 
-                                            <!-- Monitoring -->
-                                            <div class="form-check mt-3">
-                                                <input type="checkbox" th:field="*{isMonitoring}" 
-                                                       class="form-check-input" id="isMonitoring">
-                                                <label class="form-check-label" for="isMonitoring">
-                                                    Enable Monitoring
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs4.min.js"></script>
 
-                    <!-- Action Buttons -->
-                    <div class="row mt-4">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-body text-center">
-                                    <button type="submit" class="btn btn-primary glowBtn mr-3">
-                                        <i class="fas fa-save"></i> Update Template
-                                    </button>
-                                    <a th:href="@{/cloud_instance/view}" class="btn btn-secondary">
-                                        <i class="fas fa-times"></i> Cancel
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+	<script>
+		$(document).ready(function() {
+			// Initialize select2
+			$('select').select2({
+				theme : 'bootstrap4'
+			});
 
-    <!-- Footer -->
-    <div th:replace="fragments/footer :: footer"></div>
+			// File input label update
+			document.getElementById('uploadedImage').addEventListener('change', function(e) {
+				if (this.files && this.files[0]) {
+					var fileName = this.files[0].name;
+					var nextSibling = e.target.nextElementSibling;
+					nextSibling.innerText = fileName;
+				}
+			});
 
-    <!-- Common JS -->
-    <script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
-    <script th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
-    <script th:src="@{/webtemplate/dist/js/adminlte.js}"></script>
-    <script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
-    <script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+			// Server certificate toggle - initialize based on current value
+			const serverCertValue = /*[[${cloudInstance.ServerCertificate}]]*/ null;
+			const enableServerCertCheckbox = document.getElementById("enableServerCert");
+			const serverCertOptions = document.getElementById("serverCertOptions");
+			
+			// Show/hide server certificate options based on current value
+			if (serverCertValue && serverCertValue.trim() !== '') {
+				serverCertOptions.style.display = "block";
+			} else {
+				serverCertOptions.style.display = "none";
+			}
+			
+			// Toggle on checkbox change
+			enableServerCertCheckbox.addEventListener("change", function() {
+				serverCertOptions.style.display = this.checked ? "block" : "none";
+				if (!this.checked) {
+					document.getElementById("serverCertificate").value = "";
+				}
+			});
 
-    <script>
-        $(document).ready(function() {
-            // Initialize select2
-            $('select').select2({
-                theme: 'bootstrap4'
-            });
+			// Form submission handling
+			$('form').on('submit', function(e) {
+				const submitBtn = $(this).find('button[type="submit"]');
+				submitBtn.prop('disabled', true);
+				$('#vmUpdateSpinner').show();
+			});
 
-            // Form submission handling
-            $('form').on('submit', function(e) {
-                const submitBtn = $(this).find('button[type="submit"]');
-                submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Updating...');
-            });
+			// Show success/error messages
+			const successMessage = /*[[${successMessage}]]*/null;
+			const errorMessage = /*[[${errorMessage}]]*/null;
 
-            // Show success message if available
-            const result = /*[[${result}]]*/ null;
-            if (result === 'success') {
-                Swal.fire({
-                    position: "top",
-                    icon: "success",
-                    title: 'Template updated successfully',
-                    showConfirmButton: false,
-                    timer: 2000
-                });
-            } else if (result && result !== 'null') {
-                Swal.fire({
-                    position: "top",
-                    icon: "error",
-                    title: result,
-                    showConfirmButton: true
-                });
-            }
-        });
-    </script>
+			if (successMessage) {
+				Swal.fire({
+					position : "top",
+					icon : "success",
+					title : successMessage,
+					showConfirmButton : false,
+					timer : 3000
+				});
+			}
+
+			if (errorMessage) {
+				Swal.fire({
+					position : "top",
+					icon : "error",
+					title : errorMessage,
+					showConfirmButton : true
+				});
+			}
+		});
+	</script>
 </body>
 </html>

@@ -656,57 +656,57 @@ public class UserController {
 	    return "redirect:/users/view";
 	}
 	
-	@GetMapping("/edit/{id}")
-	public String editTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-	    try {
-	        AppUser user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-
-	        UserMasterRole usermasterRole = new UserMasterRole();
-	        usermasterRole.setAppUser(user);
-
-	        long roleID = userRoleRepository.findRole(id);
-	        AppRole role = appRoleRepository.findByRoleId(roleID);
-	        usermasterRole.setAppRole(role);
-
-	        model.addAttribute("user", user);
-	        model.addAttribute("pageTitle", "Edit User (ID: " + id + ")");
-	        model.addAttribute("userID", id);
-	        model.addAttribute("objEnt", usermasterRole);
-	        model.addAttribute("groupList", groupRepository.getAllGroups());
-	        model.addAttribute("switchList", switchRepository.getAllSwitch());
-
-	        // Add Departments
-	        List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
-	        model.addAttribute("departments", departments);
-
-	        // Get selected values for preselection
-	        if (user.getDepartmentName() != null) {
-	            model.addAttribute("selectedDepartmentId", user.getDepartmentName().getDepartmentId());
-	            // For Admin/HOD fields
-	            model.addAttribute("selectedAdminDepartmentId", user.getDepartmentName().getDepartmentId());
-	        }
-	        if (user.getCourseName() != null) {
-	            model.addAttribute("selectedCourseId", user.getCourseName().getCourseId());
-	            // For HOD field
-	            model.addAttribute("selectedHodCourseId", user.getCourseName().getCourseId());
-	        }
-	        if (user.getSemesterName() != null) {
-	            model.addAttribute("selectedSemesterId", user.getSemesterName().getSemesterId());
-	        }
-	        if (user.getBatchName() != null) {
-	            model.addAttribute("selectedBatchId", user.getBatchName().getBatchId());
-	        }
-
-	        // Add template names
-	        List<String> templateNames = RoleMenuTemplateRepository.findDistinctTemplateNames();
-	        model.addAttribute("templateList", templateNames);
-
-	        return "user_add";
-	    } catch (Exception e) {
-	        redirectAttributes.addFlashAttribute("message", e.getMessage());
-	        return "redirect:/users/view";
-	    }
-	}
+//	@GetMapping("/edit/{id}")
+//	public String editTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+//	    try {
+//	        AppUser user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+//
+//	        UserMasterRole usermasterRole = new UserMasterRole();
+//	        usermasterRole.setAppUser(user);
+//
+//	        long roleID = userRoleRepository.findRole(id);
+//	        AppRole role = appRoleRepository.findByRoleId(roleID);
+//	        usermasterRole.setAppRole(role);
+//
+//	        model.addAttribute("user", user);
+//	        model.addAttribute("pageTitle", "Edit User (ID: " + id + ")");
+//	        model.addAttribute("userID", id);
+//	        model.addAttribute("objEnt", usermasterRole);
+//	        model.addAttribute("groupList", groupRepository.getAllGroups());
+//	        model.addAttribute("switchList", switchRepository.getAllSwitch());
+//
+//	        // Add Departments
+//	        List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+//	        model.addAttribute("departments", departments);
+//
+//	        // Get selected values for preselection
+//	        if (user.getDepartmentName() != null) {
+//	            model.addAttribute("selectedDepartmentId", user.getDepartmentName().getDepartmentId());
+//	            // For Admin/HOD fields
+//	            model.addAttribute("selectedAdminDepartmentId", user.getDepartmentName().getDepartmentId());
+//	        }
+//	        if (user.getCourseName() != null) {
+//	            model.addAttribute("selectedCourseId", user.getCourseName().getCourseId());
+//	            // For HOD field
+//	            model.addAttribute("selectedHodCourseId", user.getCourseName().getCourseId());
+//	        }
+//	        if (user.getSemesterName() != null) {
+//	            model.addAttribute("selectedSemesterId", user.getSemesterName().getSemesterId());
+//	        }
+//	        if (user.getBatchName() != null) {
+//	            model.addAttribute("selectedBatchId", user.getBatchName().getBatchId());
+//	        }
+//
+//	        // Add template names
+//	        List<String> templateNames = RoleMenuTemplateRepository.findDistinctTemplateNames();
+//	        model.addAttribute("templateList", templateNames);
+//
+//	        return "user_add";
+//	    } catch (Exception e) {
+//	        redirectAttributes.addFlashAttribute("message", e.getMessage());
+//	        return "redirect:/users/view";
+//	    }
+//	}
 	
 //	@GetMapping("/edit/{id}")
 //	public String editTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
@@ -1095,582 +1095,1080 @@ public class UserController {
 		return "CustomeUser_view";
 	}
 
-	// upload csv code start
+	// upload  code start
 
-	@GetMapping("/upload")
-	public String showUploadPage(Model model) {
-		model.addAttribute("pageTitle", "Bulk User Upload");
-		return "user_upload";
-	}
-
-	@GetMapping("/download-csv-template")
-	public void downloadCsvTemplate(HttpServletResponse response) throws IOException {
-		response.setContentType("text/csv");
-		response.setHeader("Content-Disposition", "attachment; filename=user_upload.csv");
-
-		String csvContent = "name,userName,email,mobileNo,roleId,groupName,departmentName,courseName,semesterName,batchName\n"
-				+ "John Doe,john.doe,john@example.com,9876543210,2,Students,Computer Science,B.Tech CS,Semester 1,Batch A\n"
-				+ "Jane Smith,jane.smith,jane@example.com,9876543211,4,Faculty,Computer Science,B.Tech CS,Semester 1,Batch A\n"
-				+ "Admin User,admin,admin@example.com,9876543212,1,Administrators,,,,\n"
-				+ "Super Admin,superadmin,super@example.com,9876543213,3,SuperAdmins,,,,\n\n" + "Note:\n"
-				+ "- Required fields: name, userName, email, mobileNo, roleId, groupName\n"
-				+ "- Role IDs: 1=Admin, 2=User, 3=Super Admin, 4=Teacher\n"
-				+ "- Switch ID and Generation Type will be set to default values (1)\n"
-				+ "- For Admin, Super Admin, Teacher roles: leave academic fields empty\n"
-				+ "- For User role: fill academic fields (departmentName, courseName, semesterName, batchName)\n"
-				+ "- Username, Email, and Mobile Number must be unique across the system";
-
-		response.getWriter().write(csvContent);
-	}
-
-	@GetMapping("/download-excel-template")
-	public void downloadExcelTemplate(HttpServletResponse response) throws IOException {
-		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-		response.setHeader("Content-Disposition", "attachment; filename=user_upload.xlsx");
-
-		Workbook workbook = new XSSFWorkbook();
-		Sheet sheet = workbook.createSheet("User Template");
-
-		// Create header row
-		Row headerRow = sheet.createRow(0);
-		String[] headers = { "name", "userName", "email", "mobileNo", "roleId", "groupName", "departmentName",
-				"courseName", "semesterName", "batchName" };
-		for (int i = 0; i < headers.length; i++) {
-			Cell cell = headerRow.createCell(i);
-			cell.setCellValue(headers[i]);
-		}
-
-		// Create sample data rows
-		Object[][] sampleData = {
-				{ "John Doe", "john.doe", "john@example.com", "9876543210", "2", "Students", "Computer Science",
-						"B.Tech CS", "Semester 1", "Batch A" },
-				{ "Jane Smith", "jane.smith", "jane@example.com", "9876543211", "4", "Faculty", "Computer Science",
-						"B.Tech CS", "Semester 1", "Batch A" },
-				{ "Admin User", "admin", "admin@example.com", "9876543212", "1", "Administrators", "", "", "", "" },
-				{ "Super Admin", "superadmin", "super@example.com", "9876543213", "3", "SuperAdmins", "", "", "",
-						"" } };
-
-		for (int i = 0; i < sampleData.length; i++) {
-			Row row = sheet.createRow(i + 1);
-			for (int j = 0; j < sampleData[i].length; j++) {
-				Cell cell = row.createCell(j);
-				cell.setCellValue(sampleData[i][j].toString());
-			}
-		}
-
-		// Add note row
-		Row noteRow = sheet.createRow(sampleData.length + 2);
-		Cell noteCell = noteRow.createCell(0);
-		noteCell.setCellValue(
-				"Note: Required fields - name, userName, email, mobileNo, roleId, groupName. Switch ID and Generation Type will be set to default values (1). Role IDs: 1=Admin, 2=User, 3=Super Admin, 4=Teacher. Username, Email, and Mobile Number must be unique.");
-
-		// Auto-size columns
-		for (int i = 0; i < headers.length; i++) {
-			sheet.autoSizeColumn(i);
-		}
-
-		workbook.write(response.getOutputStream());
-		workbook.close();
-	}
-
-	@PostMapping("/bulk-upload")
-	@ResponseBody
-	public Map<String, Object> bulkUpload(@RequestParam("file") MultipartFile file) {
-		Map<String, Object> response = new HashMap<>();
-		List<Map<String, String>> successUsers = new ArrayList<>();
-		List<Map<String, String>> errorUsers = new ArrayList<>();
-
-		try {
-			String fileName = file.getOriginalFilename();
-
-			if (fileName == null || fileName.isEmpty()) {
-				throw new RuntimeException("File name is empty");
-			}
-
-			if (fileName.toLowerCase().endsWith(".csv")) {
-				processCsvFile(file, successUsers, errorUsers);
-			} else if (fileName.toLowerCase().endsWith(".xlsx") || fileName.toLowerCase().endsWith(".xls")) {
-				processExcelFile(file, successUsers, errorUsers);
-			} else {
-				throw new RuntimeException("Unsupported file format. Please upload CSV or Excel file.");
-			}
-
-			response.put("success", true);
-			response.put("message", "File processed successfully");
-			response.put("successUsers", successUsers);
-			response.put("errorUsers", errorUsers);
-			response.put("totalProcessed", successUsers.size() + errorUsers.size());
-			response.put("successCount", successUsers.size());
-			response.put("errorCount", errorUsers.size());
-
-		} catch (Exception e) {
-			response.put("success", false);
-			response.put("message", "Error processing file: " + e.getMessage());
-		}
-
-		return response;
-	}
-
-	private void processCsvFile(MultipartFile file, List<Map<String, String>> successUsers,
-			List<Map<String, String>> errorUsers) throws IOException {
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-				CSVParser csvParser = new CSVParser(reader,
-						CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
-
-			for (CSVRecord record : csvParser) {
-				processUserRecord(record.toMap(), successUsers, errorUsers);
-			}
-		}
-	}
-
-	private void processExcelFile(MultipartFile file, List<Map<String, String>> successUsers,
-			List<Map<String, String>> errorUsers) throws IOException {
-		Workbook workbook;
-		String fileName = file.getOriginalFilename();
-
-		if (fileName.toLowerCase().endsWith(".xlsx")) {
-			workbook = new XSSFWorkbook(file.getInputStream());
-		} else {
-			workbook = new HSSFWorkbook(file.getInputStream());
-		}
-
-		Sheet sheet = workbook.getSheetAt(0);
-		Iterator<Row> rowIterator = sheet.iterator();
-
-		// Skip header row
-		if (rowIterator.hasNext()) {
-			rowIterator.next();
-		}
-
-		while (rowIterator.hasNext()) {
-			Row row = rowIterator.next();
-			Map<String, String> userData = new HashMap<>();
-
-			String[] headers = { "name", "userName", "email", "mobileNo", "roleId", "groupName", "departmentName",
-					"courseName", "semesterName", "batchName" };
-
-			for (int i = 0; i < headers.length && i < row.getLastCellNum(); i++) {
-				Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-				String value = getCellValueAsString(cell);
-				userData.put(headers[i], value);
-			}
-
-			processUserRecord(userData, successUsers, errorUsers);
-		}
-
-		workbook.close();
-	}
-
-	private String getCellValueAsString(Cell cell) {
-		if (cell == null) {
-			return "";
-		}
-
-		switch (cell.getCellType()) {
-		case STRING:
-			return cell.getStringCellValue().trim();
-		case NUMERIC:
-			if (DateUtil.isCellDateFormatted(cell)) {
-				return cell.getDateCellValue().toString();
-			} else {
-				// Check if it's an integer value
-				double numericValue = cell.getNumericCellValue();
-				if (numericValue == Math.floor(numericValue)) {
-					return String.valueOf((long) numericValue);
-				} else {
-					return String.valueOf(numericValue);
-				}
-			}
-		case BOOLEAN:
-			return String.valueOf(cell.getBooleanCellValue());
-		case FORMULA:
-			try {
-				return cell.getStringCellValue();
-			} catch (Exception e) {
-				try {
-					return String.valueOf(cell.getNumericCellValue());
-				} catch (Exception ex) {
-					return cell.getCellFormula();
-				}
-			}
-		default:
-			return "";
-		}
-	}
-
-	private void processUserRecord(Map<String, String> userData, List<Map<String, String>> successUsers,
-			List<Map<String, String>> errorUsers) {
-		try {
-			// Debug: Print all received data
-			System.out.println("Processing record for user: " + userData.get("userName"));
-			userData.forEach((key, value) -> System.out.println(key + ": '" + value + "'"));
-
-			// Validate required fields
-			if (!isValidUserData(userData)) {
-				Map<String, String> error = new HashMap<>();
-				error.put("userName", userData.get("userName"));
-				error.put("error", "Missing required fields");
-				errorUsers.add(error);
-				return;
-			}
-
-			String userName = userData.get("userName");
-			String email = userData.get("email");
-			String mobileNo = userData.get("mobileNo");
-
-			// Check for duplicate username, email, and mobile number
-			String duplicateError = checkForDuplicateUser(userName, email, mobileNo);
-			if (duplicateError != null) {
-				Map<String, String> error = new HashMap<>();
-				error.put("userName", userName);
-				error.put("error", duplicateError);
-				errorUsers.add(error);
-				return;
-			}
-
-			// Set default switch ID (1) and validate if it exists
-			Integer switchId = 1; // Default value
-			Switch userSwitch = switchRepository.findById(switchId).orElse(null);
-			if (userSwitch == null) {
-				Map<String, String> error = new HashMap<>();
-				error.put("userName", userName);
-				error.put("error", "Default switch with ID " + switchId + " not found in system");
-				errorUsers.add(error);
-				return;
-			}
-
-			// Create and save user
-			AppUser user = new AppUser();
-			user.setName(userData.get("name"));
-			user.setUserName(userName);
-			user.setEmail(email);
-			user.setMobileNo(mobileNo);
-			user.setGroupName(userData.get("groupName"));
-			user.setSwitch_id(userSwitch);
-
-			// Set default generation type (1)
-			user.setGenerationType("1");
-
-			// Set default password and confirm password
-			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-			String defaultPassword = "defaultPassword123";
-			user.setEncrytedPassword(encoder.encode(defaultPassword));
-			user.setConfirmPassword(defaultPassword);
-
-			// Set default values
-			user.setEnabled(true);
-			user.setIsFirstTimeLogin(true);
-			user.setStatus("Active");
-
-			// Handle academic fields based on role
-			Long roleId = Long.parseLong(userData.get("roleId"));
-			if (roleId == 2L) {
-				setAcademicFields(user, userData);
-			} else {
-				user.setDepartmentName(null);
-				user.setCourseName(null);
-				user.setSemesterName(null);
-				user.setBatchName(null);
-			}
-
-			// Save user
-			AppUser savedUser = userRepository.save(user);
-
-			// Create user role
-			AppRole appRole = new AppRole();
-			appRole.setRoleId(roleId);
-
-			UserRole userRole = new UserRole();
-			userRole.setAppUser(savedUser);
-			userRole.setAppRole(appRole);
-			userRoleRepository.save(userRole);
-
-			// Add to success list
-			Map<String, String> success = new HashMap<>();
-			success.put("name", savedUser.getName());
-			success.put("userName", savedUser.getUserName());
-			success.put("email", savedUser.getEmail());
-			success.put("generationType", savedUser.getGenerationType());
-			success.put("switchId", String.valueOf(switchId));
-			successUsers.add(success);
-
-		} catch (Exception e) {
-			Map<String, String> error = new HashMap<>();
-			error.put("userName", userData.get("userName"));
-			error.put("error", "Error creating user: " + e.getMessage());
-			errorUsers.add(error);
-			e.printStackTrace();
-		}
-	}
-
-	private String checkForDuplicateUser(String userName, String email, String mobileNo) {
-		// Check for duplicate username
-		if (userRepository.existsByUserName(userName)) {
-			return "Username '" + userName + "' already exists";
-		}
-
-		// Check for duplicate email
-		if (userRepository.existsByEmail(email)) {
-			return "Email '" + email + "' already exists";
-		}
-
-		// Check for duplicate mobile number
-		if (userRepository.existsByMobileNo(mobileNo)) {
-			return "Mobile number '" + mobileNo + "' already exists";
-		}
-
-		return null;
-	}
-
-	private boolean isValidUserData(Map<String, String> userData) {
-		return userData.get("name") != null && !userData.get("name").trim().isEmpty()
-				&& userData.get("userName") != null && !userData.get("userName").trim().isEmpty()
-				&& userData.get("email") != null && !userData.get("email").trim().isEmpty()
-				&& userData.get("mobileNo") != null && !userData.get("mobileNo").trim().isEmpty()
-				&& userData.get("roleId") != null && !userData.get("roleId").trim().isEmpty()
-				&& userData.get("groupName") != null && !userData.get("groupName").trim().isEmpty();
-	}
-
-	private void setAcademicFields(AppUser user, Map<String, String> userData) {
-		try {
-			// Set department if provided
-			if (userData.get("departmentName") != null && !userData.get("departmentName").trim().isEmpty()) {
-				DepartmentMaster dept = DepartmentMasterRepository.findByDepartmentName(userData.get("departmentName"));
-				if (dept != null) {
-					user.setDepartmentName(dept);
-				} else {
-					System.out.println("Warning: Department not found: " + userData.get("departmentName"));
-				}
-			}
-
-			// Set course if provided
-			if (userData.get("courseName") != null && !userData.get("courseName").trim().isEmpty()) {
-				CourseMaster course = CourseMasterRepository.findByCourseName(userData.get("courseName"));
-				if (course != null) {
-					user.setCourseName(course);
-				} else {
-					System.out.println("Warning: Course not found: " + userData.get("courseName"));
-				}
-			}
-
-			// Set semester if provided
-//	        if (userData.get("semesterName") != null && !userData.get("semesterName").trim().isEmpty()) {
-//	            SemesterMaster semester = SemesterMasterRepository.findBySemesterNameAndCourseName(userData.get("semesterName"),userData.get("courseName"));
-//	            if (semester != null) {
-//	                user.setSemesterName(semester);
-//	            } else {
-//	                System.out.println("Warning: Semester not found: " + userData.get("semesterName"));
-//	            }
-//	        }
-
-			if (userData.get("semesterName") != null && !userData.get("semesterName").trim().isEmpty()) {
-				String semesterName = userData.get("semesterName").trim();
-				String courseName = userData.get("courseName") != null ? userData.get("courseName").trim() : null;
-
-				if (courseName != null && !courseName.isEmpty()) {
-					CourseMaster course = CourseMasterRepository.findByCourseName(courseName);
-					if (course != null) {
-						SemesterMaster semester = SemesterMasterRepository.findBySemesterNameAndCourse(semesterName,
-								course);
-						if (semester != null) {
-							user.setSemesterName(semester);
-						} else {
-							System.out.println("⚠️ Warning: Semester not found for name: " + semesterName
-									+ " and course: " + courseName);
-						}
-					} else {
-						System.out.println("⚠️ Warning: Course not found with name: " + courseName);
-					}
-				} else {
-					System.out.println("⚠️ Warning: Course name is missing for semester: " + semesterName);
-				}
-			}
-
-			// Set batch if provided
-			if (userData.get("batchName") != null && !userData.get("batchName").trim().isEmpty()) {
-				BatchMaster batch = BatchMasterRepository.findByBatchName(userData.get("batchName"));
-				if (batch != null) {
-					user.setBatchName(batch);
-				} else {
-					System.out.println("Warning: Batch not found: " + userData.get("batchName"));
-				}
-			}
-
-		} catch (Exception e) {
-			System.out.println("Error setting academic fields: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
-//start Sidebar code
 	
-	// Method to get current logged-in user using Principal
-	private AppUser getCurrentUser(Principal principal) {
-		if (principal == null) {
-			return null;
-		}
 
-		Authentication auth = (Authentication) principal;
-		String username = auth.getName();
-		
-		System.out.println("username_sidebar :"+username);
+    // Counter wrapper class to handle mutable counts
+    private static class OperationCounters {
+        public int insertCount = 0;
+        public int updateCount = 0;
+        public int deleteCount = 0;
+        public int failCount = 0;
+    }
 
-		return userRepository.findByUsername(username);
-	}
+    // Show bulk upload page
+    @GetMapping("/upload")
+    public String showUploadPage(Model model) {
+        model.addAttribute("pageTitle", "Bulk User Upload");
+        return "user_upload";
+    }
 
-	// Method to get menu items based on user's template
-	private List<Map<String, Object>> getUserMenuItems(Principal principal) {
-		AppUser currentUser = getCurrentUser(principal);
-		if (currentUser == null) {
-			return new ArrayList<>();
-		}
+    // Download CSV template - updated with new fields
+    @GetMapping("/download-csv-template")
+    public void downloadCsvTemplate(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=user_upload_template.csv");
 
-		String templateName = currentUser.getTemplateName();
+        String csvContent = "name,userName,email,mobileNo,roleId,groupName,departmentName,courseName,semesterName,batchName,permissions,templateName,keyParam\n" +
+                "John Doe,john.doe,john@example.com,9876543210,2,Students,Computer Science,B.Tech CS,Semester 1,Batch A,READ_WRITE,Default Template,1\n" +
+                "Jane Smith,jane.smith,jane@example.com,9876543211,4,Faculty,Computer Science,B.Tech CS,Semester 1,Batch A,READ_ONLY,Teacher Template,2\n" +
+                "Admin User,admin,admin@example.com,9876543212,1,Administrators,,,,,FULL_ACCESS,Admin Template,3\n" +
+                "Super Admin,superadmin,super@example.com,9876543213,3,SuperAdmins,,,,,FULL_ACCESS,SuperAdmin Template,1\n\n" +
+                "Note:\n" +
+                "- Required fields: name, userName, email, mobileNo, roleId, groupName, keyParam\n" +
+                "- Role IDs: 1=Admin, 2=User, 3=Super Admin, 4=Teacher\n" +
+                "- Key Parameter: 1=Insert, 2=Update, 3=Delete\n" +
+                "- For updates and deletes, email field is used to identify the user\n" +
+                "- Switch ID and Generation Type will be set to default values (1)\n" +
+                "- For Admin, Super Admin, Teacher roles: leave academic fields empty\n" +
+                "- For User role: fill academic fields (departmentName, courseName, semesterName, batchName)\n" +
+                "- Permissions and TemplateName are optional fields\n" +
+                "- Username, Email, and Mobile Number must be unique across the system";
 
-		if (templateName == null || templateName.trim().isEmpty()) {
-			return new ArrayList<>();
-		}
+        response.getWriter().write(csvContent);
+    }
 
-		return getMenuItemsByTemplateName(templateName);
-	}
+    // Download Excel template with keyParam - updated with new fields
+    @GetMapping("/download-excel-template")
+    public void downloadExcelTemplate(HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=user_upload_template.xlsx");
 
-	// Get menu items by template name using repository
-	private List<Map<String, Object>> getMenuItemsByTemplateName(String templateName) {
-		List<RoleMenuTemplate> roleMenuTemplates = RoleMenuTemplateRepository
-				.findByTemplateNameOrderByMenuSortOrder(templateName);
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("User Template");
 
-		List<Object[]> menuData = roleMenuTemplates.stream()
-				.map(rmt -> new Object[] { rmt.getMenu().getMenuId(), rmt.getMenu().getModuleId(),
-						rmt.getMenu().getModuleName(), rmt.getMenu().getSubModuleId(), rmt.getMenu().getSubModuleName(),
-						rmt.getMenu().getUrl(), rmt.getMenu().getSortOrder() })
-				.collect(Collectors.toList());
+        // Create header row with keyParam and new fields
+        Row headerRow = sheet.createRow(0);
+        String[] headers = { "name", "userName", "email", "mobileNo", "roleId", "groupName", 
+                           "departmentName", "courseName", "semesterName", "batchName", 
+                           "permissions", "templateName", "keyParam" };
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+        }
 
-		return organizeMenuItems(menuData);
-	}
+        // Create sample data rows with different keyParam values and new fields
+        Object[][] sampleData = {
+            { "John Doe", "john.doe", "john@example.com", "9876543210", "2", "Students", 
+              "Computer Science", "B.Tech CS", "Semester 1", "Batch A", "READ_WRITE", "Default Template", "1" },
+            { "Jane Smith", "jane.smith", "jane@example.com", "9876543211", "4", "Faculty", 
+              "Computer Science", "B.Tech CS", "Semester 1", "Batch A", "READ_ONLY", "Teacher Template", "2" },
+            { "Admin User", "admin", "admin@example.com", "9876543212", "1", "Administrators", 
+              "", "", "", "", "FULL_ACCESS", "Admin Template", "3" },
+            { "Super Admin", "superadmin", "super@example.com", "9876543213", "3", "SuperAdmins", 
+              "", "", "", "", "FULL_ACCESS", "SuperAdmin Template", "1" }
+        };
 
-	// Organize menu items into hierarchical structure
-	private List<Map<String, Object>> organizeMenuItems(List<Object[]> menuData) {
-		Map<Integer, Map<String, Object>> modules = new LinkedHashMap<>();
+        for (int i = 0; i < sampleData.length; i++) {
+            Row row = sheet.createRow(i + 1);
+            for (int j = 0; j < sampleData[i].length; j++) {
+                Cell cell = row.createCell(j);
+                cell.setCellValue(sampleData[i][j].toString());
+            }
+        }
 
-		for (Object[] row : menuData) {
-			Integer menuId = (Integer) row[0];
-			Integer moduleId = (Integer) row[1];
-			String moduleName = (String) row[2];
-			Integer subModuleId = (Integer) row[3];
-			String subModuleName = (String) row[4];
-			String url = (String) row[5];
-			Integer sortOrder = (Integer) row[6];
+        // Add instruction row
+        Row instructionRow = sheet.createRow(sampleData.length + 2);
+        Cell instructionCell = instructionRow.createCell(0);
+        instructionCell.setCellValue("Instructions: keyParam - 1=Insert, 2=Update, 3=Delete. For updates and deletes, email is used to identify the user. Permissions and TemplateName are optional fields.");
 
-			// Create module if it doesn't exist
-			if (!modules.containsKey(moduleId)) {
-				Map<String, Object> module = new HashMap<>();
-				module.put("moduleId", moduleId);
-				module.put("moduleName", moduleName);
-				module.put("subModules", new ArrayList<Map<String, Object>>());
-				modules.put(moduleId, module);
-			}
+        // Auto-size columns
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
 
-			// Add submodule to the module
-			Map<String, Object> subModule = new HashMap<>();
-			subModule.put("menuId", menuId);
-			subModule.put("subModuleId", subModuleId);
-			subModule.put("subModuleName", subModuleName);
-			subModule.put("url", url);
-			subModule.put("sortOrder", sortOrder);
+        workbook.write(response.getOutputStream());
+        workbook.close();
+    }
 
-			@SuppressWarnings("unchecked")
-			List<Map<String, Object>> subModules = (List<Map<String, Object>>) modules.get(moduleId).get("subModules");
-			subModules.add(subModule);
-		}
+    // Bulk upload with edit logic (INSERT, UPDATE, DELETE)
+    @PostMapping("/bulk-upload-with-edit")
+    @ResponseBody
+    public Map<String, Object> bulkUploadWithEdit(@RequestParam("file") MultipartFile file) {
+        Map<String, Object> response = new HashMap<>();
+        List<Map<String, String>> failedRecords = new ArrayList<>();
+        
+        OperationCounters counters = new OperationCounters();
 
-		return new ArrayList<>(modules.values());
-	}
+        try {
+            String fileName = file.getOriginalFilename();
 
-	// Controller method to serve dynamic sidebar
-	@GetMapping("/dynamic-sidebar")
-	public String getDynamicSidebar(Model model, Principal principal) {
-		List<Map<String, Object>> menuItems = getUserMenuItems(principal);
-		 System.out.println("=== getUserMenuItems START ===");
-		model.addAttribute("menuItems", menuItems);
+            if (fileName == null || fileName.isEmpty()) {
+                throw new RuntimeException("File name is empty");
+            }
 
-		// Add debug information
-		AppUser currentUser = getCurrentUser(principal);
-		if (currentUser != null) {
-			
-			 System.out.println("Current user is NULL");
-			 
-			model.addAttribute("username", currentUser.getUserName());
-			model.addAttribute("templateName", currentUser.getTemplateName());
-		}
+            if (fileName.toLowerCase().endsWith(".xlsx") || fileName.toLowerCase().endsWith(".xls")) {
+                processExcelFileWithEdit(file, counters, failedRecords);
+            } else {
+                throw new RuntimeException("Unsupported file format. Please upload Excel file.");
+            }
 
-		return "fragments/dynamic-sidebar";
-	}
+            response.put("success", true);
+            response.put("message", "File processed successfully");
+            response.put("insertCount", counters.insertCount);
+            response.put("updateCount", counters.updateCount);
+            response.put("deleteCount", counters.deleteCount);
+            response.put("failCount", counters.failCount);
+            response.put("failedRecords", failedRecords);
 
-	// Complete dynamic sidebar with role-based logic
-	@GetMapping("/complete-dynamic-sidebar")
-	public String getCompleteDynamicSidebar(Model model, Principal principal) {
-		List<Map<String, Object>> menuItems;
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error processing file: " + e.getMessage());
+            e.printStackTrace();
+        }
 
-		if (hasRole("ROLE_SUPERADMIN")) {
-			menuItems = getAllMenusForSuperAdmin();
-		} else {
-			menuItems = getUserMenuItems(principal);
-		}
+        return response;
+    }
 
-		model.addAttribute("menuItems", menuItems);
+    private void processExcelFileWithEdit(MultipartFile file, OperationCounters counters, 
+                                        List<Map<String, String>> failedRecords) 
+                                        throws IOException {
+        Workbook workbook;
+        String fileName = file.getOriginalFilename();
 
-		// Add user info for debugging
-		AppUser currentUser = getCurrentUser(principal);
-		if (currentUser != null) {
-			model.addAttribute("username", currentUser.getUserName());
-			model.addAttribute("templateName", currentUser.getTemplateName());
-		}
+        if (fileName.toLowerCase().endsWith(".xlsx")) {
+            workbook = new XSSFWorkbook(file.getInputStream());
+        } else {
+            workbook = new HSSFWorkbook(file.getInputStream());
+        }
 
-		return "fragments/dynamic-sidebar-complete";
-	}
+        Sheet sheet = workbook.getSheetAt(0);
+        Iterator<Row> rowIterator = sheet.iterator();
 
-	// Method to get all menus for SuperAdmin
-	private List<Map<String, Object>> getAllMenusForSuperAdmin() {
-		List<MenuChart> allMenus = MenuRepository.findAllOrderBySortOrder();
+        // Skip header row
+        if (rowIterator.hasNext()) {
+            rowIterator.next();
+        }
 
-		List<Object[]> menuData = allMenus.stream()
-				.map(menu -> new Object[] { menu.getMenuId(), menu.getModuleId(), menu.getModuleName(),
-						menu.getSubModuleId(), menu.getSubModuleName(), menu.getUrl(), menu.getSortOrder() })
-				.collect(Collectors.toList());
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            
+            // Skip empty rows
+            if (isRowEmpty(row)) {
+                continue;
+            }
+            
+            Map<String, String> userData = new HashMap<>();
 
-		return organizeMenuItems(menuData);
-	}
+            // Updated headers to include permissions and templateName
+            String[] headers = { "name", "userName", "email", "mobileNo", "roleId", "groupName", 
+                               "departmentName", "courseName", "semesterName", "batchName", 
+                               "permissions", "templateName", "keyParam" };
 
-	// Method to check if user has specific role
-	private boolean hasRole(String role) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null && auth.getAuthorities() != null) {
-			return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(role));
-		}
-		return false;
-	}
+            for (int i = 0; i < headers.length && i < row.getLastCellNum(); i++) {
+                Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                String value = getCellValueAsString(cell);
+                userData.put(headers[i], value);
+            }
 
-	// Model attribute for role checks in templates
-	@ModelAttribute("hasRole")
-	public boolean hasRoleAttribute(String role) {
-		return hasRole(role);
-	}
+            processUserRecordWithEdit(userData, counters, failedRecords);
+        }
 
-	// Utility methods for testing
-	@GetMapping("/current-user-info")
-	@ResponseBody
-	public Map<String, Object> getCurrentUserInfo(Principal principal) {
-		Map<String, Object> response = new HashMap<>();
+        workbook.close();
+    }
 
-		if (principal != null) {
-			AppUser user = getCurrentUser(principal);
-			if (user != null) {
-				response.put("username", user.getUserName());
-				response.put("templateName", user.getTemplateName());
-				response.put("menuItemsCount", getUserMenuItems(principal).size());
-			}
-		}
+    private boolean isRowEmpty(Row row) {
+        if (row == null) {
+            return true;
+        }
+        if (row.getLastCellNum() <= 0) {
+            return true;
+        }
+        for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
+            Cell cell = row.getCell(cellNum);
+            if (cell != null && cell.getCellType() != CellType.BLANK && 
+                getCellValueAsString(cell).trim().length() > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-		return response;
-	}
+    private void processUserRecordWithEdit(Map<String, String> userData, OperationCounters counters,
+                                         List<Map<String, String>> failedRecords) {
+        String keyParam = userData.get("keyParam");
+        String email = userData.get("email");
+
+        // Skip records with empty keyParam instead of throwing exception
+        if (keyParam == null || keyParam.trim().isEmpty()) {
+            counters.failCount++;
+            Map<String, String> error = new HashMap<>();
+            error.put("userName", userData.get("userName"));
+            error.put("email", userData.get("email"));
+            error.put("error", "Key parameter is required but was empty or missing");
+            error.put("keyParam", "MISSING");
+            failedRecords.add(error);
+            System.err.println("Skipping record with missing key parameter for user: " + userData.get("userName"));
+            return; // Skip this record and continue with next
+        }
+
+        // Convert key parameter (handle both string and numeric values like "1", "1.0")
+        int keyParamValue;
+        try {
+            if (keyParam.contains(".")) {
+                keyParamValue = (int) Double.parseDouble(keyParam);
+            } else {
+                keyParamValue = Integer.parseInt(keyParam);
+            }
+        } catch (NumberFormatException e) {
+            counters.failCount++;
+            Map<String, String> error = new HashMap<>();
+            error.put("userName", userData.get("userName"));
+            error.put("email", userData.get("email"));
+            error.put("error", "Invalid key parameter: " + keyParam + ". Must be 1, 2, or 3.");
+            error.put("keyParam", keyParam);
+            failedRecords.add(error);
+            System.err.println("Invalid key parameter for user: " + userData.get("userName") + ", keyParam: " + keyParam);
+            return; // Skip this record and continue with next
+        }
+
+        try {
+            switch (keyParamValue) {
+                case 1: // INSERT
+                    processInsert(userData);
+                    counters.insertCount++;
+                    break;
+                case 2: // UPDATE
+                    processUpdate(userData);
+                    counters.updateCount++;
+                    break;
+                case 3: // DELETE
+                    processDelete(userData);
+                    counters.deleteCount++;
+                    break;
+                default:
+                    counters.failCount++;
+                    Map<String, String> error = new HashMap<>();
+                    error.put("userName", userData.get("userName"));
+                    error.put("email", userData.get("email"));
+                    error.put("error", "Invalid key parameter value: " + keyParamValue + ". Must be 1, 2, or 3.");
+                    error.put("keyParam", keyParam);
+                    failedRecords.add(error);
+                    System.err.println("Invalid key parameter value for user: " + userData.get("userName") + ", value: " + keyParamValue);
+                    break;
+            }
+        } catch (Exception e) {
+            counters.failCount++;
+            Map<String, String> error = new HashMap<>();
+            error.put("userName", userData.get("userName"));
+            error.put("email", userData.get("email"));
+            error.put("error", "Processing error: " + e.getMessage());
+            error.put("keyParam", keyParam);
+            failedRecords.add(error);
+            System.err.println("Error processing record for user: " + userData.get("userName") + ", error: " + e.getMessage());
+        }
+    }
+
+    private void processInsert(Map<String, String> userData) {
+        // Validate required fields for insert
+        if (!isValidUserData(userData)) {
+            throw new RuntimeException("Missing required fields for insert");
+        }
+
+        String userName = userData.get("userName");
+        String email = userData.get("email");
+        String mobileNo = userData.get("mobileNo");
+
+        // Check for duplicate username, email, and mobile number
+        String duplicateError = checkForDuplicateUser(userName, email, mobileNo);
+        if (duplicateError != null) {
+            throw new RuntimeException(duplicateError);
+        }
+
+        // Set default switch ID (1) and validate if it exists
+        Integer switchId = 1; // Default value
+        Switch userSwitch = switchRepository.findById(switchId).orElse(null);
+        if (userSwitch == null) {
+            throw new RuntimeException("Default switch with ID " + switchId + " not found in system");
+        }
+
+        // Create and save user
+        AppUser user = new AppUser();
+        user.setName(userData.get("name"));
+        user.setUserName(userName);
+        user.setEmail(email);
+        user.setMobileNo(mobileNo);
+        user.setGroupName(userData.get("groupName"));
+        user.setSwitch_id(userSwitch);
+
+        // Set default generation type (1)
+        user.setGenerationType("1");
+
+        // Set default password and confirm password
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String defaultPassword = "defaultPassword123";
+        user.setEncrytedPassword(encoder.encode(defaultPassword));
+        user.setConfirmPassword(defaultPassword);
+
+        // Set default values
+        user.setEnabled(true);
+        user.setIsFirstTimeLogin(true);
+        user.setStatus("Active");
+
+        // Handle new fields - permissions and templateName
+        if (userData.get("permissions") != null && !userData.get("permissions").trim().isEmpty()) {
+            user.setPermissions(userData.get("permissions"));
+        }
+        
+        if (userData.get("templateName") != null && !userData.get("templateName").trim().isEmpty()) {
+            user.setTemplateName(userData.get("templateName"));
+        }
+
+        // Handle academic fields based on role
+        Long roleId = Long.parseLong(userData.get("roleId"));
+        if (roleId == 2L) { // User role
+            setAcademicFields(user, userData);
+        } else {
+            // Clear academic fields for non-user roles
+            user.setDepartmentName(null);
+            user.setCourseName(null);
+            user.setSemesterName(null);
+            user.setBatchName(null);
+        }
+
+        // Save user
+        AppUser savedUser = userRepository.save(user);
+
+        // Create user role
+        AppRole appRole = new AppRole();
+        appRole.setRoleId(roleId);
+
+        UserRole userRole = new UserRole();
+        userRole.setAppUser(savedUser);
+        userRole.setAppRole(appRole);
+        userRoleRepository.save(userRole);
+
+        System.out.println("Successfully inserted user: " + userName);
+    }
+
+    private void processUpdate(Map<String, String> userData) {
+        String email = userData.get("email");
+        
+        if (email == null || email.trim().isEmpty()) {
+            throw new RuntimeException("Email is required for update operation");
+        }
+
+        // Find existing user by email - using List and get first element
+        List<AppUser> existingUsers = userRepository.findByemail(email);
+        if (existingUsers == null || existingUsers.isEmpty()) {
+            throw new RuntimeException("User with email '" + email + "' not found for update");
+        }
+
+        AppUser existingUser = existingUsers.get(0); // Get first user from list
+
+        // Update user fields if provided
+        if (userData.get("name") != null && !userData.get("name").trim().isEmpty()) {
+            existingUser.setName(userData.get("name"));
+        }
+        
+        if (userData.get("userName") != null && !userData.get("userName").trim().isEmpty()) {
+            // Check if new username is not duplicate (excluding current user)
+            String newUserName = userData.get("userName");
+            if (!existingUser.getUserName().equals(newUserName)) {
+                if (userRepository.existsByUserName(newUserName)) {
+                    throw new RuntimeException("Username '" + newUserName + "' already exists");
+                }
+                existingUser.setUserName(newUserName);
+            }
+        }
+        
+        if (userData.get("mobileNo") != null && !userData.get("mobileNo").trim().isEmpty()) {
+            // Check if new mobile number is not duplicate (excluding current user)
+            String newMobileNo = userData.get("mobileNo");
+            if (!existingUser.getMobileNo().equals(newMobileNo)) {
+                if (userRepository.existsByMobileNo(newMobileNo)) {
+                    throw new RuntimeException("Mobile number '" + newMobileNo + "' already exists");
+                }
+                existingUser.setMobileNo(newMobileNo);
+            }
+        }
+        
+        if (userData.get("groupName") != null && !userData.get("groupName").trim().isEmpty()) {
+            existingUser.setGroupName(userData.get("groupName"));
+        }
+
+        // Update new fields - permissions and templateName
+        if (userData.get("permissions") != null) {
+            existingUser.setPermissions(userData.get("permissions"));
+        }
+        
+        if (userData.get("templateName") != null) {
+            existingUser.setTemplateName(userData.get("templateName"));
+        }
+
+        // Update role if provided
+        if (userData.get("roleId") != null && !userData.get("roleId").trim().isEmpty()) {
+            Long newRoleId = Long.parseLong(userData.get("roleId"));
+            
+            // Update user role
+            UserRole existingUserRole = userRoleRepository.findByAppUser(existingUser);
+            if (existingUserRole != null) {
+                AppRole newAppRole = new AppRole();
+                newAppRole.setRoleId(newRoleId);
+                existingUserRole.setAppRole(newAppRole);
+                userRoleRepository.save(existingUserRole);
+            }
+            
+            // Handle academic fields based on new role
+            if (newRoleId == 2L) { // User role
+                setAcademicFields(existingUser, userData);
+            } else {
+                // Clear academic fields for non-user roles
+                existingUser.setDepartmentName(null);
+                existingUser.setCourseName(null);
+                existingUser.setSemesterName(null);
+                existingUser.setBatchName(null);
+            }
+        } else {
+            // If role is not provided but user is being updated, handle academic fields based on current role
+            UserRole currentUserRole = userRoleRepository.findByAppUser(existingUser);
+            if (currentUserRole != null && currentUserRole.getAppRole().getRoleId() == 2L) {
+                setAcademicFields(existingUser, userData);
+            }
+        }
+
+        userRepository.save(existingUser);
+        System.out.println("Successfully updated user: " + existingUser.getUserName());
+    }
+
+    private void processDelete(Map<String, String> userData) {
+        String email = userData.get("email");
+        
+        if (email == null || email.trim().isEmpty()) {
+            throw new RuntimeException("Email is required for delete operation");
+        }
+
+        // Find existing user by email - using List and get first element
+        List<AppUser> existingUsers = userRepository.findByemail(email);
+        if (existingUsers == null || existingUsers.isEmpty()) {
+            throw new RuntimeException("User with email '" + email + "' not found for deletion");
+        }
+
+        AppUser existingUser = existingUsers.get(0); // Get first user from list
+        String userName = existingUser.getUserName();
+
+        // Delete user roles first - using single object instead of list
+        UserRole userRole = userRoleRepository.findByAppUser(existingUser);
+        if (userRole != null) {
+            userRoleRepository.delete(userRole);
+        }
+
+        // Delete user
+        userRepository.delete(existingUser);
+        System.out.println("Successfully deleted user: " + userName);
+    }
+
+    // Original bulk upload method (without edit logic)
+    @PostMapping("/bulk-upload")
+    @ResponseBody
+    public Map<String, Object> bulkUpload(@RequestParam("file") MultipartFile file) {
+        Map<String, Object> response = new HashMap<>();
+        List<Map<String, String>> successUsers = new ArrayList<>();
+        List<Map<String, String>> errorUsers = new ArrayList<>();
+
+        try {
+            String fileName = file.getOriginalFilename();
+
+            if (fileName == null || fileName.isEmpty()) {
+                throw new RuntimeException("File name is empty");
+            }
+
+            if (fileName.toLowerCase().endsWith(".csv")) {
+                processCsvFile(file, successUsers, errorUsers);
+            } else if (fileName.toLowerCase().endsWith(".xlsx") || fileName.toLowerCase().endsWith(".xls")) {
+                processExcelFile(file, successUsers, errorUsers);
+            } else {
+                throw new RuntimeException("Unsupported file format. Please upload CSV or Excel file.");
+            }
+
+            response.put("success", true);
+            response.put("message", "File processed successfully");
+            response.put("successUsers", successUsers);
+            response.put("errorUsers", errorUsers);
+            response.put("totalProcessed", successUsers.size() + errorUsers.size());
+            response.put("successCount", successUsers.size());
+            response.put("errorCount", errorUsers.size());
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error processing file: " + e.getMessage());
+        }
+
+        return response;
+    }
+
+    private void processCsvFile(MultipartFile file, List<Map<String, String>> successUsers,
+            List<Map<String, String>> errorUsers) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+                CSVParser csvParser = new CSVParser(reader,
+                        CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
+
+            for (CSVRecord record : csvParser) {
+                processUserRecord(record.toMap(), successUsers, errorUsers);
+            }
+        }
+    }
+
+    private void processExcelFile(MultipartFile file, List<Map<String, String>> successUsers,
+            List<Map<String, String>> errorUsers) throws IOException {
+        Workbook workbook;
+        String fileName = file.getOriginalFilename();
+
+        if (fileName.toLowerCase().endsWith(".xlsx")) {
+            workbook = new XSSFWorkbook(file.getInputStream());
+        } else {
+            workbook = new HSSFWorkbook(file.getInputStream());
+        }
+
+        Sheet sheet = workbook.getSheetAt(0);
+        Iterator<Row> rowIterator = sheet.iterator();
+
+        // Skip header row
+        if (rowIterator.hasNext()) {
+            rowIterator.next();
+        }
+
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            Map<String, String> userData = new HashMap<>();
+
+            String[] headers = { "name", "userName", "email", "mobileNo", "roleId", "groupName", "departmentName",
+                    "courseName", "semesterName", "batchName" };
+
+            for (int i = 0; i < headers.length && i < row.getLastCellNum(); i++) {
+                Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                String value = getCellValueAsString(cell);
+                userData.put(headers[i], value);
+            }
+
+            processUserRecord(userData, successUsers, errorUsers);
+        }
+
+        workbook.close();
+    }
+
+    private String getCellValueAsString(Cell cell) {
+        if (cell == null) {
+            return "";
+        }
+
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue().trim();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getDateCellValue().toString();
+                } else {
+                    // Check if it's an integer value
+                    double numericValue = cell.getNumericCellValue();
+                    if (numericValue == Math.floor(numericValue)) {
+                        return String.valueOf((long) numericValue);
+                    } else {
+                        return String.valueOf(numericValue);
+                    }
+                }
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                try {
+                    return cell.getStringCellValue();
+                } catch (Exception e) {
+                    try {
+                        return String.valueOf(cell.getNumericCellValue());
+                    } catch (Exception ex) {
+                        return cell.getCellFormula();
+                    }
+                }
+            default:
+                return "";
+        }
+    }
+
+    private void processUserRecord(Map<String, String> userData, List<Map<String, String>> successUsers,
+            List<Map<String, String>> errorUsers) {
+        try {
+            // Debug: Print all received data
+            System.out.println("Processing record for user: " + userData.get("userName"));
+            userData.forEach((key, value) -> System.out.println(key + ": '" + value + "'"));
+
+            // Validate required fields
+            if (!isValidUserData(userData)) {
+                Map<String, String> error = new HashMap<>();
+                error.put("userName", userData.get("userName"));
+                error.put("error", "Missing required fields");
+                errorUsers.add(error);
+                return;
+            }
+
+            String userName = userData.get("userName");
+            String email = userData.get("email");
+            String mobileNo = userData.get("mobileNo");
+
+            // Check for duplicate username, email, and mobile number
+            String duplicateError = checkForDuplicateUser(userName, email, mobileNo);
+            if (duplicateError != null) {
+                Map<String, String> error = new HashMap<>();
+                error.put("userName", userName);
+                error.put("error", duplicateError);
+                errorUsers.add(error);
+                return;
+            }
+
+            // Set default switch ID (1) and validate if it exists
+            Integer switchId = 1; // Default value
+            Switch userSwitch = switchRepository.findById(switchId).orElse(null);
+            if (userSwitch == null) {
+                Map<String, String> error = new HashMap<>();
+                error.put("userName", userName);
+                error.put("error", "Default switch with ID " + switchId + " not found in system");
+                errorUsers.add(error);
+                return;
+            }
+
+            // Create and save user
+            AppUser user = new AppUser();
+            user.setName(userData.get("name"));
+            user.setUserName(userName);
+            user.setEmail(email);
+            user.setMobileNo(mobileNo);
+            user.setGroupName(userData.get("groupName"));
+            user.setSwitch_id(userSwitch);
+
+            // Set default generation type (1)
+            user.setGenerationType("1");
+
+            // Set default password and confirm password
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String defaultPassword = "defaultPassword123";
+            user.setEncrytedPassword(encoder.encode(defaultPassword));
+            user.setConfirmPassword(defaultPassword);
+
+            // Set default values
+            user.setEnabled(true);
+            user.setIsFirstTimeLogin(true);
+            user.setStatus("Active");
+
+            // Handle academic fields based on role
+            Long roleId = Long.parseLong(userData.get("roleId"));
+            if (roleId == 2L) {
+                setAcademicFields(user, userData);
+            } else {
+                user.setDepartmentName(null);
+                user.setCourseName(null);
+                user.setSemesterName(null);
+                user.setBatchName(null);
+            }
+
+            // Save user
+            AppUser savedUser = userRepository.save(user);
+
+            // Create user role
+            AppRole appRole = new AppRole();
+            appRole.setRoleId(roleId);
+
+            UserRole userRole = new UserRole();
+            userRole.setAppUser(savedUser);
+            userRole.setAppRole(appRole);
+            userRoleRepository.save(userRole);
+
+            // Add to success list
+            Map<String, String> success = new HashMap<>();
+            success.put("name", savedUser.getName());
+            success.put("userName", savedUser.getUserName());
+            success.put("email", savedUser.getEmail());
+            success.put("generationType", savedUser.getGenerationType());
+            success.put("switchId", String.valueOf(switchId));
+            successUsers.add(success);
+
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("userName", userData.get("userName"));
+            error.put("error", "Error creating user: " + e.getMessage());
+            errorUsers.add(error);
+            e.printStackTrace();
+        }
+    }
+
+    private String checkForDuplicateUser(String userName, String email, String mobileNo) {
+        // Check for duplicate username
+        if (userRepository.existsByUserName(userName)) {
+            return "Username '" + userName + "' already exists";
+        }
+
+        // Check for duplicate email
+        if (userRepository.existsByEmail(email)) {
+            return "Email '" + email + "' already exists";
+        }
+
+        // Check for duplicate mobile number
+        if (userRepository.existsByMobileNo(mobileNo)) {
+            return "Mobile number '" + mobileNo + "' already exists";
+        }
+
+        return null;
+    }
+
+    private boolean isValidUserData(Map<String, String> userData) {
+        return userData.get("name") != null && !userData.get("name").trim().isEmpty()
+                && userData.get("userName") != null && !userData.get("userName").trim().isEmpty()
+                && userData.get("email") != null && !userData.get("email").trim().isEmpty()
+                && userData.get("mobileNo") != null && !userData.get("mobileNo").trim().isEmpty()
+                && userData.get("roleId") != null && !userData.get("roleId").trim().isEmpty()
+                && userData.get("groupName") != null && !userData.get("groupName").trim().isEmpty();
+    }
+
+    private void setAcademicFields(AppUser user, Map<String, String> userData) {
+        try {
+            // Set department if provided
+            if (userData.get("departmentName") != null && !userData.get("departmentName").trim().isEmpty()) {
+                DepartmentMaster dept = DepartmentMasterRepository.findByDepartmentName(userData.get("departmentName"));
+                if (dept != null) {
+                    user.setDepartmentName(dept);
+                } else {
+                    System.out.println("Warning: Department not found: " + userData.get("departmentName"));
+                }
+            }
+
+            // Set course if provided
+            if (userData.get("courseName") != null && !userData.get("courseName").trim().isEmpty()) {
+                CourseMaster course = CourseMasterRepository.findByCourseName(userData.get("courseName"));
+                if (course != null) {
+                    user.setCourseName(course);
+                } else {
+                    System.out.println("Warning: Course not found: " + userData.get("courseName"));
+                }
+            }
+
+            // Set semester if provided
+            if (userData.get("semesterName") != null && !userData.get("semesterName").trim().isEmpty()) {
+                String semesterName = userData.get("semesterName").trim();
+                String courseName = userData.get("courseName") != null ? userData.get("courseName").trim() : null;
+
+                if (courseName != null && !courseName.isEmpty()) {
+                    CourseMaster course = CourseMasterRepository.findByCourseName(courseName);
+                    if (course != null) {
+                        SemesterMaster semester = SemesterMasterRepository.findBySemesterNameAndCourse(semesterName,
+                                course);
+                        if (semester != null) {
+                            user.setSemesterName(semester);
+                        } else {
+                            System.out.println("⚠️ Warning: Semester not found for name: " + semesterName
+                                    + " and course: " + courseName);
+                        }
+                    } else {
+                        System.out.println("⚠️ Warning: Course not found with name: " + courseName);
+                    }
+                } else {
+                    System.out.println("⚠️ Warning: Course name is missing for semester: " + semesterName);
+                }
+            }
+
+            // Set batch if provided
+            if (userData.get("batchName") != null && !userData.get("batchName").trim().isEmpty()) {
+                BatchMaster batch = BatchMasterRepository.findByBatchName(userData.get("batchName"));
+                if (batch != null) {
+                    user.setBatchName(batch);
+                } else {
+                    System.out.println("Warning: Batch not found: " + userData.get("batchName"));
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error setting academic fields: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Sidebar related methods
+//    @GetMapping("/view")
+//    public String viewUsers(Model model, Principal principal) {
+//        // Your existing implementation for viewing users
+//        return "users_view";
+//    }
+
+    // Method to get current logged-in user using Principal
+//    private AppUser getCurrentUser(Principal principal) {
+//        if (principal == null) {
+//            return null;
+//        }
+//
+//        Authentication auth = (Authentication) principal;
+//        String username = auth.getName();
+//        
+//        System.out.println("username_sidebar :" + username);
+//
+//        // Using List and get first element for findByUserName
+//        List<AppUser> users = userRepository.findByuserName(username);
+//        if (users != null && !users.isEmpty()) {
+//            return users.get(0);
+//        }
+//        return null;
+//    }
+
+    // Method to get menu items based on user's template
+//    private List<Map<String, Object>> getUserMenuItems(Principal principal) {
+//        AppUser currentUser = getCurrentUser(principal);
+//        if (currentUser == null) {
+//            return new ArrayList<>();
+//        }
+//
+//        String templateName = currentUser.getTemplateName();
+//
+//        if (templateName == null || templateName.trim().isEmpty()) {
+//            return new ArrayList<>();
+//        }
+//
+//        return getMenuItemsByTemplateName(templateName);
+//    }
+
+    // Get menu items by template name using repository
+//    private List<Map<String, Object>> getMenuItemsByTemplateName(String templateName) {
+//        List<RoleMenuTemplate> roleMenuTemplates = RoleMenuTemplateRepository
+//                .findByTemplateNameOrderByMenuSortOrder(templateName);
+//
+//        List<Object[]> menuData = roleMenuTemplates.stream()
+//                .map(rmt -> new Object[] { rmt.getMenu().getMenuId(), rmt.getMenu().getModuleId(),
+//                        rmt.getMenu().getModuleName(), rmt.getMenu().getSubModuleId(), rmt.getMenu().getSubModuleName(),
+//                        rmt.getMenu().getUrl(), rmt.getMenu().getSortOrder() })
+//                .collect(Collectors.toList());
+//
+//        return organizeMenuItems(menuData);
+//    }
+
+    // Organize menu items into hierarchical structure
+//    private List<Map<String, Object>> organizeMenuItems(List<Object[]> menuData) {
+//        Map<Integer, Map<String, Object>> modules = new LinkedHashMap<>();
+//
+//        for (Object[] row : menuData) {
+//            Integer menuId = (Integer) row[0];
+//            Integer moduleId = (Integer) row[1];
+//            String moduleName = (String) row[2];
+//            Integer subModuleId = (Integer) row[3];
+//            String subModuleName = (String) row[4];
+//            String url = (String) row[5];
+//            Integer sortOrder = (Integer) row[6];
+//
+//            // Create module if it doesn't exist
+//            if (!modules.containsKey(moduleId)) {
+//                Map<String, Object> module = new HashMap<>();
+//                module.put("moduleId", moduleId);
+//                module.put("moduleName", moduleName);
+//                module.put("subModules", new ArrayList<Map<String, Object>>());
+//                modules.put(moduleId, module);
+//            }
+//
+//            // Add submodule to the module
+//            Map<String, Object> subModule = new HashMap<>();
+//            subModule.put("menuId", menuId);
+//            subModule.put("subModuleId", subModuleId);
+//            subModule.put("subModuleName", subModuleName);
+//            subModule.put("url", url);
+//            subModule.put("sortOrder", sortOrder);
+//
+//            @SuppressWarnings("unchecked")
+//            List<Map<String, Object>> subModules = (List<Map<String, Object>>) modules.get(moduleId).get("subModules");
+//            subModules.add(subModule);
+//        }
+//
+//        return new ArrayList<>(modules.values());
+//    }
+
+   
+
+	
+	
+	 //  upload  code end
+   
+	
+	
+
+    // Sidebar related methods
+//    @GetMapping("/view")
+//    public String viewUsers() {
+//        return "users_view"; // Your users view page
+//    }
+
+    // Method to get current logged-in user using Principal
+    private AppUser getCurrentUser(Principal principal) {
+        if (principal == null) {
+            return null;
+        }
+
+        Authentication auth = (Authentication) principal;
+        String username = auth.getName();
+        
+        System.out.println("username_sidebar :" + username);
+
+        // Using List and get first element for findByUserName
+        List<AppUser> users = userRepository.findByuserName(username);
+        if (users != null && !users.isEmpty()) {
+            return users.get(0);
+        }
+        return null;
+    }
+
+    // Method to get menu items based on user's template
+    private List<Map<String, Object>> getUserMenuItems(Principal principal) {
+        AppUser currentUser = getCurrentUser(principal);
+        if (currentUser == null) {
+            return new ArrayList<>();
+        }
+
+        String templateName = currentUser.getTemplateName();
+
+        if (templateName == null || templateName.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return getMenuItemsByTemplateName(templateName);
+    }
+
+    // Get menu items by template name using repository
+    private List<Map<String, Object>> getMenuItemsByTemplateName(String templateName) {
+        List<RoleMenuTemplate> roleMenuTemplates = RoleMenuTemplateRepository
+                .findByTemplateNameOrderByMenuSortOrder(templateName);
+
+        List<Object[]> menuData = roleMenuTemplates.stream()
+                .map(rmt -> new Object[] { rmt.getMenu().getMenuId(), rmt.getMenu().getModuleId(),
+                        rmt.getMenu().getModuleName(), rmt.getMenu().getSubModuleId(), rmt.getMenu().getSubModuleName(),
+                        rmt.getMenu().getUrl(), rmt.getMenu().getSortOrder() })
+                .collect(Collectors.toList());
+
+        return organizeMenuItems(menuData);
+    }
+
+    // Organize menu items into hierarchical structure
+    private List<Map<String, Object>> organizeMenuItems(List<Object[]> menuData) {
+        Map<Integer, Map<String, Object>> modules = new LinkedHashMap<>();
+
+        for (Object[] row : menuData) {
+            Integer menuId = (Integer) row[0];
+            Integer moduleId = (Integer) row[1];
+            String moduleName = (String) row[2];
+            Integer subModuleId = (Integer) row[3];
+            String subModuleName = (String) row[4];
+            String url = (String) row[5];
+            Integer sortOrder = (Integer) row[6];
+
+            // Create module if it doesn't exist
+            if (!modules.containsKey(moduleId)) {
+                Map<String, Object> module = new HashMap<>();
+                module.put("moduleId", moduleId);
+                module.put("moduleName", moduleName);
+                module.put("subModules", new ArrayList<Map<String, Object>>());
+                modules.put(moduleId, module);
+            }
+
+            // Add submodule to the module
+            Map<String, Object> subModule = new HashMap<>();
+            subModule.put("menuId", menuId);
+            subModule.put("subModuleId", subModuleId);
+            subModule.put("subModuleName", subModuleName);
+            subModule.put("url", url);
+            subModule.put("sortOrder", sortOrder);
+
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> subModules = (List<Map<String, Object>>) modules.get(moduleId).get("subModules");
+            subModules.add(subModule);
+        }
+
+        return new ArrayList<>(modules.values());
+    }
+
+    // Controller method to serve dynamic sidebar
+    @GetMapping("/dynamic-sidebar")
+    public String getDynamicSidebar(Model model, Principal principal) {
+        List<Map<String, Object>> menuItems = getUserMenuItems(principal);
+        System.out.println("=== getUserMenuItems START ===");
+        model.addAttribute("menuItems", menuItems);
+
+        // Add debug information
+        AppUser currentUser = getCurrentUser(principal);
+        if (currentUser != null) {
+            model.addAttribute("username", currentUser.getUserName());
+            model.addAttribute("templateName", currentUser.getTemplateName());
+        }
+
+        return "fragments/dynamic-sidebar";
+    }
+
+    // Complete dynamic sidebar with role-based logic
+    @GetMapping("/complete-dynamic-sidebar")
+    public String getCompleteDynamicSidebar(Model model, Principal principal) {
+        List<Map<String, Object>> menuItems;
+
+        if (hasRole("ROLE_SUPERADMIN")) {
+            menuItems = getAllMenusForSuperAdmin();
+        } else {
+            menuItems = getUserMenuItems(principal);
+        }
+
+        model.addAttribute("menuItems", menuItems);
+
+        // Add user info for debugging
+        AppUser currentUser = getCurrentUser(principal);
+        if (currentUser != null) {
+            model.addAttribute("username", currentUser.getUserName());
+            model.addAttribute("templateName", currentUser.getTemplateName());
+        }
+
+        return "fragments/dynamic-sidebar-complete";
+    }
+
+    // Method to get all menus for SuperAdmin
+    private List<Map<String, Object>> getAllMenusForSuperAdmin() {
+        List<MenuChart> allMenus = MenuRepository.findAllOrderBySortOrder();
+
+        List<Object[]> menuData = allMenus.stream()
+                .map(menu -> new Object[] { menu.getMenuId(), menu.getModuleId(), menu.getModuleName(),
+                        menu.getSubModuleId(), menu.getSubModuleName(), menu.getUrl(), menu.getSortOrder() })
+                .collect(Collectors.toList());
+
+        return organizeMenuItems(menuData);
+    }
+
+    // Method to check if user has specific role
+    private boolean hasRole(String role) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getAuthorities() != null) {
+            return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(role));
+        }
+        return false;
+    }
+
+    // Model attribute for role checks in templates
+    @ModelAttribute("hasRole")
+    public boolean hasRoleAttribute(String role) {
+        return hasRole(role);
+    }
+
+    // Utility methods for testing
+    @GetMapping("/current-user-info")
+    @ResponseBody
+    public Map<String, Object> getCurrentUserInfo(Principal principal) {
+        Map<String, Object> response = new HashMap<>();
+
+        if (principal != null) {
+            AppUser user = getCurrentUser(principal);
+            if (user != null) {
+                response.put("username", user.getUserName());
+                response.put("templateName", user.getTemplateName());
+                response.put("menuItemsCount", getUserMenuItems(principal).size());
+            }
+        }
+
+        return response;
+    }
 
 }

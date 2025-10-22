@@ -680,13 +680,19 @@ keyframes spin {to { transform:rotate(360deg);
     </td>
 
     <!-- Edit Button Column -->
-    <td class="text-center">
-        <a class="btn btn-sm btn-primary" 
-           th:href="@{'/cloud_instance/new?id=' + ${obj.id}}">
-            <i class="fas fa-edit"></i> Edit
-        </a>
-    </td>
+<!--     <td class="text-center"> -->
+<!--         <a class="btn btn-sm btn-primary"  -->
+<!--            th:href="@{'/cloud_instance/new?id=' + ${obj.id}}"> -->
+<!--             <i class="fas fa-edit"></i> Edit -->
+<!--         </a> -->
+<!--     </td> -->
 
+<td class="text-center">
+ <a th:href="@{/cloud_instance/template_edit/{id}(id=${obj.id})}" 
+                                           class="btn btn-sm btn-primary mr-2">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+</td>
     <!-- View Instruction Column -->
     <td class="text-center">
         <a class="btn btn-sm btn-info" 
