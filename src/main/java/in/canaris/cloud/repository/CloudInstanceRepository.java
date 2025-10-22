@@ -160,18 +160,20 @@ public interface CloudInstanceRepository extends JpaRepository<CloudInstance, In
 	@Query("SELECT  c FROM CloudInstance c WHERE instance_name=:instance_name")
 	CloudInstance findByInstance(String instance_name);
 
-	@Query(value = "SELECT " +
-	        "pm.product_name, " +
-	        "spm.sub_product_name, " +
-	        "COUNT(ci.ID) AS instance_count " +
-	        "FROM cloud_instance ci " +
-	        "JOIN sub_product_master spm ON ci.subproduct_id = spm.ID " +
-	        "JOIN product_master pm ON spm.product_id = pm.ID " +
-	        "GROUP BY pm.product_name, spm.sub_product_name",
-	        nativeQuery = true)
+	@Query(value = "SELECT " + "pm.product_name, " + "spm.sub_product_name, " + "COUNT(ci.ID) AS instance_count "
+			+ "FROM cloud_instance ci " + "JOIN sub_product_master spm ON ci.subproduct_id = spm.ID "
+			+ "JOIN product_master pm ON spm.product_id = pm.ID "
+			+ "GROUP BY pm.product_name, spm.sub_product_name", nativeQuery = true)
 	List<Object[]> getSubProductDetails();
 
-	
+	@Query(value = "SELECT " + "ci.instance_name, " + "ci.description, " + "ci.virtualization_type, " + "ci.vm_status, "
+			+ "ci.created_on " + "FROM cloud_instance ci "
+			+ "JOIN sub_product_master spm ON ci.subproduct_id = spm.ID "
+			+ "JOIN product_master pm ON spm.product_id = pm.ID "
+			+ "WHERE pm.product_name = :productName AND spm.sub_product_name = :subProductName "
+			+ "ORDER BY ci.created_on DESC", nativeQuery = true)
+	List<Object[]> findTemplatesByProductAndSubProduct(@Param("productName") String productName,
+			@Param("subProductName") String subProductName);
 
 //	@Query("SELECT Count( c.subProductId) FROM CloudInstance c WHERE c.subProductId IS NOT NULL")
 //	List<Integer> findDistinctSubProductIds();

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Edit Template</title>
+<link rel="icon" type="image/png" href="/webtemplate/dist/img/magicboxEye3.png">
+
+<!-- Common CSS -->
+<link rel="stylesheet" th:href="@{/css/fontAwesome.css}">
+<link rel="stylesheet" th:href="@{/webtemplate/plugins/fontawesome-free/css/all.min.css}">
+<link rel="stylesheet" th:href="@{/css/ionicIcons.css}">
+<link rel="stylesheet" th:href="@{/webtemplate/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css}">
+<link rel="stylesheet" th:href="@{/webtemplate/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
+<link rel="stylesheet" th:href="@{/webtemplate/plugins/jqvmap/jqvmap.min.css}">
+<link rel="stylesheet" th:href="@{/webtemplate/dist/css/adminlte.min.css}">
+<link rel="stylesheet" th:href="@{/webtemplate/plugins/overlayScrollbars/css/OverlayScrollbars.min.css}">
+<link rel="stylesheet" th:href="@{/webtemplate/plugins/daterangepicker/daterangepicker.css}">
+<link rel="stylesheet" th:href="@{/webtemplate/plugins/summernote/summernote-bs4.min.css}">
+
+<link rel="stylesheet" th:href="@{/webtemplate/css/cloudfont-awesome.min.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/webtemplate/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css}">
+<link rel="stylesheet" th:href="@{/webtemplate/plugins/select2/css/select2.min.css}">
+<link rel="stylesheet" th:href="@{/webtemplate/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+
+<style>
+.glowBtn {
+    background-color: #1c87c9;
+    border-radius: 5px;
+    border: none;
+    color: #eeeeee;
+    cursor: pointer;
+    display: inline-block;
+    font-family: sans-serif;
+    font-size: 20px;
+    padding: 5px 15px;
+    text-align: center;
+    text-decoration: none;
+}
+
+@keyframes glowing {
+  0% { background-color: #2ba805; box-shadow: 0 0 5px #2ba805; }
+  50% { background-color: #49e819; box-shadow: 0 0 20px #49e819; }
+  100% { background-color: #2ba805; box-shadow: 0 0 5px #2ba805; }
+}
+.glowBtn {
+    animation: glowing 1300ms infinite;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #4361ee, #3f37c9);
+    color: white;
+}
+
+.form-control:focus {
+    border-color: #4361ee;
+    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+}
+</style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <!-- Header -->
+        <div th:replace="fragments/header_bk :: header"></div>
+        <!-- Close Header -->
+
+        <!-- Sidebar -->
+        <div th:replace="fragments/sidebar :: aside"></div>
+        <!-- Close Sidebar -->
+
+        <div class="content-wrapper">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h2 class="m-0 text-primary">Edit Template</h2>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a th:href="@{/cloud_instance/view}">Templates</a></li>
+                            <li class="breadcrumb-item active">Edit Template</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Form -->
+            <form th:action="@{/cloud_instance/update}" method="post" th:object="${cloudInstance}">
+                <input type="hidden" th:field="*{id}" />
+                
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- Basic Information -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Basic Information</h3>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Template Name -->
+                                    <div class="form-group">
+                                        <label for="instance_name">Template Name *</label>
+                                        <input type="text" th:field="*{instance_name}" class="form-control" 
+                                               id="instance_name" required placeholder="Enter template name">
+                                    </div>
+
+                                    <!-- Description -->
+                                    <div class="form-group">
+                                        <label for="description">Description</label>
+                                        <textarea th:field="*{description}" class="form-control" 
+                                                 id="description" rows="3" placeholder="Enter template description"></textarea>
+                                    </div>
+
+                                    <!-- Lab Tag -->
+                                    <div class="form-group">
+                                        <label for="lab_tag">Lab Tag *</label>
+                                        <input type="text" th:field="*{lab_tag}" class="form-control" 
+                                               id="lab_tag" required placeholder="Enter lab tag">
+                                    </div>
+
+                                    <!-- Virtualization Type -->
+                                    <div class="form-group">
+                                        <label for="virtualization_type">Virtualization Type *</label>
+                                        <select th:field="*{virtualization_type}" class="form-control" 
+                                                id="virtualization_type" required>
+                                            <option value="">SELECT</option>
+                                            <option value="KVM">KVM</option>
+                                            <option value="hyperv">Hyper-V</option>
+                                            <option value="Docker">Docker</option>
+                                            <option value="OpenStack">OpenStack</option>
+                                            <option value="Proxmox">Proxmox</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connection Details -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Connection Details</h3>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Console Username -->
+                                    <div class="form-group">
+                                        <label for="ConsoleUsername">Username *</label>
+                                        <input type="text" th:field="*{ConsoleUsername}" class="form-control" 
+                                               id="ConsoleUsername" required placeholder="Enter username">
+                                    </div>
+
+                                    <!-- Console Password -->
+                                    <div class="form-group">
+                                        <label for="ConsolePassword">Password *</label>
+                                        <input type="password" th:field="*{ConsolePassword}" class="form-control" 
+                                               id="ConsolePassword" required placeholder="Enter password">
+                                    </div>
+
+                                    <!-- Console Protocol -->
+                                    <div class="form-group">
+                                        <label for="ConsoleProtocol">Protocol *</label>
+                                        <select th:field="*{ConsoleProtocol}" class="form-control" 
+                                                id="ConsoleProtocol" required>
+                                            <option value="">SELECT</option>
+                                            <option value="rdp">RDP</option>
+                                            <option value="ssh">SSH</option>
+                                            <option value="vnc">VNC</option>
+                                            <option value="telnet">Telnet</option>
+                                            <option value="kubernetes">Kubernetes</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Security Mode -->
+                                    <div class="form-group">
+                                        <label for="SecurityMode">Security Mode</label>
+                                        <select th:field="*{SecurityMode}" class="form-control" 
+                                                id="SecurityMode">
+                                            <option value="">SELECT</option>
+                                            <option value="any">Any</option>
+                                            <option value="nla">NLA (Network Level Authentication)</option>
+                                            <option value="rdp">RDP Security</option>
+                                            <option value="tls">TLS</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Server Configuration -->
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Server Configuration</h3>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Physical Server IP -->
+                                    <div class="form-group">
+                                        <label for="physicalServerIP">Physical Server IP *</label>
+                                        <input type="text" th:field="*{physicalServerIP}" class="form-control" 
+                                               id="physicalServerIP" required placeholder="Enter server IP">
+                                    </div>
+
+                                    <!-- Instance IP -->
+                                    <div class="form-group">
+                                        <label for="instance_ip">Instance IP</label>
+                                        <input type="text" th:field="*{instance_ip}" class="form-control" 
+                                               id="instance_ip" placeholder="Enter instance IP">
+                                    </div>
+
+                                    <!-- VNC Port -->
+                                    <div class="form-group">
+                                        <label for="vnc_port">VNC Port</label>
+                                        <input type="text" th:field="*{vnc_port}" class="form-control" 
+                                               id="vnc_port" placeholder="Enter VNC port">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Resource Allocation</h3>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Memory Assigned -->
+                                    <div class="form-group">
+                                        <label for="memoryAssigned">Memory Assigned</label>
+                                        <input type="text" th:field="*{memoryAssigned}" class="form-control" 
+                                               id="memoryAssigned" placeholder="e.g., 4GB">
+                                    </div>
+
+                                    <!-- CPU Assigned -->
+                                    <div class="form-group">
+                                        <label for="cpuAssigned">CPU Assigned</label>
+                                        <input type="text" th:field="*{cpuAssigned}" class="form-control" 
+                                               id="cpuAssigned" placeholder="e.g., 2 vCPU">
+                                    </div>
+
+                                    <!-- Disk Assigned -->
+                                    <div class="form-group">
+                                        <label for="diskAssigned">Disk Assigned</label>
+                                        <input type="text" th:field="*{diskAssigned}" class="form-control" 
+                                               id="diskAssigned" placeholder="e.g., 50GB">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information -->
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Additional Information</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <!-- VM Instructions -->
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="vm_instructions">VM Instructions</label>
+                                                <textarea th:field="*{vm_instructions}" class="form-control" 
+                                                         id="vm_instructions" rows="4" placeholder="Enter VM setup instructions"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <!-- Status Information -->
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="vm_status">VM Status</label>
+                                                <select th:field="*{vm_status}" class="form-control" 
+                                                        id="vm_status">
+                                                    <option value="">SELECT</option>
+                                                    <option value="Running">Running</option>
+                                                    <option value="Stopped">Stopped</option>
+                                                    <option value="Paused">Paused</option>
+                                                    <option value="Error">Error</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="request_status">Request Status</label>
+                                                <select th:field="*{request_status}" class="form-control" 
+                                                        id="request_status">
+                                                    <option value="">SELECT</option>
+                                                    <option value="Pending">Pending</option>
+                                                    <option value="Approved">Approved</option>
+                                                    <option value="Rejected">Rejected</option>
+                                                    <option value="Completed">Completed</option>
+                                                </select>
+                                            </div>
+
+                                            <!-- Monitoring -->
+                                            <div class="form-check mt-3">
+                                                <input type="checkbox" th:field="*{isMonitoring}" 
+                                                       class="form-check-input" id="isMonitoring">
+                                                <label class="form-check-label" for="isMonitoring">
+                                                    Enable Monitoring
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <button type="submit" class="btn btn-primary glowBtn mr-3">
+                                        <i class="fas fa-save"></i> Update Template
+                                    </button>
+                                    <a th:href="@{/cloud_instance/view}" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <!-- Common JS -->
+    <script th:src="@{/webtemplate/plugins/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webtemplate/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/webtemplate/dist/js/adminlte.js}"></script>
+    <script th:src="@{/webtemplate/plugins/sweetalert2/sweetalert2.min.js}"></script>
+    <script th:src="@{/webtemplate/plugins/select2/js/select2.full.min.js}"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize select2
+            $('select').select2({
+                theme: 'bootstrap4'
+            });
+
+            // Form submission handling
+            $('form').on('submit', function(e) {
+                const submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Updating...');
+            });
+
+            // Show success message if available
+            const result = /*[[${result}]]*/ null;
+            if (result === 'success') {
+                Swal.fire({
+                    position: "top",
+                    icon: "success",
+                    title: 'Template updated successfully',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            } else if (result && result !== 'null') {
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: result,
+                    showConfirmButton: true
+                });
+            }
+        });
+    </script>
+</body>
+</html>

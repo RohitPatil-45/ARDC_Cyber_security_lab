@@ -757,6 +757,17 @@ body {
 	text-align: right;
 }
 
+/* Style for clickable instance count */
+.clickable-instance {
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.clickable-instance:hover {
+	transform: scale(1.05);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 /* Responsive adjustments */
 @media ( max-width : 768px) {
 	.chart-widget {
@@ -801,78 +812,26 @@ keyframes float { 0% {
 	transform: translate(0, 0);
 }
 50
-
-
-
-
 %
 {
 transform
-
-
-
-
 :
-
-
-
-
-translate
-
-
-(
-
-
-
-
+translate(
 10px
 ,
 10px
-
-
-
-
-)
-
-
-;
+);
 }
 100
-
-
-
-
 %
 {
 transform
-
-
-
-
 :
-
-
-
-
-translate
-
-
-(
-
-
-
-
+translate(
 0
 ,
 0
-
-
-
-
-)
-
-
-;
+);
 }
 }
 </style>
@@ -1248,7 +1207,9 @@ translate
 												<td th:text="${item.productName}">Product Name</td>
 												<td th:text="${item.subProductName}">Sub Product Name</td>
 												<td class="text-center"><span
-													class="badge bg-primary px-3 py-2"
+													class="badge bg-primary px-3 py-2 clickable-instance"
+													th:data-product="${item.productName}"
+													th:data-subproduct="${item.subProductName}"
 													th:text="${item.instanceCount}">0</span></td>
 											</tr>
 
@@ -1272,7 +1233,6 @@ translate
 
 
 
-				<!-- Users Table Section -->
 				<!-- Users Table Section -->
 				<div class="card mt-4">
 					<div class="card-header bg-primary text-white">
@@ -1350,7 +1310,7 @@ translate
 
 
 		<!-- Enhanced Bootstrap Modal - Fixed Version -->
-		<!-- MODAL -->
+		<!-- Server Status Modal -->
 		<div class="modal fade" id="serverModalstatus" tabindex="-1"
 			role="dialog" aria-hidden="true">
 			<div class="modal-dialog modal-xl" role="document">
@@ -1358,11 +1318,9 @@ translate
 
 					<div class="modal-header">
 						<h5 class="modal-title">Server Details</h5>
-						<!--         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
 						<button type="button" class="btn" data-bs-dismiss="modal"
 							aria-label="Close">
 							<span aria-hidden="true">&times;</span>
-							<!-- this makes it clickable -->
 						</button>
 					</div>
 
@@ -1386,8 +1344,7 @@ translate
 			</div>
 		</div>
 
-
-
+		<!-- Health Details Modal -->
 		<div class="modal fade" id="healthModal" tabindex="-1" role="dialog"
 			aria-hidden="true">
 			<div class="modal-dialog modal-xl" role="document">
@@ -1423,8 +1380,6 @@ translate
 			</div>
 		</div>
 
-
-
 		<!-- User Status Modal -->
 		<div class="modal fade" id="userModal" tabindex="-1" role="dialog"
 			aria-hidden="true">
@@ -1454,12 +1409,39 @@ translate
 			</div>
 		</div>
 
-
-
+		<!-- Template Details Modal -->
+		<div class="modal fade" id="templateModal" tabindex="-1" role="dialog"
+			aria-hidden="true">
+			<div class="modal-dialog modal-xl" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Template Details</h5>
+						<button type="button" class="btn" data-bs-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<table id="templateDetailsTable"
+							class="table table-bordered table-striped" width="100%">
+							<thead>
+								<tr>
+									<th>Sr</th>
+									<th>Template Name</th>
+									<th>Description</th>
+									<th>Virtualization Type</th>
+									<!-- 									<th>Status</th> -->
+									<!-- 									<th>Created Date</th> -->
+								</tr>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
 
 	</div>
-
-
 
 	<div th:replace="fragments/footer :: footer"></div>
 	</div>
@@ -1608,29 +1590,21 @@ translate
             });
         });
         
-        // Click handlers for chart legends
-//         document.querySelectorAll('.clickable-legend').forEach(function(el) {
-//             el.addEventListener('click', function() {
-//                 const status = this.getAttribute('data-status');
-//                 handleLegendClick(status);
-//             });
-//         });
-        
         // Click handlers for chart legends - Server status
-document.querySelectorAll('.clickable-legend[data-status="operational"], .clickable-legend[data-status="offline"]').forEach(function(el) {
-    el.addEventListener('click', function() {
-        const status = this.getAttribute('data-status');
-        handleServerLegendClick(status);
-    });
-});
+        document.querySelectorAll('.clickable-legend[data-status="operational"], .clickable-legend[data-status="offline"]').forEach(function(el) {
+            el.addEventListener('click', function() {
+                const status = this.getAttribute('data-status');
+                handleServerLegendClick(status);
+            });
+        });
 
-// Click handlers for chart legends - User status
-document.querySelectorAll('.clickable-legend[data-status="online"], .clickable-legend[data-status="offline-user"]').forEach(function(el) {
-    el.addEventListener('click', function() {
-        const status = this.getAttribute('data-status');
-        handleUserLegendClick(status);
-    });
-});
+        // Click handlers for chart legends - User status
+        document.querySelectorAll('.clickable-legend[data-status="online"], .clickable-legend[data-status="offline-user"]').forEach(function(el) {
+            el.addEventListener('click', function() {
+                const status = this.getAttribute('data-status');
+                handleUserLegendClick(status);
+            });
+        });
         
         // Click handlers for health metrics
         document.querySelectorAll('.clickable-health').forEach(function(el) {
@@ -1641,10 +1615,17 @@ document.querySelectorAll('.clickable-legend[data-status="online"], .clickable-l
             });
         });
         
+        // Click handlers for instance count badges
+        document.querySelectorAll('.clickable-instance').forEach(function(badge) {
+            badge.addEventListener('click', function() {
+                const productName = this.getAttribute('data-product');
+                const subProductName = this.getAttribute('data-subproduct');
+                handleTemplateClick(productName, subProductName);
+            });
+        });
+        
        
         function handleStatusClick(type, status) {
-        	
-       
             $.ajax({
                 url: '/guac/getserverdetails',
                 method: 'POST',
@@ -1717,321 +1698,320 @@ document.querySelectorAll('.clickable-legend[data-status="online"], .clickable-l
             });
         }
 
+        // Function to handle server legend clicks
+        function handleServerLegendClick(status) {
+            let title = '';
+            let modalTitle = '';
 
-
-        
-        // Function to handle legend clicks
-      // Function to handle server legend clicks
-function handleServerLegendClick(status) {
-    let title = '';
-    let modalTitle = '';
-
-    if (status === 'operational') {
-        title = 'Operational Servers';
-        modalTitle = 'Operational Servers';
-    } else if (status === 'offline') {
-        title = 'Offline Servers';
-        modalTitle = 'Offline Servers';
-    }
-
-    // Fetch and show server data in server modal
-    $.ajax({
-        url: '/guac/getserverdetails',
-        method: 'POST',
-        data: {
-            type: "all",
-            status: status
-        },
-        success: function (response) {
-            $('#serverModalstatus .modal-title').text(modalTitle);
-            $('#serverModalstatus').modal('show');
-
-            setTimeout(function () {
-                let table = $('#serverDetailsTable').DataTable({
-                    responsive: true,
-                    paging: true,
-                    searching: true,
-                    ordering: true,
-                    destroy: true,
-                    autoWidth: false,
-                    pageLength: 10,
-                    lengthChange: true,
-                    language: {
-                        search: "Search:",
-                        lengthMenu: "Show _MENU_ entries",
-                        info: "Showing _START_ to _END_ of _TOTAL_ servers",
-                    },
-                    columnDefs: [
-                        { targets: 0, className: 'text-center', width: "5%" },
-                        { targets: 3, className: 'text-center' }
-                    ],
-                    dom: 'Bfrtip',
-                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-                });
-
-                table.clear();
-
-                response.forEach((server, index) => {
-                    const statusBadge = server.status?.toLowerCase() === 'up'
-                        ? '<span class="badge badge-success">UP</span>'
-                        : '<span class="badge badge-danger">DOWN</span>';
-
-                    table.row.add([
-                        index + 1,
-                        server.serverName || '-',
-                        server.ip || '-',
-                        statusBadge
-                    ]);
-                });
-
-                table.draw();
-            }, 100);
-        },
-        error: function () {
-            Swal.fire({
-                title: 'Error',
-                text: 'Failed to fetch server details.',
-                icon: 'error'
-            });
-        }
-    });
-}
-
-// Function to handle user legend clicks
-function handleUserLegendClick(status) {
-    let modalTitle = '';
-    
-    if (status === 'online') {
-        modalTitle = 'Online Users';
-    } else if (status === 'offline-user') {
-        modalTitle = 'Offline Users';
-    }
-
-    // Fetch and show user data in user modal
-    $.ajax({
-        url: '/guac/getuserdetails', // You'll need to create this endpoint
-        method: 'POST',
-        data: {
-            status: status,
-        },
-        success: function (response) {
-            $('#userModal .modal-title').text(modalTitle);
-            $('#userModal').modal('show');
-
-            setTimeout(function () {
-                let table = $('#userDetailsTable').DataTable({
-                    responsive: true,
-                    paging: true,
-                    searching: true,
-                    ordering: true,
-                    destroy: true,
-                    autoWidth: false,
-                    pageLength: 10,
-                    lengthChange: true,
-                    language: {
-                        search: "Search:",
-                        lengthMenu: "Show _MENU_ entries",
-                        info: "Showing _START_ to _END_ of _TOTAL_ users",
-                    },
-                    columnDefs: [
-                        { targets: 0, className: 'text-center', width: "5%" },
-                        { targets: 2, className: 'text-center' }
-                    ],
-                    dom: 'Bfrtip',
-                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-                });
-
-                table.clear();
-
-                response.forEach((user, index) => {
-                    const statusBadge = user.status?.toLowerCase() === 'online'
-                        ? '<span class="badge badge-success">ONLINE</span>'
-                        : '<span class="badge badge-danger">OFFLINE</span>';
-
-                    table.row.add([
-                        index + 1,
-                        user.username || '-',
-                        statusBadge
-                    ]);
-                });
-
-                table.draw();
-            }, 100);
-        },
-        error: function () {
-            Swal.fire({
-                title: 'Error',
-                text: 'Failed to fetch user details.',
-                icon: 'error'
-            });
-        }
-    });
-}
-        
-        // Function to handle health metric clicks
-// function handleHealthClick(type, resource) {
-//     $.ajax({
-//         url: '/guac/gethealthdetails',
-//         method: 'POST',
-//         data: {
-//             type: type,
-//             resource: resource
-//         },
-//         success: function (response) {
-//             const resourceLabel = resource.toUpperCase(); // CPU / RAM / DISK
-//             $('#healthModal .modal-title').text(`${type} - ${resourceLabel} Usage Details`);
-//             $('#healthModal').modal('show');
-
-//             setTimeout(function () {
-//                 let table = $('#healthDetailsTable').DataTable({
-//                     responsive: true,
-//                     paging: true,
-//                     searching: true,
-//                     ordering: true,
-//                     destroy: true,
-//                     autoWidth: false,
-//                     pageLength: 10,
-//                     lengthChange: true,
-//                     language: {
-//                         search: "Search:",
-//                         lengthMenu: "Show _MENU_ entries",
-//                         info: "Showing _START_ to _END_ of _TOTAL_ entries",
-//                     },
-//                     columnDefs: [
-//                         { targets: 0, className: 'text-center', width: "5%" }, // Sr No
-//                         { targets: 4, className: 'text-center' } // Usage %
-//                     ],
-//                     dom: 'Bfrtip',
-//                     buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-//                 });
-
-//                 table.clear();
-
-//                 response.forEach((entry, index) => {
-//                     const usage = `${entry.usagePercent.toFixed(2)}%`;
-//                     table.row.add([
-//                         index + 1,
-//                         entry.serverName || '-',
-//                         entry.ip || '-',
-//                         entry.total || '-',
-//                         entry.used || '-',
-//                         entry.free || '-',
-                        
-//                         usage
-//                     ]);
-//                 });
-
-//                 table.draw();
-//             }, 100);
-//         },
-//         error: function () {
-//             Swal.fire({
-//                 title: 'Error',
-//                 text: 'Failed to fetch health details.',
-//                 icon: 'error'
-//             });
-//         }
-//     });
-// }
-        
-        
-        // Function to handle health metric clicks
-function handleHealthClick(type, resource) {
-    $.ajax({
-        url: '/guac/gethealthdetails',
-        method: 'POST',
-        data: {
-            type: type,
-            resource: resource
-        },
-        success: function (response) {
-            const resourceLabels = {
-                'cpu': 'CPU Usage',
-                'ram': 'RAM Usage', 
-                'disk': 'Disk Usage'
-            };
-            
-            const columnHeaders = {
-                'cpu': ['Sr', 'Server Name', 'IP Address', 'Total CPU(cores)', 'Used CPU', 'Free CPU', 'Usage %'],
-                'ram': ['Sr', 'Server Name', 'IP Address', 'Total RAM(MB)', 'Used RAM(MB)', 'Free RAM(MB)', 'Usage %'],
-                'disk': ['Sr', 'Server Name', 'IP Address', 'Total Disk(GB)', 'Used Disk(GB)', 'Free Disk(GB)', 'Usage %']
-            };
-            
-            const resourceLabel = resourceLabels[resource] || resource.toUpperCase();
-            $('#healthModal .modal-title').text(`${type} - ${resourceLabel} Details`);
-            
-            // Destroy existing DataTable instance if it exists
-            if ($.fn.DataTable.isDataTable('#healthDetailsTable')) {
-                $('#healthDetailsTable').DataTable().destroy();
+            if (status === 'operational') {
+                title = 'Operational Servers';
+                modalTitle = 'Operational Servers';
+            } else if (status === 'offline') {
+                title = 'Offline Servers';
+                modalTitle = 'Offline Servers';
             }
-            
-            // Clear the table body completely
-            $('#healthDetailsTable tbody').empty();
-            
-            // Get the table header and update column names
-            const table = $('#healthDetailsTable');
-            const thead = table.find('thead tr');
-            
-            // Clear existing headers
-            thead.empty();
-            
-            // Add new headers based on resource type
-            columnHeaders[resource].forEach(headerText => {
-                thead.append(`<th>${headerText}</th>`);
+
+            // Fetch and show server data in server modal
+            $.ajax({
+                url: '/guac/getserverdetails',
+                method: 'POST',
+                data: {
+                    type: "all",
+                    status: status
+                },
+                success: function (response) {
+                    $('#serverModalstatus .modal-title').text(modalTitle);
+                    $('#serverModalstatus').modal('show');
+
+                    setTimeout(function () {
+                        let table = $('#serverDetailsTable').DataTable({
+                            responsive: true,
+                            paging: true,
+                            searching: true,
+                            ordering: true,
+                            destroy: true,
+                            autoWidth: false,
+                            pageLength: 10,
+                            lengthChange: true,
+                            language: {
+                                search: "Search:",
+                                lengthMenu: "Show _MENU_ entries",
+                                info: "Showing _START_ to _END_ of _TOTAL_ servers",
+                            },
+                            columnDefs: [
+                                { targets: 0, className: 'text-center', width: "5%" },
+                                { targets: 3, className: 'text-center' }
+                            ],
+                            dom: 'Bfrtip',
+                            buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+                        });
+
+                        table.clear();
+
+                        response.forEach((server, index) => {
+                            const statusBadge = server.status?.toLowerCase() === 'up'
+                                ? '<span class="badge badge-success">UP</span>'
+                                : '<span class="badge badge-danger">DOWN</span>';
+
+                            table.row.add([
+                                index + 1,
+                                server.serverName || '-',
+                                server.ip || '-',
+                                statusBadge
+                            ]);
+                        });
+
+                        table.draw();
+                    }, 100);
+                },
+                error: function () {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Failed to fetch server details.',
+                        icon: 'error'
+                    });
+                }
             });
+        }
 
-            $('#healthModal').modal('show');
+        // Function to handle user legend clicks
+        function handleUserLegendClick(status) {
+            let modalTitle = '';
+            
+            if (status === 'online') {
+                modalTitle = 'Online Users';
+            } else if (status === 'offline-user') {
+                modalTitle = 'Offline Users';
+            }
 
-            // Initialize DataTable after a short delay to ensure DOM is updated
-            setTimeout(function () {
-                let dataTable = $('#healthDetailsTable').DataTable({
+            // Fetch and show user data in user modal
+            $.ajax({
+                url: '/guac/getuserdetails', // You'll need to create this endpoint
+                method: 'POST',
+                data: {
+                    status: status,
+                },
+                success: function (response) {
+                    $('#userModal .modal-title').text(modalTitle);
+                    $('#userModal').modal('show');
+
+                    setTimeout(function () {
+                        let table = $('#userDetailsTable').DataTable({
+                            responsive: true,
+                            paging: true,
+                            searching: true,
+                            ordering: true,
+                            destroy: true,
+                            autoWidth: false,
+                            pageLength: 10,
+                            lengthChange: true,
+                            language: {
+                                search: "Search:",
+                                lengthMenu: "Show _MENU_ entries",
+                                info: "Showing _START_ to _END_ of _TOTAL_ users",
+                            },
+                            columnDefs: [
+                                { targets: 0, className: 'text-center', width: "5%" },
+                                { targets: 2, className: 'text-center' }
+                            ],
+                            dom: 'Bfrtip',
+                            buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+                        });
+
+                        table.clear();
+
+                        response.forEach((user, index) => {
+                            const statusBadge = user.status?.toLowerCase() === 'online'
+                                ? '<span class="badge badge-success">ONLINE</span>'
+                                : '<span class="badge badge-danger">OFFLINE</span>';
+
+                            table.row.add([
+                                index + 1,
+                                user.username || '-',
+                                statusBadge
+                            ]);
+                        });
+
+                        table.draw();
+                    }, 100);
+                },
+                error: function () {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Failed to fetch user details.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+        
+        // Function to handle health metric clicks
+        function handleHealthClick(type, resource) {
+            $.ajax({
+                url: '/guac/gethealthdetails',
+                method: 'POST',
+                data: {
+                    type: type,
+                    resource: resource
+                },
+                success: function (response) {
+                    const resourceLabels = {
+                        'cpu': 'CPU Usage',
+                        'ram': 'RAM Usage', 
+                        'disk': 'Disk Usage'
+                    };
+                    
+                    const columnHeaders = {
+                        'cpu': ['Sr', 'Server Name', 'IP Address', 'Total CPU(cores)', 'Used CPU', 'Free CPU', 'Usage %'],
+                        'ram': ['Sr', 'Server Name', 'IP Address', 'Total RAM(MB)', 'Used RAM(MB)', 'Free RAM(MB)', 'Usage %'],
+                        'disk': ['Sr', 'Server Name', 'IP Address', 'Total Disk(GB)', 'Used Disk(GB)', 'Free Disk(GB)', 'Usage %']
+                    };
+                    
+                    const resourceLabel = resourceLabels[resource] || resource.toUpperCase();
+                    $('#healthModal .modal-title').text(`${type} - ${resourceLabel} Details`);
+                    
+                    // Destroy existing DataTable instance if it exists
+                    if ($.fn.DataTable.isDataTable('#healthDetailsTable')) {
+                        $('#healthDetailsTable').DataTable().destroy();
+                    }
+                    
+                    // Clear the table body completely
+                    $('#healthDetailsTable tbody').empty();
+                    
+                    // Get the table header and update column names
+                    const table = $('#healthDetailsTable');
+                    const thead = table.find('thead tr');
+                    
+                    // Clear existing headers
+                    thead.empty();
+                    
+                    // Add new headers based on resource type
+                    columnHeaders[resource].forEach(headerText => {
+                        thead.append(`<th>${headerText}</th>`);
+                    });
+
+                    $('#healthModal').modal('show');
+
+                    // Initialize DataTable after a short delay to ensure DOM is updated
+                    setTimeout(function () {
+                        let dataTable = $('#healthDetailsTable').DataTable({
+                            responsive: true,
+                            paging: true,
+                            searching: true,
+                            ordering: true,
+                            destroy: true, // This ensures it can be reinitialized
+                            autoWidth: false,
+                            pageLength: 10,
+                            lengthChange: true,
+                            language: {
+                                search: "Search:",
+                                lengthMenu: "Show _MENU_ entries",
+                                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                            },
+                            columnDefs: [
+                                { targets: 0, className: 'text-center', width: "5%" }, // Sr No
+                                { targets: 6, className: 'text-center' } // Usage %
+                            ],
+                            dom: 'Bfrtip',
+                            buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+                        });
+
+                        // Add rows from response
+                        response.forEach((entry, index) => {
+                            const usage = `${entry.usagePercent ? entry.usagePercent.toFixed(2) : '0.00'}%`;
+                            dataTable.row.add([
+                                index + 1,
+                                entry.serverName || '-',
+                                entry.ip || '-',
+                                entry.total || '-',
+                                entry.used || '-',
+                                entry.free || '-',
+                                usage
+                            ]);
+                        });
+
+                        dataTable.draw();
+                    }, 100);
+                },
+                error: function () {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Failed to fetch health details.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+
+        // Function to handle template click
+      function handleTemplateClick(productName, subProductName) {
+    $.ajax({
+        url: '/guac/getTemplateDetails',
+        method: 'POST',
+        data: {
+            productName: productName,
+            subProductName: subProductName
+        },
+        success: function(response) {
+            $('#templateModal .modal-title').text(`Template Details - ${productName} / ${subProductName}`);
+            $('#templateModal').modal('show');
+
+            setTimeout(function() {
+                let table = $('#templateDetailsTable').DataTable({
                     responsive: true,
                     paging: true,
                     searching: true,
                     ordering: true,
-                    destroy: true, // This ensures it can be reinitialized
+                    destroy: true,
                     autoWidth: false,
                     pageLength: 10,
                     lengthChange: true,
                     language: {
                         search: "Search:",
                         lengthMenu: "Show _MENU_ entries",
-                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        info: "Showing _START_ to _END_ of _TOTAL_ templates",
                     },
                     columnDefs: [
-                        { targets: 0, className: 'text-center', width: "5%" }, // Sr No
-                        { targets: 6, className: 'text-center' } // Usage %
+                        { targets: 0, className: 'text-center', width: "5%" }
                     ],
                     dom: 'Bfrtip',
                     buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
                 });
 
-                // Add rows from response
-                response.forEach((entry, index) => {
-                    const usage = `${entry.usagePercent ? entry.usagePercent.toFixed(2) : '0.00'}%`;
-                    dataTable.row.add([
-                        index + 1,
-                        entry.serverName || '-',
-                        entry.ip || '-',
-                        entry.total || '-',
-                        entry.used || '-',
-                        entry.free || '-',
-                        usage
-                    ]);
-                });
+                table.clear();
 
-                dataTable.draw();
+                if (response.length === 0) {
+                    // Show no data message
+                    table.row.add([
+                        '1',
+                        'No templates found',
+                        'N/A',
+                        'N/A'
+                    ]);
+                } else {
+                    response.forEach((template, index) => {
+                        table.row.add([
+                            index + 1,
+                            template.templateName || '-',
+                            template.description || '-',
+                            template.virtualizationType || '-'
+                        ]);
+                    });
+                }
+
+                table.draw();
             }, 100);
         },
-        error: function () {
+        error: function() {
             Swal.fire({
                 title: 'Error',
-                text: 'Failed to fetch health details.',
+                text: 'Failed to fetch template details.',
                 icon: 'error'
             });
         }
     });
 }
+        
     })
 
 </script>

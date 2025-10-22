@@ -1077,6 +1077,33 @@ public class GuacamoleController {
 			return 0.0;
 		}
 	}
+	
+	
+	  @PostMapping("/getTemplateDetails")
+	    @ResponseBody
+	    public List<Map<String, Object>> getTemplateDetails(@RequestParam String productName, 
+	                                                       @RequestParam String subProductName) {
+	        try {
+	            // Fetch template details based on product and sub-product
+	            List<Object[]> templateResults = repository.findTemplatesByProductAndSubProduct(productName, subProductName);
+	            List<Map<String, Object>> templateList = new ArrayList<>();
+	            
+	            for (Object[] row : templateResults) {
+	                Map<String, Object> template = new HashMap<>();
+	                template.put("templateName", row[0] != null ? row[0].toString() : "N/A");
+	                template.put("description", row[1] != null ? row[1].toString() : "N/A");
+	                template.put("virtualizationType", row[2] != null ? row[2].toString() : "N/A");
+//	                template.put("status", row[3] != null ? row[3].toString() : "N/A");
+//	                template.put("createdDate", "");
+	                templateList.add(template);
+	            }
+	            
+	            return templateList;
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return new ArrayList<>();
+	        }
+	    }
 
 	@GetMapping("/groupUsers/{deptId}/{courseId}/{semesterId}/{batchId}")
 	public String viewGroupUsers(@PathVariable Long deptId, @PathVariable Long courseId, @PathVariable Long semesterId,
@@ -11183,4 +11210,47 @@ public class GuacamoleController {
 //        }
 //        return Collections.emptyList();
 //    }
+    
+    
+ // Endpoint to get current user profile
+    @GetMapping("/getUserProfile")
+    @ResponseBody
+    public Map<String, Object> getUserProfile(Principal principal) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            if (principal != null) {
+                String username = principal.getName();
+                
+                // Fetch user details from app_user table - returns List
+                List<AppUser> userList = AppUserRepository.findByUserName(username);
+                
+                if (userList != null && !userList.isEmpty()) {
+                    // Get the first user (should be only one since username is unique)
+                    AppUser user = userList.get(0);
+                    
+                    Map<String, Object> userData = new HashMap<>();
+                    userData.put("userId", user.getUserId());
+                    userData.put("username", user.getUserName());
+                    userData.put("email", user.getEmail());
+                    userData.put("mobile", user.getMobileNo());
+                    
+                    response.put("success", true);
+                    response.put("user", userData);
+                } else {
+                    response.put("success", false);
+                    response.put("message", "User not found");
+                }
+            } else {
+                response.put("success", false);
+                response.put("message", "User not authenticated");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "Error fetching user profile: " + e.getMessage());
+        }
+        
+        return response;
+    }
 }
