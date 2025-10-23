@@ -110,175 +110,181 @@
 
 /* Professional Search Section - Matching Page Design */
 .search-section {
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-    border-radius: 12px;
-    padding: 25px 30px;
-    margin-bottom: 30px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    position: relative;
-    overflow: hidden;
+	background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+	border-radius: 12px;
+	padding: 25px 30px;
+	margin-bottom: 30px;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+	border: 1px solid rgba(59, 130, 246, 0.3);
+	position: relative;
+	overflow: hidden;
 }
 
 .search-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
-    background-size: 200% 100%;
-    animation: shimmer 3s infinite linear;
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 4px;
+	background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+	background-size: 200% 100%;
+	animation: shimmer 3s infinite linear;
 }
 
-@keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+@
+keyframes shimmer { 0% {
+	background-position: -200% 0;
 }
 
+100
+%
+{
+background-position
+:
+200%
+0;
+}
+}
 .search-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    color: white;
+	display: flex;
+	align-items: center;
+	margin-bottom: 20px;
+	color: white;
 }
 
 .search-header i {
-    font-size: 28px;
-    margin-right: 15px;
-    color: #60a5fa;
+	font-size: 28px;
+	margin-right: 15px;
+	color: #60a5fa;
 }
 
 .search-header h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: white;
+	margin: 0;
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: white;
 }
 
 .search-container {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    flex-wrap: wrap;
+	display: flex;
+	gap: 15px;
+	align-items: center;
+	flex-wrap: wrap;
 }
 
 .search-box {
-    flex: 1;
-    min-width: 300px;
-    position: relative;
+	flex: 1;
+	min-width: 300px;
+	position: relative;
 }
 
 .search-input {
-    width: 100%;
-    padding: 14px 50px 14px 20px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 2px solid rgba(59, 130, 246, 0.3);
-    border-radius: 10px;
-    color: #1f2937;
-    font-size: 16px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+	width: 100%;
+	padding: 14px 50px 14px 20px;
+	background: rgba(255, 255, 255, 0.95);
+	border: 2px solid rgba(59, 130, 246, 0.3);
+	border-radius: 10px;
+	color: #1f2937;
+	font-size: 16px;
+	font-weight: 500;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .search-input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    background: white;
-    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
-    transform: translateY(-2px);
+	outline: none;
+	border-color: #3b82f6;
+	background: white;
+	box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+	transform: translateY(-2px);
 }
 
 .search-input::placeholder {
-    color: #6b7280;
-    font-weight: 400;
+	color: #6b7280;
+	font-weight: 400;
 }
 
 .search-icon {
-    position: absolute;
-    right: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #3b82f6;
-    font-size: 20px;
-    transition: all 0.3s ease;
+	position: absolute;
+	right: 18px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #3b82f6;
+	font-size: 20px;
+	transition: all 0.3s ease;
 }
 
-.search-input:focus + .search-icon {
-    color: #1d4ed8;
-    transform: translateY(-50%) scale(1.1);
+.search-input:focus+.search-icon {
+	color: #1d4ed8;
+	transform: translateY(-50%) scale(1.1);
 }
 
 .search-stats {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 12px 20px;
-    color: white;
-    font-size: 14px;
-    font-weight: 500;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+	padding: 12px 20px;
+	color: white;
+	font-size: 14px;
+	font-weight: 500;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	backdrop-filter: blur(10px);
 }
 
 .search-stats i {
-    margin-right: 8px;
-    color: #60a5fa;
+	margin-right: 8px;
+	color: #60a5fa;
 }
 
 /* No Results Styling */
 .no-results {
-    text-align: center;
-    padding: 60px 20px;
-    background: #1a1a1a;
-    border-radius: 12px;
-    border: 2px solid #2d4fa6;
-    margin: 20px 0;
+	text-align: center;
+	padding: 60px 20px;
+	background: #1a1a1a;
+	border-radius: 12px;
+	border: 2px solid #2d4fa6;
+	margin: 20px 0;
 }
 
 .no-results i {
-    font-size: 64px;
-    margin-bottom: 20px;
-    color: #3b82f6;
-    opacity: 0.7;
+	font-size: 64px;
+	margin-bottom: 20px;
+	color: #3b82f6;
+	opacity: 0.7;
 }
 
 .no-results h3 {
-    color: #e0e0e0;
-    font-size: 24px;
-    margin-bottom: 10px;
-    font-weight: 600;
+	color: #e0e0e0;
+	font-size: 24px;
+	margin-bottom: 10px;
+	font-weight: 600;
 }
 
 .no-results p {
-    color: #b0b0b0;
-    font-size: 16px;
-    margin: 0;
+	color: #b0b0b0;
+	font-size: 16px;
+	margin: 0;
 }
 
 .hidden {
-    display: none !important;
+	display: none !important;
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
-    .search-section {
-        padding: 20px;
-    }
-    
-    .search-container {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .search-box {
-        min-width: auto;
-    }
-    
-    .search-stats {
-        text-align: center;
-    }
+@media ( max-width : 768px) {
+	.search-section {
+		padding: 20px;
+	}
+	.search-container {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	.search-box {
+		min-width: auto;
+	}
+	.search-stats {
+		text-align: center;
+	}
 }
 </style>
 
@@ -297,15 +303,21 @@
 					<div class="row mb-2">
 						<div class="col-sm-6">
 							<h1>
-								<i class="fas fa-list-ol playlist-icon"></i> View Scenario
+								<!-- 								<i class="fas fa-list-ol playlist-icon"></i> View Scenario -->
 							</h1>
 						</div>
-						<div class="col-sm-6">
-							<ol class="breadcrumb float-sm-right">
-								<li class="breadcrumb-item"><a href="#"><i
-										class="fas fa-home"></i> Home</a></li>
-								<li class="breadcrumb-item active"><a href="#">Scenario</a></li>
-							</ol>
+						<div class="col-sm-5"></div>
+						<!-- 						<div class="col-sm-6"> -->
+						<!-- 							<ol class="breadcrumb float-sm-right"> -->
+						<!-- 								<li class="breadcrumb-item"><a href="#"><i -->
+						<!-- 										class="fas fa-home"></i> Home</a></li> -->
+						<!-- 								<li class="breadcrumb-item active"><a href="#">Scenario</a></li> -->
+						<!-- 							</ol> -->
+						<!-- 						</div> -->
+
+						<div class="col-md-1">
+							<a href="/guac/Scenario_Details"
+								class="btn btn-block bg-gradient-primary">Add</a>
 						</div>
 					</div>
 				</div>
@@ -321,24 +333,25 @@
 						</div>
 						<div class="search-container">
 							<div class="search-box">
-								<input type="text" id="searchInput" class="search-input" 
+								<input type="text" id="searchInput" class="search-input"
 									placeholder="Search by scenario name, category, difficulty, duration...">
 								<i class="fas fa-search search-icon"></i>
 							</div>
 							<div class="search-stats">
-								<i class="fas fa-chart-bar"></i>
-								<span id="resultsCount">Loading scenarios...</span>
+								<i class="fas fa-chart-bar"></i> <span id="resultsCount">Loading
+									scenarios...</span>
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="row">
 						<div class="col-md-12">
 							<!-- No Results Message -->
 							<div id="noResults" class="no-results hidden">
 								<i class="fas fa-search"></i>
 								<h3>No matching scenarios found</h3>
-								<p>Try adjusting your search criteria or browse all categories</p>
+								<p>Try adjusting your search criteria or browse all
+									categories</p>
 							</div>
 
 							<div id="categoryContainer"></div>

@@ -85,7 +85,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// For ADMIN only.
 		http.authorizeRequests().antMatchers("/admin", "/discount/*", "/	/*")
-				.access("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPERADMIN')");
+				.access("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPERADMIN')")
+				.antMatchers("/cloud_instance/*").access("hasRole('ROLE_SUPERADMIN')");
+		
+		
+		
 
 		// When the user has logged in as XX.
 		// But access a page that requires role YY,
@@ -105,7 +109,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
 				List<String> allowedSubModules = roleMenuTemplateRepository.findUrlsByTemplateName(userObj.getTemplateName());
-				System.out.println("Allowed urls = "+allowedSubModules);
+				System.out.println("Allowed sub modules = "+allowedSubModules);
 				request.getSession().setAttribute("allowedSubModules", allowedSubModules);
 
 				List<String> allowedModules = roleMenuTemplateRepository
