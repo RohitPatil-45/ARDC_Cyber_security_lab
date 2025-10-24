@@ -377,6 +377,35 @@
 
 
 						</ul></li>
+						
+						
+						<li
+						th:if="${#httpSession.getAttribute('allowedModules').contains('Report')}"
+						class="nav-item"><a href="#" class="nav-link"> <i
+							class="nav-icon fas fa-chalkboard-teacher"></i>
+							<p>
+								Report <i class="right fas fa-angle-left"></i>
+							</p>
+					</a>
+						<ul class="nav nav-treeview">
+
+							<li
+								th:if="${#httpSession.getAttribute('allowedSubModules').contains('Subject-Report')}"
+								class="nav-item"><a href="/guac/subjectsreport"
+								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+									<p>Subject Report</p>
+							</a></li>
+
+							<li class="nav-item"
+								th:if="${#httpSession.getAttribute('allowedSubModules').contains('Scenario-Report')}"><a
+								href="/guac/subjectsscenariosreport" class="nav-link"> <i
+									class="far fa-dot-circle nav-icon"></i>
+									<p>Scenario Report</p>
+							</a></li>
+
+
+
+						</ul></li>
 
 					<!--User Sidebar-->
 

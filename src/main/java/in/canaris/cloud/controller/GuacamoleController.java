@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -2881,7 +2882,7 @@ public class GuacamoleController {
 	        
 	    } catch (Exception e) {
 	        e.printStackTrace();
-	        return List.of();
+	        return Arrays.asList();
 	    }
 	}
 
@@ -10647,9 +10648,9 @@ public class GuacamoleController {
 //		} catch (Exception e) {
 //			e.printStackTrace();
 //			model.addAttribute("error", "Error loading elective mapping page: " + e.getMessage());
-//			model.addAttribute("users", List.of());
-//			model.addAttribute("electiveSubjects", List.of());
-//			model.addAttribute("existingMappings", List.of());
+//			model.addAttribute("users", Arrays.asList());
+//			model.addAttribute("electiveSubjects", Arrays.asList());
+//			model.addAttribute("existingMappings", Arrays.asList());
 //		}
 //
 //		return "elective-addsubject-mapping";
@@ -10683,8 +10684,8 @@ public class GuacamoleController {
 //	    } catch (Exception e) {
 //	        e.printStackTrace();
 //	        model.addAttribute("error", "Error loading elective mapping page: " + e.getMessage());
-//	        model.addAttribute("departments", List.of());
-//	        model.addAttribute("electiveSubjects", List.of());
+//	        model.addAttribute("departments", Arrays.asList());
+//	        model.addAttribute("electiveSubjects", Arrays.asList());
 //	    }
 //
 //	    return "elective-addsubject-mapping";
@@ -10755,8 +10756,8 @@ public class GuacamoleController {
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        model.addAttribute("error", "Error loading elective mapping page: " + e.getMessage());
-	        model.addAttribute("departments", List.of());
-	        model.addAttribute("electiveSubjects", List.of());
+	        model.addAttribute("departments", Arrays.asList());
+	        model.addAttribute("electiveSubjects", Arrays.asList());
 	    }
 
 	    return "elective-addsubject-mapping";
@@ -10805,9 +10806,9 @@ public class GuacamoleController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			model.addAttribute("error", "Error loading elective mapping page: " + e.getMessage());
-			model.addAttribute("users", List.of());
-			model.addAttribute("electiveSubjects", List.of());
-			model.addAttribute("existingMappings", List.of());
+			model.addAttribute("users", Arrays.asList());
+			model.addAttribute("electiveSubjects", Arrays.asList());
+			model.addAttribute("existingMappings", Arrays.asList());
 		}
 
 		return "elective-subject-mapping";
@@ -11034,7 +11035,7 @@ public class GuacamoleController {
             
         } catch (Exception e) {
             e.printStackTrace();
-            return List.of();
+            return Arrays.asList();
         }
     }
     

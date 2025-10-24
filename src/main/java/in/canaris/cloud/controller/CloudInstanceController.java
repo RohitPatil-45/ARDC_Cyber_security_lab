@@ -4420,7 +4420,7 @@ public class CloudInstanceController {
 					}
 
 					container.setCreated(ts);
-				}
+				} 
 
 				discoverDockerContainersRepository.save(container);
 			}

@@ -751,6 +751,59 @@ public class UserController {
 //			return "redirect:/users/view";
 //		}
 //	}
+	
+	
+	@GetMapping("/edit/{id}")
+	public String editTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+	    try {
+	        AppUser user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+
+	        UserMasterRole usermasterRole = new UserMasterRole();
+	        usermasterRole.setAppUser(user);
+
+	        long roleID = userRoleRepository.findRole(id);
+	        AppRole role = appRoleRepository.findByRoleId(roleID);
+	        usermasterRole.setAppRole(role);
+
+	        model.addAttribute("user", user);
+	        model.addAttribute("pageTitle", "Edit User (ID: " + id + ")");
+	        model.addAttribute("userID", id);
+	        model.addAttribute("objEnt", usermasterRole);
+	        model.addAttribute("groupList", groupRepository.getAllGroups());
+	        model.addAttribute("switchList", switchRepository.getAllSwitch());
+
+	        // Add Departments
+	        List<DepartmentMaster> departments = DepartmentMasterRepository.findAll();
+	        model.addAttribute("departments", departments);
+
+	        // Get selected values for preselection
+	        if (user.getDepartmentName() != null) {
+	            model.addAttribute("selectedDepartmentId", user.getDepartmentName().getDepartmentId());
+	            // For Admin/HOD fields
+	            model.addAttribute("selectedAdminDepartmentId", user.getDepartmentName().getDepartmentId());
+	        }
+	        if (user.getCourseName() != null) {
+	            model.addAttribute("selectedCourseId", user.getCourseName().getCourseId());
+	            // For HOD field
+	            model.addAttribute("selectedHodCourseId", user.getCourseName().getCourseId());
+	        }
+	        if (user.getSemesterName() != null) {
+	            model.addAttribute("selectedSemesterId", user.getSemesterName().getSemesterId());
+	        }
+	        if (user.getBatchName() != null) {
+	            model.addAttribute("selectedBatchId", user.getBatchName().getBatchId());
+	        }
+
+	        // Add template names
+	        List<String> templateNames = RoleMenuTemplateRepository.findDistinctTemplateNames();
+	        model.addAttribute("templateList", templateNames);
+
+	        return "user_add";
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("message", e.getMessage());
+	        return "redirect:/users/view";
+	    }
+	}
 
 //	@GetMapping("/delete/{id}")
 //	public String deleteTutorial(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
