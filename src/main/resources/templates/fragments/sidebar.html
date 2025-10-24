@@ -147,6 +147,7 @@
 									class="far fa-dot-circle nav-icon"></i>
 									<p>Mail Master</p>
 							</a></li>
+							
 							<li class="nav-item"
 								th:if="${#httpSession.getAttribute('allowedSubModules').contains('Physical Server Master')}"><a
 								href="/physicalServer/view" class="nav-link"> <i
@@ -359,7 +360,9 @@
 					</a>
 						<ul class="nav nav-treeview">
 
-							<li th:if="${#httpSession.getAttribute('allowedSubModules').contains('Home-Teacher')}" class="nav-item"><a href="/guac/teacher-homePage"
+							<li
+								th:if="${#httpSession.getAttribute('allowedSubModules').contains('Home-Teacher')}"
+								class="nav-item"><a href="/guac/teacher-homePage"
 								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
 									<p>Home-Teacher</p>
 							</a></li>
@@ -466,6 +469,60 @@
 
 					<!--End user Sidebar-->
 
+
+					<li
+						th:if="${#httpSession.getAttribute('allowedModules').contains('Hod')}"
+						class="nav-item"><a href="#" class="nav-link"> <i
+							class="nav-icon fas fa-chalkboard-teacher"></i>
+							<p>
+								Department Head <i class="right fas fa-angle-left"></i>
+							</p>
+					</a>
+						<ul class="nav nav-treeview">
+
+							<li
+								th:if="${#httpSession.getAttribute('allowedSubModules').contains('Home-Hod')}"
+								class="nav-item"><a href="/guac/Hod-homePage"
+								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+									<p>Home-HOD</p>
+							</a></li>
+
+							<li
+								th:if="${#httpSession.getAttribute('allowedSubModules').contains('Dashboard-Hod')}"
+								class="nav-item"><a href="/guac/hod-dashboard"
+								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+									<p>Dashboard</p>
+							</a></li>
+
+
+						</ul></li>
+						
+						<li
+						th:if="${#httpSession.getAttribute('allowedModules').contains('Admin')}"
+						class="nav-item"><a href="#" class="nav-link"> <i
+							class="nav-icon fas fa-chalkboard-teacher"></i>
+							<p>
+								Admin <i class="right fas fa-angle-left"></i>
+							</p>
+					</a>
+						<ul class="nav nav-treeview">
+
+							<li
+								th:if="${#httpSession.getAttribute('allowedSubModules').contains('Home-Admin')}"
+								class="nav-item"><a href="/guac/admin-homePage"
+								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+									<p>Home-Admin</p>
+							</a></li>
+
+							<li
+								th:if="${#httpSession.getAttribute('allowedSubModules').contains('Dashboard-Admin')}"
+								class="nav-item"><a href="/guac/admin-dashboard"
+								class="nav-link"> <i class="far fa-dot-circle nav-icon"></i>
+									<p>Dashboard</p>
+							</a></li>
+
+
+						</ul></li>
 
 					<li
 						th:if="${#httpSession.getAttribute('allowedModules').contains('User Management')}"
