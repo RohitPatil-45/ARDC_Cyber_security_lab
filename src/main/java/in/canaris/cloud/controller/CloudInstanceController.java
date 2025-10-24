@@ -32,6 +32,7 @@ import org.apache.logging.log4j.util.StringBuilders;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -69,6 +71,7 @@ import in.canaris.cloud.entity.CloudInstanceUsage;
 import in.canaris.cloud.entity.CloudInstanceUsageDaily;
 import in.canaris.cloud.entity.Customer;
 import in.canaris.cloud.entity.Discount;
+import in.canaris.cloud.entity.DiscoverDockerContainers;
 import in.canaris.cloud.entity.Group;
 import in.canaris.cloud.entity.KVMDriveDetails;
 import in.canaris.cloud.entity.Location;
@@ -106,6 +109,7 @@ import in.canaris.cloud.repository.CloudInstanceUsageRepository;
 import in.canaris.cloud.repository.CustomUserRoleRepository;
 import in.canaris.cloud.repository.CustomerRepository;
 import in.canaris.cloud.repository.DiscountRepository;
+import in.canaris.cloud.repository.DiscoverDockerContainersRepository;
 import in.canaris.cloud.repository.FirewallRepository;
 import in.canaris.cloud.repository.GroupRepository;
 import in.canaris.cloud.repository.KVMDriveDetailsRepository;
@@ -158,6 +162,13 @@ import java.util.Iterator;
 @Controller
 @RequestMapping("/cloud_instance")
 public class CloudInstanceController {
+
+	private RestTemplate restTemplate = new RestTemplate();
+
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+	@Value("${api_host}")
+	private String physical_server_agent_api_host;
 
 	@Autowired
 	private CloudInstanceUsageDailyRepository repositoryInstanceDailyUsage;
@@ -290,16 +301,19 @@ public class CloudInstanceController {
 
 	@Autowired
 	private ProxmoxService proxmoxService;
-	
+
 	@Autowired
 	private ProxmoxAssignedIpAddressRepository proxmoxAssignedIpAddressRepository;
 
 	@Autowired
 	private GuacamoleService guacService;
-	
+
 	@Autowired
 	private AssessmentUserLabRepository assessmentUserLabRepository;
 	
+	@Autowired
+	private DiscoverDockerContainersRepository discoverDockerContainersRepository;
+
 	@Autowired
 	private AssessmentUserWiseChatBoatInstructionTemplateRepository assessmentInstructionTemplateRepository;
 
@@ -503,130 +517,128 @@ public class CloudInstanceController {
 //		// redirectAttributes.addFlashAttribute("result", "success");
 //		return mav;
 //	}
-	
+
 	@GetMapping("/new")
 	public ModelAndView add(@RequestParam(required = false) Integer id, RedirectAttributes redirectAttributes) {
-	    System.out.println("New/Edit Controller called: " + id);
-	    ModelAndView mav = new ModelAndView(var_function_name + "_add");
-	    mav.addObject("pageTitle", id == null ? "Add New " + disp_function_name : "Edit " + disp_function_name);
-	    mav.addObject("action_name", var_function_name);
-	    mav.addObject("dcLocationList", repositoryLocation.getAllDClocations());
-	    mav.addObject("vmlocationPathList", repositoryVMLocationPath.getAllVMlocationsPahts());
-	    mav.addObject("securityGroupList", firewallRepository.getFirewall());
-	    mav.addObject("sharedCpuPlan", priceRepository.getSharedCpuPlan());
-	    mav.addObject("dedicatedCpuPlan", priceRepository.getDedicatedCpuPlan());
-	    mav.addObject("highMemoryPlan", priceRepository.getHighMemoryPlan());
-	    mav.addObject("switchList", switchRepository.getAllSwitch());
-	    mav.addObject("physicalServerIPList", PhysicalServerRepository.getPhysicalServerIPs());
+		System.out.println("New/Edit Controller called: " + id);
+		ModelAndView mav = new ModelAndView(var_function_name + "_add");
+		mav.addObject("pageTitle", id == null ? "Add New " + disp_function_name : "Edit " + disp_function_name);
+		mav.addObject("action_name", var_function_name);
+		mav.addObject("dcLocationList", repositoryLocation.getAllDClocations());
+		mav.addObject("vmlocationPathList", repositoryVMLocationPath.getAllVMlocationsPahts());
+		mav.addObject("securityGroupList", firewallRepository.getFirewall());
+		mav.addObject("sharedCpuPlan", priceRepository.getSharedCpuPlan());
+		mav.addObject("dedicatedCpuPlan", priceRepository.getDedicatedCpuPlan());
+		mav.addObject("highMemoryPlan", priceRepository.getHighMemoryPlan());
+		mav.addObject("switchList", switchRepository.getAllSwitch());
+		mav.addObject("physicalServerIPList", PhysicalServerRepository.getPhysicalServerIPs());
 
-	    CloudInstance objEnt;
-	    if (id != null) {
-	        // Edit mode - load existing data
-	        objEnt = repository.findById(id).orElse(new CloudInstance());
-	        
-	        // Load existing instructions
-	        int templateId = id; // Safe unboxing since id is not null
-	        List<ChartBoatInstructionTemplate> existingInstructions = 
-	            ChartBoatInstructionTemplateRepository.findBytemplateId(templateId);
-	        mav.addObject("existingInstructions", existingInstructions);
-	    } else {
-	        // Create mode - new object
-	        objEnt = new CloudInstance();
-	    }
-	    
-	    mav.addObject("objEnt", objEnt);
-	    mav.addObject("isEdit", id != null);
-	    mav.addObject("templateId", id);
+		CloudInstance objEnt;
+		if (id != null) {
+			// Edit mode - load existing data
+			objEnt = repository.findById(id).orElse(new CloudInstance());
 
-	    return mav;
+			// Load existing instructions
+			int templateId = id; // Safe unboxing since id is not null
+			List<ChartBoatInstructionTemplate> existingInstructions = ChartBoatInstructionTemplateRepository
+					.findBytemplateId(templateId);
+			mav.addObject("existingInstructions", existingInstructions);
+		} else {
+			// Create mode - new object
+			objEnt = new CloudInstance();
+		}
+
+		mav.addObject("objEnt", objEnt);
+		mav.addObject("isEdit", id != null);
+		mav.addObject("templateId", id);
+
+		return mav;
 	}
-	
+
 	@PostMapping("/update")
-	public String update(@ModelAttribute CloudInstanceForm form, 
-	                    @ModelAttribute CloudInstance obj,
-	                    @RequestParam(required = false) MultipartFile uploadedImage,
-	                    @RequestParam(required = false) List<Integer> deletedInstructions,
-	                    RedirectAttributes redirectAttributes,
-	                    Principal principal) {
+	public String update(@ModelAttribute CloudInstanceForm form, @ModelAttribute CloudInstance obj,
+			@RequestParam(required = false) MultipartFile uploadedImage,
+			@RequestParam(required = false) List<Integer> deletedInstructions, RedirectAttributes redirectAttributes,
+			Principal principal) {
 
-	    try {
-	        // Load existing instance
-	        CloudInstance existingInstance = repository.findById(obj.getId())
-	                .orElseThrow(() -> new RuntimeException("Instance not found"));
+		try {
+			// Load existing instance
+			CloudInstance existingInstance = repository.findById(obj.getId())
+					.orElseThrow(() -> new RuntimeException("Instance not found"));
 
-	        // Update fields
-	        existingInstance.setInstance_name(obj.getInstance_name());
-	        existingInstance.setLab_tag(obj.getLab_tag());
-	        existingInstance.setConsoleUsername(obj.getConsoleUsername());
-	        existingInstance.setConsolePassword(obj.getConsolePassword());
-	        existingInstance.setConsoleProtocol(obj.getConsoleProtocol());
-	        existingInstance.setSecurityMode(obj.getSecurityMode());
-	        existingInstance.setServerCertificate(obj.getServerCertificate());
-	        existingInstance.setDescription(obj.getDescription());
-	        existingInstance.setVirtualization_type(obj.getVirtualization_type());
-	        existingInstance.setPhysicalServerIP(obj.getPhysicalServerIP());
-	        existingInstance.setSwitch_id(obj.getSwitch_id());
-	        existingInstance.setLocation_id(obj.getLocation_id());
-	        existingInstance.setSubproduct_id(obj.getSubproduct_id());
-	        existingInstance.setPrice_id(obj.getPrice_id());
-	        existingInstance.setSecurity_group_id(obj.getSecurity_group_id());
+			// Update fields
+			existingInstance.setInstance_name(obj.getInstance_name());
+			existingInstance.setLab_tag(obj.getLab_tag());
+			existingInstance.setConsoleUsername(obj.getConsoleUsername());
+			existingInstance.setConsolePassword(obj.getConsolePassword());
+			existingInstance.setConsoleProtocol(obj.getConsoleProtocol());
+			existingInstance.setSecurityMode(obj.getSecurityMode());
+			existingInstance.setServerCertificate(obj.getServerCertificate());
+			existingInstance.setDescription(obj.getDescription());
+			existingInstance.setVirtualization_type(obj.getVirtualization_type());
+			existingInstance.setPhysicalServerIP(obj.getPhysicalServerIP());
+			existingInstance.setSwitch_id(obj.getSwitch_id());
+			existingInstance.setLocation_id(obj.getLocation_id());
+			existingInstance.setSubproduct_id(obj.getSubproduct_id());
+			existingInstance.setPrice_id(obj.getPrice_id());
+			existingInstance.setSecurity_group_id(obj.getSecurity_group_id());
 
-	        // Handle image update
-	        if (uploadedImage != null && !uploadedImage.isEmpty()) {
-	            existingInstance.setLab_image(uploadedImage.getBytes());
-	        }
+			// Handle image update
+			if (uploadedImage != null && !uploadedImage.isEmpty()) {
+				existingInstance.setLab_image(uploadedImage.getBytes());
+			}
 
-	        // Handle docker network
-	        if (obj.getDocker_network_id() != null && obj.getDocker_network_id().contains("~")) {
-	            String[] parts = obj.getDocker_network_id().split("~", 2);
-	            existingInstance.setDocker_network_id(parts[0]);
-	            existingInstance.setDocker_network_name(parts[1]);
-	        }
+			// Handle docker network
+			if (obj.getDocker_network_id() != null && obj.getDocker_network_id().contains("~")) {
+				String[] parts = obj.getDocker_network_id().split("~", 2);
+				existingInstance.setDocker_network_id(parts[0]);
+				existingInstance.setDocker_network_name(parts[1]);
+			}
 
-	        repository.save(existingInstance);
+			repository.save(existingInstance);
 
-	        // Handle instructions
-	        List<InstructionDto> instructions = form.getInstructions();
-	        
-	        // Delete removed instructions
-	        if (deletedInstructions != null) {
-	            for (Integer instructionId : deletedInstructions) {
-	                ChartBoatInstructionTemplateRepository.deleteById(instructionId);
-	            }
-	        }
+			// Handle instructions
+			List<InstructionDto> instructions = form.getInstructions();
 
-	        // Update or create instructions
-	        for (InstructionDto dto : instructions) {
-	            ChartBoatInstructionTemplate instruction;
-	            
-	            if (dto.getId() != null && dto.getId() > 0) {
-	                // Update existing instruction
-	                instruction = ChartBoatInstructionTemplateRepository.findById(dto.getId())
-	                        .orElse(new ChartBoatInstructionTemplate());
-	            } else {
-	                // Create new instruction
-	                instruction = new ChartBoatInstructionTemplate();
-	            }
-	            
-	            instruction.setTemplateId(existingInstance.getId());
-	            instruction.setTemaplateName(existingInstance.getInstance_name());
-	            instruction.setInstructionCommand(dto.getCommandText());
-	            instruction.setInstructionDetails(
-	                dto.getInstructionText() != null ? dto.getInstructionText().getBytes() : "".getBytes());
+			// Delete removed instructions
+			if (deletedInstructions != null) {
+				for (Integer instructionId : deletedInstructions) {
+					ChartBoatInstructionTemplateRepository.deleteById(instructionId);
+				}
+			}
 
-	            ChartBoatInstructionTemplateRepository.save(instruction);
-	        }
+			// Update or create instructions
+			for (InstructionDto dto : instructions) {
+				ChartBoatInstructionTemplate instruction;
 
-	        redirectAttributes.addFlashAttribute("result", "success");
-	        redirectAttributes.addFlashAttribute("message", "Template updated successfully!");
+				if (dto.getId() != null && dto.getId() > 0) {
+					// Update existing instruction
+					instruction = ChartBoatInstructionTemplateRepository.findById(dto.getId())
+							.orElse(new ChartBoatInstructionTemplate());
+				} else {
+					// Create new instruction
+					instruction = new ChartBoatInstructionTemplate();
+				}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        redirectAttributes.addFlashAttribute("result", "Error: " + e.getMessage());
-	        redirectAttributes.addFlashAttribute("error", "Failed to update template: " + e.getMessage());
-	    }
+				instruction.setTemplateId(existingInstance.getId());
+				instruction.setTemaplateName(existingInstance.getInstance_name());
+				instruction.setInstructionCommand(dto.getCommandText());
+				instruction.setInstructionDetails(
+						dto.getInstructionText() != null ? dto.getInstructionText().getBytes() : "".getBytes());
 
-	    return "redirect:/" + var_function_name + "/view";
+				ChartBoatInstructionTemplateRepository.save(instruction);
+			}
+
+			redirectAttributes.addFlashAttribute("result", "success");
+			redirectAttributes.addFlashAttribute("message", "Template updated successfully!");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("result", "Error: " + e.getMessage());
+			redirectAttributes.addFlashAttribute("error", "Failed to update template: " + e.getMessage());
+		}
+
+		return "redirect:/" + var_function_name + "/view";
 	}
 
 	@GetMapping("/vm_database")
@@ -3938,278 +3950,276 @@ public class CloudInstanceController {
 		}
 
 	}
-	
-	//Assesstemnt
-	
+
+	// Assesstemnt
+
 	@PostMapping("/assessment")
 	public @ResponseBody String assessmentDocker(@RequestParam("scenarioId") String scenarioId, Principal principal) {
-	    System.out.println("Inside_Assessment_Docker_Method :::: ");
-	    System.out.println("scenarioId :::: " + scenarioId);
-	    String result = null;
-	    Map<Integer, Integer> portMappings = null;
+		System.out.println("Inside_Assessment_Docker_Method :::: ");
+		System.out.println("scenarioId :::: " + scenarioId);
+		String result = null;
+		Map<Integer, Integer> portMappings = null;
 
-	    String network = null;
-	    Integer newVncPort;
-	    Integer newNoVncPort;
-	    Integer newRdpPort;
+		String network = null;
+		Integer newVncPort;
+		Integer newNoVncPort;
+		Integer newRdpPort;
 
-	    String containerIP = null;
+		String containerIP = null;
 
-	    String jsonResponse = null;
+		String jsonResponse = null;
 
-	    String username = ((User) ((Authentication) principal).getPrincipal()).getUsername();
+		String username = ((User) ((Authentication) principal).getPrincipal()).getUsername();
 
-	    String scenarioName = null;
+		String scenarioName = null;
 
-	    try {
+		try {
 
-	        List<ScenarioLabTemplate> templates = scenarioLabTemplateRepository
-	                .findByScenarioId(Integer.valueOf(scenarioId));
+			List<ScenarioLabTemplate> templates = scenarioLabTemplateRepository
+					.findByScenarioId(Integer.valueOf(scenarioId));
 
-	        System.out.println("rDokcer_templates : " + templates);
-	        for (ScenarioLabTemplate temp : templates) {
+			System.out.println("rDokcer_templates : " + templates);
+			for (ScenarioLabTemplate temp : templates) {
 
-	            System.out.println("Inside_Dokcer_templates : " + templates);
+				System.out.println("Inside_Dokcer_templates : " + templates);
 
-	            Optional<CloudInstance> obj = repository.findById(temp.getTemplateId());
-	            CloudInstance instance = obj.get();
+				Optional<CloudInstance> obj = repository.findById(temp.getTemplateId());
+				CloudInstance instance = obj.get();
 
-	            String templateName = instance.getInstance_name();
-	            String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
-	            String filePath = instance.getSubproduct_id().getIso_file_path();
-	            File file = new File(filePath);
-	            String imageName = instance.getSubproduct_id().getVariant();
-	            int templateId = instance.getProxmoxTemplateId();
-	            scenarioName = temp.getScenarioName();
+				String templateName = instance.getInstance_name();
+				String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+				String filePath = instance.getSubproduct_id().getIso_file_path();
+				File file = new File(filePath);
+				String imageName = instance.getSubproduct_id().getVariant();
+				int templateId = instance.getProxmoxTemplateId();
+				scenarioName = temp.getScenarioName();
 
-	            System.out.println("imageNameimageName ::::" + imageName);
+				System.out.println("imageNameimageName ::::" + imageName);
 
-	            Integer maxLabId1 = assessmentUserLabRepository.findMaxLabId();
+				Integer maxLabId1 = assessmentUserLabRepository.findMaxLabId();
 
-	            int maxLabId = (maxLabId1 != null) ? maxLabId1 : 0;
+				int maxLabId = (maxLabId1 != null) ? maxLabId1 : 0;
 
-	            maxLabId++;
+				maxLabId++;
 
-	            String newInstanceName = instance.getInstance_name() + "Assessment" + maxLabId;
-	            System.out.println("Inside__newInstanceName : " + newInstanceName);
+				String newInstanceName = instance.getInstance_name() + "Assessment" + maxLabId;
+				System.out.println("Inside__newInstanceName : " + newInstanceName);
 
-	            String newIp = proxmoxAssignedIpAddressRepository.findMaxIp();
+				String newIp = proxmoxAssignedIpAddressRepository.findMaxIp();
 
-	            if (instance.getVirtualization_type().equalsIgnoreCase("Proxmox")) {
+				if (instance.getVirtualization_type().equalsIgnoreCase("Proxmox")) {
 
-	                Map<String, Object> resp = proxmoxService.cloneVm(templateId, newInstanceName, filePath,
-	                        instance.getPhysicalServerIP(), proxmoxService.getNextIp(newIp));
-	                System.out.println("Proxmox vm creation output : " + resp.toString());
-	                if ("fail".equalsIgnoreCase((String) resp.get("status"))) {
-	                    result = "fail";
-	                } else {
+					Map<String, Object> resp = proxmoxService.cloneVm(templateId, newInstanceName, filePath,
+							instance.getPhysicalServerIP(), proxmoxService.getNextIp(newIp));
+					System.out.println("Proxmox vm creation output : " + resp.toString());
+					if ("fail".equalsIgnoreCase((String) resp.get("status"))) {
+						result = "fail";
+					} else {
 
-	                    jsonResponse = guacService.createConnection(newInstanceName, "rdp",
-	                            proxmoxService.getNextIp(newIp), 3389, "administrator", instance.getInstance_password(),
-	                            "", "true", "", "", "", "", "", "", "", "", "");
-	                    if (guacService.getConnectionIdByName(jsonResponse) != null) {
-	                        saveInAssessmentUserLab(newInstanceName, username, instance.getConsoleProtocol(),
-	                                instance.getInstance_name(), guacService.getConnectionIdByName(jsonResponse), 0, 0,
-	                                instance.getInstance_password(), resp.get("ip").toString(), scenarioId);
+						jsonResponse = guacService.createConnection(newInstanceName, "rdp",
+								proxmoxService.getNextIp(newIp), 3389, "administrator", instance.getInstance_password(),
+								"", "true", "", "", "", "", "", "", "", "", "");
+						if (guacService.getConnectionIdByName(jsonResponse) != null) {
+							saveInAssessmentUserLab(newInstanceName, username, instance.getConsoleProtocol(),
+									instance.getInstance_name(), guacService.getConnectionIdByName(jsonResponse), 0, 0,
+									instance.getInstance_password(), resp.get("ip").toString(), scenarioId);
 
-	                        insertAssessmentUserWiseChatBoatInstruction(temp.getTemplateId(), instance.getInstance_name(),
-	                                newInstanceName, username, scenarioId);
+							insertAssessmentUserWiseChatBoatInstruction(temp.getTemplateId(),
+									instance.getInstance_name(), newInstanceName, username, scenarioId);
 
-	                        saveIpAddress(newInstanceName, resp.get("ip").toString());
+							saveIpAddress(newInstanceName, resp.get("ip").toString());
 
-	                    }
+						}
 
-	                    result = "success";
-	                }
+						result = "success";
+					}
 
-	            }
+				}
 
-	            else {
+				else {
 
-	                portMappings = new HashMap<>();
-	                newVncPort = portDetailsRepository.findMaxVncPorts() + 1;
-	                newNoVncPort = portDetailsRepository.findMaxnoVncPort() + 1;
-	                newRdpPort = portDetailsRepository.findMaxRdpPort() + 1;
+					portMappings = new HashMap<>();
+					newVncPort = portDetailsRepository.findMaxVncPorts() + 1;
+					newNoVncPort = portDetailsRepository.findMaxnoVncPort() + 1;
+					newRdpPort = portDetailsRepository.findMaxRdpPort() + 1;
 
-	                if (os.equalsIgnoreCase("Windows")) {
-	                    portMappings.put(newRdpPort, 3389);
-	                }
+					if (os.equalsIgnoreCase("Windows")) {
+						portMappings.put(newRdpPort, 3389);
+					}
 
-	                else {
-	                    portMappings.put(newVncPort, 5901);
-	                }
+					else {
+						portMappings.put(newVncPort, 5901);
+					}
 
-	                portMappings.put(newNoVncPort, 8080);
+					portMappings.put(newNoVncPort, 8080);
 
-	                network = instance.getDocker_network_name();
+					network = instance.getDocker_network_name();
 
-	                if (os.equalsIgnoreCase("windows")) {
-	                    result = dockerService.runWindowsContainer(imageName, newInstanceName, portMappings, network,
-	                            filePath);
-	                    if (result.equalsIgnoreCase("success")) {
-	                        System.out.println("inside windows docker : " + result);
-	                        jsonResponse = guacService.createConnection(newInstanceName, "rdp",
-	                                instance.getPhysicalServerIP(), newRdpPort, "admin", "Admin@123!", "", "true", "",
-	                                "", "", "", "", "", "", "", "");
-	                        if (guacService.getConnectionIdByName(jsonResponse) != null) {
-	                            containerIP = dockerService.getContainerIpViaCli(newInstanceName);
-	                            insertIntoPortDetailsForWindows(newInstanceName, newRdpPort, newNoVncPort);
-	                            insertIntoAssessmentUserLabForWindows(newInstanceName, username, "rdp", templateName,
-	                                    guacService.getConnectionIdByName(jsonResponse), newRdpPort, newNoVncPort,
-	                                    "Admin@123!", "admin", containerIP, scenarioId);
+					if (os.equalsIgnoreCase("windows")) {
+						result = dockerService.runWindowsContainer(imageName, newInstanceName, portMappings, network,
+								filePath);
+						if (result.equalsIgnoreCase("success")) {
+							System.out.println("inside windows docker : " + result);
+							jsonResponse = guacService.createConnection(newInstanceName, "rdp",
+									instance.getPhysicalServerIP(), newRdpPort, "admin", "Admin@123!", "", "true", "",
+									"", "", "", "", "", "", "", "");
+							if (guacService.getConnectionIdByName(jsonResponse) != null) {
+								containerIP = dockerService.getContainerIpViaCli(newInstanceName);
+								insertIntoPortDetailsForWindows(newInstanceName, newRdpPort, newNoVncPort);
+								insertIntoAssessmentUserLabForWindows(newInstanceName, username, "rdp", templateName,
+										guacService.getConnectionIdByName(jsonResponse), newRdpPort, newNoVncPort,
+										"Admin@123!", "admin", containerIP, scenarioId);
 
-	                            insertAssessmentUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName,
-	                                    username, scenarioId);
-	                        }
+								insertAssessmentUserWiseChatBoatInstruction(temp.getTemplateId(), templateName,
+										newInstanceName, username, scenarioId);
+							}
 
-	                    }
+						}
 
-	                } else {
+					} else {
 
-	                    result = dockerService.runContainer(imageName, newInstanceName, portMappings, network);
+						result = dockerService.runContainer(imageName, newInstanceName, portMappings, network);
 
-	                    if (result.equalsIgnoreCase("success")) {
-	                        System.out.println("inside linux docker : " + result);
-	                        // Create connection in Guacamole
-	                        jsonResponse = guacService.createConnection(newInstanceName, "vnc",
-	                                instance.getPhysicalServerIP(), newVncPort, "kali", "kalilinux", "", "", "", "", "",
-	                                "", "", "", "", "", "");
-	                        if (guacService.getConnectionIdByName(jsonResponse) != null) {
-	                            containerIP = dockerService.getContainerIpViaCli(newInstanceName);
-	                            insertIntoPortDetails(newInstanceName, newVncPort, newNoVncPort);
-	                            insertIntoAssessmentUserLab(newInstanceName, username, "vnc", templateName,
-	                                    guacService.getConnectionIdByName(jsonResponse), newVncPort, newNoVncPort,
-	                                    "kalilinux", containerIP, scenarioId);
+						if (result.equalsIgnoreCase("success")) {
+							System.out.println("inside linux docker : " + result);
+							// Create connection in Guacamole
+							jsonResponse = guacService.createConnection(newInstanceName, "vnc",
+									instance.getPhysicalServerIP(), newVncPort, "kali", "kalilinux", "", "", "", "", "",
+									"", "", "", "", "", "");
+							if (guacService.getConnectionIdByName(jsonResponse) != null) {
+								containerIP = dockerService.getContainerIpViaCli(newInstanceName);
+								insertIntoPortDetails(newInstanceName, newVncPort, newNoVncPort);
+								insertIntoAssessmentUserLab(newInstanceName, username, "vnc", templateName,
+										guacService.getConnectionIdByName(jsonResponse), newVncPort, newNoVncPort,
+										"kalilinux", containerIP, scenarioId);
 
-	                            insertAssessmentUserWiseChatBoatInstruction(temp.getTemplateId(), templateName, newInstanceName,
-	                                    username, scenarioId);
-	                        }
+								insertAssessmentUserWiseChatBoatInstruction(temp.getTemplateId(), templateName,
+										newInstanceName, username, scenarioId);
+							}
 
-	                    }
-	                }
+						}
+					}
 
-	            }
+				}
 
-	        }
-	        if (result.equalsIgnoreCase("success")) {
-	            insertUserScenerio(scenarioId, scenarioName, username);
-	        }
+			}
+			if (result.equalsIgnoreCase("success")) {
+				insertUserScenerio(scenarioId, scenarioName, username);
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        System.out.println("Exception_Assessment_Dokcer_method : " + e);
-	        result = "fail";
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Exception_Assessment_Dokcer_method : " + e);
+			result = "fail";
+		}
 
-	    return result;
+		return result;
 	}
-	
-	
-	public void insertIntoAssessmentUserLab(String newInstanceName, String username, String remoteType, String templateName,
-	        String guacamoleId, Integer newVncPort, Integer newNoVncPort, String password, String containerIP,
-	        String scenarioId) {
-	    AssessmentUserLab lab = new AssessmentUserLab();
-	    lab.setInstanceName(newInstanceName);
-	    lab.setGuacamoleId(Integer.valueOf(guacamoleId));
-	    lab.setUsername(username);
-	    lab.setPassword(password);
-	    lab.setInstanceUser("kali");
-	    lab.setRemoteType(remoteType);
-	    lab.setNoVncPort(newNoVncPort);
-	    lab.setVncPort(newVncPort);
-	    lab.setIpAddress(containerIP);
-	    lab.setVmState("running");
-	    lab.setStatus("InProgress");
-	    lab.setTemplateName(templateName);
-	    lab.setScenarioId(Integer.valueOf(scenarioId));
-	    lab.setLastActiveConnection(new Timestamp(System.currentTimeMillis()));
 
-	    assessmentUserLabRepository.save(lab);
+	public void insertIntoAssessmentUserLab(String newInstanceName, String username, String remoteType,
+			String templateName, String guacamoleId, Integer newVncPort, Integer newNoVncPort, String password,
+			String containerIP, String scenarioId) {
+		AssessmentUserLab lab = new AssessmentUserLab();
+		lab.setInstanceName(newInstanceName);
+		lab.setGuacamoleId(Integer.valueOf(guacamoleId));
+		lab.setUsername(username);
+		lab.setPassword(password);
+		lab.setInstanceUser("kali");
+		lab.setRemoteType(remoteType);
+		lab.setNoVncPort(newNoVncPort);
+		lab.setVncPort(newVncPort);
+		lab.setIpAddress(containerIP);
+		lab.setVmState("running");
+		lab.setStatus("InProgress");
+		lab.setTemplateName(templateName);
+		lab.setScenarioId(Integer.valueOf(scenarioId));
+		lab.setLastActiveConnection(new Timestamp(System.currentTimeMillis()));
+
+		assessmentUserLabRepository.save(lab);
 	}
 
 	public void saveInAssessmentUserLab(String newInstanceName, String username, String remoteType, String templateName,
-	        String guacamoleId, Integer newVncPort, Integer newNoVncPort, String password, String containerIP,
-	        String scenarioId) {
-	    AssessmentUserLab lab = new AssessmentUserLab();
-	    lab.setInstanceName(newInstanceName);
-	    lab.setGuacamoleId(Integer.valueOf(guacamoleId));
-	    lab.setUsername(username);
-	    lab.setPassword(password);
-	    lab.setInstanceUser("administrator");
-	    lab.setRemoteType(remoteType);
-	    lab.setNoVncPort(newNoVncPort);
-	    lab.setVncPort(newVncPort);
-	    lab.setIpAddress(containerIP);
-	    lab.setStatus("InProgress");
-	    lab.setVmState("running");
-	    lab.setTemplateName(templateName);
-	    lab.setScenarioId(Integer.valueOf(scenarioId));
-	    lab.setLastActiveConnection(new Timestamp(System.currentTimeMillis()));
+			String guacamoleId, Integer newVncPort, Integer newNoVncPort, String password, String containerIP,
+			String scenarioId) {
+		AssessmentUserLab lab = new AssessmentUserLab();
+		lab.setInstanceName(newInstanceName);
+		lab.setGuacamoleId(Integer.valueOf(guacamoleId));
+		lab.setUsername(username);
+		lab.setPassword(password);
+		lab.setInstanceUser("administrator");
+		lab.setRemoteType(remoteType);
+		lab.setNoVncPort(newNoVncPort);
+		lab.setVncPort(newVncPort);
+		lab.setIpAddress(containerIP);
+		lab.setStatus("InProgress");
+		lab.setVmState("running");
+		lab.setTemplateName(templateName);
+		lab.setScenarioId(Integer.valueOf(scenarioId));
+		lab.setLastActiveConnection(new Timestamp(System.currentTimeMillis()));
 
-	    assessmentUserLabRepository.save(lab);
+		assessmentUserLabRepository.save(lab);
 	}
 
 	public void insertIntoAssessmentUserLabForWindows(String newInstanceName, String username, String remoteType,
-	        String templateName, String guacamoleId, Integer newRdpPort, Integer newNoVncPort, String password,
-	        String instanceuser, String containerIP, String scenarioId) {
-	    AssessmentUserLab lab = new AssessmentUserLab();
-	    lab.setInstanceName(newInstanceName);
-	    lab.setGuacamoleId(Integer.valueOf(guacamoleId));
-	    lab.setUsername(username);
-	    lab.setPassword(password);
-	    lab.setInstanceUser(instanceuser);
-	    lab.setRemoteType(remoteType);
-	    lab.setNoVncPort(newNoVncPort);
-	    lab.setVncPort(newRdpPort);
-	    lab.setIpAddress(containerIP);
-	    lab.setVmState("running");
-	    lab.setStatus("InProgress");
-	    lab.setTemplateName(templateName);
-	    lab.setScenarioId(Integer.valueOf(scenarioId));
-	    lab.setLastActiveConnection(new Timestamp(System.currentTimeMillis()));
+			String templateName, String guacamoleId, Integer newRdpPort, Integer newNoVncPort, String password,
+			String instanceuser, String containerIP, String scenarioId) {
+		AssessmentUserLab lab = new AssessmentUserLab();
+		lab.setInstanceName(newInstanceName);
+		lab.setGuacamoleId(Integer.valueOf(guacamoleId));
+		lab.setUsername(username);
+		lab.setPassword(password);
+		lab.setInstanceUser(instanceuser);
+		lab.setRemoteType(remoteType);
+		lab.setNoVncPort(newNoVncPort);
+		lab.setVncPort(newRdpPort);
+		lab.setIpAddress(containerIP);
+		lab.setVmState("running");
+		lab.setStatus("InProgress");
+		lab.setTemplateName(templateName);
+		lab.setScenarioId(Integer.valueOf(scenarioId));
+		lab.setLastActiveConnection(new Timestamp(System.currentTimeMillis()));
 
-	    assessmentUserLabRepository.save(lab);
+		assessmentUserLabRepository.save(lab);
 	}
 
-	public void insertAssessmentUserWiseChatBoatInstruction(int templateId, String templateName, String LabName, String username,
-	        String scenarioId) {
+	public void insertAssessmentUserWiseChatBoatInstruction(int templateId, String templateName, String LabName,
+			String username, String scenarioId) {
 
-	    try {
+		try {
 
-	        List<ChartBoatInstructionTemplate> templates = ChartBoatInstructionTemplateRepository
-	                .findBytemplateId(templateId);
-	        Integer labid = assessmentUserLabRepository.findMaxLabId();
+			List<ChartBoatInstructionTemplate> templates = ChartBoatInstructionTemplateRepository
+					.findBytemplateId(templateId);
+			Integer labid = assessmentUserLabRepository.findMaxLabId();
 
-	        if (!templates.isEmpty()) {
+			if (!templates.isEmpty()) {
 
-	            for (ChartBoatInstructionTemplate template : templates) {
+				for (ChartBoatInstructionTemplate template : templates) {
 
-	                AssessmentUserWiseChatBoatInstructionTemplate userWiseTemplate = new AssessmentUserWiseChatBoatInstructionTemplate();
+					AssessmentUserWiseChatBoatInstructionTemplate userWiseTemplate = new AssessmentUserWiseChatBoatInstructionTemplate();
 
-	                userWiseTemplate.setTemplateId(template.getTemplateId());
-	                userWiseTemplate.setTemaplateName(template.getTemaplateName());
-	                userWiseTemplate.setInstructionCommand(template.getInstructionCommand());
-	                userWiseTemplate.setInstructionDetails(template.getInstructionDetails());
+					userWiseTemplate.setTemplateId(template.getTemplateId());
+					userWiseTemplate.setTemaplateName(template.getTemaplateName());
+					userWiseTemplate.setInstructionCommand(template.getInstructionCommand());
+					userWiseTemplate.setInstructionDetails(template.getInstructionDetails());
 
-	                userWiseTemplate.setLabId(labid);
-	                userWiseTemplate.setLabName(LabName);
+					userWiseTemplate.setLabId(labid);
+					userWiseTemplate.setLabName(LabName);
 
-	                userWiseTemplate.setUsername(username);
-	                userWiseTemplate.setIsCommandExecuted("false");
-	                userWiseTemplate.setCommandExecutedCheckTime(new Timestamp(System.currentTimeMillis()));
-	                userWiseTemplate.setScenarioId(Integer.parseInt(scenarioId));
+					userWiseTemplate.setUsername(username);
+					userWiseTemplate.setIsCommandExecuted("false");
+					userWiseTemplate.setCommandExecutedCheckTime(new Timestamp(System.currentTimeMillis()));
+					userWiseTemplate.setScenarioId(Integer.parseInt(scenarioId));
 
-	                assessmentInstructionTemplateRepository.save(userWiseTemplate);
-	            }
+					assessmentInstructionTemplateRepository.save(userWiseTemplate);
+				}
 
-	        }
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        System.out.println("Exception_insert_assessment_chartboardInstruction" + e);
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Exception_insert_assessment_chartboardInstruction" + e);
+		}
 	}
-	
 
 	@PostMapping("/sourceImage")
 	public @ResponseBody String sourceImage(@RequestParam("templateId") int templateId) {
@@ -4237,120 +4247,190 @@ public class CloudInstanceController {
 		}
 
 	}
-	
-	 @GetMapping("/template_edit/{id}")
-	    public String showEditForm(@PathVariable("id") int id, Model model) {
-	        try {
-	            Optional<CloudInstance> cloudInstanceOptional = repository.findById(id);
-	            
-	            if (cloudInstanceOptional.isPresent()) {
-	                CloudInstance cloudInstance = cloudInstanceOptional.get();
-	                model.addAttribute("cloudInstance", cloudInstance);
-	                model.addAttribute("pageTitle", "Edit Template");
-	                return "edit_template";
-	            } else {
-	                return "redirect:/cloud_instance/view?error=Template+not+found";
-	            }
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	            return "redirect:/cloud_instance/view?error=Error+loading+template";
-	        }
-	    }
-	 
-	 
-	 @PostMapping("/updateTemplate")
-	 public String updateTemplate(
-	         @ModelAttribute CloudInstance cloudInstance,
-	         @RequestParam(value = "uploadedImage", required = false) MultipartFile uploadedImage,
-	         @RequestParam(value = "removeImage", defaultValue = "false") boolean removeImage,
-	         RedirectAttributes redirectAttributes) {
-	     
-	     try {
-	         // Get existing template to preserve all data
-	         Optional<CloudInstance> existingTemplate = repository.findById(cloudInstance.getId());
-	         
-	         if (existingTemplate.isPresent()) {
-	             CloudInstance existing = existingTemplate.get();
-	             
-	             // Only update fields that are provided/not null
-	             if (cloudInstance.getInstance_name() != null && !cloudInstance.getInstance_name().trim().isEmpty()) {
-	                 existing.setInstance_name(cloudInstance.getInstance_name());
-	             }
-	             
-	             if (cloudInstance.getLab_tag() != null && !cloudInstance.getLab_tag().trim().isEmpty()) {
-	                 existing.setLab_tag(cloudInstance.getLab_tag());
-	             }
-	             
-	             if (cloudInstance.getConsoleUsername() != null && !cloudInstance.getConsoleUsername().trim().isEmpty()) {
-	                 existing.setConsoleUsername(cloudInstance.getConsoleUsername());
-	             }
-	             
-	             // Only update password if provided (not blank)
-	             if (cloudInstance.getConsolePassword() != null && !cloudInstance.getConsolePassword().trim().isEmpty()) {
-	                 existing.setConsolePassword(cloudInstance.getConsolePassword());
-	             }
-	             
-	             if (cloudInstance.getConsoleProtocol() != null && !cloudInstance.getConsoleProtocol().trim().isEmpty()) {
-	                 existing.setConsoleProtocol(cloudInstance.getConsoleProtocol());
-	             }
-	             
-	             if (cloudInstance.getSecurityMode() != null && !cloudInstance.getSecurityMode().trim().isEmpty()) {
-	                 existing.setSecurityMode(cloudInstance.getSecurityMode());
-	             }
-	             
-	             if (cloudInstance.getServerCertificate() != null) {
-	                 existing.setServerCertificate(cloudInstance.getServerCertificate());
-	             }
-	             
-	             if (cloudInstance.getDescription() != null && !cloudInstance.getDescription().trim().isEmpty()) {
-	                 existing.setDescription(cloudInstance.getDescription());
-	             }
-	             
-	             if (cloudInstance.getVirtualization_type() != null && !cloudInstance.getVirtualization_type().trim().isEmpty()) {
-	                 existing.setVirtualization_type(cloudInstance.getVirtualization_type());
-	             }
-	             
-	             if (cloudInstance.getPhysicalServerIP() != null && !cloudInstance.getPhysicalServerIP().trim().isEmpty()) {
-	                 existing.setPhysicalServerIP(cloudInstance.getPhysicalServerIP());
-	             }
-	             
-	             // Handle image upload/removal
-	             if (removeImage) {
-	                 // Remove current image
-	                 existing.setLab_image(null);
-	             } else if (uploadedImage != null && !uploadedImage.isEmpty()) {
-	                 // Handle new image upload
-	                 if (!uploadedImage.getContentType().startsWith("image/")) {
-	                     redirectAttributes.addFlashAttribute("errorMessage", "Please upload a valid image file");
-	                     return "redirect:/cloud_instance/edit/" + cloudInstance.getId();
-	                 }
-	                 
-	                 // Check file size (max 5MB)
-	                 if (uploadedImage.getSize() > 5 * 1024 * 1024) {
-	                     redirectAttributes.addFlashAttribute("errorMessage", "Image size should be less than 5MB");
-	                     return "redirect:/cloud_instance/edit/" + cloudInstance.getId();
-	                 }
-	                 
-	                 existing.setLab_image(uploadedImage.getBytes());
-	             }
-	             // If no image change, keep the existing image
-	             
-	             // Update the template
-	             repository.save(existing);
-	             
-	             redirectAttributes.addFlashAttribute("successMessage", "Template updated successfully");
-	             return "redirect:/cloud_instance/view";
-	         } else {
-	             redirectAttributes.addFlashAttribute("errorMessage", "Template not found");
-	             return "redirect:/cloud_instance/view";
-	         }
-	         
-	     } catch (Exception e) {
-	         e.printStackTrace();
-	         redirectAttributes.addFlashAttribute("errorMessage", "Error updating template: " + e.getMessage());
-	         return "redirect:/cloud_instance/edit/" + cloudInstance.getId();
-	     }
-	 }
-	
+
+	@GetMapping("/template_edit/{id}")
+	public String showEditForm(@PathVariable("id") int id, Model model) {
+		try {
+			Optional<CloudInstance> cloudInstanceOptional = repository.findById(id);
+
+			if (cloudInstanceOptional.isPresent()) {
+				CloudInstance cloudInstance = cloudInstanceOptional.get();
+				model.addAttribute("cloudInstance", cloudInstance);
+				model.addAttribute("pageTitle", "Edit Template");
+				return "edit_template";
+			} else {
+				return "redirect:/cloud_instance/view?error=Template+not+found";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "redirect:/cloud_instance/view?error=Error+loading+template";
+		}
+	}
+
+	@PostMapping("/updateTemplate")
+	public String updateTemplate(@ModelAttribute CloudInstance cloudInstance,
+			@RequestParam(value = "uploadedImage", required = false) MultipartFile uploadedImage,
+			@RequestParam(value = "removeImage", defaultValue = "false") boolean removeImage,
+			RedirectAttributes redirectAttributes) {
+
+		try {
+			// Get existing template to preserve all data
+			Optional<CloudInstance> existingTemplate = repository.findById(cloudInstance.getId());
+
+			if (existingTemplate.isPresent()) {
+				CloudInstance existing = existingTemplate.get();
+
+				// Only update fields that are provided/not null
+				if (cloudInstance.getInstance_name() != null && !cloudInstance.getInstance_name().trim().isEmpty()) {
+					existing.setInstance_name(cloudInstance.getInstance_name());
+				}
+
+				if (cloudInstance.getLab_tag() != null && !cloudInstance.getLab_tag().trim().isEmpty()) {
+					existing.setLab_tag(cloudInstance.getLab_tag());
+				}
+
+				if (cloudInstance.getConsoleUsername() != null
+						&& !cloudInstance.getConsoleUsername().trim().isEmpty()) {
+					existing.setConsoleUsername(cloudInstance.getConsoleUsername());
+				}
+
+				// Only update password if provided (not blank)
+				if (cloudInstance.getConsolePassword() != null
+						&& !cloudInstance.getConsolePassword().trim().isEmpty()) {
+					existing.setConsolePassword(cloudInstance.getConsolePassword());
+				}
+
+				if (cloudInstance.getConsoleProtocol() != null
+						&& !cloudInstance.getConsoleProtocol().trim().isEmpty()) {
+					existing.setConsoleProtocol(cloudInstance.getConsoleProtocol());
+				}
+
+				if (cloudInstance.getSecurityMode() != null && !cloudInstance.getSecurityMode().trim().isEmpty()) {
+					existing.setSecurityMode(cloudInstance.getSecurityMode());
+				}
+
+				if (cloudInstance.getServerCertificate() != null) {
+					existing.setServerCertificate(cloudInstance.getServerCertificate());
+				}
+
+				if (cloudInstance.getDescription() != null && !cloudInstance.getDescription().trim().isEmpty()) {
+					existing.setDescription(cloudInstance.getDescription());
+				}
+
+				if (cloudInstance.getVirtualization_type() != null
+						&& !cloudInstance.getVirtualization_type().trim().isEmpty()) {
+					existing.setVirtualization_type(cloudInstance.getVirtualization_type());
+				}
+
+				if (cloudInstance.getPhysicalServerIP() != null
+						&& !cloudInstance.getPhysicalServerIP().trim().isEmpty()) {
+					existing.setPhysicalServerIP(cloudInstance.getPhysicalServerIP());
+				}
+
+				// Handle image upload/removal
+				if (removeImage) {
+					// Remove current image
+					existing.setLab_image(null);
+				} else if (uploadedImage != null && !uploadedImage.isEmpty()) {
+					// Handle new image upload
+					if (!uploadedImage.getContentType().startsWith("image/")) {
+						redirectAttributes.addFlashAttribute("errorMessage", "Please upload a valid image file");
+						return "redirect:/cloud_instance/edit/" + cloudInstance.getId();
+					}
+
+					// Check file size (max 5MB)
+					if (uploadedImage.getSize() > 5 * 1024 * 1024) {
+						redirectAttributes.addFlashAttribute("errorMessage", "Image size should be less than 5MB");
+						return "redirect:/cloud_instance/edit/" + cloudInstance.getId();
+					}
+
+					existing.setLab_image(uploadedImage.getBytes());
+				}
+				// If no image change, keep the existing image
+
+				// Update the template
+				repository.save(existing);
+
+				redirectAttributes.addFlashAttribute("successMessage", "Template updated successfully");
+				return "redirect:/cloud_instance/view";
+			} else {
+				redirectAttributes.addFlashAttribute("errorMessage", "Template not found");
+				return "redirect:/cloud_instance/view";
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("errorMessage", "Error updating template: " + e.getMessage());
+			return "redirect:/cloud_instance/edit/" + cloudInstance.getId();
+		}
+	}
+
+	@GetMapping("/syncContainers")
+	public @ResponseBody String fetchAndSyncContainers(@RequestParam String serverIp) {
+		try {
+
+			System.out.println("Sync Docker containers ...!");
+
+			@SuppressWarnings("unchecked")
+			Map<String, Object> response = restTemplate
+					.getForObject(physical_server_agent_api_host.replace("<physicalServerIp>", serverIp), Map.class);
+
+			if (response == null || !"success".equals(response.get("status")))
+				return "fail";
+
+			@SuppressWarnings("unchecked")
+			List<Map<String, Object>> containers = (List<Map<String, Object>>) response.get("containers");
+
+			if (containers == null || containers.isEmpty())
+				return "fail";
+
+			for (Map<String, Object> c : containers) {
+
+				if (c.containsKey("error"))
+					continue;
+
+				String containerId = (String) c.get("id");
+				DiscoverDockerContainers container = discoverDockerContainersRepository.findByContainerId(containerId);
+				if (container == null) {
+					container = new DiscoverDockerContainers();
+					container.setContainerId(containerId);
+				}
+
+				container.setContainerName((String) c.get("name"));
+				container.setImageName((String) c.get("image"));
+				container.setCommand((String) c.get("command"));
+				container.setStatus((String) c.get("status"));
+				container.setState((String) c.get("state"));
+				container.setPorts((String) c.get("ports"));
+				container.setServices((String) c.get("services"));
+				container.setPhysicalServerIp(serverIp);
+
+				if (c.get("created") != null) {
+					Object createdObj = c.get("created");
+					Timestamp ts = null;
+
+					if (createdObj instanceof String) {
+						try {
+							ts = new Timestamp(dateFormat.parse((String) createdObj).getTime());
+						} catch (Exception e) {
+							ts = new Timestamp(System.currentTimeMillis()); // fallback
+						}
+					} else if (createdObj instanceof Date) {
+						ts = new Timestamp(((Date) createdObj).getTime());
+					}
+
+					container.setCreated(ts);
+				}
+
+				discoverDockerContainersRepository.save(container);
+			}
+
+			return "success";
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
+		}
+	}
 
 }
