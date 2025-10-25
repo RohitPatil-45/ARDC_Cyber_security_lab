@@ -320,7 +320,7 @@ background-position
 					<div class="row mb-2">
 						<div class="col-sm-6"></div>
 						<div class="col-sm-5"></div>
-						<div class="col-sm-1">
+						<div class="col-sm-1" th:if="${session.access != 'READ'}">
 							<a href="/guac/Add_Sub_Playlist"
 								class="btn btn-block bg-gradient-primary">Sub-Playlist</a>
 						</div>

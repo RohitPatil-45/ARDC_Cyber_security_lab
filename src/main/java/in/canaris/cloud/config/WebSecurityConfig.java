@@ -77,15 +77,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers("/", "/logout").permitAll();
 
 		// /userInfo page requires login as ROLE_USER or ROLE_ADMIN.
-		// If no login, it will redirect to /login page.
-		http.authorizeRequests().antMatchers("/userInfo")
-				.access("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPERADMIN')");
-		http.authorizeRequests().antMatchers("/vpc/*")
-				.access("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPERADMIN')");
 
 		// For ADMIN only.
-		http.authorizeRequests().antMatchers("/admin", "/discount/*", "/	/*")
-				.access("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPERADMIN')");
+		http.authorizeRequests().antMatchers("/admin", "/discount/*", "/price/*", "/product/*", "/sub_product/*", "/guac/manage", "/users/*", 
+				"/	/*", "/group/*", "/location/*", "/guac/View_Category", "/discount/*", "/emailConfig/*", 
+				"/physicalServer/*", "/vmLocationPath/*", "/switchmaster/*", "/discover/*", "guac/viewElectiveMappingPage")
+				.access("hasRole('ROLE_SUPERADMIN')");
+
+		http.authorizeRequests().antMatchers("/guac/UserWise_Dashboard", "/guac/UserTaskPerformance")
+				.access("hasRole('ROLE_USER')");
+
+		http.authorizeRequests().antMatchers("/guac/teacher-dashboard", "/guac/teacher-homePage")
+				.access("hasRole('ROLE_TEACHER')");
+
+		http.authorizeRequests().antMatchers("/guac/Hod-homePage", "/guac/hod-dashboard").access("hasRole('ROLE_HOD')");
+		
+		http.authorizeRequests().antMatchers("/guac/admin-dashboard", "/guac/admin-homePage").access("hasRole('ROLE_ADMIN')");
 
 		// When the user has logged in as XX.
 		// But access a page that requires role YY,
@@ -103,15 +110,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				AppUser userObj = appUserRepository.findOneByUserName(user);
 				Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
 
-
-				List<String> allowedSubModules = roleMenuTemplateRepository.findUrlsByTemplateName(userObj.getTemplateName());
-				System.out.println("Allowed urls = "+allowedSubModules);
+				List<String> allowedSubModules = roleMenuTemplateRepository
+						.findUrlsByTemplateName(userObj.getTemplateName());
+				System.out.println("Allowed sub modules = " + allowedSubModules);
 				request.getSession().setAttribute("allowedSubModules", allowedSubModules);
 
 				List<String> allowedModules = roleMenuTemplateRepository
 						.findModulesByTemplateName(userObj.getTemplateName());
 				request.getSession().setAttribute("allowedModules", allowedModules);
 				
+				List<String> allowedUrls = roleMenuTemplateRepository.findAllowedUrlsByTemplateName(userObj.getTemplateName());
+				request.getSession().setAttribute("allowedUrls", allowedUrls);
+
 				request.getSession().setAttribute("access", userObj.getPermissions());
 
 				if (userObj.getIsFirstTimeLogin()) {

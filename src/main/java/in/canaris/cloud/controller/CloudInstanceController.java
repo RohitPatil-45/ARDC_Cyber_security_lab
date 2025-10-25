@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.persistence.Transient;
+import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.util.StringBuilders;
 import org.json.JSONArray;
@@ -310,7 +311,7 @@ public class CloudInstanceController {
 
 	@Autowired
 	private AssessmentUserLabRepository assessmentUserLabRepository;
-	
+
 	@Autowired
 	private DiscoverDockerContainersRepository discoverDockerContainersRepository;
 
@@ -519,9 +520,20 @@ public class CloudInstanceController {
 //	}
 
 	@GetMapping("/new")
-	public ModelAndView add(@RequestParam(required = false) Integer id, RedirectAttributes redirectAttributes) {
-		System.out.println("New/Edit Controller called: " + id);
-		ModelAndView mav = new ModelAndView(var_function_name + "_add");
+	public ModelAndView add(@RequestParam(required = false) Integer id, RedirectAttributes redirectAttributes,
+			HttpSession session) {
+
+		ModelAndView mav = new ModelAndView();
+
+		String access = (String) session.getAttribute("access");
+
+		if (access == null || access.equalsIgnoreCase("READ")) {
+			mav.setViewName("redirect:/403");
+			return mav;
+		}
+
+		mav.setViewName(var_function_name + "_add");
+
 		mav.addObject("pageTitle", id == null ? "Add New " + disp_function_name : "Edit " + disp_function_name);
 		mav.addObject("action_name", var_function_name);
 		mav.addObject("dcLocationList", repositoryLocation.getAllDClocations());
@@ -4420,7 +4432,7 @@ public class CloudInstanceController {
 					}
 
 					container.setCreated(ts);
-				} 
+				}
 
 				discoverDockerContainersRepository.save(container);
 			}

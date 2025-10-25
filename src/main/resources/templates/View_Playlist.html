@@ -326,7 +326,7 @@
 <!-- 							</ol> -->
 						</div>
 						
-						<div class="col-sm-1">
+						<div class="col-sm-1" th:if="${session.access != 'READ'}">
 							<a href="/guac/Add_Playlist"
 								class="btn btn-block bg-gradient-primary">Add</a>
 						</div>

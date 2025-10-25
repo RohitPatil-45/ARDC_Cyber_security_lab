@@ -315,7 +315,7 @@ background-position
 						<!-- 							</ol> -->
 						<!-- 						</div> -->
 
-						<div class="col-md-1">
+						<div class="col-md-1" th:if="${session.access != 'READ'}">
 							<a href="/guac/Scenario_Details"
 								class="btn btn-block bg-gradient-primary">Add</a>
 						</div>

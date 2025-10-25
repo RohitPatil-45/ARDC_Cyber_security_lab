@@ -31,5 +31,8 @@ public interface RoleMenuTemplateRepository extends JpaRepository<RoleMenuTempla
 	@Transactional
 	@Query(value = "DELETE FROM role_menu_template WHERE template_name = :templateName", nativeQuery = true)
 	void deleteByTemplateName(@Param("templateName") String templateName);
+	
+	@Query("SELECT r.menu.url FROM RoleMenuTemplate r WHERE r.templateName = :templateName")
+	List<String> findAllowedUrlsByTemplateName(@Param("templateName") String templateName);
 
 }

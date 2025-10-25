@@ -2525,7 +2525,15 @@ public class GuacamoleController {
 //	}
 
 	@GetMapping("/Add_Playlist")
-	public String showCreatePlaylistForm(@RequestParam(value = "Id", required = false) Integer id, Model model) {
+	public String showCreatePlaylistForm(@RequestParam(value = "Id", required = false) Integer id, Model model,
+			HttpSession session) {
+
+		String access = (String) session.getAttribute("access");
+
+		if (access == null || access.equalsIgnoreCase("READ")) {
+			return "redirect:/403";
+		}
+
 		Playlist playlist = (id != null) ? PlaylistRepository.findById(id).orElse(new Playlist()) : new Playlist();
 		model.addAttribute("playlist", playlist);
 
@@ -3082,14 +3090,29 @@ public class GuacamoleController {
 	}
 
 	@GetMapping("/Add_Sub_Playlist")
-	public String showCreateForm(Model model) {
+	public String showCreateForm(Model model, HttpSession session) {
+
+		String access = (String) session.getAttribute("access");
+
+		if (access == null || access.equalsIgnoreCase("READ")) {
+			return "redirect:/403";
+		}
+
 		model.addAttribute("playlist", new SubPlaylist());
 		model.addAttribute("pageTitle", "Create New Sub Playlist");
 		return "Add_Sub_Playlist";
 	}
 
 	@GetMapping("/Edit_Sub_Playlist/{id}")
-	public String showEditForm(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes) {
+	public String showEditForm(@PathVariable("id") Integer id, Model model, RedirectAttributes redirectAttributes,
+			HttpSession session) {
+
+		String access = (String) session.getAttribute("access");
+
+		if (access == null || access.equalsIgnoreCase("READ")) {
+			return "redirect:/403";
+		}
+
 		Optional<SubPlaylist> optional = SubPlaylistRepository.findById(id);
 		if (optional.isPresent()) {
 			model.addAttribute("playlist", optional.get());
@@ -3103,7 +3126,13 @@ public class GuacamoleController {
 	}
 
 	@GetMapping("/deletesubplaylist/{id}")
-	public String deletesubplaylist(@PathVariable("id") Integer id) {
+	public String deletesubplaylist(@PathVariable("id") Integer id, HttpSession session) {
+
+		String access = (String) session.getAttribute("access");
+
+		if (access == null || access.equalsIgnoreCase("READ")) {
+			return "redirect:/403";
+		}
 
 		try {
 			ModelAndView mav = new ModelAndView("Add_Sub_Playlist");
@@ -3336,8 +3365,15 @@ public class GuacamoleController {
 	@PostMapping("/addplaylist_SubPlaylist")
 	@ResponseBody
 	public String addSubPlaylistToPlaylist(@RequestParam("playlistId") int playlistId,
-			@RequestParam("subPlaylistId") int subPlaylistId) {
+			@RequestParam("subPlaylistId") int subPlaylistId, HttpSession session) {
 		try {
+
+			String access = (String) session.getAttribute("access");
+
+			if (access == null || access.equalsIgnoreCase("READ")) {
+				return "redirect:/403";
+			}
+
 			// check parent playlist exists
 			Playlist playlist = PlaylistRepository.findById(playlistId)
 					.orElseThrow(() -> new RuntimeException("Playlist not found"));
@@ -3367,10 +3403,21 @@ public class GuacamoleController {
 	}
 
 	@GetMapping("/editplaylist/{id}")
-	public ModelAndView editplaylist(@PathVariable("id") Integer id) {
+	public ModelAndView editplaylist(@PathVariable("id") Integer id, HttpSession session) {
 
 		try {
-			ModelAndView mav = new ModelAndView("Add_Playlist");
+
+			ModelAndView mav = new ModelAndView();
+
+			String access = (String) session.getAttribute("access");
+
+			if (access == null || access.equalsIgnoreCase("READ")) {
+				mav.setViewName("redirect:/403");
+				return mav;
+			}
+
+			mav.setViewName("Add_Playlist");
+
 //			mav.addObject("action_name", var_function_name);
 			mav.addObject("playlist", PlaylistRepository.findById(id).get());
 			mav.addObject("pageTitle", "Edit Playlist (ID: " + id + ")");
@@ -3385,20 +3432,20 @@ public class GuacamoleController {
 	}
 
 	@GetMapping("/deletplaylist/{id}")
-	public String deletplaylist(@PathVariable("id") Integer id) {
+	public String deletplaylist(@PathVariable("id") Integer id, HttpSession session) {
 
 		try {
-			ModelAndView mav = new ModelAndView("Add_Playlist");
-//			mav.addObject("action_name", var_function_name);
-//			mav.addObject("playlist", PlaylistRepository.deleteById(id));
+
+			String access = (String) session.getAttribute("access");
+
+			if (access == null || access.equalsIgnoreCase("READ")) {
+				return "redirect:/403";
+			}
+
 			PlaylistRepository.deleteById(id);
-//			mav.addObject("pageTitle",  "Edit " + disp_function_name + " (ID: " + id + ")");
-//			return mav;
 		} catch (Exception e) {
 			ModelAndView mav = new ModelAndView("Add_Playlist");
-//			mav.addObject("action_name", var_function_name);
 			mav.addObject("message", e.getMessage());
-//			return mav;
 		}
 		return "redirect:/guac/View_Playlist";
 	}
@@ -3771,8 +3818,18 @@ public class GuacamoleController {
 
 	@GetMapping("/View_Playlist")
 	@ResponseBody
-	public ModelAndView getView_Playlist(Principal principal) {
-		ModelAndView mav = new ModelAndView("View_Playlist");
+	public ModelAndView getView_Playlist(Principal principal, HttpSession session) {
+
+		ModelAndView mav = new ModelAndView();
+
+		List<String> allowedUrls = (List<String>) session.getAttribute("allowedUrls");
+
+		if (allowedUrls == null || !allowedUrls.contains("/guac/View_Playlist")) {
+			mav.setViewName("redirect:/403");
+			return mav;
+		}
+
+		mav.setViewName("View_Playlist");
 		JSONArray Finalarray = new JSONArray();
 		List<Playlist> dataList = new ArrayList<>();
 
@@ -3974,8 +4031,15 @@ public class GuacamoleController {
 //	}
 
 	@GetMapping("/View_SubPalylist")
-	public ModelAndView getView_SubPlaylist(Principal principal) {
-		ModelAndView mav = new ModelAndView("View_SubPalylist");
+	public ModelAndView getView_SubPlaylist(Principal principal, HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		List<String> allowedUrls = (List<String>) session.getAttribute("allowedUrls");
+
+		if (allowedUrls == null || !allowedUrls.contains("/guac/View_SubPalylist")) {
+			mav.setViewName("redirect:/403");
+			return mav;
+		}
+
 		JSONArray Finalarray = new JSONArray();
 		List<SubPlaylist> dataList = new ArrayList<>();
 
@@ -4025,6 +4089,7 @@ public class GuacamoleController {
 			mav.addObject("listObj", null);
 			mav.addObject("error", e.getMessage());
 		}
+		mav.setViewName("View_SubPalylist");
 		return mav;
 	}
 
@@ -4149,8 +4214,18 @@ public class GuacamoleController {
 //	}
 
 	@GetMapping("/Scenario_Details")
-	public ModelAndView showScenarioDetails() {
-		ModelAndView mav = new ModelAndView("Add_Scenario");
+	public ModelAndView showScenarioDetails(HttpSession session) {
+
+		ModelAndView mav = new ModelAndView();
+
+		String access = (String) session.getAttribute("access");
+
+		if (access == null || access.equalsIgnoreCase("READ")) {
+			mav.setViewName("redirect:/403");
+			return mav;
+		}
+
+		mav.setViewName("Add_Scenario");
 
 		List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
 		List<CategoryMaster> categoryList = CategoryMasterRepository.findAll();
@@ -4458,8 +4533,19 @@ public class GuacamoleController {
 //	}
 
 	@GetMapping("/editsceneriolist/{id}")
-	public ModelAndView editsceneriolist(@PathVariable("id") Integer id) {
-		ModelAndView mav = new ModelAndView("Add_Scenario");
+	public ModelAndView editsceneriolist(@PathVariable("id") Integer id, HttpSession session) {
+
+		ModelAndView mav = new ModelAndView();
+
+		String access = (String) session.getAttribute("access");
+
+		if (access == null || access.equalsIgnoreCase("READ")) {
+			mav.setViewName("redirect:/403");
+			return mav;
+		}
+
+		mav.setViewName("Add_Scenario");
+
 		try {
 			List<CloudInstance> instances = repository.getInstanceNameNotAssigned();
 			List<CategoryMaster> categories = CategoryMasterRepository.findAll();
@@ -4543,20 +4629,21 @@ public class GuacamoleController {
 //	}
 
 	@GetMapping("/deletsceneriolist/{id}")
-	public String deletsceneriolist(@PathVariable("id") Integer id) {
+	public String deletsceneriolist(@PathVariable("id") Integer id, HttpSession session) {
 
 		try {
-			ModelAndView mav = new ModelAndView("Add_Playlist");
-//			mav.addObject("action_name", var_function_name);
-//			mav.addObject("playlist", PlaylistRepository.deleteById(id));
+
+			String access = (String) session.getAttribute("access");
+
+			if (access == null || access.equalsIgnoreCase("READ")) {
+				return "redirect:/403";
+			}
+
 			ScenarioRepository.deleteById(id);
-//			mav.addObject("pageTitle",  "Edit " + disp_function_name + " (ID: " + id + ")");
-//			return mav;
+
 		} catch (Exception e) {
 			ModelAndView mav = new ModelAndView("Add_Playlist");
-//			mav.addObject("action_name", var_function_name);
 			mav.addObject("message", e.getMessage());
-//			return mav;
 		}
 
 		return "redirect:/guac/View_Scenario";
@@ -4722,8 +4809,17 @@ public class GuacamoleController {
 //	}
 
 	@GetMapping("/View_Scenario")
-	public ModelAndView getView_Scenario(Principal principal) {
-		ModelAndView mav = new ModelAndView("View_Scenario");
+	public ModelAndView getView_Scenario(Principal principal, HttpSession session) {
+
+		ModelAndView mav = new ModelAndView();
+
+		List<String> allowedUrls = (List<String>) session.getAttribute("allowedUrls");
+
+		if (allowedUrls == null || !allowedUrls.contains("/guac/View_Scenario")) {
+			mav.setViewName("redirect:/403");
+			return mav;
+		}
+
 		JSONArray Finalarray = new JSONArray();
 		List<Add_Scenario> dataList = new ArrayList<>();
 
@@ -4776,7 +4872,7 @@ public class GuacamoleController {
 			mav.addObject("listObj", null);
 			mav.addObject("error", e.getMessage());
 		}
-
+		mav.setViewName("View_Scenario");
 		return mav;
 	}
 
@@ -4881,8 +4977,17 @@ public class GuacamoleController {
 //	}
 
 	@GetMapping("/My_Scenario_Inprogress")
-	public ModelAndView getMy_View_Scenario(Principal principal, Model model) {
-		ModelAndView mav = new ModelAndView("My_View_Scenario");
+	public ModelAndView getMy_View_Scenario(Principal principal, Model model, HttpSession session) {
+
+		ModelAndView mav = new ModelAndView();
+
+		List<String> allowedUrls = (List<String>) session.getAttribute("allowedUrls");
+
+		if (allowedUrls == null || !allowedUrls.contains("/guac/My_Scenario_Inprogress")) {
+			mav.setViewName("redirect:/403");
+			return mav;
+		}
+
 		JSONArray finalArray = new JSONArray();
 
 		try {
@@ -4963,12 +5068,22 @@ public class GuacamoleController {
 			System.out.println("Error fetching data: " + e.getMessage());
 		}
 
+		mav.setViewName("My_View_Scenario");
 		return mav;
 	}
 
 	@GetMapping("/My_Scenario_Completed")
-	public ModelAndView getMy_View_Scenario_Completed(Principal principal, Model model) {
-		ModelAndView mav = new ModelAndView("My_View_Scenario");
+	public ModelAndView getMy_View_Scenario_Completed(Principal principal, Model model, HttpSession session) {
+
+		ModelAndView mav = new ModelAndView();
+
+		List<String> allowedUrls = (List<String>) session.getAttribute("allowedUrls");
+
+		if (allowedUrls == null || !allowedUrls.contains("/guac/My_Scenario_Completed")) {
+			mav.setViewName("redirect:/403");
+			return mav;
+		}
+
 		JSONArray finalArray = new JSONArray();
 
 		try {
@@ -5035,6 +5150,7 @@ public class GuacamoleController {
 			System.out.println("Error fetching data: " + e.getMessage());
 		}
 
+		mav.setViewName("My_View_Scenario");
 		return mav;
 	}
 
@@ -5072,8 +5188,15 @@ public class GuacamoleController {
 	@PostMapping("/addplaylist_Scenario")
 	@ResponseBody
 	public String addScenarioToPlaylist(@RequestParam("playlistId") int playlistId,
-			@RequestParam("scenarioId") List<Integer> scenarioIds) {
+			@RequestParam("scenarioId") List<Integer> scenarioIds, HttpSession session) {
 		try {
+
+			String access = (String) session.getAttribute("access");
+
+			if (access == null || access.equalsIgnoreCase("READ")) {
+				return "redirect:/403";
+			}
+
 			Playlist playlist = PlaylistRepository.findById(playlistId)
 					.orElseThrow(() -> new RuntimeException("Playlist not found"));
 
@@ -6079,8 +6202,14 @@ public class GuacamoleController {
 	}
 
 	@PostMapping("/addSubPlaylist_Scenario")
-	public String addSubPlaylist_Scenario(@RequestParam("subPlaylistId") Integer subPlaylistId,
+	public @ResponseBody String addSubPlaylist_Scenario(@RequestParam("subPlaylistId") Integer subPlaylistId, HttpSession session,
 			@RequestParam("scenarioIds") List<Integer> scenarioIds) {
+		
+		String access =  (String) session.getAttribute("access");
+
+	    if (access == null || access.equalsIgnoreCase("READ")) {
+	    	return "fail";
+	    }
 
 		// ✅ Fetch existing SubPlaylist
 		SubPlaylist subPlaylist = SubPlaylistRepository.findById(subPlaylistId)
@@ -6097,7 +6226,8 @@ public class GuacamoleController {
 			SubPlaylistScenarioRepository.save(joinEntity);
 		}
 
-		return "redirect:/guac/View_Particular_Playlist?Id=" + subPlaylistId;
+//		return "redirect:/guac/View_Particular_Playlist?Id=" + subPlaylistId;
+		return "success";
 	}
 
 	@GetMapping("/removeSubPlaylistItem")
@@ -6420,8 +6550,18 @@ public class GuacamoleController {
 //	}
 
 	@GetMapping("/UserWisePerformance")
-	public ModelAndView getAllUsersTaskPerformance(Model model, Principal principal) {
+	public ModelAndView getAllUsersTaskPerformance(Model model, Principal principal, HttpSession session) {
 		ModelAndView mav = new ModelAndView("UserWisePerformance");
+
+		List<String> allowedUrls = (List<String>) session.getAttribute("allowedUrls");
+
+		if (allowedUrls == null || !allowedUrls.contains("/guac/UserWisePerformance")) {
+			mav.setViewName("redirect:/403");
+			return mav;
+		}
+
+		mav.setViewName("UserWisePerformance");
+
 		JSONArray finalArray = new JSONArray();
 
 		try {
@@ -6535,8 +6675,20 @@ public class GuacamoleController {
 	}
 
 	@GetMapping("/UserNameTaskPerformance")
-	public ModelAndView getUserTaskPerformance(Model model, Principal principal, @RequestParam String username) {
-		ModelAndView mav = new ModelAndView("UserTaskPerformance");
+	public ModelAndView getUserTaskPerformance(Model model, Principal principal, HttpSession session,
+			@RequestParam String username) {
+
+		ModelAndView mav = new ModelAndView();
+
+		List<String> allowedUrls = (List<String>) session.getAttribute("allowedUrls");
+
+		if (allowedUrls == null || !allowedUrls.contains("/guac/UserNameTaskPerformance")) {
+			mav.setViewName("redirect:/403");
+			return mav;
+		}
+
+		mav.setViewName("UserTaskPerformance");
+
 		JSONArray finalArray = new JSONArray();
 
 		try {
@@ -8198,7 +8350,13 @@ public class GuacamoleController {
 	}
 
 	@GetMapping("/subjectView")
-	public String subjectView(Model model, Principal principal) {
+	public String subjectView(Model model, Principal principal, HttpSession session) {
+
+		List<String> allowedUrls = (List<String>) session.getAttribute("allowedUrls");
+
+		if (allowedUrls == null || !allowedUrls.contains("/guac/subjectView")) {
+			return "redirect:/403";
+		}
 
 		try {
 			// Verify user exists
@@ -8488,9 +8646,15 @@ public class GuacamoleController {
 	}
 
 	@GetMapping("/teachers")
-	public String getAllTeachers(Model model, Principal principal) {
+	public String getAllTeachers(Model model, Principal principal, HttpSession session) {
 		if (principal == null) {
 			return "redirect:/";
+		}
+
+		List<String> allowedUrls = (List<String>) session.getAttribute("allowedUrls");
+
+		if (allowedUrls == null || !allowedUrls.contains("/guac/teachers")) {
+			return "redirect:/403";
 		}
 
 		Authentication authentication = (Authentication) principal;
@@ -11304,7 +11468,14 @@ public class GuacamoleController {
 	}
 
 	@GetMapping("/subjectsreport")
-	public String getAllSubjectsReport(Model model, Principal principal) {
+	public String getAllSubjectsReport(Model model, Principal principal, HttpSession session) {
+
+		List<String> allowedUrls = (List<String>) session.getAttribute("allowedUrls");
+
+		if (allowedUrls == null || !allowedUrls.contains("/guac/subjectsreport")) {
+			return "redirect:/403";
+		}
+
 		try {
 			// Get current user info
 			String currentUsername = principal.getName();
@@ -11382,7 +11553,14 @@ public class GuacamoleController {
 	}
 
 	@GetMapping("/subjectsscenariosreport")
-	public String getAllSubjectsScenariosReport(Model model, Principal principal) {
+	public String getAllSubjectsScenariosReport(Model model, Principal principal, HttpSession session) {
+
+		List<String> allowedUrls = (List<String>) session.getAttribute("allowedUrls");
+
+		if (allowedUrls == null || !allowedUrls.contains("/guac/subjectsscenariosreport")) {
+			return "redirect:/403";
+		}
+
 		try {
 			// Get current user info
 			String currentUsername = principal.getName();
@@ -11594,165 +11772,166 @@ public class GuacamoleController {
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> compareMarks(@RequestParam int labId, @RequestParam String reason) {
 
-	    Map<String, Object> response = new HashMap<>();
-	    System.out.println("::: assessmentmarkCompleted :::");
-	    try {
+		Map<String, Object> response = new HashMap<>();
+		System.out.println("::: assessmentmarkCompleted :::");
+		try {
 
-	        List<AssessmentUserLab> assessment = assessmentUserLabRepository.findByguacamoleId(labId);
-	        if (assessment == null || assessment.isEmpty()) {
-	            response.put("success", false);
-	            response.put("error", "Assessment not found");
-	            return ResponseEntity.badRequest().body(response);
-	        }
+			List<AssessmentUserLab> assessment = assessmentUserLabRepository.findByguacamoleId(labId);
+			if (assessment == null || assessment.isEmpty()) {
+				response.put("success", false);
+				response.put("error", "Assessment not found");
+				return ResponseEntity.badRequest().body(response);
+			}
 
-	        AssessmentUserLab assessmentLab = assessment.get(0); // Get the first assessment
-	        Long LabId = assessmentLab.getLabId();
-	        String labName = assessmentLab.getInstanceName();
-	        int labIdInt = LabId.intValue();
-	        System.out.println("LabId :::"+labIdInt);
-	        System.out.println("labName :::"+labName);
-	        
-	        // 2. Get expected commands from assessment_userwise_chatboat_instruction_template by labId
-	        List<AssessmentUserWiseChatBoatInstructionTemplate> expectedCommands = assessmentInstructionTemplateRepository
-	                .findByLabId(labIdInt);
+			AssessmentUserLab assessmentLab = assessment.get(0); // Get the first assessment
+			Long LabId = assessmentLab.getLabId();
+			String labName = assessmentLab.getInstanceName();
+			int labIdInt = LabId.intValue();
+			System.out.println("LabId :::" + labIdInt);
+			System.out.println("labName :::" + labName);
 
-	        // 3. Get performed commands from commandhistory table by lab name
-	        List<CommandHistory> performedCommands = CommandHistoryRepository.findByContainerName(labName);
+			// 2. Get expected commands from
+			// assessment_userwise_chatboat_instruction_template by labId
+			List<AssessmentUserWiseChatBoatInstructionTemplate> expectedCommands = assessmentInstructionTemplateRepository
+					.findByLabId(labIdInt);
 
-	        // 4. Compare commands and update isCommandExecuted status
-	        int totalCommands = expectedCommands.size();
-	        int executedCommands = 0;
+			// 3. Get performed commands from commandhistory table by lab name
+			List<CommandHistory> performedCommands = CommandHistoryRepository.findByContainerName(labName);
 
-	        for (AssessmentUserWiseChatBoatInstructionTemplate expectedCommand : expectedCommands) {
-	            boolean commandFound = false;
-	            
-	            for(CommandHistory currentCommand : performedCommands) {
-	                // Compare the commands - you might want to use contains, equals, or some pattern matching
-	                if(currentCommand.getCommand().contains(expectedCommand.getInstructionCommand()) || 
-	                   expectedCommand.getInstructionCommand().contains(currentCommand.getCommand())) {
-	                    
-	                    // Update the expected command as executed
-	                    expectedCommand.setIsCommandExecuted("true");
-	                    expectedCommand.setCommandExecutedCheckTime(new Timestamp(System.currentTimeMillis()));
-	                    
-	                    // Save the updated entity
-	                    assessmentInstructionTemplateRepository.save(expectedCommand);
-	                    
-	                    executedCommands++;
-	                    commandFound = true;
-	                    break; // No need to check other performed commands for this expected command
-	                }
-	            }
-	            
-	            // Optional: Mark as not executed if not found
-	            if (!commandFound && !"true".equals(expectedCommand.getIsCommandExecuted())) {
-	                expectedCommand.setIsCommandExecuted("false");
-	                expectedCommand.setCommandExecutedCheckTime(new Timestamp(System.currentTimeMillis()));
-	                assessmentInstructionTemplateRepository.save(expectedCommand);
-	            }
-	        }
+			// 4. Compare commands and update isCommandExecuted status
+			int totalCommands = expectedCommands.size();
+			int executedCommands = 0;
 
-	        // 5. Update AssessmentUserLab Status to "Completed"
-	        assessmentLab.setStatus("Completed");
-	        assessmentUserLabRepository.save(assessmentLab);
+			for (AssessmentUserWiseChatBoatInstructionTemplate expectedCommand : expectedCommands) {
+				boolean commandFound = false;
 
-	        // Calculate completion percentage
-	        double completionPercentage = totalCommands > 0 ? (double) executedCommands / totalCommands * 100 : 0;
+				for (CommandHistory currentCommand : performedCommands) {
+					// Compare the commands - you might want to use contains, equals, or some
+					// pattern matching
+					if (currentCommand.getCommand().contains(expectedCommand.getInstructionCommand())
+							|| expectedCommand.getInstructionCommand().contains(currentCommand.getCommand())) {
 
-	        response.put("success", true);
-	        response.put("message", "Command comparison completed successfully");
-	        response.put("totalCommands", totalCommands);
-	        response.put("executedCommands", executedCommands);
-	        response.put("completionPercentage", completionPercentage);
-	        response.put("labId", labId);
-	        response.put("labStatus", "Completed");
+						// Update the expected command as executed
+						expectedCommand.setIsCommandExecuted("true");
+						expectedCommand.setCommandExecutedCheckTime(new Timestamp(System.currentTimeMillis()));
 
-	        return ResponseEntity.ok(response);
+						// Save the updated entity
+						assessmentInstructionTemplateRepository.save(expectedCommand);
 
-	    } catch (Exception e) {
-	        e.printStackTrace(); // Better logging
-	        response.put("success", false);
-	        response.put("error", "Failed to compare commands: " + e.getMessage());
-	        return ResponseEntity.internalServerError().body(response);
-	    }
+						executedCommands++;
+						commandFound = true;
+						break; // No need to check other performed commands for this expected command
+					}
+				}
+
+				// Optional: Mark as not executed if not found
+				if (!commandFound && !"true".equals(expectedCommand.getIsCommandExecuted())) {
+					expectedCommand.setIsCommandExecuted("false");
+					expectedCommand.setCommandExecutedCheckTime(new Timestamp(System.currentTimeMillis()));
+					assessmentInstructionTemplateRepository.save(expectedCommand);
+				}
+			}
+
+			// 5. Update AssessmentUserLab Status to "Completed"
+			assessmentLab.setStatus("Completed");
+			assessmentUserLabRepository.save(assessmentLab);
+
+			// Calculate completion percentage
+			double completionPercentage = totalCommands > 0 ? (double) executedCommands / totalCommands * 100 : 0;
+
+			response.put("success", true);
+			response.put("message", "Command comparison completed successfully");
+			response.put("totalCommands", totalCommands);
+			response.put("executedCommands", executedCommands);
+			response.put("completionPercentage", completionPercentage);
+			response.put("labId", labId);
+			response.put("labStatus", "Completed");
+
+			return ResponseEntity.ok(response);
+
+		} catch (Exception e) {
+			e.printStackTrace(); // Better logging
+			response.put("success", false);
+			response.put("error", "Failed to compare commands: " + e.getMessage());
+			return ResponseEntity.internalServerError().body(response);
+		}
 	}
 
-	
 	@GetMapping("/viewVMs/{serverIP}")
 	public ModelAndView viewVMsByPhysicalServer(@PathVariable String serverIP, Principal principal) {
-	    ModelAndView mav = new ModelAndView("View_ServerIp_Vm_Listing");
-	    
-	    // Get the username of the authenticated user
-	    Authentication auth = (Authentication) principal;
-	    String username = auth.getName();
+		ModelAndView mav = new ModelAndView("View_ServerIp_Vm_Listing");
 
-	    // Fetch all labs for the authenticated user
-	    List<UserLab> labs = UserLabRepository.findAll();
+		// Get the username of the authenticated user
+		Authentication auth = (Authentication) principal;
+		String username = auth.getName();
 
-	    // Filter labs by physical server IP and add additional data
-	    List<Map<String, Object>> labData = new ArrayList<>();
-	    for (UserLab lab : labs) {
-	        // Fetch CloudInstance by instance name
-	        String instanceName = lab.getTemplateName();
-	        List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
+		// Fetch all labs for the authenticated user
+		List<UserLab> labs = UserLabRepository.findAll();
 
-	        // Check if this VM belongs to the specified physical server
-	        if (!cloudInstances.isEmpty()) {
-	            CloudInstance instance = cloudInstances.get(0);
-	            String physicalServerIP = instance.getPhysicalServerIP();
-	            
-	            // Only include VMs that belong to the specified physical server
-	            if (serverIP.equals(physicalServerIP)) {
-	                Map<String, Object> map = new HashMap<>();
-	                map.put("lab", lab);
+		// Filter labs by physical server IP and add additional data
+		List<Map<String, Object>> labData = new ArrayList<>();
+		for (UserLab lab : labs) {
+			// Fetch CloudInstance by instance name
+			String instanceName = lab.getTemplateName();
+			List<CloudInstance> cloudInstances = repository.findByInstanceName(instanceName);
 
-	                String templateName = instance.getInstance_name();
-	                String password = instance.getInstance_password();
-	                String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
+			// Check if this VM belongs to the specified physical server
+			if (!cloudInstances.isEmpty()) {
+				CloudInstance instance = cloudInstances.get(0);
+				String physicalServerIP = instance.getPhysicalServerIP();
 
-	                // Store OS and PhysicalServerIP
-	                map.put("os", os);
-	                map.put("PhysicalServerIP", physicalServerIP);
+				// Only include VMs that belong to the specified physical server
+				if (serverIP.equals(physicalServerIP)) {
+					Map<String, Object> map = new HashMap<>();
+					map.put("lab", lab);
 
-	                // Handle Scenario data
-	                int ScenarioId = lab.getScenarioId();
-	                Optional<Add_Scenario> Scenariolist = ScenarioRepository.findById(ScenarioId);
+					String templateName = instance.getInstance_name();
+					String password = instance.getInstance_password();
+					String os = instance.getSubproduct_id().getProduct_id().getProduct_name();
 
-	                if (Scenariolist.isPresent()) {
-	                    Add_Scenario Scenarioinstance = Scenariolist.get();
-	                    String ScenarioName = Scenarioinstance.getScenarioName();
-	                    map.put("ScenarioName", ScenarioName);
-	                } else {
-	                    map.put("ScenarioName", "N/A");
-	                }
+					// Store OS and PhysicalServerIP
+					map.put("os", os);
+					map.put("PhysicalServerIP", physicalServerIP);
 
-	                // Handle LabId
-	                Long labIdLong = lab.getLabId();
-	                int labId = labIdLong.intValue();
+					// Handle Scenario data
+					int ScenarioId = lab.getScenarioId();
+					Optional<Add_Scenario> Scenariolist = ScenarioRepository.findById(ScenarioId);
 
-	                // Get true and false counts for completion
-	                Integer falseCountObj = instructionTemplateRepository.getfalseCompletionCountsByTemplateName(labId);
-	                Integer trueCountObj = instructionTemplateRepository.gettrueCompletionCountsByTemplateName(labId);
+					if (Scenariolist.isPresent()) {
+						Add_Scenario Scenarioinstance = Scenariolist.get();
+						String ScenarioName = Scenarioinstance.getScenarioName();
+						map.put("ScenarioName", ScenarioName);
+					} else {
+						map.put("ScenarioName", "N/A");
+					}
 
-	                // Handle null values
-	                int falseCount = (falseCountObj != null) ? falseCountObj : 0;
-	                int trueCount = (trueCountObj != null) ? trueCountObj : 0;
+					// Handle LabId
+					Long labIdLong = lab.getLabId();
+					int labId = labIdLong.intValue();
 
-	                // Calculate total and percentage
-	                int total = trueCount + falseCount;
-	                int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
-	                map.put("percentage", percentage);
+					// Get true and false counts for completion
+					Integer falseCountObj = instructionTemplateRepository.getfalseCompletionCountsByTemplateName(labId);
+					Integer trueCountObj = instructionTemplateRepository.gettrueCompletionCountsByTemplateName(labId);
 
-	                labData.add(map);
-	            }
-	        }
-	    }
+					// Handle null values
+					int falseCount = (falseCountObj != null) ? falseCountObj : 0;
+					int trueCount = (trueCountObj != null) ? trueCountObj : 0;
 
-	    // Add the lab data and server IP to the model
-	    mav.addObject("labData", labData);
-	    mav.addObject("physicalServerIP", serverIP);
-	    mav.addObject("pageTitle", "VMs on Server: " + serverIP);
+					// Calculate total and percentage
+					int total = trueCount + falseCount;
+					int percentage = (total == 0) ? 0 : (trueCount * 100 / total);
+					map.put("percentage", percentage);
 
-	    return mav;
+					labData.add(map);
+				}
+			}
+		}
+
+		// Add the lab data and server IP to the model
+		mav.addObject("labData", labData);
+		mav.addObject("physicalServerIP", serverIP);
+		mav.addObject("pageTitle", "VMs on Server: " + serverIP);
+
+		return mav;
 	}
 }
