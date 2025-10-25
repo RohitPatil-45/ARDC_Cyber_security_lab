@@ -414,6 +414,33 @@ body {
 	box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
 	color: white;
 }
+
+/* Score Display Styles */
+.score-display {
+	margin: 20px 0;
+	padding: 15px;
+	background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(33, 136, 56, 0.1));
+	border: 1px solid #28a745;
+	border-radius: 10px;
+}
+
+.score-value {
+	font-size: 2.5rem;
+	font-weight: bold;
+	color: #28a745;
+	margin: 10px 0;
+}
+
+.score-max {
+	color: #a0aec0;
+	font-size: 1.1rem;
+}
+
+.score-message {
+	color: #a0aec0;
+	font-size: 1rem;
+	margin-top: 10px;
+}
 </style>
 
 <link rel="stylesheet" th:href="@{/webtemplate/css/style_connetion.css}">
@@ -497,11 +524,6 @@ body {
 								</div>
 							</div>
 							
-<!-- 							<h5 class="mb-3" style="color: aliceblue;">Connection Details</h5> -->
-<!-- 							<div id="connection_details"> -->
-								<!-- Connection details will be dynamically loaded here -->
-<!-- 							</div> -->
-							
 							<!-- Assessment Progress -->
 							<div style="margin-top: 20px; padding: 15px; background-color: rgba(138, 43, 226, 0.1); border-radius: 8px;">
 								<h6 style="color: var(--assessment-color); margin-bottom: 10px;">
@@ -541,7 +563,15 @@ body {
 				<i class="fas fa-check-circle"></i>
 			</div>
 			<h2 class="lab-completion-title">Lab Completed Successfully!</h2>
-			<p class="lab-completion-message">
+			
+			<!-- Score Display Section -->
+			<div class="score-display" id="scoreDisplay" style="display: none;">
+				<div class="score-value" id="obtainedScore">0</div>
+				<div class="score-max">out of <span id="totalScore">0</span> points</div>
+				<div class="score-message" id="scoreMessage">Calculating your performance...</div>
+			</div>
+			
+			<p class="lab-completion-message" id="completionMessage">
 				Congratulations! You have successfully completed the lab assessment.<br>
 				Your performance has been recorded and scored.
 			</p>
@@ -569,24 +599,58 @@ body {
 			const path = window.location.pathname;
 			const parts = path.split('/');
 			const labId = parts[parts.length - 1];
-			const scenarioId = parts[parts.length - 2]; // Assuming URL pattern: /guac/assessmentviewPlaylistConnection/{scenarioId}/{labId}
+			const scenarioId = parts[parts.length - 2];
 			return { labId, scenarioId };
 		}
 		
 		// Function to redirect to previous page or scenario page
 		function redirectToPreviousPage() {
-			if (currentScenarioId) {
-				// Redirect to scenario page
-				window.location.href = `/guac/assessmentviewPlaylistConnection/${currentScenarioId}`;
-			} else {
-				// Go back to previous page
-				window.history.back();
-			}
+			
+			markAssessmentCompleted('Completed Before Time');
+			
+			window.history.back();
+			
+			
 		}
 
-		// Function to show lab completion modal
-		function showLabCompletionModal() {
+		// Function to show lab completion modal with score
+		function showLabCompletionModal(scoreData) {
 			const modal = document.getElementById('labCompletionModal');
+			const scoreDisplay = document.getElementById('scoreDisplay');
+			const obtainedScore = document.getElementById('obtainedScore');
+			const totalScore = document.getElementById('totalScore');
+			const scoreMessage = document.getElementById('scoreMessage');
+			const completionMessage = document.getElementById('completionMessage');
+			
+			// Display score if available
+			if (scoreData && scoreData.success) {
+				scoreDisplay.style.display = 'block';
+				obtainedScore.textContent = scoreData.obtainedMarks || 0;
+				totalScore.textContent = scoreData.totalMarks || 0;
+				
+				// Custom message based on score
+				const percentage = ((scoreData.obtainedMarks / scoreData.totalMarks) * 100) || 0;
+				if (percentage >= 80) {
+					scoreMessage.textContent = 'Excellent work! You have mastered this assessment.';
+					scoreMessage.style.color = '#28a745';
+				} else if (percentage >= 60) {
+					scoreMessage.textContent = 'Good job! You have passed the assessment.';
+					scoreMessage.style.color = '#ffc107';
+				} else {
+					scoreMessage.textContent = 'Keep practicing! You can do better next time.';
+					scoreMessage.style.color = '#dc3545';
+				}
+				
+				completionMessage.innerHTML = 
+					`Your assessment has been completed and scored.<br>
+					 Detailed performance analysis is available in your dashboard.`;
+			} else {
+				scoreDisplay.style.display = 'none';
+				completionMessage.innerHTML = 
+					`Congratulations! You have successfully completed the lab assessment.<br>
+					 Your performance has been recorded and scored.`;
+			}
+			
 			modal.style.display = 'flex';
 			
 			// Disable all controls
@@ -597,6 +661,30 @@ body {
 			
 			// Stop the timer
 			clearInterval(assessmentTimer);
+		}
+
+		// Function to compare marks and get score
+		function compareMarksAndGetScore(labId, reason) {
+			return new Promise((resolve, reject) => {
+				$.ajax({
+					type: "POST",
+					url: "/guac/assessmentcompareMarks",
+					data: {
+						labId: labId,
+						reason: reason,
+						completionTime: new Date().toISOString(),
+						tabSwitches: tabSwitchCount,
+						mandatoryCommandExecuted: mandatoryCommandExecuted
+					},
+					success: function(response) {
+						resolve(response);
+					},
+					error: function(error) {
+						console.error('Failed to compare marks:', error);
+						reject(error);
+					}
+				});
+			});
 		}
 
 		// Timer functionality
@@ -669,43 +757,45 @@ body {
 			        color: 'white'
 			    }).then(() => {
 			        markAssessmentCompleted('Tab switching violation');
-			        window.history.back(); // Go back to previous page
 			    });
 			}
 		}
 
 		// Function to mark assessment as completed and redirect
-		function markAssessmentCompleted(reason) {
+		 function markAssessmentCompleted(reason) {
 			if (assessmentCompleted) return;
 			
 			assessmentCompleted = true;
 			clearInterval(assessmentTimer);
 			
-			// Update UI
+			
 			document.getElementById('assessmentStatus').innerHTML = 
 				'<i class="fas fa-check-circle" style="color: #28a745;"></i> Completed';
 			document.getElementById('assessmentStatus').style.color = '#28a745';
-			
-			// Send completion to server
-			$.ajax({
-				type: "POST",
-				url: "/guac/assessment/markCompleted",
-				data: {
-					labId: currentLabId,
-					reason: reason
-				},
-				success: function(response) {
-					console.log('Assessment marked as completed:', response);
-					
-					// Show completion modal instead of SweetAlert
-					showLabCompletionModal();
-				},
-				error: function(error) {
-					console.error('Failed to mark assessment completed:', error);
-					// Still show completion modal even if there's an error
-					showLabCompletionModal();
-				}
-			});
+// 			alert("completed")
+			try {
+				// First mark assessment as completed
+				 $.ajax({
+					type: "POST",
+					url: "/guac/assessmentmarkCompleted",
+					data: {
+						labId: currentLabId,
+						reason: reason
+					}
+				});
+				
+				console.log('Assessment marked as completed:', markCompletedResponse);
+				
+				// Then compare marks and get score
+				
+				// Show completion modal with score
+				showLabCompletionModal(scoreData);
+				
+			} catch (error) {
+				console.error('Failed to complete assessment process:', error);
+				// Still show completion modal even if there's an error
+				showLabCompletionModal();
+			}
 		}
 
 		// Function to check mandatory command status

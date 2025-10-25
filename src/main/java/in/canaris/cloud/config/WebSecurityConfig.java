@@ -85,11 +85,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// For ADMIN only.
 		http.authorizeRequests().antMatchers("/admin", "/discount/*", "/	/*")
-				.access("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPERADMIN')")
-				.antMatchers("/cloud_instance/*").access("hasRole('ROLE_SUPERADMIN')");
-		
-		
-		
+				.access("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPERADMIN')");
 
 		// When the user has logged in as XX.
 		// But access a page that requires role YY,
@@ -109,7 +105,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
 				List<String> allowedSubModules = roleMenuTemplateRepository.findUrlsByTemplateName(userObj.getTemplateName());
-				System.out.println("Allowed sub modules = "+allowedSubModules);
+				System.out.println("Allowed urls = "+allowedSubModules);
 				request.getSession().setAttribute("allowedSubModules", allowedSubModules);
 
 				List<String> allowedModules = roleMenuTemplateRepository
@@ -132,8 +128,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				} else if (roles.contains("ROLE_ADMIN")) {
 					landingpageURl = "/guac/admin-dashboard";
 				} else if (roles.contains("ROLE_USER")) {
-					landingpageURl = "/guac/UserWise_Dashboard";
-//					landingpageURl = "/guac/subjectView";
+//					landingpageURl = "/guac/UserWise_Dashboard";
+					landingpageURl = "/guac/subjectView";
 				} else if (roles.contains("ROLE_TEACHER")) {
 					landingpageURl = "/guac/teacher-dashboard";
 				} else if (roles.contains("ROLE_HOD")) {

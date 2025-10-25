@@ -18,7 +18,6 @@
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
 								<li class="breadcrumb-item"><a href="/guac/physicalServerHealth">Physical Server Health</a></li>
-<!-- 								<li class="breadcrumb-item active">Physical Servers</li> -->
 							</ol>
 						</div>
 					</div>
@@ -80,13 +79,23 @@
 												<td>[[${obj.virtualization_type}]]</td>
 												<td>[[${obj.ssh_host}]]</td>
 												<td>[[${obj.ssh_password}]]</td>
-												<td><a th:href="@{'/'+${action_name}+'/edit/' + ${obj.id}}"
-													title="Edit this Physical Server"
-													class="fa fa-edit"></a> &nbsp; <a
-													th:href="@{'/'+${action_name}+'/delete/' + ${obj.id}}"
-													th:tutorialTitle="${obj.serverIP}" id="btnDelete"
-													title="Delete this Physical Server"
-													class="fa fa-trash btn-delete"></a></td>
+												<td>
+													<!-- View VMs Button -->
+													<a th:href="@{'/guac/viewVMs/' + ${obj.serverIP}}"
+														title="View VMs on this server"
+														class="fa fa-eye text-primary mr-2"></a> 
+													
+													<!-- Edit Button -->
+													<a th:href="@{'/'+${action_name}+'/edit/' + ${obj.id}}"
+														title="Edit this Physical Server"
+														class="fa fa-edit text-info mr-2"></a> 
+													
+													<!-- Delete Button -->
+													<a th:href="@{'/'+${action_name}+'/delete/' + ${obj.id}}"
+														th:tutorialTitle="${obj.serverIP}" id="btnDelete"
+														title="Delete this Physical Server"
+														class="fa fa-trash btn-delete text-danger"></a>
+												</td>
 											</tr>
 										</tbody>
 									</table>
@@ -146,5 +155,4 @@
 				});
 	</script>
 </body>
-
 </html>

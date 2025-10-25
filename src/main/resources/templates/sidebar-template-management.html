@@ -384,15 +384,15 @@ body {
 														</small>
 													</div>
 													<div class="row role-filter-options">
-														<!-- 														<div class="col-md-2 mb-3"> -->
-														<!-- 															<div class="card role-filter-option active" data-role="all"> -->
-														<!-- 																<div class="card-body text-center p-3"> -->
-														<!-- 																	<i class="fas fa-users fa-2x mb-2"></i> -->
-														<!-- 																	<h6 class="card-title">All Roles</h6> -->
-														<!-- 																	<span class="badge role-badge role-all">All</span> -->
-														<!-- 																</div> -->
-														<!-- 															</div> -->
-														<!-- 														</div> -->
+<!-- 														<div class="col-md-2 mb-3"> -->
+<!-- 															<div class="card role-filter-option active" data-role="all"> -->
+<!-- 																<div class="card-body text-center p-3"> -->
+<!-- 																	<i class="fas fa-users fa-2x mb-2"></i> -->
+<!-- 																	<h6 class="card-title">All Roles</h6> -->
+<!-- 																	<span class="badge role-badge role-all">All</span> -->
+<!-- 																</div> -->
+<!-- 															</div> -->
+<!-- 														</div> -->
 														<div class="col-md-2 mb-3">
 															<div class="card role-filter-option"
 																data-role="superadmin">
@@ -450,7 +450,7 @@ body {
 																		class="badge bg-primary counter-badge"
 																		id="menuItemCount">0 items</span>
 																</div>
-																<button type="button"
+																<button type="button" style="display: none"
 																	class="btn btn-outline-primary btn-sm"
 																	id="resetRoleFilter">
 																	<i class="fas fa-sync-alt me-1"></i>Reset Filter
@@ -477,7 +477,7 @@ body {
 																	include in your template</small>
 															</div>
 															<div class="d-flex align-items-center">
-																<div class="form-check form-switch me-3">
+																<div class="form-check form-switch me-3" style="display: none">
 																	<input class="form-check-input" type="checkbox"
 																		id="showRoleIndicators" checked> <label
 																		class="form-check-label" for="showRoleIndicators">
@@ -506,7 +506,7 @@ body {
 																</div>
 																<button type="button"
 																	class="btn btn-sm btn-outline-secondary toggle-module">
-																	<i class="fas fa-chevron-down"></i>
+																	<i class="fas fa-chevron-up"></i>
 																</button>
 															</div>
 															<div class="menu-items">
@@ -521,7 +521,7 @@ body {
 																				class="form-check-label"
 																				th:for="'menu_' + ${menu.menuId}"> <span
 																				th:text="${menu.subModuleName} ?: 'Unnamed Item'">Sub
-																					Module</span> <!-- 																				<small th:if="${menu.url}" class="text-muted d-block" th:text="${menu.url}">URL</small> -->
+																					Module</span> 
 																				<div class="menu-role-indicators">
 																					<span
 																						class="menu-role-indicator menu-role-superadmin"
@@ -597,22 +597,9 @@ body {
 		src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect/dist/js/bootstrap-multiselect.min.js"></script>
 
 	<script type="text/javascript">
-		// Hardcoded role-based menu data based on your database entries
+		// Updated role-based menu data with all menu items and correct role assignments
 		const menuRoles = {
 			// Master Module (menu_id 1-10, 51)
-// 			1: ['superadmin', 'admin'], // Group Master
-// 			2: ['superadmin', 'admin'], // Location Master
-// 			3: ['superadmin', 'admin'], // Category
-// 			4: ['superadmin', 'admin'], // Discount Master
-// 			5: ['superadmin', 'admin'], // Mail Master
-// 			6: ['superadmin', 'admin'], // Physical Server Master
-// 			7: ['superadmin', 'admin'], // VM Location Path Master
-// 			8: ['superadmin', 'admin'], // Switch
-// 			9: ['superadmin', 'admin'], // Discover
-// 			10: ['superadmin', 'admin'], // Billing
-// 			51: ['superadmin', 'admin'], // Manage Scope
-
-
 			1: ['superadmin'], // Group Master
 			2: ['superadmin'], // Location Master
 			3: ['superadmin'], // Category
@@ -625,60 +612,37 @@ body {
 			10: ['superadmin'], // Billing
 			51: ['superadmin'], // Manage Scope
 			
+			
 			// Dashboard Module (menu_id 11)
 			11: ['superadmin'], // SuperAdmin Dashboard
 			
 			// Templates Module (menu_id 12-13)
-// 			12: ['superadmin', 'admin'], // Create Template
-// 			13: ['superadmin', 'admin'], // View Template
-
-12: ['superadmin'], // Create Template
+			12: ['superadmin'], // Create Template
 			13: ['superadmin'], // View Template
 			
 			// Scenarios Module (menu_id 14-15)
-// 			14: ['superadmin', 'admin', 'teacher'], // Create Scenario
-// 			15: ['superadmin', 'admin', 'teacher', 'user'], // View Scenario
-
 			14: ['superadmin'], // Create Scenario
 			15: ['superadmin'], // View Scenario
 			
 			// Playlists Module (menu_id 16-17)
-// 			16: ['superadmin', 'admin', 'teacher'], // Create Playlist
-// 			17: ['superadmin', 'admin', 'teacher', 'user'], // View Playlist
-
 			16: ['superadmin'], // Create Playlist
 			17: ['superadmin'], // View Playlist
 			
 			// Sub-Playlists Module (menu_id 18-19)
-// 			18: ['superadmin', 'admin', 'teacher'], // Create Sub Playlist
-// 			19: ['superadmin', 'admin', 'teacher', 'user'], // View Sub Playlist
-
 			18: ['superadmin'], // Create Sub Playlist
 			19: ['superadmin'], // View Sub Playlist
 			
 			// Scenario Mapping Module (menu_id 20-22)
-// 			20: ['superadmin', 'admin', 'teacher'], // Map Scenario in Sub-Playlist
-// 			21: ['superadmin', 'admin', 'teacher'], // Map Scenario & Sub-Playlist In Playlist
-// 			22: ['superadmin', 'admin', 'teacher'], // Map Scenario to Subject
-
 			20: ['superadmin'], // Map Scenario in Sub-Playlist
 			21: ['superadmin'], // Map Scenario & Sub-Playlist In Playlist
 			22: ['superadmin'], // Map Scenario to Subject
 			
 			// In Progress Task Module (menu_id 23-24)
-// 			23: ['superadmin', 'admin', 'teacher', 'user'], // My Scenario Inprogress
-// 			24: ['superadmin', 'admin', 'teacher', 'user'], // My Scenario Completed
-
-			23: ['superadmin'], // My Scenario Inprogress
-			24: ['superadmin'], // My Scenario Completed
+			23: ['superadmin', 'teacher','admin','hod'], // My Scenario Inprogress
+			24: ['superadmin', 'teacher','admin','hod'], // My Scenario Completed
 			
 			// Docker Management Module (menu_id 25-28)
-// 			25: ['superadmin', 'admin'], // Discover Docker
-// 			26: ['superadmin', 'admin'], // Create Docker Network
-// 			27: ['superadmin', 'admin'], // View Docker Network
-// 			28: ['superadmin', 'admin'], // View Discover Container
-
-	25: ['superadmin'], // Discover Docker
+			25: ['superadmin'], // Discover Docker
 			26: ['superadmin'], // Create Docker Network
 			27: ['superadmin'], // View Docker Network
 			28: ['superadmin'], // View Discover Container
@@ -698,21 +662,10 @@ body {
 			52: ['user'], // Home-User
 			
 			// User Management Module (menu_id 37-38)
-// 			37: ['superadmin', 'admin'], // Users
-// 			38: ['superadmin', 'admin'], // Teachers
-
 			37: ['superadmin'], // Users
 			38: ['superadmin'], // Teachers
 			
 			// University Management Module (menu_id 39-44)
-// 			39: ['superadmin', 'admin', 'hod'], // Department
-// 			40: ['superadmin', 'admin', 'hod'], // Course
-// 			41: ['superadmin', 'admin', 'hod'], // Semester
-// 			42: ['superadmin', 'admin', 'hod'], // Subject
-// 			43: ['superadmin', 'admin', 'hod'], // Add Batch
-// 			44: ['superadmin', 'admin', 'hod'], // View Batch
-
-// now this will showcase to only to superAdmin if want to show case to other filed like hod,Admin then add here there role
 			39: ['superadmin'], // Department
 			40: ['superadmin'], // Course
 			41: ['superadmin'], // Semester
@@ -721,29 +674,18 @@ body {
 			44: ['superadmin'], // View Batch
 			
 			// Role Management Module (menu_id 45)
-// 			45: ['superadmin', 'admin'], // Assign Role
-
 			45: ['superadmin'], // Assign Role
 			
 			// Performance Management Module (menu_id 46)
-// 			46: ['superadmin', 'admin', 'hod', 'teacher'], // User Wise Performance
-
-			46: ['superadmin'], // User Wise Performance
+			46: ['superadmin',], // User Wise Performance
 			
 			// Lab Management Module (menu_id 47)
-// 			47: ['superadmin', 'admin'], // Labs
-
 			47: ['superadmin'], // Labs
 			
 			// Price Master Module (menu_id 48)
-// 			48: ['superadmin', 'admin'], // View Price
-
 			48: ['superadmin'], // View Price
 			
 			// Product Master Module (menu_id 49-50)
-// 			49: ['superadmin', 'admin'], // Product Master
-// 			50: ['superadmin', 'admin'], // Sub Product Master
-
 			49: ['superadmin'], // Product Master
 			50: ['superadmin'], // Sub Product Master
 			
@@ -753,7 +695,14 @@ body {
 			
 			// Admin Module (menu_id 56-57)
 			56: ['admin'], // Dashboard-Admin
-			57: ['admin'] // Home-Admin
+			57: ['admin'], // Home-Admin
+			
+			// Report Module (menu_id 58-59)
+			58: ['superadmin', 'hod', 'teacher','admin'], // Subject-Report
+			59: ['superadmin', 'hod', 'teacher','admin'],  // Scenario-Report
+			60: ['superadmin'], //viewElectiveMappingPage
+			61: ['superadmin'], //Lab Ideal Management
+			
 		};
 
 		// Current active role filter
@@ -788,8 +737,8 @@ body {
 						selectedRole === 'all' ? 'All Roles' : 
 						selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1);
 					
-					// Filter menu items
-					filterMenuItemsByRole(selectedRole);
+					// Filter menu items and modules
+					filterMenuItemsAndModulesByRole(selectedRole);
 					
 					// Update menu item count
 					updateMenuItemCount();
@@ -841,52 +790,37 @@ body {
 			});
 		}
 		
-		// Filter menu items by role
-// 		function filterMenuItemsByRole(role) {
-// 			const menuItems = document.querySelectorAll('.menu-item');
+		// Filter menu items and modules by role
+		function filterMenuItemsAndModulesByRole(role) {
+			const moduleSections = document.querySelectorAll('.module-section');
 			
-// 			menuItems.forEach(item => {
-// 				const menuId = parseInt(item.id.replace('menu-item-', ''));
-// 				const roles = menuRoles[menuId] || [];
+			moduleSections.forEach(section => {
+				const menuItems = section.querySelectorAll('.menu-item');
+				let hasVisibleItems = false;
 				
-// 				if (role === 'all' || role === 'superadmin' || roles.includes(role)) {
-// 					item.style.display = 'block';
-// 				} else {
-// 					item.style.display = 'none';
-// 				}
-// 			});
+				menuItems.forEach(item => {
+					const menuId = parseInt(item.id.replace('menu-item-', ''));
+					const roles = menuRoles[menuId] || [];
+					
+					if (role === 'all' || roles.includes(role)) {
+						item.style.display = 'block';
+						hasVisibleItems = true;
+					} else {
+						item.style.display = 'none';
+					}
+				});
+				
+				// Show or hide the entire module based on whether it has visible items
+				if (hasVisibleItems) {
+					section.style.display = 'block';
+				} else {
+					section.style.display = 'none';
+				}
+			});
 			
-// 			// Update module item counts
-// 			updateModuleItemCounts();
-// 		}
-		
-		
-		  function filterMenuItemsByRole(role) {
-            const menuItems = document.querySelectorAll('.menu-item');
-            
-            menuItems.forEach(item => {
-                const menuId = parseInt(item.id.replace('menu-item-', ''));
-                const roles = menuRoles[menuId] || [];
-                
-                if (role === 'all') {
-                    // Show all items for "All Roles"
-                    item.style.display = 'block';
-                } else if (role === 'superadmin') {
-                    // SuperAdmin can see all items
-                    item.style.display = 'block';
-                } else {
-                    // For other roles, only show items that belong to that specific role
-                    if (roles.includes(role)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                }
-            });
-            
-            // Update module item counts
-            updateModuleItemCounts();
-        }
+			// Update module item counts
+			updateModuleItemCounts();
+		}
 		
 		// Update role indicators for each menu item
 		function updateRoleIndicators() {
@@ -950,7 +884,7 @@ body {
 					const menuItems = moduleSection.querySelector('.menu-items');
 					
 					if (menuItems.style.display === 'none') {
-						menuItems.style.display = 'none';
+						menuItems.style.display = 'block';
 						this.innerHTML = '<i class="fas fa-chevron-up"></i>';
 					} else {
 						menuItems.style.display = 'none';

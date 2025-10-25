@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:include="template :: headFragment(${pageTitle})">
+<title>Template Details - [[${templateName}]]</title>
+<style>
+    .module-section {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        margin-bottom: 1rem;
+    }
+    .module-header {
+        background-color: #e9ecef;
+        padding: 1rem;
+        border-bottom: 1px solid #dee2e6;
+        font-weight: 600;
+    }
+    .menu-items {
+        padding: 1rem;
+    }
+    .menu-item {
+        padding: 0.5rem;
+        border-bottom: 1px solid #f1f1f1;
+    }
+    .menu-item:last-child {
+        border-bottom: none;
+    }
+</style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div th:replace="fragments/header :: header"></div>
+        <div th:replace="fragments/sidebar :: aside"></div>
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Template Details</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i> Home</a></li>
+                                <li class="breadcrumb-item"><a th:href="@{/guac/manage-view}">Templates</a></li>
+                                <li class="breadcrumb-item active">[[${templateName}]]</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Success/Error Messages -->
+                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <span th:text="${success}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <span th:text="${error}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card card-primary">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h3 class="card-title">
+                                                <i class="fas fa-info-circle"></i> 
+                                                Template: [[${templateName}]]
+                                            </h3>
+                                        </div>
+                                        <div class="col-md-4 text-right">
+                                            <a th:href="@{/guac/manage-view}" class="btn btn-secondary btn-sm">
+                                                <i class="fas fa-arrow-left"></i> Back to List
+                                            </a>
+                                            <a th:href="@{'/guac/manage-edit/' + ${templateName}}" class="btn btn-warning btn-sm">
+                                                <i class="fas fa-edit"></i> Edit Template
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <!-- Template Summary -->
+                                    <div class="row mb-4">
+                                        <div class="col-md-12">
+                                            <div class="alert alert-info">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <strong>Template Name:</strong> [[${templateName}]]
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <strong>Total Menu Items:</strong> 
+                                                        <span class="badge bg-primary" th:text="${totalMenuItems}">0</span>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <strong>Modules:</strong> 
+                                                        <span class="badge bg-secondary" th:text="${menusByModule.size()}">0</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Menu Items by Module -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h5 class="mb-3"><i class="fas fa-list"></i> Menu Items</h5>
+                                            
+                                            <div th:if="${menusByModule != null and !menusByModule.empty}">
+                                                <div th:each="module : ${menusByModule}" class="module-section">
+                                                    <div class="module-header">
+                                                        <i class="fas fa-folder me-2"></i>
+                                                        <span th:text="${module.key}">Module Name</span>
+                                                        <span class="badge bg-secondary ms-2" th:text="${module.value.size()}">0</span>
+                                                    </div>
+                                                    <div class="menu-items">
+                                                        <div th:each="menu : ${module.value}" class="menu-item">
+                                                            <i class="fas fa-chevron-right text-muted me-2"></i>
+                                                            <span th:text="${menu.subModuleName}">Sub Module</span>
+                                                            <small class="text-muted ms-2" th:text="${menu.url}">URL</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div th:if="${menusByModule == null or menusByModule.empty}" class="text-center py-4">
+                                                <i class="fas fa-exclamation-circle fa-2x text-muted mb-3"></i>
+                                                <p class="text-muted">No menu items found for this template.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-footer">
+                                    <div class="row">
+                                        <div class="col-md-12 text-right">
+                                            <a th:href="@{'/guac/manage-edit/' + ${templateName}}" class="btn btn-warning">
+                                                <i class="fas fa-edit"></i> Edit Template
+                                            </a>
+                                            <a th:href="@{/guac/manage-view}" class="btn btn-secondary">
+                                                <i class="fas fa-list"></i> Back to Templates
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
+    <div th:replace="template :: jsscript"></div>
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>View Sidebar Templates</title>
+<head th:include="template :: headFragment"></head>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+<style>
+    .template-card {
+        border-left: 4px solid #3498db;
+        transition: all 0.3s ease;
+    }
+    .template-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .menu-preview {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    .badge-menu-count {
+        background-color: #17a2b8;
+    }
+    .action-buttons .btn {
+        margin-right: 5px;
+    }
+</style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div th:replace="fragments/header :: header"></div>
+        <div th:replace="fragments/sidebar :: aside"></div>
+        
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Sidebar Templates</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i> Home</a></li>
+                                <li class="breadcrumb-item active">Template Management</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Success/Error Messages -->
+                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <span th:text="${success}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <span th:text="${error}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card card-secondary">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h3 class="card-title" style="padding-top: 10px">
+                                                <i class="fas fa-list-alt"></i> Template List
+                                            </h3>
+                                        </div>
+                                        <div class="col-md-4 text-right">
+                                            <a th:href="@{'/guac/manage'}" class="btn btn-primary">
+                                                <i class="fas fa-plus"></i> Create New Template
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <!-- Summary Cards -->
+                                    <div class="row mb-4">
+                                        <div class="col-md-3">
+                                            <div class="info-box bg-info">
+                                                <span class="info-box-icon"><i class="fas fa-layer-group"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Total Templates</span>
+                                                    <span class="info-box-number" th:text="${totalTemplates}">0</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <div class="alert alert-info">
+                                                <small>
+                                                    <i class="fas fa-info-circle"></i> 
+                                                    Manage your sidebar templates. You can view details, edit, or delete existing templates.
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Templates Table -->
+                                    <div th:if="${templateList != null and !templateList.empty}" class="table-responsive">
+                                        <table id="templatesTable" class="table table-bordered table-striped">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Sr</th>
+                                                    <th>Template Name</th>
+                                                    <th>Menu Items</th>
+                                                    <th>Sample Menu Items</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="template, stat : ${templateList}">
+                                                    <td th:text="${stat.count}">1</td>
+                                                    <td>
+                                                        <strong th:text="${template.get('templateName')}">Template Name</strong>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-menu-count" 
+                                                              th:text="${template.get('menuItemsCount')} + ' items'">0 items</span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="menu-preview">
+                                                            <span th:each="menuName, iter : ${template.get('sampleMenuNames')}" 
+                                                                  th:text="${menuName + (iter.last ? '' : ', ')}">Menu Item</span>
+                                                            <span th:if="${template.get('menuItemsCount') > 3}" class="text-muted">
+                                                                + <span th:text="${template.get('menuItemsCount') - 3}">0</span> more
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="action-buttons">
+                                                        <a th:href="@{'/guac/manage-details/' + ${template.get('templateName')}}" 
+                                                           class="btn btn-info btn-sm" title="View Details">
+                                                            <i class="fas fa-eye"></i> View
+                                                        </a>
+                                                        <a th:href="@{'/guac/manage-edit/' + ${template.get('templateName')}}" 
+                                                           class="btn btn-warning btn-sm" title="Edit Template">
+                                                            <i class="fas fa-edit"></i> Edit
+                                                        </a>
+                                                        <a th:href="@{'/guac/manage-delete/' + ${template.get('templateName')}}" 
+                                                           class="btn btn-danger btn-sm btn-delete" 
+                                                           th:data-template-name="${template.get('templateName')}"
+                                                           title="Delete Template">
+                                                            <i class="fas fa-trash"></i> Delete
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Empty State -->
+                                    <div th:if="${templateList == null or templateList.empty}" class="text-center py-5">
+                                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                        <h4 class="text-muted">No Templates Found</h4>
+                                        <p class="text-muted">You haven't created any sidebar templates yet.</p>
+                                        <a th:href="@{'/guac/manage'}" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i> Create Your First Template
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete Confirmation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete the template "<strong id="templateNameText"></strong>"?</p>
+                        <p class="text-danger"><small>This action cannot be undone.</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <a id="confirmDeleteBtn" href="#" class="btn btn-danger">Delete Template</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
+
+    <div th:replace="template :: jsscript"></div>
+    
+    <!-- DataTables Scripts -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Initialize DataTable
+            var table = $('#templatesTable').DataTable({
+                "responsive": true,
+                "lengthChange": true,
+                "autoWidth": false,
+                "pageLength": 10,
+                "dom": '<"row"<"col-md-6"B><"col-md-6"f>><"row"<"col-md-12"tr>><"row"<"col-md-5"i><"col-md-7"p>>',
+                "buttons": [
+                    {
+                        extend: 'collection',
+                        className: 'btn btn-secondary',
+                        text: '<i class="fas fa-cog"></i> Options',
+                        buttons: [
+                            {
+                                extend: 'copy',
+                                className: 'btn btn-secondary',
+                                text: '<i class="fas fa-copy"></i> Copy'
+                            },
+                            {
+                                extend: 'excel',
+                                className: 'btn btn-success',
+                                text: '<i class="fas fa-file-excel"></i> Excel'
+                            },
+                            {
+                                extend: 'pdf',
+                                className: 'btn btn-danger',
+                                text: '<i class="fas fa-file-pdf"></i> PDF'
+                            },
+                            {
+                                extend: 'print',
+                                className: 'btn btn-info',
+                                text: '<i class="fas fa-print"></i> Print'
+                            }
+                        ]
+                    }
+                ],
+                "language": {
+                    "search": "Search Templates:",
+                    "lengthMenu": "Show _MENU_ templates"
+                }
+            });
+
+            // Delete confirmation
+            $(".btn-delete").on("click", function(e) {
+                e.preventDefault();
+                var templateName = $(this).data('template-name');
+                var deleteUrl = $(this).attr('href');
+                
+                $("#templateNameText").text(templateName);
+                $("#confirmDeleteBtn").attr('href', deleteUrl);
+                $("#confirmModal").modal('show');
+            });
+        });
+    </script>
+</body>
+</html>

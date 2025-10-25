@@ -13,6 +13,7 @@ public class ContainerUserLabDTO {
 	    private String ports;
 	    private String containerName;
 	    private String physicalServerIp;
+	    private String services;
 
 	    private String username;
 	    private String scenarioName;
@@ -96,6 +97,12 @@ public class ContainerUserLabDTO {
 		}
 		public void setGuacamoleId(String guacamoleId) {
 			this.guacamoleId = guacamoleId;
+		}
+		public String getServices() {
+			return services;
+		}
+		public void setServices(String services) {
+			this.services = services;
 		}
 	    
 	    

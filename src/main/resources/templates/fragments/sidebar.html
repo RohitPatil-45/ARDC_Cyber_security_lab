@@ -147,7 +147,7 @@
 									class="far fa-dot-circle nav-icon"></i>
 									<p>Mail Master</p>
 							</a></li>
-							
+
 							<li class="nav-item"
 								th:if="${#httpSession.getAttribute('allowedSubModules').contains('Physical Server Master')}"><a
 								href="/physicalServer/view" class="nav-link"> <i
@@ -377,9 +377,9 @@
 
 
 						</ul></li>
-						
-						
-						<li
+
+
+					<li
 						th:if="${#httpSession.getAttribute('allowedModules').contains('Report')}"
 						class="nav-item"><a href="#" class="nav-link"> <i
 							class="nav-icon fas fa-chalkboard-teacher"></i>
@@ -525,8 +525,8 @@
 
 
 						</ul></li>
-						
-						<li
+
+					<li
 						th:if="${#httpSession.getAttribute('allowedModules').contains('Admin')}"
 						class="nav-item"><a href="#" class="nav-link"> <i
 							class="nav-icon fas fa-chalkboard-teacher"></i>
@@ -709,6 +709,13 @@
 								href="/guac/View_All_Vm_Listing" class="nav-link"> <i
 									class="far fa-dot-circle nav-icon"></i>
 									<p>Labs</p>
+							</a></li>
+
+							<li class="nav-item"
+								th:if="${#httpSession.getAttribute('allowedSubModules').contains('Ideal-Labs')}"><a
+								href="/guac/idealLabs" class="nav-link"> <i
+									class="far fa-dot-circle nav-icon"></i>
+									<p>Ideal Labs</p>
 							</a></li>
 
 						</ul></li>

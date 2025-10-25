@@ -60,6 +60,7 @@
                                                 <th>Ports</th>
                                                 <th>Container Name</th>
                                                 <th>Physical Server IP</th>
+                                                <th>Services</th>
                                                 <th>Username</th>
                                                 <th>Scenario Name</th>
                                                 <th>Last Active Connection</th>
@@ -76,6 +77,7 @@
                                                 <td th:text="${obj.ports}"></td>
                                                 <td th:text="${obj.containerName}"></td>
                                                 <td th:text="${obj.physicalServerIp}"></td>
+                                                 <td th:text="${obj.services}"></td>
                                                 <td th:text="${obj.username}"></td>
                                                 <td th:text="${obj.scenarioName}"></td>
                                                 <td th:text="${obj.lastActiveConnection != null ? #dates.format(obj.lastActiveConnection, 'yyyy-MM-dd HH:mm:ss') : '-'}"></td>

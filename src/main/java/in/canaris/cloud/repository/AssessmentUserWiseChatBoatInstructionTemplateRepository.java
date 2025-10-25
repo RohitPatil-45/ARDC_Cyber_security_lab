@@ -50,4 +50,6 @@ public interface AssessmentUserWiseChatBoatInstructionTemplateRepository
 	@Query("SELECT COUNT(u) FROM AssessmentUserWiseChatBoatInstructionTemplate u WHERE u.username = :userName AND u.ScenarioId = :scenarioId AND u.isCommandExecuted = 'true'")
 	Integer getTrueCompletionCountsByusernameandscenarioId(@Param("userName") String userName,
 			@Param("scenarioId") int scenarioId);
+
+	
 }

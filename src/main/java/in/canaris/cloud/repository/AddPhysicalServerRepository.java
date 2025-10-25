@@ -39,7 +39,7 @@ public interface AddPhysicalServerRepository extends JpaRepository<AddPhysicalSe
 	@Query(value = "SELECT a.virtualization_type, " + "h.used_cpu, h.total_cpu, " + "h.used_ram, h.total_ram, "
 			+ "h.used_disk, h.total_disk " + "FROM add_physical_server a "
 			+ "INNER JOIN physical_server_health_monitoring h ON a.server_ip = h.physical_server_ip "
-			+ "WHERE a.server_ip IS NOT NULL AND h.physical_server_ip IS NOT NULL", nativeQuery = true)
+			+ "WHERE a.server_ip IS NOT NULL AND h.physical_server_ip IS NOT NULL ORDER BY a.virtualization_type", nativeQuery = true)
 	List<Object[]> findHealthDataByVirtualizationType();
 
 //	@Query("SELECT a.virtualization_type, " + "SUM(a.used_cpu), SUM(a.total_cpu), " + "SUM(a.used_ram), SUM(a.total_ram), "

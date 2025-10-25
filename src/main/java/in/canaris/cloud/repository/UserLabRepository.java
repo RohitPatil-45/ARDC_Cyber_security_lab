@@ -26,7 +26,7 @@ public interface UserLabRepository extends JpaRepository<UserLab, Integer> {
 	List<UserLab> findByguacamoleId(int id);
 	
 	@Query("SELECT u FROM UserLab u where u.guacamoleId=:id")
-	UserLab getByProxmoxId(int id);
+	List<UserLab>  getByProxmoxId(int id);
 	
 	UserLab findByInstanceName(String instanceName);
 
@@ -77,6 +77,10 @@ public interface UserLabRepository extends JpaRepository<UserLab, Integer> {
 	void updateMandatoryCommandStatus(@Param("guacamoleId") Integer guacamoleId, @Param("status") Boolean status);
 
 	List<UserLab> findByUsernameAndScenarioId(String username, int scenarioId);
+	
+	@Query(value = "SELECT * FROM user_lab "
+			+ "WHERE TIMESTAMPDIFF(DAY, last_active_connection, CURRENT_TIMESTAMP()) > 15", nativeQuery = true)
+	List<UserLab> findIdealLabs();
 
 
 }

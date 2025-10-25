@@ -200,6 +200,9 @@ public class UserController {
 		}
 		return "user_view";
 	}
+	
+	
+	
 
 //	@GetMapping("/new")
 //	public String addUser(Model model) {

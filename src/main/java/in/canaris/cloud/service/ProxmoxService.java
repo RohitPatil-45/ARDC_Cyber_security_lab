@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,31 @@ public class ProxmoxService {
 	private String proxmox_tokenSecret;
 
 	private final RestTemplate restTemplate = new RestTemplate();
+	
+	@SuppressWarnings("unchecked")
+    public List<Map<String, Object>> discoverVms() {
+        try {
+            String url = String.format("https://%s:8006/api2/json/nodes/%s/qemu", proxmox_host, proxmox_node);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "PVEAPIToken=" + proxmox_tokenId + "=" + proxmox_tokenSecret);
+
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                Map<String, Object> body = response.getBody();
+                return (List<Map<String, Object>>) body.get("data");
+            } else {
+                throw new RuntimeException("Failed to fetch VM list: " + response.getStatusCode());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error discovering VMs: " + e.getMessage());
+        }
+    }
 
 	public String getProxmoxConsoleUrl(int vmId, String vmName) {
 		Map<String, Object> vncData = getVncWebSocketUrl(vmId); // your API call to /vncproxy

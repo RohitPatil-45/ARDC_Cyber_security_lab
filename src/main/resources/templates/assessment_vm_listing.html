@@ -669,12 +669,12 @@ h3 {
 			<div class="row hidden-section" id="timerSection">
 				<div class="col-md-12">
 					<div class="timer-container" id="timerContainer">
-						<div class="timer-label">
-							<i class="fas fa-clock"></i> ASSESSMENT TIME REMAINING
-						</div>
-						<div class="timer-display" id="timerDisplay">
-							[[${assessmentTime}]]
-						</div>
+<!-- 						<div class="timer-label"> -->
+<!-- 							<i class="fas fa-clock"></i> ASSESSMENT TIME REMAINING -->
+<!-- 						</div> -->
+<!-- 						<div class="timer-display" id="timerDisplay"> -->
+<!-- 							[[${assessmentTime}]] -->
+<!-- 						</div> -->
 					</div>
 				</div>
 			</div>
@@ -755,7 +755,7 @@ h3 {
 														<a th:if="${data['lab'].Status != 'Completed'}" 
 														   class="btn btn-sm btn-assessment console-link"
 														   th:href="@{|/guac/assessmentviewPlaylistConnection/${data['lab'].guacamoleId}|}"
-														   title="Access Virtual Machine Console" target="_blank">
+														   title="Access Virtual Machine Console">
 															<i class="fas fa-desktop"></i> View Console
 														</a>
 														<span th:if="${data['lab'].Status == 'Completed'}" class="text-muted">

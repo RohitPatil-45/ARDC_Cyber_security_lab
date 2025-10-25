@@ -27,7 +27,7 @@ public interface AssessmentUserLabRepository extends JpaRepository<AssessmentUse
     // Custom query for getByProxmoxId - since there's no proxmoxId field, 
     // I assume you want to use guacamoleId instead
     @Query("SELECT a FROM AssessmentUserLab a WHERE a.guacamoleId = ?1")
-    AssessmentUserLab getByProxmoxId(Integer guacamoleId);
+    List<AssessmentUserLab> getByProxmoxId(Integer guacamoleId);
 
     // Update mandatory command status
     @Query("UPDATE AssessmentUserLab a SET a.mandatoryCommandExecuted = ?2 WHERE a.guacamoleId = ?1")
@@ -38,6 +38,8 @@ public interface AssessmentUserLabRepository extends JpaRepository<AssessmentUse
     int updateStatusById(Long labId);
 
 	List<AssessmentUserLab> findByguacamoleId(int temp);
+
+	
 
 	
 	
