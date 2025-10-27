@@ -850,7 +850,7 @@ public class GuacamoleController {
 					// Update overall counts
 					if ("up".equals(status)) {
 						overallUp += count;
-					} else if ("down".equals(status)) {
+					} else {
 						overallDown += count;
 					}
 				}
@@ -876,7 +876,7 @@ public class GuacamoleController {
 
 					if ("online".equalsIgnoreCase(st)) {
 						userOnline += c;
-					} else if ("offline".equalsIgnoreCase(st)) {
+					} else{
 						userOffline += c;
 					}
 				}
@@ -6202,14 +6202,14 @@ public class GuacamoleController {
 	}
 
 	@PostMapping("/addSubPlaylist_Scenario")
-	public @ResponseBody String addSubPlaylist_Scenario(@RequestParam("subPlaylistId") Integer subPlaylistId, HttpSession session,
-			@RequestParam("scenarioIds") List<Integer> scenarioIds) {
-		
-		String access =  (String) session.getAttribute("access");
+	public @ResponseBody String addSubPlaylist_Scenario(@RequestParam("subPlaylistId") Integer subPlaylistId,
+			HttpSession session, @RequestParam("scenarioIds") List<Integer> scenarioIds) {
 
-	    if (access == null || access.equalsIgnoreCase("READ")) {
-	    	return "fail";
-	    }
+		String access = (String) session.getAttribute("access");
+
+		if (access == null || access.equalsIgnoreCase("READ")) {
+			return "fail";
+		}
 
 		// ✅ Fetch existing SubPlaylist
 		SubPlaylist subPlaylist = SubPlaylistRepository.findById(subPlaylistId)
